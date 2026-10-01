@@ -1,16 +1,21 @@
 # Current State
 
-- Repository exists and is governed by DevOS/project rules.
-- Public-repository privacy boundary is established.
-- Product requirements are now concrete: private Hindi-first official-letter archive with context-first search.
-- Smart renaming, full-text search, semantic/context search, mobile filters, original-file links, validity states, and recursive archive reprocessing are required.
-- Original documents are immutable; all OCR/AI/search/filename layers are derived and versioned.
-- AI provider is intentionally replaceable and only one primary model/provider should be active at a time.
-- No production deployment, live archive import, private document storage, database, OCR service, AI credential, or application code has been deployed from this repository yet.
-- Next step: choose private storage + initial AI provider, then implement the first synthetic/private vertical slice.
+- Canonical repository: `zzpsah/digital-letter-registry`.
+- Formal archive name: **Official Letter Intelligence Archive**.
+- Public-repository privacy boundary is established: code/docs/synthetic fixtures/schema only.
+- Existing private UMV Google Drive is the selected original-file storage.
+- Private archive structure exists with `originals/`, `quarantine/`, and `exports/`; all three are currently empty.
+- A separate Supabase archive project exists, isolated from the existing UMV database.
+- Core tables exist: `letters`, `letter_processing`, `letter_relationships`, and `letter_chunks`.
+- RLS is enabled on all public archive tables; security advisor is clean.
+- The archive database currently contains no auth user and no real archive rows.
+- The public-safe core schema is captured under `supabase/migrations/`.
+- Domain code includes immutable source identity, SHA-256 fingerprints, processing versions, statuses/relationships, and smart filenames.
+- Official filename pattern is `short-title__issuer__date__reference-number.ext`.
+- Naming now preserves Hindi/English/Hinglish Unicode and uses `undated` / `no-ref` placeholders.
+- Rename functionality is preview-only; no Drive rename executor is authorized yet.
+- No live document ingestion, OCR/AI processing, or production deployment has occurred.
 
-## 2026-10-01 — Domain foundation
+## Next step
 
-- Implemented a dependency-free Python domain layer for immutable source identity, processing versions, statuses/relationships, SHA-256 fingerprints, and deterministic smart filenames.
-- Verified with five standard-library unit tests and Python compilation.
-- No external adapter, credential, live document, or deployment was used.
+Establish an authenticated archive owner for RLS-backed writes, then implement the private storage/database repository adapter using synthetic fixtures before any live-letter ingestion.
