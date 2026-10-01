@@ -5,26 +5,83 @@ from letter_registry.naming import build_smart_filename
 
 
 class SmartFilenameTests(unittest.TestCase):
-    def test_filename_is_normalised_and_deterministic(self) -> None:
+    def test_english_filename_uses_official_pattern(self) -> None:
         filename = build_smart_filename(
-            issue_date=date(2026, 9, 18),
-            category="BSEB Examination",
-            subject="Intermediate Exam Form Extension",
-            original_filename="DOC10086.PDF",
-            record_suffix="ltr_01",
+            short_title="Scholarship Guidelines",
+            issuer="Education Department",
+            issue_date=date(2026, 10, 1),
+            reference_number="REF-001",
+            original_filename="DOC10086.pdf",
         )
 
         self.assertEqual(
             filename,
-            "2026-09-18_bseb-examination_intermediate-exam-form-extension_ltr-01.pdf",
+            "scholarship-guidelines__education-department__2026-10-01__REF-001.pdf",
         )
 
-    def test_unknown_date_is_explicit(self) -> None:
+    def test_hindi_is_preserved(self) -> None:
         filename = build_smart_filename(
-            issue_date=None,
-            category="UDISE",
-            subject="PEN Correction",
-            original_filename="scan.jpg",
+            short_title="छात्रवृत्ति निर्देश",
+            issuer="शिक्षा विभाग",
+            issue_date=date(2026, 10, 1),
+            reference_number="REF-001",
+            original_filename="scan.pdf",
         )
 
-        self.assertEqual(filename, "undated_udise_pen-correction.jpg")
+        self.assertEqual(
+            filename,
+            "छात्रवृत्ति-निर्देश__शिक्षा-विभाग__2026-10-01__REF-001.pdf",
+        )
+
+    def test_hinglish_and_punctuation_are_normalized(self) -> None:
+        filename = build_smart_filename(
+            short_title="Inter परीक्षा Form / Date Extension",
+            issuer="BSEB - शिक्षा विभाग",
+            issue_date=None,
+            reference_number=None,
+            original_filename="image.JPG",
+        )
+
+        self.assertEqual(
+            filename,
+            "inter-परीक्षा-form-date-extension__bseb-शिक्षा-विभाग__undated__no-ref.JPG",
+        )
+
+    def test_unknown_date_and_reference_use_placeholders(self) -> None:
+        filename = build_smart_filename(
+            short_title="Inter Exam Schedule",
+            issuer="Education Department",
+            issue_date=None,
+            reference_number="",
+            original_filename="letter.pdf",
+        )
+
+        self.assertEqual(
+            filename,
+            "inter-exam-schedule__education-department__undated__no-ref.pdf",
+        )
+
+    def test_original_extension_case_is_preserved(self) -> None:
+        filename = build_smart_filename(
+            short_title="UDISE PEN Correction",
+            issuer="Education Department",
+            issue_date=None,
+            reference_number=None,
+            original_filename="scan.PDF",
+        )
+
+        self.assertTrue(filename.endswith(".PDF"))
+
+    def test_extension_is_required(self) -> None:
+        with self.assertRaises(ValueError):
+            build_smart_filename(
+                short_title="Letter",
+                issuer="Department",
+                issue_date=None,
+                reference_number=None,
+                original_filename="no-extension",
+            )
+
+
+if __name__ == "__main__":
+    unittest.main()
