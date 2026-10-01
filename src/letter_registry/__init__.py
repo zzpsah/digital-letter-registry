@@ -8,7 +8,12 @@ from .models import (
     ProcessingVersions,
 )
 from .naming import build_smart_filename
-from .rename_preview import RenameCandidate, RenamePreview, build_rename_preview
+from .rename_preview import (
+    RenameCandidate,
+    RenamePreview,
+    build_rename_preview,
+    render_rename_preview_csv,
+)
 
 __all__ = [
     "DocumentRecord",
@@ -19,5 +24,6 @@ __all__ = [
     "RenamePreview",
     "build_rename_preview",
     "build_smart_filename",
+    "render_rename_preview_csv",
     "sha256_file",
 ]
