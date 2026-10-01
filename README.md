@@ -1,5 +1,7 @@
 # Digital Letter Registry
 
+Formal archive name: **Official Letter Intelligence Archive**
+
 A private, Hindi-first, mobile-friendly searchable memory for official school and government letters.
 
 ## Core problem
@@ -26,6 +28,36 @@ Search later in normal Hindi / English / Hinglish
 Open or download the original
 ```
 
+## Official archive filename convention
+
+Derived archive filenames use:
+
+```text
+short-title__issuer__date__reference-number.ext
+```
+
+Examples:
+
+```text
+scholarship-guidelines__education-department__2026-10-01__REF-001.pdf
+छात्रवृत्ति-निर्देश__शिक्षा-विभाग__2026-10-01__REF-001.pdf
+inter-exam-schedule__education-department__undated__no-ref.pdf
+```
+
+Rules:
+
+- `short-title`: short, clear meaning of the letter.
+- `issuer`: issuing department/institution.
+- `date`: `YYYY-MM-DD`; if unknown use `undated`.
+- `reference-number`: official reference/memo number; if unknown use `no-ref`.
+- Separate the four fields with double underscores: `__`.
+- Preserve the original file extension.
+- Hindi, English, and Hinglish titles/issuers are valid.
+- The original uploaded file remains immutable; the smart filename is derived presentation metadata.
+- Existing Drive files must never be renamed in bulk before a preview mapping is reviewed and explicitly approved.
+
+See `docs/NAMING-SPEC.md` for the detailed contract.
+
 ## Non-negotiable architecture
 
 - Original PDF/image is immutable and authoritative.
@@ -36,6 +68,7 @@ Open or download the original
 - Hindi government/education terminology and document structure must be first-class.
 - AI provider must be replaceable; no permanent lock-in to one vendor/model.
 - Originals and private archive data stay outside public Git.
+- The public repository must not contain real letters, private Drive IDs/URLs, API keys, Supabase credentials, SSH keys, or server details.
 
 ## Planned user experience
 
@@ -43,12 +76,13 @@ The main interface is one search box plus optional filters such as date/year, au
 
 ## Status
 
-Planning and governance baseline is now defined. No production deployment or live document migration is authorized yet.
+The private archive folder structure and a separate Supabase archive database are established. The database and Drive archive are currently empty of real archive records. No production deployment or live document migration is authorized yet.
 
 See:
 - `PRD.md`
 - `docs/PROJECT-HANDOFF.md`
 - `docs/ARCHITECTURE.md`
+- `docs/NAMING-SPEC.md`
 - `docs/SECURITY.md`
 - `TASKS.md`
 
