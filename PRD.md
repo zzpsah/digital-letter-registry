@@ -1,29 +1,72 @@
 # Product Requirements Document
 
+## Product
+
+**Digital Letter Registry** — a private searchable memory for Hindi-first official letters, circulars, orders, PDFs, scans, and images.
+
 ## Problem
 
-Paper letters and unstructured scans are difficult to preserve, locate, and understand. This project will provide a private system for an authorized archive owner without putting sensitive records in public source control.
+The user receives many official documents through messaging channels. Files often have meaningless names and become difficult to recover later. The user usually remembers the subject or context, not the exact memo number/date/filename.
 
-## Initial outcome
+Examples of real search intent:
+- `inter exam last date`
+- `BSEB form date extension`
+- `UDISE PEN correction`
+- `11th registration`
+- `board ne exam form bharne ka date badhaya tha`
 
-An authorized user can privately ingest a PDF or image, preserve its original, record validated metadata, search extracted text, and review assisted output with provenance.
+## Primary outcome
 
-## Planned scope
+An authorized user can privately ingest a PDF/image and later find it using remembered meaning, keywords, Hindi/English/Hinglish wording, date/category filters, or ordinary filename search.
 
-- Private PDF/image intake and immutable original storage.
-- Metadata: date, sender, recipient, subject, category, tags, and processing status.
-- Full-text search over extracted text.
-- Hindi-first content with English navigation where useful.
-- Local extraction/OCR by default and a provider-independent analysis adapter.
+## Required processing
 
-## Foundation exclusions
+1. Preserve original privately and immutably.
+2. Extract embedded text when available.
+3. Run Hindi/English OCR only when needed; perfect OCR is not required.
+4. Apply government/education vocabulary and structural hints.
+5. Use one replaceable AI provider to derive context.
+6. Generate a short normalized smart filename.
+7. Save structured metadata, full text, concepts, and processing versions.
+8. Index for filename, full-text, and semantic/context search.
+9. Always link back to the original.
 
-No public letter hosting, bulk import, live deployment, provider choice, database choice, authentication choice, or production data handling is implemented or approved.
+## Required metadata
 
-## First vertical-slice acceptance criteria
+At minimum: record ID, original filename, smart filename, storage reference, authority/department, subject/title, category/subcategory, summary/context, issue/received/upload dates when known, deadlines, action-required hint, concepts/keywords, file type, validity/status hint, related-document links, and processing-version fields.
 
-1. An authorized synthetic fixture can be ingested without entering Git.
-2. The original has an opaque record ID and private storage reference.
-3. Metadata is validated and retrievable.
-4. Extracted text is searchable with extraction provenance.
-5. Tests cover the flow and privacy boundary.
+## Validity and relationships
+
+Documents may be `Current`, `Expired`, `Historical`, `Superseded`, or `Unknown`. Later extension/correction/cancellation letters should be linkable to earlier records. Historical letters remain searchable.
+
+## Smart filename
+
+Suggested pattern:
+
+`YYYY-MM-DD_CATEGORY_SHORT-SUBJECT[_LETTER-NO].pdf`
+
+Uncertain fields are omitted rather than guessed. Original filename is retained in metadata.
+
+## Search
+
+Ranking should combine:
+- normalized smart filename/title,
+- metadata and full extracted/OCR text,
+- semantic/context similarity,
+- optional filters.
+
+## Recursive upgrades
+
+All derived processing is versioned. Future changes to OCR, dictionary, AI model/provider, filename rules, categories, embeddings, or validity logic must be able to reprocess historical records without re-uploading originals.
+
+## Mobile/web requirement
+
+Primary interface is a responsive web/PWA view optimized for mobile and low bandwidth. Search remains simple; advanced filters stay optional.
+
+## Privacy boundary
+
+No real letters, private identifiers, credentials, API keys, storage paths containing secrets, or archive content belong in this public repository.
+
+## First useful vertical slice
+
+A synthetic/private test document can be uploaded, preserved outside Git, processed into context + smart filename + searchable text, found through contextual search and filters, and opened from its original private storage reference.
