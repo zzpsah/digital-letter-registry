@@ -1,0 +1,30 @@
+context_version: 1
+specification: portable-project-context
+project_id: digital-letter-registry
+name: "Digital Letter Registry"
+managed_by: development-os
+canonical_repository: zzpsah/digital-letter-registry
+canonical_url: https://github.com/zzpsah/digital-letter-registry
+devos_repository: zzpsah/chatgpt-development-os
+devos_url: https://github.com/zzpsah/chatgpt-development-os
+context_directory: .ai
+brain:
+  directory: brain
+  required: true
+  enhancement_standard: ENHANCEMENT-STANDARD.md
+read_first:
+  - STATE-INDEX.md
+  - PROJECT.md
+  - CURRENT-STATE.md
+recommended:
+  - ARCHITECTURE.md
+  - DECISIONS.md
+  - TASKS.md
+  - CHANGELOG.md
+state_index:
+  generated: true
+  authority: repository-evidence-only
+session_records:
+  directory: SESSIONS
+  format: session-template.md
+secrets_policy: never-store-secrets

@@ -1,0 +1,15 @@
+# Project-side caller for the reusable Development OS context synchronizer.
+name: Development OS Context Sync
+
+on:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    uses: zzpsah/chatgpt-development-os/.github/workflows/context-sync.yml@main
+    permissions:
+      contents: write
