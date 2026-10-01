@@ -1,23 +1,23 @@
-# Project Brain — Current State
+# Current Working State
 
 Last verified: 2026-10-01
 
-## Working
+## Current state
 
-DevOS lifecycle is MANAGED; the public-safe scaffold exists.
+- Canonical repository: `zzpsah/digital-letter-registry`.
+- Product requirements and architecture baseline are documented.
+- Context-first search, smart renaming, Hindi-government understanding, original-file preservation, validity states, and recursive reprocessing are required.
+- No application runtime or production deployment has been created from this repository.
 
-## In progress
+## Open setup decisions
 
-No application implementation.
+- private durable storage for original PDFs/images
+- initial AI provider/model
+- authentication method for the web UI
+- exact queue/worker implementation
 
-## Known issues
+## Next concrete step
 
-Stack, storage, data model, and deployment remain undecided.
+Choose private storage + initial AI provider, then implement the first synthetic/private vertical slice:
 
-## Next action
-
-Create a scoped design decision before implementation.
-
-## Evidence
-
-Managed lifecycle readback during repository onboarding.
+`Upload → preserve original → extract/OCR → derive context → smart rename → index → search → open original`
