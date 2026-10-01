@@ -9,16 +9,22 @@
 - [x] Define smart filename requirement.
 - [x] Define context-first Hindi/English/Hinglish search requirement.
 - [x] Define recursive archive reprocessing requirement.
-- [ ] Confirm private original-file storage target.
+- [x] Confirm private original-file storage target: existing private UMV Google Drive archive structure.
+- [x] Create a separate Supabase archive project and core schema.
+- [x] Capture the public-safe Supabase schema in repository migrations.
+- [x] Define official archive filename convention.
+- [x] Add Unicode-safe Hindi/English/Hinglish filename generation.
+- [x] Add preview-only rename mapping.
 - [ ] Confirm initial AI provider/model and fallback adapter contract.
-- [ ] Confirm private deployment boundary on Oracle VPS.
+- [ ] Establish the archive owner authentication identity for RLS-backed writes.
 
 ## Phase 1 — Archive foundation
 
-- [ ] Define document + processing-version schema.
+- [x] Define document + processing-version schema.
 - [ ] Implement private upload with synthetic fixtures.
-- [ ] Preserve original and compute duplicate hash.
-- [ ] Store original filename + immutable storage reference.
+- [x] Preserve source identity contract and compute duplicate SHA-256.
+- [ ] Store original filename + immutable private storage reference through a repository adapter.
+- [ ] Add Supabase repository adapter using authenticated owner identity.
 
 ## Phase 2 — Extraction/context
 
@@ -26,7 +32,9 @@
 - [ ] Add Hindi/English OCR fallback.
 - [ ] Create government/education Hindi vocabulary.
 - [ ] Implement provider-independent structured AI analysis.
-- [ ] Generate normalized smart filename.
+- [x] Generate normalized smart filename.
+- [x] Use `undated` and `no-ref` placeholders.
+- [x] Preserve Hindi/English/Hinglish Unicode text.
 
 ## Phase 3 — Search/UI
 
@@ -42,10 +50,14 @@
 - [ ] Related/superseded/extension/correction links.
 - [ ] Processing-version registry.
 - [ ] Preview + recursive reprocessing jobs.
-- [ ] Safe filename regeneration.
+- [ ] Safe rename executor only after explicit approval.
 - [ ] Historical bulk import.
 - [ ] Additional intake channels: Telegram, WhatsApp, email, watched folder.
 
-## Guardrail
+## Current safety boundary
 
-No production deployment, live-data import, or credential configuration until explicitly approved.
+- Drive archive folders remain private and empty.
+- Rename behavior is preview-only.
+- No live document ingestion has occurred.
+- No production deployment is claimed.
+- No Drive IDs/URLs, Supabase credentials, SSH keys, or server details belong in public Git.
