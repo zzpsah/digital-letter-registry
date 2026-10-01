@@ -93,7 +93,7 @@ create index letters_owner_status_idx
   on public.letters (owner_id, status);
 
 create index letters_title_trgm_idx
-  on public.letters using gin (title extensions.gin_trgm_ops);
+  on public.letters using gin (title gin_trgm_ops);
 
 create index letter_processing_concepts_idx
   on public.letter_processing using gin (concepts);
