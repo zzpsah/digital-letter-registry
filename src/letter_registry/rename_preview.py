@@ -6,6 +6,8 @@ contains no provider-specific Drive logic.
 
 from __future__ import annotations
 
+import csv
+import io
 from dataclasses import dataclass
 from datetime import date
 from typing import Iterable
@@ -51,3 +53,20 @@ def build_rename_preview(
             )
         )
     return previews
+
+
+def render_rename_preview_csv(previews: Iterable[RenamePreview]) -> str:
+    """Render a reviewable CSV report; performs no rename or provider write."""
+
+    buffer = io.StringIO(newline="")
+    writer = csv.writer(buffer)
+    writer.writerow(("original_filename", "proposed_filename", "changed"))
+    for preview in previews:
+        writer.writerow(
+            (
+                preview.original_filename,
+                preview.proposed_filename,
+                "yes" if preview.changed else "no",
+            )
+        )
+    return buffer.getvalue()
