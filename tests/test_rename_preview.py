@@ -1,7 +1,11 @@
 from datetime import date
 import unittest
 
-from letter_registry.rename_preview import RenameCandidate, build_rename_preview
+from letter_registry.rename_preview import (
+    RenameCandidate,
+    build_rename_preview,
+    render_rename_preview_csv,
+)
 
 
 class RenamePreviewTests(unittest.TestCase):
@@ -34,6 +38,27 @@ class RenamePreviewTests(unittest.TestCase):
             "परीक्षा-फॉर्म-तिथि-विस्तार__शिक्षा-विभाग__undated__no-ref.jpg",
         )
         self.assertTrue(all(item.changed for item in previews))
+
+    def test_csv_report_is_reviewable_and_contains_no_provider_logic(self) -> None:
+        previews = build_rename_preview(
+            [
+                RenameCandidate(
+                    original_filename="scan.pdf",
+                    short_title="Inter Exam Schedule",
+                    issuer="Education Department",
+                )
+            ]
+        )
+
+        report = render_rename_preview_csv(previews)
+
+        self.assertIn("original_filename,proposed_filename,changed", report)
+        self.assertIn("scan.pdf", report)
+        self.assertIn(
+            "inter-exam-schedule__education-department__undated__no-ref.pdf",
+            report,
+        )
+        self.assertIn(",yes", report)
 
 
 if __name__ == "__main__":
