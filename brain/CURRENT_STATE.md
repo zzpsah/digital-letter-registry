@@ -21,3 +21,7 @@ Create a scoped design decision before implementation.
 ## Evidence
 
 Managed lifecycle readback during repository onboarding.
+
+## 2026-10-01 — Domain foundation
+
+A dependency-free domain layer is implemented and locally verified. It does not connect to external storage, databases, OCR, AI, bots, or deployment.
