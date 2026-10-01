@@ -72,6 +72,21 @@ class SmartFilenameTests(unittest.TestCase):
 
         self.assertTrue(filename.endswith(".PDF"))
 
+    def test_long_fields_keep_date_and_reference_segments(self) -> None:
+        filename = build_smart_filename(
+            short_title="A" * 200,
+            issuer="B" * 120,
+            issue_date=date(2026, 10, 1),
+            reference_number="REF-" + ("9" * 80),
+            original_filename="scan.pdf",
+        )
+
+        parts = filename[:-4].split("__")
+        self.assertEqual(len(parts), 4)
+        self.assertEqual(parts[2], "2026-10-01")
+        self.assertTrue(parts[3].startswith("REF-"))
+        self.assertLessEqual(len(filename), 220)
+
     def test_extension_is_required(self) -> None:
         with self.assertRaises(ValueError):
             build_smart_filename(
