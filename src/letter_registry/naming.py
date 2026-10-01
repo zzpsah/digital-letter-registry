@@ -8,6 +8,9 @@ from datetime import date
 from pathlib import PurePath
 
 _MAX_FILENAME_LENGTH = 220
+_MAX_TITLE_LENGTH = 90
+_MAX_ISSUER_LENGTH = 60
+_MAX_REFERENCE_LENGTH = 40
 _DASH_RUN = re.compile(r"-+")
 
 
@@ -41,6 +44,15 @@ def _normalise_part(
     raise ValueError("filename field must contain at least one letter or digit")
 
 
+def _limit_field(value: str, max_length: int) -> str:
+    """Trim a normalized field without removing the canonical separators later."""
+
+    trimmed = value[:max_length].rstrip("-")
+    if not trimmed:
+        raise ValueError("filename field became empty after length normalization")
+    return trimmed
+
+
 def build_smart_filename(
     *,
     short_title: str,
@@ -61,19 +73,20 @@ def build_smart_filename(
     if not extension:
         raise ValueError("original_filename must contain a file extension")
 
-    title_part = _normalise_part(short_title)
-    issuer_part = _normalise_part(issuer)
+    title_part = _limit_field(_normalise_part(short_title), _MAX_TITLE_LENGTH)
+    issuer_part = _limit_field(_normalise_part(issuer), _MAX_ISSUER_LENGTH)
     date_part = issue_date.isoformat() if issue_date else "undated"
-    reference_part = _normalise_part(
-        reference_number,
-        lowercase=False,
-        placeholder="no-ref",
+    reference_part = _limit_field(
+        _normalise_part(
+            reference_number,
+            lowercase=False,
+            placeholder="no-ref",
+        ),
+        _MAX_REFERENCE_LENGTH,
     )
 
     stem = "__".join((title_part, issuer_part, date_part, reference_part))
-    max_stem_length = _MAX_FILENAME_LENGTH - len(extension)
-    if max_stem_length < 1:
-        raise ValueError("file extension is too long")
-
-    stem = stem[:max_stem_length].rstrip("-_")
-    return f"{stem}{extension}"
+    filename = f"{stem}{extension}"
+    if len(filename) > _MAX_FILENAME_LENGTH:
+        raise ValueError("derived filename exceeds the configured safe length")
+    return filename
