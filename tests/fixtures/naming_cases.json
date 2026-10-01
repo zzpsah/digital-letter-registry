@@ -1,0 +1,26 @@
+[
+  {
+    "short_title": "Scholarship Guidelines",
+    "issuer": "Education Department",
+    "issue_date": "2026-10-01",
+    "reference_number": "REF-001",
+    "original_filename": "DOC10086.pdf",
+    "expected": "scholarship-guidelines__education-department__2026-10-01__REF-001.pdf"
+  },
+  {
+    "short_title": "छात्रवृत्ति निर्देश",
+    "issuer": "शिक्षा विभाग",
+    "issue_date": "2026-10-01",
+    "reference_number": "REF-001",
+    "original_filename": "scan.pdf",
+    "expected": "छात्रवृत्ति-निर्देश__शिक्षा-विभाग__2026-10-01__REF-001.pdf"
+  },
+  {
+    "short_title": "Inter Exam Schedule",
+    "issuer": "Education Department",
+    "issue_date": null,
+    "reference_number": null,
+    "original_filename": "letter.pdf",
+    "expected": "inter-exam-schedule__education-department__undated__no-ref.pdf"
+  }
+]
