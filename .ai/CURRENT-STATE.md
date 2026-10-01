@@ -1,9 +1,10 @@
-# AI Current-State Pointer
+# Current State
 
-Canonical live working state: `brain/CURRENT_STATE.md`.
-
-Canonical project handoff: `docs/PROJECT-HANDOFF.md`.
-
-Canonical roadmap: `TASKS.md`.
-
-This file intentionally contains no duplicate project state.
+- Repository exists and is governed by DevOS/project rules.
+- Public-repository privacy boundary is established.
+- Product requirements are now concrete: private Hindi-first official-letter archive with context-first search.
+- Smart renaming, full-text search, semantic/context search, mobile filters, original-file links, validity states, and recursive archive reprocessing are required.
+- Original documents are immutable; all OCR/AI/search/filename layers are derived and versioned.
+- AI provider is intentionally replaceable and only one primary model/provider should be active at a time.
+- No production deployment, live archive import, private document storage, database, OCR service, AI credential, or application code has been deployed from this repository yet.
+- Next step: choose private storage + initial AI provider, then implement the first synthetic/private vertical slice.
