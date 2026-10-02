@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 2460bd3f68bb16bf9a0dc412e777245362a6d190
-- Change: fix: harden archive invite admin RPCs
+- Commit: 03d22221bfbb7c240fcc3e81b43cb6e73bd6976f
+- Change: db: index archive invite foreign keys
 - Date: 2026-10-02
 - Durable context synchronization: completed

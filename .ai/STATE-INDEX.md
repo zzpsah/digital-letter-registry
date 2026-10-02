@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 2460bd3f68bb16bf9a0dc412e777245362a6d190
-- Last commit: fix: harden archive invite admin RPCs
+- HEAD: 03d22221bfbb7c240fcc3e81b43cb6e73bd6976f
+- Last commit: db: index archive invite foreign keys
 - Last commit date: 2026-10-02
 - Last commit author: Prashant
 
