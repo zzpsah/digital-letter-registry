@@ -98,6 +98,78 @@ class ApiTests(unittest.TestCase):
             "private, no-store",
         )
 
+    def test_magic_link_callback_without_token_hash_serves_fragment_bridge(self):
+        response = self.client.get("/auth/confirm")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("session-from-fragment", response.text)
+        self.assertEqual(
+            response.headers["cache-control"],
+            "private, no-store",
+        )
+
+    def test_fragment_session_bridge_sets_httponly_cookies_for_owner(self):
+        from letter_registry.session import SupabaseUserSession
+
+        owner_id = "11111111-1111-4111-8111-111111111111"
+        with patch(
+            "letter_registry.api.SupabaseUserSession.from_environment"
+        ) as factory:
+            factory.return_value.user_id.return_value = owner_id
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm",
+                    "AUTH_COOKIE_SECURE": "false",
+                    "SUPABASE_OWNER_ID": owner_id,
+                },
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/session-from-fragment",
+                    headers={"Origin": "https://archive.example.com"},
+                    json={
+                        "access_token": "a" * 40,
+                        "refresh_token": "r" * 40,
+                        "expires_in": 3600,
+                    },
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["authenticated"])
+        cookies = "\n".join(
+            response.headers.get_list("set-cookie")
+        ).lower()
+        self.assertIn("dlr_access_token=", cookies)
+        self.assertIn("dlr_refresh_token=", cookies)
+        self.assertIn("httponly", cookies)
+
+    def test_fragment_session_bridge_rejects_non_owner(self):
+        with patch(
+            "letter_registry.api.SupabaseUserSession.from_environment"
+        ) as factory:
+            factory.return_value.user_id.return_value = (
+                "22222222-2222-4222-8222-222222222222"
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm",
+                    "SUPABASE_OWNER_ID": "11111111-1111-4111-8111-111111111111",
+                },
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/session-from-fragment",
+                    headers={"Origin": "https://archive.example.com"},
+                    json={
+                        "access_token": "a" * 40,
+                        "refresh_token": "r" * 40,
+                        "expires_in": 3600,
+                    },
+                )
+
+        self.assertEqual(response.status_code, 403)
+
     def test_cookie_authenticated_search_needs_no_bearer_header(self):
         fake = FakeTransport()
         self.client.cookies.set(
