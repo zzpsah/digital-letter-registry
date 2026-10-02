@@ -43,3 +43,50 @@ class InMemoryProcessingQueue:
         )
         self.jobs.append(job)
         return job
+
+
+
+class JobTransport(Protocol):
+    def insert(
+        self,
+        table: str,
+        row: dict[str, object],
+        *,
+        on_conflict: str | None = None,
+    ) -> dict[str, object]:
+        ...
+
+
+@dataclass(slots=True)
+class SupabaseProcessingQueue:
+    """Durable queue persisted in public.processing_jobs."""
+
+    transport: JobTransport
+
+    def enqueue(self, *, letter_id: str, owner_id: str) -> ProcessingJob:
+        UUID(letter_id)
+        UUID(owner_id)
+        row = self.transport.insert(
+            "processing_jobs",
+            {
+                "owner_id": owner_id,
+                "letter_id": letter_id,
+                "reason": "initial_processing",
+                "status": "pending",
+            },
+            on_conflict="letter_id,reason",
+        )
+
+        job_id = str(row.get("id") or uuid4())
+        created_raw = row.get("created_at")
+        created_at = (
+            datetime.fromisoformat(str(created_raw).replace("Z", "+00:00"))
+            if created_raw
+            else datetime.now(timezone.utc)
+        )
+        return ProcessingJob(
+            job_id=job_id,
+            letter_id=letter_id,
+            owner_id=owner_id,
+            created_at=created_at,
+        )
