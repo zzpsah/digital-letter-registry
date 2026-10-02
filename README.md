@@ -76,7 +76,7 @@ The main interface is one search box plus optional filters such as date/year, au
 
 ## Status
 
-The private archive folder structure and a separate Supabase archive database are established. The database and Drive archive are currently empty of real archive records. Refreshable Google Drive OAuth is now verified with a private authorized-user credentials file, including live originals listing and server-side streaming of the existing synthetic test original. No production deployment or live document migration is authorized yet.
+The private archive folder structure and a separate Supabase archive database are established. The database and Drive archive are currently empty of real archive records. Refreshable Google Drive OAuth is verified with runtime secret-manager injection, including live originals listing and server-side streaming of the existing synthetic test original; a protected file credential remains supported only as a local/migration fallback. No public production deployment or live document migration is authorized yet.
 
 See:
 - `PRD.md`
