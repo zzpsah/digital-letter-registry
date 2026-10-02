@@ -156,3 +156,21 @@ No production deployment or live archive import is authorized yet. Synthetic/pri
 ## Drive account portability
 
 The codebase is Google-account portable. A deployment uses the Google account that explicitly completes OAuth consent plus that deployment's configured archive-folder references. The current private deployment is single-owner/single-archive configured. A different account requires separate OAuth consent, secret-manager credentials and folder configuration; do not silently reuse or repoint another deployment's credentials.
+
+
+## Authentication scope
+
+DLR's passwordless email login (Magic Link / Email OTP login) exists to establish an authenticated archive-user session and supply Supabase RLS with the user's identity.
+
+Scope:
+- authenticate the browser user;
+- create/refresh the private DLR session using HttpOnly cookies;
+- allow Supabase RLS to enforce owner-scoped database access;
+- support future multi-user or multi-school isolation without redesigning the auth layer.
+
+Out of scope:
+- Google Drive authorization (handled by backend Google OAuth);
+- Tailscale/private-network transport;
+- automatic approval of real uploads, renames, deletes, historical imports, or other consequential archive mutations.
+
+Authentication proves identity; it does not itself authorize every action.
