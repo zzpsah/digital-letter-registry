@@ -5,6 +5,7 @@ from letter_registry.channel_intake import (
     ChannelIntakeService,
     InboundAttachment,
     IntakeChannel,
+    IntakeProvenance,
     SupabaseProvenanceRepository,
 )
 from letter_registry.intake import IntakeService
@@ -20,8 +21,8 @@ class FakeProvenance:
     def __init__(self):
         self.rows = []
 
-    def save_source(self, *, owner_id, letter_id, attachment):
-        self.rows.append((owner_id, letter_id, attachment))
+    def save_source(self, *, owner_id, letter_id, provenance):
+        self.rows.append((owner_id, letter_id, provenance))
 
 
 class FakeTransport:
@@ -57,13 +58,15 @@ class ChannelIntakeTests(unittest.TestCase):
                 service, provenance = self.service()
                 result = service.ingest(
                     InboundAttachment(
-                        channel=channel,
-                        filename=f"synthetic-{channel.value}.pdf",
-                        content=b"%PDF-synthetic",
-                        received_at=datetime(
-                            2026, 10, 2, tzinfo=timezone.utc
+                        provenance=IntakeProvenance(
+                            channel=channel,
+                            filename=f"synthetic-{channel.value}.pdf",
+                            received_at=datetime(
+                                2026, 10, 2, tzinfo=timezone.utc
+                            ),
+                            external_message_id=f"msg-{channel.value}",
                         ),
-                        external_message_id=f"msg-{channel.value}",
+                        content=b"%PDF-synthetic",
                     ),
                     owner_id=OWNER_ID,
                 )
@@ -77,21 +80,19 @@ class ChannelIntakeTests(unittest.TestCase):
                     channel,
                 )
 
-    def test_attachment_filename_must_be_basename(self):
+    def test_provenance_filename_must_be_basename(self):
         with self.assertRaises(ValueError):
-            InboundAttachment(
+            IntakeProvenance(
                 channel=IntakeChannel.EMAIL,
                 filename="../synthetic.pdf",
-                content=b"x",
             )
 
     def test_provenance_adapter_keeps_channel_metadata_private(self):
         transport = FakeTransport()
         repository = SupabaseProvenanceRepository(transport)
-        attachment = InboundAttachment(
+        provenance = IntakeProvenance(
             channel=IntakeChannel.WHATSAPP,
             filename="synthetic-whatsapp.pdf",
-            content=b"%PDF-synthetic",
             external_message_id="synthetic-message-id",
             source_label="synthetic-group",
             metadata={"forwarded": True},
@@ -100,7 +101,7 @@ class ChannelIntakeTests(unittest.TestCase):
         repository.save_source(
             owner_id=OWNER_ID,
             letter_id="22222222-2222-4222-8222-222222222222",
-            attachment=attachment,
+            provenance=provenance,
         )
 
         table, row, conflict = transport.calls[0]
@@ -115,10 +116,30 @@ class ChannelIntakeTests(unittest.TestCase):
     def test_empty_attachment_is_rejected(self):
         with self.assertRaises(ValueError):
             InboundAttachment(
-                channel=IntakeChannel.TELEGRAM,
-                filename="synthetic.pdf",
+                provenance=IntakeProvenance(
+                    channel=IntakeChannel.TELEGRAM,
+                    filename="synthetic.pdf",
+                ),
                 content=b"",
             )
+
+    def test_ingest_path_requires_matching_provenance_filename(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        service, _ = self.service()
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "synthetic.pdf"
+            path.write_bytes(b"%PDF-synthetic")
+            with self.assertRaisesRegex(ValueError, "filename"):
+                service.ingest_path(
+                    path,
+                    owner_id=OWNER_ID,
+                    provenance=IntakeProvenance(
+                        channel=IntakeChannel.WEB,
+                        filename="other.pdf",
+                    ),
+                )
 
 
 if __name__ == "__main__":
