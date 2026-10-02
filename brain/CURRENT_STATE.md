@@ -57,3 +57,10 @@ PDF and image paths are both represented: PDF uses native text then OCRmyPDF/Tes
 ## Relationship intelligence
 
 The worker now generates only conservative, reviewable relationship suggestions when explicit extension/correction/superseding language references a known prior letter number. Suggestions never change status automatically. Authenticated review endpoints confirm/reject them, and only confirmed supersedes links affect the older letter's status through an RLS-aware recalculation function.
+
+
+## Relationship + recursive reprocessing
+
+Relationship inference is deliberately conservative and reviewable: explicit relationship wording plus a referenced prior letter is required before a suggestion is created. Suggestions do not change status until confirmed by the authenticated owner.
+
+A live processing-version registry and reprocessing preview/enqueue flow now exist. Version changes can be previewed per letter/stage first; recursive reprocessing is queued only after explicit confirmation and is idempotent for the same target-version profile.
