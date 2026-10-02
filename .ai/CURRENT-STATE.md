@@ -4,11 +4,11 @@
 - Formal archive name: **Official Letter Intelligence Archive**.
 - Public-repository privacy boundary is established: code/docs/synthetic fixtures/schema only.
 - Existing private UMV Google Drive is the selected original-file storage.
-- Private archive structure exists with `originals/`, `quarantine/`, and `exports/`; all three are currently empty.
+- Private archive structure exists with `originals/`, `quarantine/`, and `exports/`; a synthetic integration PDF has been used in `originals/`, but no real archive letters have been ingested.
 - A separate Supabase archive project exists, isolated from the existing UMV database.
 - Core tables exist: `letters`, `letter_processing`, `letter_relationships`, and `letter_chunks`.
 - RLS is enabled on all public archive tables; security advisor is clean.
-- The archive database currently contains no auth user and no real archive rows.
+- Supabase archive-owner Auth identity exists and is confirmed; no real archive-letter rows have been ingested.
 - The public-safe core schema is captured under `supabase/migrations/`.
 - Domain code includes immutable source identity, SHA-256 fingerprints, processing versions, statuses/relationships, and smart filenames.
 - Official filename pattern is `short-title__issuer__date__reference-number.ext`.
@@ -16,7 +16,7 @@
 - Rename functionality is preview-only; no Drive rename executor is authorized yet.
 - Persistence ports, Supabase row mapping, an injected-transport Supabase repository adapter, synthetic/local ingestion preparation, storage ports, and an injected Google Drive storage adapter are implemented.
 - GitHub CI runs the synthetic unit-test suite on pushes/PRs.
-- No live document ingestion, OCR/AI processing, or production deployment has occurred.
+- No real archive-letter ingestion or production deployment has occurred. OCR/AI/search pipelines are implemented but not yet live-verified against real letters.
 
 ## Next step
 
@@ -96,11 +96,18 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Safe authenticated letter-detail endpoint is implemented.
 - Passwordless email link request is implemented with `create_user=false`; callback/session exchange remains a deployment-time integration.
 - PWA service worker caches only public app-shell assets and never caches `/api/` data.
-- Original-file route remains closed (501) until a private server-side Drive resolver is injected.
-- Application CI recently exposed and led to fixes for native-PDF syntax and blank-embedding validation; final green verification is pending the newest workflow run.
+- Server-side original streaming is implemented: the API resolves private storage references under RLS and can stream Google Drive bytes without exposing Drive object IDs. Live runtime credential verification remains pending.
+- Application CI is green after fixing native-PDF, blank-embedding, and Drive-reader source-generation regressions. DevOS context-sync is also green using the vendored local helper.
 
 ## Last automated change
 - Commit: 8212058d3f30aca4db42b4838e3a74fbf8276e82
 - Change: fix: repair Google Drive object reference validation syntax
 - Date: 2026-10-02
 - Durable context synchronization: completed
+
+
+## Verified CI baseline
+
+- Application unit-test workflow is green on the latest Google Drive reader syntax fix.
+- Development OS context-sync is green and no longer depends on cross-repository workflow access.
+- DevOS self-sync commits are guarded against recursive triggering.
