@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 31c42df96f4e84d369dac08515230f2bced6aed2
-- Change: fix: expose safe auth callback diagnostics
+- Commit: 4e11c985114228af40ac8014302cfb9a4f9f6bf2
+- Change: fix: allow access-only callback sessions
 - Date: 2026-10-03
 - Durable context synchronization: completed

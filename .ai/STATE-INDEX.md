@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 31c42df96f4e84d369dac08515230f2bced6aed2
-- Last commit: fix: expose safe auth callback diagnostics
+- HEAD: 4e11c985114228af40ac8014302cfb9a4f9f6bf2
+- Last commit: fix: allow access-only callback sessions
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 

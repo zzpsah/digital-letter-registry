@@ -1,3 +1,10 @@
+## 2026-10-03 — fix: allow access-only callback sessions
+- Commit: 4e11c985114228af40ac8014302cfb9a4f9f6bf2
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/auth.py`
+
 ## 2026-10-03 — fix: expose safe auth callback diagnostics
 - Commit: 31c42df96f4e84d369dac08515230f2bced6aed2
 - Author: PRASHANT KUMAR SAH
