@@ -64,6 +64,93 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.client.get("/manifest.webmanifest").status_code, 200)
         self.assertEqual(self.client.get("/sw.js").status_code, 200)
 
+    def test_synthetic_intake_returns_archive_and_job_ids_only(self):
+        from letter_registry.intake import IntakeService
+        from letter_registry.jobs import InMemoryProcessingQueue
+        from letter_registry.persistence import InMemoryLetterRepository
+        from letter_registry.storage import InMemoryOriginalStorage
+
+        service = IntakeService(
+            storage=InMemoryOriginalStorage(),
+            repository=InMemoryLetterRepository(),
+            queue=InMemoryProcessingQueue(),
+        )
+
+        with patch(
+            "letter_registry.api._runtime_intake",
+            return_value=(
+                "11111111-1111-4111-8111-111111111111",
+                service,
+            ),
+        ):
+            response = self.client.post(
+                "/api/v1/intake",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+                files={
+                    "file": (
+                        "synthetic-upload.pdf",
+                        b"%PDF-synthetic-upload",
+                        "application/pdf",
+                    )
+                },
+            )
+
+        self.assertEqual(response.status_code, 202)
+        body = response.json()
+        self.assertEqual(body["original_filename"], "synthetic-upload.pdf")
+        self.assertEqual(body["job_status"], "pending")
+        self.assertTrue(body["synthetic_only"])
+        self.assertEqual(len(body["sha256"]), 64)
+        self.assertNotIn("storage_object_id", body)
+        self.assertNotIn("storage_reference", body)
+
+    def test_real_looking_upload_is_blocked_by_default(self):
+        from letter_registry.intake import IntakeService
+        from letter_registry.jobs import InMemoryProcessingQueue
+        from letter_registry.persistence import InMemoryLetterRepository
+        from letter_registry.storage import InMemoryOriginalStorage
+
+        service = IntakeService(
+            storage=InMemoryOriginalStorage(),
+            repository=InMemoryLetterRepository(),
+            queue=InMemoryProcessingQueue(),
+        )
+
+        with patch(
+            "letter_registry.api._runtime_intake",
+            return_value=(
+                "11111111-1111-4111-8111-111111111111",
+                service,
+            ),
+        ):
+            response = self.client.post(
+                "/api/v1/intake",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+                files={
+                    "file": (
+                        "official-letter.pdf",
+                        b"%PDF-real-looking",
+                        "application/pdf",
+                    )
+                },
+            )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("real document intake is disabled", response.json()["detail"])
+
+    def test_intake_requires_bearer_session(self):
+        response = self.client.post(
+            "/api/v1/intake",
+            files={
+                "file": (
+                    "synthetic.pdf",
+                    b"%PDF-synthetic",
+                    "application/pdf",
+                )
+            },
+        )
+        self.assertEqual(response.status_code, 401)
+
     def test_search_requires_bearer_session(self):
         response = self.client.get("/api/v1/search?q=inter")
         self.assertEqual(response.status_code, 401)
