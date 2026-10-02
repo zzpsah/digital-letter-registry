@@ -9,6 +9,7 @@ from .extraction import (
     is_usable_native_text,
     normalize_extracted_text,
 )
+from .extraction_backends import OcrmypdfTesseractBackend, PypdfTextBackend
 from .fingerprints import sha256_file
 from .ingestion import prepare_source_record, persist_prepared_source
 from .orchestration import ingest_original
@@ -47,6 +48,8 @@ __all__ = [
     "PdfTextBackend",
     "OcrBackend",
     "VersionedTextExtractor",
+    "PypdfTextBackend",
+    "OcrmypdfTesseractBackend",
     "DocumentRecord",
     "DocumentRelationship",
     "DocumentStatus",
