@@ -120,6 +120,17 @@ class SupabaseProcessingVersionRegistry:
             status_rule=str(row["status_rule_version"]),
         )
 
+    def enqueue_reprocessing(self, *, limit: int = 500) -> int:
+        if limit < 1 or limit > 500:
+            raise ValueError("limit must be between 1 and 500")
+        rows = self.transport.rpc(
+            "enqueue_reprocessing_jobs",
+            {"result_limit": limit},
+        )
+        if not rows:
+            return 0
+        return int(rows[0].get("enqueued") or 0)
+
     def preview(self, *, limit: int = 100) -> list[ReprocessingPreview]:
         if limit < 1 or limit > 500:
             raise ValueError("limit must be between 1 and 500")
