@@ -35,6 +35,8 @@ security = HTTPBearer(auto_error=False)
 class SearchCard(BaseModel):
     id: str
     title: str
+    summary: str | None = None
+    reference_number: str | None = None
     authority: str | None = None
     category: str | None = None
     issue_date: str | None = None
@@ -297,6 +299,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     title=item.result.title
                     or item.result.smart_filename
                     or "Untitled letter",
+                    summary=item.result.summary,
+                    reference_number=item.result.reference_number,
                     authority=item.result.authority,
                     category=item.result.category,
                     issue_date=(
@@ -322,6 +326,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 SearchCard(
                     id=item.record_id,
                     title=item.title or item.smart_filename or "Untitled letter",
+                    summary=item.summary,
+                    reference_number=item.reference_number,
                     authority=item.authority,
                     category=item.category,
                     issue_date=item.issue_date.isoformat() if item.issue_date else None,
