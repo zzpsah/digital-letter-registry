@@ -73,3 +73,14 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Change: feat: add signed-in password settings UI
 - Date: 2026-10-03
 - Durable context synchronization: completed
+
+
+## Password login readiness
+
+- Authenticated members can set/change their Supabase Auth password from DLR.
+- DLR never stores or logs the password.
+- Account UI is deployed on the private runtime.
+- Unauthenticated password update is rejected with HTTP 401.
+- Email/password, Magic Link, and invite-only registration remain enabled; Google provider remains optional/off.
+- Full synthetic suite passes 255/255.
+- The bootstrap admin still needs one normal browser/email session to set its first DLR password.
