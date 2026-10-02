@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 6f3ca89bdc9442a69ad2dad74bbfc93a614cfe27
-- Last commit: test: accept Supabase fragment token shapes
+- HEAD: 023d0cf8bdb143daa5d227514f6bd3ec479188d7
+- Last commit: docs: record Magic Link bridge repair
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
