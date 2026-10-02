@@ -4,12 +4,33 @@
 
 - Project ID: digital-letter-registry
 - Name: Digital Letter Registry
+- Formal archive name: Official Letter Intelligence Archive
 - Repository: zzpsah/digital-letter-registry
 
 ## Purpose
 
-Create a private, Hindi-first registry for letter archives without exposing archive data in the public repository.
+Operate a private, Hindi-first archive for official school and government letters. It preserves immutable originals while deriving searchable OCR, structured context, filename metadata, relationships, and reviewable lifecycle information.
 
-## Scope
+## Current scope
 
-Foundation planning and governance are present. The application and all infrastructure choices remain unimplemented.
+The application foundation is implemented in the public repository:
+
+- FastAPI private API and Hindi-first mobile PWA.
+- Passwordless Supabase-authenticated sessions using Secure HttpOnly cookies.
+- Synthetic-first intake, immutable Drive storage adapter, Supabase persistence, durable processing jobs, duplicate checks, and source provenance.
+- Native PDF extraction, Hindi/English OCR fallback contracts, structured-context adapters, embeddings, full-text/fuzzy/semantic/hybrid search, and relationship/reprocessing workflows.
+- Preview-first historical import and approval-locked rename execution.
+
+## Safety boundary
+
+- Public Git contains code, documentation, migrations, and synthetic fixtures only.
+- Real letters, private Drive identifiers/URLs, API keys, Supabase credentials, OAuth tokens, SSH keys, and server details must never be committed.
+- Real intake remains disabled by default.
+- Live letter ingestion, renames, imports, provider configuration, and production deployment require explicit authorization.
+
+## Current integration gaps
+
+- Live Google Drive OAuth credentials are not yet verified in the runtime.
+- Gemini runtime credentials are not yet configured/verified.
+- A final authenticated HTTP/PostgREST synthetic vertical-slice check remains pending.
+- Hosted Supabase magic-link template and production redirect/Site URL setup remain an external dashboard task.
