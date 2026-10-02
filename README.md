@@ -127,3 +127,24 @@ DLR prefers **Google Sign-In** for the archive user when the Supabase Google pro
 A successful sign-in establishes the same server-managed Supabase session/RLS identity used by the existing application. The refresh session persists for 30 days by default (subject to Supabase revocation/session policy), so normal browser restarts should not require a fresh email link every time.
 
 Google Sign-In credentials are separate from Google Drive OAuth credentials. Browser login requires its own Google **Web application** OAuth client.
+
+
+## DLR accounts and roles
+
+DLR authorization is archive-membership based, not Gmail/provider based.
+
+- Any valid email provider can be used for a DLR account (Gmail is not required).
+- Primary native login is email + password.
+- Magic Link remains a passwordless/recovery option.
+- Google Sign-In is optional and maps into the same Supabase user/membership model when enabled.
+- Registration is **invite-only**. Creating a Supabase Auth user does not by itself grant archive access.
+- Roles are:
+  - `admin`: manage members/invites and administrative archive operations;
+  - `editor`: read/search and add/update archive content;
+  - `viewer`: read/search only.
+- The initial archive owner is the bootstrap admin. Additional dedicated admins can be invited using any valid email address.
+- Database RLS enforces archive membership and role boundaries; authorization is not based on email domain or user-editable metadata.
+- The database prevents disabling/demoting/removing the final active admin.
+- Invite links keep the invite code in the URL fragment (`#invite=...`) so the code is not sent in normal HTTP request URLs/referrers; the browser clears it after prefill.
+
+Google Drive OAuth remains a separate backend storage authorization system and is not tied to the user's login provider.
