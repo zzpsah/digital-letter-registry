@@ -70,6 +70,8 @@ class SupabaseAuthConfigManager:
     site_url: str
     redirect_url: str
     template_html: str
+    google_client_id: str | None = None
+    google_client_secret: str | None = None
     subject: str = "Your sign-in link"
     http_executor: HttpExecutor = _default_http_executor
 
@@ -83,6 +85,16 @@ class SupabaseAuthConfigManager:
         base_url = os.environ.get("SUPABASE_URL", "").strip()
         redirect = os.environ.get("AUTH_REDIRECT_URL", "").strip()
         app_origin = os.environ.get("AUTH_APP_ORIGIN", "").strip()
+        google_client_id = os.environ.get(
+            "GOOGLE_SIGNIN_OAUTH_CLIENT_ID", ""
+        ).strip()
+        google_client_secret = os.environ.get(
+            "GOOGLE_SIGNIN_OAUTH_CLIENT_SECRET", ""
+        ).strip()
+        if bool(google_client_id) != bool(google_client_secret):
+            raise ValueError(
+                "Google Sign-In OAuth client id and secret must be supplied together"
+            )
         if not token:
             raise ValueError("SUPABASE_MANAGEMENT_ACCESS_TOKEN is required")
         if not base_url:
@@ -97,6 +109,8 @@ class SupabaseAuthConfigManager:
             site_url=_origin(app_origin or redirect),
             redirect_url=redirect,
             template_html=template_path.read_text(encoding="utf-8"),
+            google_client_id=google_client_id or None,
+            google_client_secret=google_client_secret or None,
         )
 
     @property
@@ -129,8 +143,13 @@ class SupabaseAuthConfigManager:
     def get_config(self) -> dict[str, object]:
         return self._request("GET")
 
-    def desired_patch(self, current: dict[str, object]) -> dict[str, object]:
-        desired = {
+    def desired_patch(
+        self,
+        current: dict[str, object],
+        *,
+        include_google_secret: bool = False,
+    ) -> dict[str, object]:
+        desired: dict[str, object] = {
             "site_url": self.site_url,
             "uri_allow_list": _merge_allow_list(
                 str(current.get("uri_allow_list") or ""),
@@ -139,18 +158,37 @@ class SupabaseAuthConfigManager:
             "mailer_subjects_magic_link": self.subject,
             "mailer_templates_magic_link_content": self.template_html,
         }
-        return {
+        if self.google_client_id and self.google_client_secret:
+            desired["external_google_enabled"] = True
+            desired["external_google_client_id"] = self.google_client_id
+
+        patch = {
             key: value
             for key, value in desired.items()
             if current.get(key) != value
         }
+        if (
+            include_google_secret
+            and self.google_client_id
+            and self.google_client_secret
+        ):
+            patch["external_google_secret"] = self.google_client_secret
+        return patch
 
     def check(self) -> tuple[str, ...]:
-        return tuple(self.desired_patch(self.get_config()).keys())
+        return tuple(
+            self.desired_patch(
+                self.get_config(),
+                include_google_secret=False,
+            ).keys()
+        )
 
     def apply(self) -> tuple[str, ...]:
         current = self.get_config()
-        patch = self.desired_patch(current)
+        patch = self.desired_patch(
+            current,
+            include_google_secret=True,
+        )
         if patch:
             self._request("PATCH", patch)
         remaining = self.check()

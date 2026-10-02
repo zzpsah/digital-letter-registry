@@ -15,7 +15,7 @@ def main() -> int:
     parser.add_argument(
         "--apply",
         action="store_true",
-        help="apply the checked-in magic-link template and URL config",
+        help="apply checked-in Auth URL/template config and optional Google provider config",
     )
     args = parser.parse_args()
 

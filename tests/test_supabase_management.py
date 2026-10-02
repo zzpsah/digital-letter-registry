@@ -75,6 +75,77 @@ class SupabaseManagementTests(unittest.TestCase):
         )
         self.assertEqual(calls[1].method, "PATCH")
 
+    def test_google_provider_patch_is_optional(self):
+        manager = SupabaseAuthConfigManager(
+            project_ref="example-ref",
+            management_token="secret-token",
+            site_url="https://archive.example.com",
+            redirect_url="https://archive.example.com/auth/confirm",
+            template_html="<a>synthetic template</a>",
+        )
+        current = {
+            "site_url": "https://archive.example.com",
+            "uri_allow_list": "https://archive.example.com/auth/confirm",
+            "mailer_subjects_magic_link": "Your sign-in link",
+            "mailer_templates_magic_link_content": "<a>synthetic template</a>",
+        }
+        self.assertEqual(manager.desired_patch(current), {})
+
+    def test_google_provider_patch_enables_provider_and_secret_on_apply(self):
+        manager = SupabaseAuthConfigManager(
+            project_ref="example-ref",
+            management_token="secret-token",
+            site_url="https://archive.example.com",
+            redirect_url="https://archive.example.com/auth/confirm",
+            template_html="<a>synthetic template</a>",
+            google_client_id="synthetic-google-client",
+            google_client_secret="synthetic-google-secret",
+        )
+        current = {
+            "site_url": "https://archive.example.com",
+            "uri_allow_list": "https://archive.example.com/auth/confirm",
+            "mailer_subjects_magic_link": "Your sign-in link",
+            "mailer_templates_magic_link_content": "<a>synthetic template</a>",
+            "external_google_enabled": False,
+            "external_google_client_id": "",
+        }
+        check_patch = manager.desired_patch(current)
+        self.assertEqual(
+            check_patch["external_google_enabled"],
+            True,
+        )
+        self.assertEqual(
+            check_patch["external_google_client_id"],
+            "synthetic-google-client",
+        )
+        self.assertNotIn("external_google_secret", check_patch)
+
+        apply_patch = manager.desired_patch(
+            current,
+            include_google_secret=True,
+        )
+        self.assertEqual(
+            apply_patch["external_google_secret"],
+            "synthetic-google-secret",
+        )
+
+    def test_environment_requires_google_client_pair(self):
+        with tempfile.TemporaryDirectory() as td:
+            template = Path(td) / "magic.html"
+            template.write_text("{{ .TokenHash }}", encoding="utf-8")
+            env = {
+                "SUPABASE_MANAGEMENT_ACCESS_TOKEN": "secret-token",
+                "SUPABASE_URL": "https://example-ref.supabase.co",
+                "AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm",
+                "GOOGLE_SIGNIN_OAUTH_CLIENT_ID": "client-only",
+                "GOOGLE_SIGNIN_OAUTH_CLIENT_SECRET": "",
+            }
+            with patch.dict(os.environ, env, clear=False):
+                with self.assertRaises(ValueError):
+                    SupabaseAuthConfigManager.from_environment(
+                        template_path=template
+                    )
+
     def test_environment_loader_never_requires_project_ref_secret(self):
         with tempfile.TemporaryDirectory() as td:
             template = Path(td) / "magic.html"
@@ -90,6 +161,8 @@ class SupabaseManagementTests(unittest.TestCase):
                 )
         self.assertEqual(manager.project_ref, "example-ref")
         self.assertEqual(manager.site_url, "https://archive.example.com")
+        self.assertIsNone(manager.google_client_id)
+        self.assertIsNone(manager.google_client_secret)
 
 
 if __name__ == "__main__":
