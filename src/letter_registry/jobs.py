@@ -22,7 +22,13 @@ class ProcessingJob:
 
 
 class ProcessingQueue(Protocol):
-    def enqueue(self, *, letter_id: str, owner_id: str) -> ProcessingJob:
+    def enqueue(
+        self,
+        *,
+        letter_id: str,
+        owner_id: str,
+        reason: str = "initial_processing",
+    ) -> ProcessingJob:
         ...
 
 
@@ -32,18 +38,38 @@ class InMemoryProcessingQueue:
 
     jobs: list[ProcessingJob] = field(default_factory=list)
 
-    def enqueue(self, *, letter_id: str, owner_id: str) -> ProcessingJob:
+    def enqueue(
+        self,
+        *,
+        letter_id: str,
+        owner_id: str,
+        reason: str = "initial_processing",
+    ) -> ProcessingJob:
         UUID(letter_id)
         UUID(owner_id)
+        if not reason.strip():
+            raise ValueError("processing job reason is required")
+
+        existing = next(
+            (
+                job
+                for job in self.jobs
+                if job.letter_id == letter_id and job.reason == reason
+            ),
+            None,
+        )
+        if existing is not None:
+            return existing
+
         job = ProcessingJob(
             job_id=str(uuid4()),
             letter_id=letter_id,
             owner_id=owner_id,
             created_at=datetime.now(timezone.utc),
+            reason=reason,
         )
         self.jobs.append(job)
         return job
-
 
 
 class JobTransport(Protocol):
@@ -79,15 +105,24 @@ class SupabaseProcessingQueue:
 
     transport: JobTransport
 
-    def enqueue(self, *, letter_id: str, owner_id: str) -> ProcessingJob:
+    def enqueue(
+        self,
+        *,
+        letter_id: str,
+        owner_id: str,
+        reason: str = "initial_processing",
+    ) -> ProcessingJob:
         UUID(letter_id)
         UUID(owner_id)
+        if not reason.strip():
+            raise ValueError("processing job reason is required")
+
         row = self.transport.insert(
             "processing_jobs",
             {
                 "owner_id": owner_id,
                 "letter_id": letter_id,
-                "reason": "initial_processing",
+                "reason": reason,
                 "status": "pending",
             },
             on_conflict="letter_id,reason",
@@ -98,9 +133,9 @@ class SupabaseProcessingQueue:
                 "processing_jobs",
                 filters={
                     "letter_id": letter_id,
-                    "reason": "initial_processing",
+                    "reason": reason,
                 },
-                columns="id,created_at",
+                columns="id,created_at,reason",
             )
             if not existing:
                 raise RuntimeError(
@@ -120,8 +155,8 @@ class SupabaseProcessingQueue:
             letter_id=letter_id,
             owner_id=owner_id,
             created_at=created_at,
+            reason=str(row.get("reason") or reason),
         )
-
 
     def claim_next(self) -> ProcessingJob | None:
         rows = self.transport.rpc("claim_processing_job", {})
@@ -140,12 +175,10 @@ class SupabaseProcessingQueue:
         )
 
     def complete(self, job: ProcessingJob) -> None:
-        rows = self.transport.rpc(
+        self.transport.rpc(
             "complete_processing_job",
             {"job_id": job.job_id},
         )
-        if not rows:
-            return
 
     def fail(self, job: ProcessingJob, *, error_message: str) -> None:
         self.transport.rpc(
