@@ -128,8 +128,11 @@ as $$
     (r.text_rank * 0.75 + r.fuzzy_rank * 0.25)::real as combined_rank
   from ranked r
   order by
-    case when (select q from normalized) is null then 0 else combined_rank end desc,
-    issue_date desc nulls last
+    case
+      when (select q from normalized) is null then 0::real
+      else (r.text_rank * 0.75 + r.fuzzy_rank * 0.25)::real
+    end desc,
+    r.issue_date desc nulls last
   limit greatest(1, least(coalesce(result_limit, 25), 100));
 $$;
 
