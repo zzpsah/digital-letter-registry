@@ -316,6 +316,34 @@ class SupabasePasswordlessAuth:
             )
         return self._session_from_response(raw)
 
+    def update_password(
+        self,
+        *,
+        access_token: str,
+        password: str,
+    ) -> None:
+        token = access_token.strip()
+        if not token:
+            raise ValueError("access_token is required")
+        if len(password) < 8 or len(password) > 256:
+            raise ValueError("password must be between 8 and 256 characters")
+
+        req = request.Request(
+            f"{self.base_url.rstrip('/')}/auth/v1/user",
+            data=json.dumps({"password": password}).encode("utf-8"),
+            headers={
+                "apikey": self.publishable_key,
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+            method="PUT",
+        )
+        status, _ = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise SupabaseAuthError(
+                f"unexpected Supabase password update HTTP status: {status}"
+            )
+
     def verify_token_hash(
         self,
         *,
