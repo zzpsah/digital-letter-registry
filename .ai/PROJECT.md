@@ -56,3 +56,17 @@ The application foundation is implemented in the public repository:
 ## Preferred user login
 
 Google Sign-In is the preferred browser authentication experience when configured. Magic Link remains fallback/recovery. Both resolve to the same Supabase authenticated user/session and owner-scoped RLS model. Google Sign-In uses a separate Web OAuth client; never reuse backend Drive OAuth credentials.
+
+
+## Account authorization model
+
+DLR authorization is archive-membership based and independent of the user's email provider.
+
+- Native email/password login is supported.
+- Magic Link is fallback/recovery.
+- Google Sign-In is optional.
+- Registration is invite-only.
+- Active membership roles are admin/editor/viewer.
+- A Supabase Auth account alone does not grant archive access.
+- The current bootstrap owner is the initial admin; additional dedicated admins can use any valid email provider.
+- Database RLS and last-admin protection enforce the model.
