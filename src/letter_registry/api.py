@@ -24,6 +24,7 @@ from .intake import DuplicateSourceError, IntakePolicy, IntakeService
 from .jobs import SupabaseProcessingQueue
 from .original_access import SupabaseOriginalAccessService
 from .relationships import RelationshipReviewStatus, SupabaseRelationshipRepository
+from .runtime_readiness import check_runtime_readiness
 from .reprocessing import ReprocessingTargets, SupabaseReprocessingPlanner
 from .search import SearchFilters, SupabaseSearchRepository
 from .semantic_search import SupabaseEmbeddingRepository
@@ -74,6 +75,17 @@ class RuntimeCapabilitiesResponse(BaseModel):
     original_streaming_configured: bool
     semantic_search_configured: bool
     auth_cookie_secure: bool
+
+
+class RuntimeReadinessCheckResponse(BaseModel):
+    name: str
+    ready: bool
+    detail: str
+
+
+class RuntimeReadinessResponse(BaseModel):
+    ready: bool
+    checks: list[RuntimeReadinessCheckResponse]
 
 
 class LetterDetailResponse(BaseModel):
@@ -400,6 +412,27 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
         _set_session_cookies(response, session)
         return response
+
+    @app.get(
+        "/api/v1/readiness",
+        response_model=RuntimeReadinessResponse,
+    )
+    def runtime_readiness(
+        access_token: str = Depends(_access_token),
+    ) -> RuntimeReadinessResponse:
+        _transport(access_token)
+        readiness = check_runtime_readiness()
+        return RuntimeReadinessResponse(
+            ready=readiness.ready,
+            checks=[
+                RuntimeReadinessCheckResponse(
+                    name=item.name,
+                    ready=item.ready,
+                    detail=item.detail,
+                )
+                for item in readiness.checks
+            ],
+        )
 
     @app.get(
         "/api/v1/capabilities",
