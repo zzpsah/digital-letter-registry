@@ -1,5 +1,28 @@
 # Project Brain — Tasks
 
+## Completed
+
 - [x] Establish repository and DevOS foundation.
-- [ ] Design the private runtime boundary.
-- [ ] Build a synthetic-fixture vertical slice.
+- [x] Design and implement the private runtime boundary in code.
+- [x] Build synthetic-first archive/intake/search/runtime foundations.
+- [x] Verify owner-scoped RLS structure.
+- [x] Verify DB-level synthetic owner insert/read and wrong-user isolation with simulated JWT request claims.
+- [x] Verify local Hindi/English OCR runtime.
+
+## Next
+
+- [ ] Complete real short-lived authenticated HTTP/PostgREST owner-session synthetic vertical slice.
+- [ ] Configure/verify refreshable Google Drive OAuth credentials with synthetic data only.
+- [ ] Verify private original streaming end-to-end.
+- [ ] Configure/verify Gemini runtime credentials with synthetic data only.
+- [ ] Configure hosted Supabase magic-link template/Site URL.
+- [ ] Remove retained synthetic RLS verification row through an authorized cleanup path.
+- [ ] Re-run readiness and synchronize README/docs/.ai/brain after each meaningful checkpoint.
+
+## Deferred by safety boundary
+
+- [ ] Real letter ingestion.
+- [ ] Historical live import.
+- [ ] Real Drive rename.
+- [ ] Live messaging/email connector activation.
+- [ ] Production deployment.
