@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 8051d8bd139e1e51fa456a8bc050c09db1618212
-- Last commit: chore: ignore Python packaging and synthetic runtime artifacts
+- HEAD: 21ca0c5538265895eef8e3afc589755170895d99
+- Last commit: test: cover runtime OCR executable overrides
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 

@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover runtime OCR executable overrides
+- Commit: 21ca0c5538265895eef8e3afc589755170895d99
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_extraction_backends.py`
+
 ## 2026-10-02 — chore: ignore Python packaging and synthetic runtime artifacts
 - Commit: 8051d8bd139e1e51fa456a8bc050c09db1618212
 - Author: PRASHANT KUMAR SAH
