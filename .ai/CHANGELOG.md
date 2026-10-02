@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover relationship review API
+- Commit: 477b43a807ade4059c1d2e800d0b835bb6985744
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-02 — feat: add relationship review API
 - Commit: 51ae5c9377619c8aae0716514146fac64492cae0
 - Author: PRASHANT KUMAR SAH
