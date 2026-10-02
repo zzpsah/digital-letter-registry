@@ -208,10 +208,19 @@ class SupabaseProvenanceRepository:
             {
                 "owner_id": owner_id,
                 "letter_id": letter_id,
-                "channel": provenance.channel,
-                "source_id": provenance.source_id,
-                "sender_label": provenance.sender_label,
-                "conversation_label": provenance.conversation_label,
+                "source_channel": (
+                    "web" if provenance.channel == "web_upload"
+                    else provenance.channel
+                ),
+                "external_message_id": provenance.source_id,
+                "source_label": (
+                    provenance.conversation_label
+                    or provenance.sender_label
+                ),
+                "metadata": {
+                    "sender_label": provenance.sender_label,
+                    "conversation_label": provenance.conversation_label,
+                },
             },
-            on_conflict="owner_id,channel,source_id",
+            on_conflict="owner_id,source_channel,external_message_id",
         )
