@@ -140,3 +140,14 @@ The broader environment already has an authorized private administration path th
 ## Current boundary
 
 No production deployment or live archive import is authorized yet. Synthetic/private test fixtures must prove the vertical slice safely before real archive intake.
+
+
+## 2026-10-02 runtime verification checkpoint
+
+- Dedicated refreshable Google Drive OAuth is configured through a private authorized-user credentials file; no refresh token/client secret is stored in Git.
+- Current live Drive grant is read-only.
+- Live token refresh, originals listing, and server-side streaming of the existing synthetic original are verified.
+- Full synthetic test suite passes 212/212.
+- Runtime readiness has Supabase, auth callback, Drive credentials/folder, OCR tooling/languages, and synthetic-only safety ready; Gemini is the only failing readiness check.
+- Real Supabase owner-session/PostgREST vertical-slice verification remains blocked by the hosted email-send throttle.
+- Runtime Drive write/upload verification remains pending a separately approved write-capable scope.
