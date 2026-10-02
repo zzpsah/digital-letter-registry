@@ -10,8 +10,8 @@
 - DB-level synthetic verification on 2026-10-02 confirmed: owner-context insert succeeds, owner-context read succeeds, a different synthetic user sees zero rows, and cross-owner insert is rejected by RLS.
 - That verification used simulated request JWT claims inside the database, not a real browser/PostgREST bearer session, so the real short-lived owner-session HTTP/PostgREST vertical slice remains pending.
 - Repository auth/template implementation is ready: `supabase/templates/magic-link.html` already targets the server-side `/auth/confirm?token_hash=...` callback.
-- Archive-owner magic-link delivery is working, but hosted Supabase Auth still sends the default direct-confirmation URL, so the checked-in template/Site URL has not yet been applied to the live project.
-- VPS focused auth/session/API suite passes 35/35 tests; the full synthetic unit suite passes 205/205 tests. The Supabase Management Auth-config helper focused suite passes 4/4.
+- Archive-owner magic-link delivery is working. The hosted project uses Supabase's default direct-confirmation email because the Dashboard requires custom SMTP before editing template subject/body. The application now supports that default flow with a hardened fragment bridge at `/auth/confirm`: browser fragment tokens are posted same-origin, the server validates the authenticated owner, stores only HttpOnly cookies, and clears the URL. The checked-in token-hash template remains an optional future path if custom SMTP is enabled.
+- VPS auth/API suite passes 28/28 tests after the default-flow bridge; the full synthetic unit suite passes 208/208 tests. The Supabase Management Auth-config helper focused suite passes 4/4.
 - VPS project runtime has Supabase runtime/publishable configuration but no Supabase Management API token or CLI login; hosted Auth settings therefore cannot currently be changed from the VPS through the existing credential set. A guarded Management API helper is now implemented and ready once a scoped runtime management token is supplied.
 - The connected remote execution layer correctly blocked forwarding a one-time auth token into a VPS command. No bypass was used and no one-time token was persisted.
 - One synthetic RLS verification row currently remains in `letters`; no real archive-letter row exists.
@@ -29,13 +29,13 @@
 
 ## Next step
 
-1. Apply the hosted Supabase magic-link template/Site URL for the server-readable token-hash callback flow.
-2. Complete the authenticated owner-session HTTP/PostgREST synthetic vertical slice with a real short-lived session.
-3. Configure and verify refreshable Google Drive OAuth runtime credentials using synthetic data only.
-4. Verify private original streaming and the synthetic upload path end-to-end.
-5. Configure and verify Gemini runtime credentials using synthetic data only.
-6. Remove the retained synthetic DB verification row when an authorized cleanup path is available.
-7. Re-check readiness before considering any real-letter intake.
+1. Complete the authenticated owner-session HTTP/PostgREST synthetic vertical slice with a real short-lived session using the default hosted Magic Link flow.
+2. Configure and verify refreshable Google Drive OAuth runtime credentials using synthetic data only.
+3. Verify private original streaming and the synthetic upload path end-to-end.
+4. Configure and verify Gemini runtime credentials using synthetic data only.
+5. Remove the retained synthetic DB verification row when an authorized cleanup path is available.
+6. Re-check readiness before considering any real-letter intake.
+7. Optional later: enable custom SMTP and apply the checked-in token-hash email template.
 
 No real-letter ingestion, historical adoption, Drive rename, connector activation, or production deployment is authorized by this state record.
 
@@ -51,9 +51,10 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 ## 2026-10-02 — Runtime connectivity checkpoint
 
 - Magic-link delivery to the authorized archive-owner mailbox was verified.
-- Checked-in magic-link template is correct for server-side `token_hash` verification, but the hosted Supabase project still uses its default direct-confirmation template behavior.
-- VPS auth/session/API tests: 35/35 passed.
-- Full VPS synthetic unit suite: 205/205 passed.
+- Checked-in magic-link template is correct for server-side `token_hash` verification, while the hosted Supabase project uses default direct-confirmation behavior because custom SMTP is required to edit email templates.
+- Default hosted callback compatibility is implemented and hardened (`no-store`, `no-referrer`, CSP, owner validation, HttpOnly cookies, URL cleanup).
+- VPS auth/API tests: 28/28 passed.
+- Full VPS synthetic unit suite: 208/208 passed.
 - Supabase Management Auth-config helper focused suite: 4/4 passed.
 - Existing Supabase runtime credentials are sufficient for application access but not for Management API Auth-template changes.
 - Connected Google Drive access verified the private archive folder structure and existing synthetic-only original.
