@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover read-only reprocessing preview API
+- Commit: f7660b8a3d938d9d59af949471b4ec55bbd99510
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-02 — feat: add processing version registry domain
 - Commit: 13d48a0767f77320624483900b421b6859343afb
 - Author: PRASHANT KUMAR SAH
