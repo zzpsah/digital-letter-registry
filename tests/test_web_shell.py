@@ -23,6 +23,14 @@ class WebShellTests(unittest.TestCase):
         self.assertNotIn('sessionStorage.setItem("dlr_refresh_token"', self.html)
         self.assertNotIn('localStorage.setItem("dlr_refresh_token"', self.html)
 
+    def test_authenticated_user_can_set_or_change_password(self) -> None:
+        self.assertIn('id="passwordChangeForm"', self.html)
+        self.assertIn(
+            'fetch("/api/v1/auth/password/change"',
+            self.html,
+        )
+        self.assertIn('id="confirmPassword"', self.html)
+
     def test_admin_can_send_pending_registration_email(self) -> None:
         self.assertIn('data-send-invite-email=', self.html)
         self.assertIn(
