@@ -82,7 +82,8 @@
 - [x] One-job processing worker orchestration with durable success/failure state.
 - [x] Approval-locked rename executor + private Drive rename transport implemented; no mapping approved/executed yet.
 - [x] Preview-first historical bulk import/adoption pipeline for local files and existing private Drive objects; no real import executed.
-- [ ] Additional intake channels: Telegram, WhatsApp, email, watched folder.
+- [x] Provider-neutral Telegram/WhatsApp/email/watched-folder intake normalization + provenance persistence.
+- [ ] Activate live Telegram/WhatsApp/email/watched-folder connectors with runtime credentials and synthetic verification.
 
 ## Current safety boundary
 
