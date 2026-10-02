@@ -11,7 +11,7 @@ class RuntimeDependencyCheckTests(unittest.TestCase):
         which.side_effect = lambda name: f"/usr/bin/{name}"
         version = Mock(stdout="5.3.4\n", stderr="")
         langs = Mock(stdout="List of available languages (2):\neng\nhin\n", stderr="")
-        run.side_effect = [version, version, langs]
+        run.side_effect = [langs, version, version]
 
         report = runtime_report()
 
