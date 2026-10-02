@@ -212,3 +212,15 @@ Hosted Supabase role behavior was verified on 2026-10-02 using synthetic JWT-cla
 Synthetic users/rows/memberships were removed and zero residue was confirmed. Pending invites can now be onboarded with one click by sending the existing invite-validated registration Magic Link, while copy links retain invite codes only in URL fragments.
 
 The remaining auth proof is a real short-lived browser/email owner session against PostgREST; Magic Link delivery is working, but that final bearer-session completion is not yet marked complete.
+
+
+## Password setup handoff
+
+The private DLR runtime now supports member-controlled password setup/change. A currently authenticated archive member may set a password through the Account UI; the backend forwards it to the authenticated Supabase Auth user endpoint and does not store it.
+
+This allows the bootstrap admin to use one Magic Link once, set a password, and then use ordinary email/password login on future computers. Magic Link remains recovery.
+
+Live verification:
+- Account UI deployed;
+- unauthenticated password-change request returns 401;
+- full synthetic suite 255/255.
