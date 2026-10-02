@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: ece323fe0c1d443cd5ff59ffe8aa120db7be7217
-- Last commit: feat: add server-side magic-link verification and refresh
+- HEAD: c174d213f52227bffd4972931d5c563bcfcb7077
+- Last commit: feat: add HttpOnly Supabase magic-link session callback
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 

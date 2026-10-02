@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add HttpOnly Supabase magic-link session callback
+- Commit: c174d213f52227bffd4972931d5c563bcfcb7077
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — feat: add server-side magic-link verification and refresh
 - Commit: ece323fe0c1d443cd5ff59ffe8aa120db7be7217
 - Author: PRASHANT KUMAR SAH
