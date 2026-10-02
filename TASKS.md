@@ -83,7 +83,7 @@
 - [x] Refreshable Google Drive OAuth credential strategy with in-memory access-token caching.
 - [x] Add authorized-user file fallback and secret-manager-injected refresh credential support.
 - [x] Verify live secret-manager-only refresh/list/stream with synthetic data; retire the Oracle runtime file credential after cutover.
-- [ ] Verify runtime synthetic upload/write after the approved write-capable Drive re-consent is completed.
+- [x] Verify runtime synthetic upload/write after the approved write-capable Drive re-consent; disposable upload/stream/delete cleanup passed.
 
 ## Phase 4 — Intelligence lifecycle
 
