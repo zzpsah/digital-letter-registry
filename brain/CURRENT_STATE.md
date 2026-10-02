@@ -31,7 +31,7 @@ Last verified: 2026-10-02
 
 ## Next action
 
-Complete the authenticated synthetic HTTP/PostgREST vertical slice with a short-lived owner session and refreshable Drive credentials. OCR runtime verification is also pending because Oracle package installation currently requires interactive sudo authorization.
+Complete the authenticated synthetic HTTP/PostgREST vertical slice with a short-lived owner session, refreshable Drive OAuth credentials, and synthetic upload/read verification. OCR runtime is already verified through the user-local toolchain; no sudo package installation is required for that verified path.
 
 ## Safety
 
@@ -50,7 +50,7 @@ PDF and image paths are both represented: PDF uses native text then OCRmyPDF/Tes
 - Applied the pending relationship-review migration to the empty archive database.
 - Live schema now includes processing jobs, search/semantic RPCs, summary/reference metadata, and reviewable relationship lifecycle.
 - Verified RLS owner access and cross-user isolation without retaining test rows.
-- PWA now captures implicit magic-link sessions safely on the client and can open streamed original bytes.
+- PWA uses the server-side token-hash magic-link callback with Secure HttpOnly session cookies and can open streamed original bytes.
 - No real letter ingestion, rename execution, or production deployment occurred.
 
 
