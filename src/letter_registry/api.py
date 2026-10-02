@@ -63,6 +63,10 @@ class MessageResponse(BaseModel):
     message: str
 
 
+class SessionStatusResponse(BaseModel):
+    authenticated: bool
+
+
 class LetterDetailResponse(BaseModel):
     id: str
     smart_filename: str | None = None
@@ -327,6 +331,15 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
         _set_session_cookies(response, session)
         return response
+
+    @app.get("/api/v1/auth/session", response_model=SessionStatusResponse)
+    def session_status(
+        access_token: str = Depends(_access_token),
+    ) -> SessionStatusResponse:
+        SupabaseUserSession.from_environment(
+            access_token=access_token,
+        ).user_id()
+        return SessionStatusResponse(authenticated=True)
 
     @app.post("/api/v1/auth/logout", response_model=MessageResponse)
     def logout() -> Response:
