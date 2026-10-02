@@ -22,6 +22,7 @@ from .intake import DuplicateSourceError, IntakePolicy, IntakeService
 from .jobs import SupabaseProcessingQueue
 from .original_access import SupabaseOriginalAccessService
 from .relationships import RelationshipReviewStatus, SupabaseRelationshipRepository
+from .reprocessing import ReprocessingTargets, SupabaseReprocessingPlanner
 from .search import SearchFilters, SupabaseSearchRepository
 from .semantic_search import SupabaseEmbeddingRepository
 from .session import SupabaseUserSession
@@ -91,6 +92,18 @@ class RelationshipResponse(BaseModel):
 
 class RelationshipReviewRequest(BaseModel):
     decision: str
+
+
+class ReprocessingPreviewItemResponse(BaseModel):
+    letter_id: str
+    reasons: list[str]
+    current_versions: dict[str, str]
+    target_versions: dict[str, str]
+
+
+class ReprocessingPreviewResponse(BaseModel):
+    count: int
+    items: list[ReprocessingPreviewItemResponse]
 
 
 class IntakeResponse(BaseModel):
@@ -278,6 +291,45 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             sha256=result.record.original_sha256,
             job_id=result.job.job_id,
             synthetic_only=service.policy.synthetic_only,
+        )
+
+    @app.get(
+        "/api/v1/reprocessing/preview",
+        response_model=ReprocessingPreviewResponse,
+    )
+    def preview_reprocessing(
+        ocr_version: str = Query(..., min_length=1),
+        context_version: str = Query(..., min_length=1),
+        dictionary_version: str = Query(..., min_length=1),
+        filename_rule_version: str = Query(..., min_length=1),
+        category_schema_version: str = Query(..., min_length=1),
+        embedding_version: str = Query(..., min_length=1),
+        status_rule_version: str = Query(..., min_length=1),
+        access_token: str = Depends(_access_token),
+    ) -> ReprocessingPreviewResponse:
+        targets = ReprocessingTargets(
+            ocr_version=ocr_version,
+            context_version=context_version,
+            dictionary_version=dictionary_version,
+            filename_rule_version=filename_rule_version,
+            category_schema_version=category_schema_version,
+            embedding_version=embedding_version,
+            status_rule_version=status_rule_version,
+        )
+        items = SupabaseReprocessingPlanner(
+            _transport(access_token)
+        ).preview(targets)
+        return ReprocessingPreviewResponse(
+            count=len(items),
+            items=[
+                ReprocessingPreviewItemResponse(
+                    letter_id=item.letter_id,
+                    reasons=list(item.reasons),
+                    current_versions=item.current_versions,
+                    target_versions=item.target_versions,
+                )
+                for item in items
+            ],
         )
 
     @app.get("/api/v1/search", response_model=SearchResponse)
