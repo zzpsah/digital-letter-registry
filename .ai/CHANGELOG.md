@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: remove stale brain runtime claims
+- Commit: dfa3e9b02d3f05c62732a3154502299e5fc983d1
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/CURRENT_STATE.md`
+
 ## 2026-10-02 — docs: record repository context reconciliation
 - Commit: a44054982e9ba0cd7dd81c174e6e34234768c505
 - Author: PRASHANT KUMAR SAH
