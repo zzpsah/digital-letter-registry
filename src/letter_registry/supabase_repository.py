@@ -12,6 +12,7 @@ from typing import Protocol
 from .extraction import ExtractionResult
 from .structured_analysis import ContextAnalysisResult
 from .models import DocumentRecord
+from .rename_execution import StoredRenameIdentity
 from .persistence import (
     build_supabase_letter_row,
     build_supabase_processing_row,
@@ -58,6 +59,27 @@ class SupabaseLetterRepository:
 
     transport: SupabaseTransport
     storage_provider: str = "gdrive"
+
+    def get_rename_identity(
+        self,
+        record_id: str,
+    ) -> StoredRenameIdentity | None:
+        rows = self.transport.select(
+            "letters",
+            filters={"id": record_id},
+            columns=(
+                "id,original_filename,storage_provider,storage_object_id"
+            ),
+        )
+        if not rows:
+            return None
+        row = rows[0]
+        return StoredRenameIdentity(
+            record_id=str(row["id"]),
+            original_filename=str(row["original_filename"]),
+            storage_provider=str(row["storage_provider"]),
+            storage_object_reference=str(row["storage_object_id"]),
+        )
 
     def source_exists_by_hash(self, *, owner_id: str, sha256: str) -> bool:
         rows = self.transport.select(
