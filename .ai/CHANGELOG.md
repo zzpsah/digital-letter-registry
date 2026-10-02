@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover Drive credentials file readiness
+- Commit: 793e8d0d46e0c4ea462696abaab409044061b0d0
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_runtime_readiness.py`
+
 ## 2026-10-02 — test: cover file-based Drive OAuth
 - Commit: 39bd57ac6ebba2f2d1b9200d78d91e801e03dfef
 - Author: PRASHANT KUMAR SAH
