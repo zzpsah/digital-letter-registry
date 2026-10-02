@@ -84,3 +84,17 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - HNSW cosine index and `search_letter_chunks_semantic` RPC are deployed.
 - Hybrid search combines text/fuzzy rank with semantic similarity.
 - Embedding spaces remain explicitly versioned so future provider/model changes require controlled re-embedding rather than mixed-vector comparison.
+
+
+## Private mobile API/PWA
+
+- FastAPI private API foundation is implemented.
+- Hindi-first mobile PWA shell is implemented with query and filters.
+- Filtered text/fuzzy search RPC is live in the archive database.
+- Search API uses the caller's Supabase bearer session, preserving RLS as the data boundary.
+- Search/detail responses never expose private storage object identifiers.
+- Safe authenticated letter-detail endpoint is implemented.
+- Passwordless email link request is implemented with `create_user=false`; callback/session exchange remains a deployment-time integration.
+- PWA service worker caches only public app-shell assets and never caches `/api/` data.
+- Original-file route remains closed (501) until a private server-side Drive resolver is injected.
+- Application CI recently exposed and led to fixes for native-PDF syntax and blank-embedding validation; final green verification is pending the newest workflow run.
