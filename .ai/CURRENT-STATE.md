@@ -104,3 +104,25 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Change: feat: expose official filename rule version
 - Date: 2026-10-02
 - Durable context synchronization: completed
+
+
+## Intake + durable processing queue
+
+- Authenticated `POST /api/v1/intake` is implemented.
+- Supabase Auth session lookup determines owner UUID; owner IDs are never accepted from client input.
+- Intake is synthetic-only by default and enforces type/size validation.
+- Duplicate SHA-256 is checked before private Drive upload.
+- Google Drive immutable upload adapter is implemented with runtime-only OAuth and folder reference.
+- Live Supabase `processing_jobs` table is deployed with RLS.
+- Atomic `claim_processing_job`, `complete_processing_job`, and `fail_processing_job` RPCs are deployed.
+- One-job worker orchestration is implemented and tested for completed/failed/idle states.
+- Worker remains synthetic-only unless real intake is explicitly enabled.
+
+## Metadata + OCR completion
+
+- Images now use direct Tesseract Hindi+English OCR; PDFs prefer native text and fall back to OCRmyPDF/Tesseract.
+- Structured context now has explicit `issue_date` and `reference_number`.
+- `letters.summary` and `letters.reference_number` are deployed live.
+- Smart filename is generated automatically only when title + authority are present; unknown date/reference use the approved placeholders.
+- Search-card RPC now includes AI summary/reference and ranks those fields.
+- Gemini Embedding 2 REST payload was corrected to the current top-level `output_dimensionality` format.
