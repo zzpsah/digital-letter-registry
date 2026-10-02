@@ -81,7 +81,7 @@
 - [x] Preview + explicit-confirmation recursive reprocessing jobs.
 - [x] One-job processing worker orchestration with durable success/failure state.
 - [x] Approval-locked rename executor + private Drive rename transport implemented; no mapping approved/executed yet.
-- [ ] Historical bulk import.
+- [x] Preview-first historical bulk import/adoption pipeline for local files and existing private Drive objects; no real import executed.
 - [ ] Additional intake channels: Telegram, WhatsApp, email, watched folder.
 
 ## Current safety boundary
