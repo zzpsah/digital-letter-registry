@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover reviewable relationship lifecycle
+- Commit: dabc7e0f998391e1e57f147d5483b2ae4acf4d0e
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_relationships.py`
+
 ## 2026-10-02 — feat: add explicit relationship review RPC
 - Commit: 9b831b0b67a87722bee287d675cf8cf37966114b
 - Author: PRASHANT KUMAR SAH
