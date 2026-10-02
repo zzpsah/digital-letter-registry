@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: record synthetic RLS cleanup
+- Commit: bee23e8f22bd6df302e1101438cf8ae10bd5c443
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/LIVE-INTEGRATION-CHECKPOINT.md`
+
 ## 2026-10-02 — docs: refresh live integration checkpoint
 - Commit: b5bd43c3d3f9a019fb42d64b3cf05ec9524c9e38
 - Author: PRASHANT KUMAR SAH
