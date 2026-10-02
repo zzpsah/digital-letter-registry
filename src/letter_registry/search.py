@@ -21,6 +21,8 @@ class SearchResult:
     record_id: str
     smart_filename: str | None
     title: str | None
+    summary: str | None
+    reference_number: str | None
     authority: str | None
     category: str | None
     issue_date: date | None
@@ -63,7 +65,7 @@ class SupabaseSearchRepository:
             raise ValueError("year must be between 1900 and 2100")
 
         rows = self.transport.rpc(
-            "search_letters_filtered",
+            "search_letter_cards",
             {
                 "search_query": normalized or None,
                 "authority_filter": filters.authority,
@@ -87,6 +89,8 @@ class SupabaseSearchRepository:
                     record_id=str(row["id"]),
                     smart_filename=row.get("smart_filename"),
                     title=row.get("title"),
+                    summary=row.get("summary"),
+                    reference_number=row.get("reference_number"),
                     authority=row.get("authority"),
                     category=row.get("category"),
                     issue_date=issue_date,
