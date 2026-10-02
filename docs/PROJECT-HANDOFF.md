@@ -181,3 +181,21 @@ Authentication proves identity; it does not itself authorize every action.
 Primary target: **Sign in with Google** through Supabase Auth. Magic Link remains a fallback. The existing archive-owner email identity should be automatically linked to the verified Google identity with the same email, preserving the existing Supabase user id and RLS ownership. After authentication, DLR uses HttpOnly access/refresh cookies; the refresh cookie persists for 30 days by default.
 
 This user-auth OAuth client is separate from the backend Google Drive OAuth client.
+
+
+## DLR account / role model
+
+DLR is no longer a Gmail-specific or single-owner authorization design. Authentication provider and archive authorization are separate.
+
+- A user may authenticate using email/password, Magic Link, optional Google Sign-In, or future compatible providers.
+- Archive access requires an active row in `archive_members`.
+- Roles: `admin`, `editor`, `viewer`.
+- New-account registration is invite-only.
+- A raw Supabase Auth account without membership has no archive access.
+- The current bootstrap owner remains the initial active admin.
+- Additional dedicated admins can use any valid email provider.
+- Database RLS is archive/role-aware and the final active admin is protected against removal/demotion/disablement.
+- Invite codes are carried in URL fragments rather than query strings and are cleared after client-side prefill.
+- Backend Google Drive OAuth is separate from user authentication.
+
+Hosted state was verified on 2026-10-02: one active admin, no disabled members, no pending invites, no real archive-letter rows. Full synthetic suite: 249/249.
