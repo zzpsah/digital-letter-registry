@@ -45,6 +45,8 @@ _CONTEXT_SCHEMA = {
         "subcategory": {"type": ["string", "null"]},
         "summary": {"type": ["string", "null"]},
         "action_required": {"type": ["string", "null"]},
+        "issue_date": {"type": ["string", "null"]},
+        "reference_number": {"type": ["string", "null"]},
         "concepts": {"type": "array", "items": {"type": "string"}},
         "important_dates": {
             "type": "array",
@@ -70,6 +72,8 @@ _CONTEXT_SCHEMA = {
         "subcategory",
         "summary",
         "action_required",
+        "issue_date",
+        "reference_number",
         "concepts",
         "important_dates",
         "deadline",
@@ -162,6 +166,7 @@ class GeminiDocumentContextProvider:
             f"Deterministic concept hints: {concepts}\n"
             f"Government structure hints: {structure}\n\n"
             "Extract: title, authority, category, subcategory, summary, action_required, "
+            "issue_date (YYYY-MM-DD only when confidently present), reference_number, "
             "concepts, important_dates, deadline, related_terms_hi, related_terms_en, confidence.\n\n"
             "LETTER TEXT:\n"
             f"{extracted_text}"
@@ -183,6 +188,15 @@ class GeminiDocumentContextProvider:
             if isinstance(item, dict) and "label" in item and "value" in item
         )
 
+        raw_issue_date = data.get("issue_date")
+        issue_date = None
+        if raw_issue_date:
+            from datetime import date
+            try:
+                issue_date = date.fromisoformat(str(raw_issue_date)).isoformat()
+            except ValueError:
+                issue_date = None
+
         return StructuredDocumentContext(
             title=data.get("title"),
             authority=data.get("authority"),
@@ -190,6 +204,8 @@ class GeminiDocumentContextProvider:
             subcategory=data.get("subcategory"),
             summary=data.get("summary"),
             action_required=data.get("action_required"),
+            issue_date=issue_date,
+            reference_number=data.get("reference_number"),
             concepts=tuple(str(x) for x in data.get("concepts", [])),
             important_dates=dates,
             deadline=data.get("deadline"),
