@@ -72,7 +72,7 @@ class SessionStatusResponse(BaseModel):
 class FragmentSessionRequest(BaseModel):
     access_token: str = Field(min_length=20)
     refresh_token: str = Field(min_length=20)
-    expires_in: int = Field(default=3600, ge=60, le=86400)
+    expires_in: int = Field(default=3600, ge=60)
 
 
 class RuntimeCapabilitiesResponse(BaseModel):
