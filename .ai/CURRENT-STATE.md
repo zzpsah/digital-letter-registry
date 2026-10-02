@@ -28,6 +28,13 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Live private Drive upload was verified with a synthetic PDF in `originals/`.
 - The synthetic PDF uses the approved smart-filename pattern and remains private.
 - A Supabase archive-owner Auth identity was created through passwordless email signup.
-- Supabase Auth currently reports the owner email as unconfirmed.
-- RLS-backed live database insertion remains intentionally blocked until confirmation.
+- Supabase archive-owner email is confirmed.
+- Runtime authenticated Supabase PostgREST transport and a guarded synthetic integration command are implemented; the final live insert/RLS-denial execution remains pending.
 - No real archive letter was ingested or renamed.
+
+
+## Runtime Supabase integration
+
+- `src/letter_registry/supabase_runtime.py` provides environment-only authenticated PostgREST transport.
+- `scripts/run_synthetic_supabase_integration.py` refuses non-synthetic filenames and performs no Drive upload.
+- No project URL, publishable key, access token, owner UUID, or Drive object ID is stored in Git.
