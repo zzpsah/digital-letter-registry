@@ -100,29 +100,7 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Application CI is green after fixing native-PDF, blank-embedding, and Drive-reader source-generation regressions. DevOS context-sync is also green using the vendored local helper.
 
 ## Last automated change
-- Commit: 479cde5b8305184ca160097cd6ba12f36ae6951d
-- Change: feat: complete browser magic-link session handling
+- Commit: 0d4114379d1fe01236669b19ca1cbbfedecff12a
+- Change: fix: keep explicit-reference relationship inference canonical
 - Date: 2026-10-02
 - Durable context synchronization: completed
-
-
-## 2026-10-02 — Live schema/RLS/auth-shell verification
-
-- Applied the final pending `add_relationship_review` migration to the separate archive Supabase project; live migration history is now aligned with repository migrations by migration name.
-- Verified one confirmed archive-owner Auth identity exists.
-- Verified owner RLS access and unrelated-authenticated-user isolation using rollback-only synthetic transactions; no archive rows were retained.
-- Verified archive data tables remained empty after the RLS checks.
-- Verified the private Drive `originals/` folder contains only the existing synthetic integration PDF and no real archive letter.
-- Added client-side implicit magic-link callback handling and streamed-original blob opening to the PWA.
-- GitHub Actions was triggered for the new web-shell tests; final completion should be checked before treating this exact commit as green.
-
-
-## Relationship/status intelligence
-
-- Canonical live migration adds `suggested/confirmed/rejected` review state, rationale, relationship version, and review timestamp.
-- Conservative deterministic inference only suggests `extends`, `corrects`, or `supersedes` when an explicit relationship cue and referenced prior-letter number are both present.
-- The worker saves inferred relationships only as `suggested`.
-- Authenticated API can list letter relationships and explicitly confirm/reject one.
-- Status recalculation is RLS-aware; only confirmed `supersedes` relationships mark the target letter `superseded`.
-- Rejecting/removing the last confirmed superseding relationship allows recalculation back to `current`.
-- Duplicate relationship migration created during an interrupted attempt was removed; the already-applied canonical relationship-review migration remains authoritative.

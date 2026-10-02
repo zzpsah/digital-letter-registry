@@ -1,3 +1,10 @@
+## 2026-10-02 — fix: keep explicit-reference relationship inference canonical
+- Commit: 0d4114379d1fe01236669b19ca1cbbfedecff12a
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261002144000_add_relationship_candidates.sql`
+
 ## 2026-10-02 — test: cover worker relationship suggestion creation
 - Commit: 856c60a9b267969cddba4d5d8e01bf2b92046d70
 - Author: PRASHANT KUMAR SAH
