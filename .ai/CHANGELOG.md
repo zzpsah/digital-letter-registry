@@ -1,3 +1,10 @@
+## 2026-10-02 — test: enforce current Gemini embedding REST payload
+- Commit: a384b0eed65b2f6f3cacc24358b56966f753aab2
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_embeddings.py`
+
 ## 2026-10-02 — test: cover worker archived-source loading
 - Commit: 48efcb19c76caffbd9c82d814ef2c886af9fff35
 - Author: PRASHANT KUMAR SAH

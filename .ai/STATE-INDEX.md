@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 48efcb19c76caffbd9c82d814ef2c886af9fff35
-- Last commit: test: cover worker archived-source loading
+- HEAD: a384b0eed65b2f6f3cacc24358b56966f753aab2
+- Last commit: test: enforce current Gemini embedding REST payload
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
