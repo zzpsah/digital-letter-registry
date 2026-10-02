@@ -9,10 +9,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
+from .extraction import ExtractionResult
 from .models import DocumentRecord
 from .persistence import (
     build_supabase_letter_row,
     build_supabase_processing_row,
+    build_supabase_extraction_patch,
 )
 
 
@@ -59,6 +61,25 @@ class SupabaseLetterRepository:
 
     def save_processing_state(self, record: DocumentRecord, *, owner_id: str) -> None:
         row = build_supabase_processing_row(record, owner_id=owner_id)
+        self.transport.upsert(
+            "letter_processing",
+            row,
+            on_conflict="letter_id",
+        )
+
+
+    def save_extraction_result(
+        self,
+        record: DocumentRecord,
+        *,
+        owner_id: str,
+        result: ExtractionResult,
+    ) -> None:
+        row = build_supabase_extraction_patch(
+            record,
+            owner_id=owner_id,
+            result=result,
+        )
         self.transport.upsert(
             "letter_processing",
             row,
