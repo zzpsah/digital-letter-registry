@@ -11,8 +11,8 @@
 - That verification used simulated request JWT claims inside the database, not a real browser/PostgREST bearer session, so the real short-lived owner-session HTTP/PostgREST vertical slice remains pending.
 - Repository auth/template implementation is ready: `supabase/templates/magic-link.html` already targets the server-side `/auth/confirm?token_hash=...` callback.
 - Archive-owner magic-link delivery is working, but hosted Supabase Auth still sends the default direct-confirmation URL, so the checked-in template/Site URL has not yet been applied to the live project.
-- VPS focused auth/session/API suite passes 35/35 tests; the full synthetic unit suite passes 201/201 tests.
-- VPS project runtime has Supabase runtime/publishable configuration but no Supabase Management API token or CLI login; hosted Auth settings therefore cannot currently be changed from the VPS through the existing credential set.
+- VPS focused auth/session/API suite passes 35/35 tests; the full synthetic unit suite passes 205/205 tests. The Supabase Management Auth-config helper focused suite passes 4/4.
+- VPS project runtime has Supabase runtime/publishable configuration but no Supabase Management API token or CLI login; hosted Auth settings therefore cannot currently be changed from the VPS through the existing credential set. A guarded Management API helper is now implemented and ready once a scoped runtime management token is supplied.
 - The connected remote execution layer correctly blocked forwarding a one-time auth token into a VPS command. No bypass was used and no one-time token was persisted.
 - One synthetic RLS verification row currently remains in `letters`; no real archive-letter row exists.
 - Supabase archive-owner Auth identity exists and is confirmed.
@@ -24,6 +24,7 @@
 - Connected Drive access can see the private archive and synthetic original, but the VPS `phone_drive` rclone credential cannot enumerate the archive contents even when given the archive/originals folder IDs directly; it is not suitable as the registry's runtime credential.
 - Refreshable Drive OAuth/runtime wiring therefore remains pending.
 - Gemini runtime remains unconfigured; an apparent Hermes reference was only example/commented configuration and no live key was available to reuse.
+- A dedicated Google OAuth client exists in a private vault from the earlier OAuth attempt, but Bitwarden CLI is unavailable on both connected Windows and VPS paths, so the credential cannot be programmatically retrieved through the current tool path.
 - No real archive-letter ingestion or production deployment has occurred.
 
 ## Next step
@@ -52,7 +53,8 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Magic-link delivery to the authorized archive-owner mailbox was verified.
 - Checked-in magic-link template is correct for server-side `token_hash` verification, but the hosted Supabase project still uses its default direct-confirmation template behavior.
 - VPS auth/session/API tests: 35/35 passed.
-- Full VPS synthetic unit suite: 201/201 passed.
+- Full VPS synthetic unit suite: 205/205 passed.
+- Supabase Management Auth-config helper focused suite: 4/4 passed.
 - Existing Supabase runtime credentials are sufficient for application access but not for Management API Auth-template changes.
 - Connected Google Drive access verified the private archive folder structure and existing synthetic-only original.
 - VPS `phone_drive` rclone can resolve the supplied folder IDs without a hard error but returns empty listings and cannot enumerate the archive contents; it cannot be used as the registry runtime credential.
