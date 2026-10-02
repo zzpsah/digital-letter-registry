@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: complete browser magic-link session handling
+- Commit: 479cde5b8305184ca160097cd6ba12f36ae6951d
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-02 — test: cover relationship review API
 - Commit: 477b43a807ade4059c1d2e800d0b835bb6985744
 - Author: PRASHANT KUMAR SAH
