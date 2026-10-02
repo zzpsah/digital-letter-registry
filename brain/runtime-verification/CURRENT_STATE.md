@@ -21,9 +21,9 @@ Observed on 2026-10-02:
 - DLR runtime now uses a dedicated tailnet-only HTTPS origin, separate from other Oracle VPS applications. Supabase Site URL and redirect allow-list are aligned to that private origin. Exact private routing details remain runtime-only.
 - Tailnet HTTPS health check passed from an authorized client. Devices must be on the authorized tailnet to open DLR magic-link callbacks; no public exposure is enabled.
 - Supabase email-send throttling is currently preventing issuance of another fresh test link; the API now reports this safely as HTTP 429 instead of 500.
-- The dedicated Google OAuth client is now successfully in use; temporary OAuth transfer artifacts were cleaned after installing the private authorized-user file.
+- The dedicated Google OAuth client is successfully in use through secret-manager-injected refresh credentials; legacy persistent authorized-user runtime files were retired after verified cutover.
 
-Pending: real short-lived owner-session HTTP/PostgREST test through the dedicated tailnet-only default hosted Magic Link flow once email throttling permits a fresh link, Gemini synthetic verification, and a separate write-capable Drive authorization if runtime synthetic upload verification is desired. Custom SMTP/template application is optional.
+Pending: real short-lived owner-session HTTP/PostgREST test through the dedicated tailnet-only default hosted Magic Link flow once email throttling permits a fresh link, and Gemini synthetic verification. Write-capable Drive authorization is complete and disposable synthetic upload/stream/delete cleanup passed. Custom SMTP/template application is optional.
 
 ## OCR readiness correction
 
@@ -31,4 +31,4 @@ Observed on 2026-10-02:
 - The user-local Tesseract and project-virtualenv OCRmyPDF executables are present and Hindi/English language data is available.
 - Runtime readiness honors explicit `TESSERACT_CMD` and `OCRMYPDF_CMD` mappings instead of relying only on `PATH`.
 - With the private environment loaded, Supabase runtime, auth callback, originals folder, Tesseract, OCRmyPDF, Hindi/English language checks, and synthetic-only safety are ready.
-- Drive OAuth is configured and live read/list/stream verification passed. Gemini remains unconfigured; no live Gemini synthetic operation has been completed yet.
+- Drive OAuth is configured with the verified write-capable grant; live refresh/list/stream plus disposable synthetic upload/stream/delete cleanup passed. Gemini remains unconfigured; no live Gemini synthetic operation has been completed yet.
