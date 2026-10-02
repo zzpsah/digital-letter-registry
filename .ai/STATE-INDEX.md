@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 1d54745815d41978544dfef1151773dbcd33878a
-- Last commit: test: align channel intake tests with provenance model
+- HEAD: 6250fe06a2280e0db5119d229e05e85dad872ed9
+- Last commit: docs: sync brain with Drive refresh and intake channels
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
