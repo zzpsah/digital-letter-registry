@@ -42,9 +42,10 @@ class EmbeddingTests(unittest.TestCase):
         self.assertEqual(len(result.values), 8)
         self.assertIn("gemini-embedding-2:embedContent", seen["url"])
         self.assertEqual(
-            seen["payload"]["embedContentConfig"]["outputDimensionality"],
+            seen["payload"]["output_dimensionality"],
             8,
         )
+        self.assertNotIn("embedContentConfig", seen["payload"])
         self.assertIn("retrieving relevant official", seen["payload"]["content"]["parts"][0]["text"])
 
     def test_blank_embedding_input_is_rejected(self) -> None:
