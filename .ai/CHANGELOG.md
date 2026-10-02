@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover magic-link email throttling
+- Commit: 6e2e57167ff11542bddefb21e528215ca60731a2
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-02 — fix: surface magic-link rate limits safely
 - Commit: e9172a264f896ac7e8840b8309cc19d741dc097d
 - Author: PRASHANT KUMAR SAH

@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: e9172a264f896ac7e8840b8309cc19d741dc097d
-- Last commit: fix: surface magic-link rate limits safely
+- HEAD: 6e2e57167ff11542bddefb21e528215ca60731a2
+- Last commit: test: cover magic-link email throttling
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
