@@ -23,3 +23,8 @@
 - [x] Verify zero synthetic residue after hosted role tests.
 - [x] Add one-click registration email action for pending invites.
 - [ ] Complete real owner bearer-session/PostgREST vertical slice through normal browser completion.
+
+
+- [x] Add authenticated password set/change flow.
+- [x] Deploy Account password UI and verify unauthenticated denial.
+- [ ] Set bootstrap admin password through a real browser session.
