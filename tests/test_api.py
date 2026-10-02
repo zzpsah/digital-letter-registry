@@ -182,6 +182,50 @@ class ApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_capabilities_report_synthetic_mode_and_refresh_drive_config(self):
+        env = {
+            "ENABLE_REAL_INTAKE": "false",
+            "GOOGLE_OAUTH_CLIENT_ID": "synthetic-client",
+            "GOOGLE_OAUTH_CLIENT_SECRET": "synthetic-secret",
+            "GOOGLE_DRIVE_REFRESH_TOKEN": "synthetic-refresh",
+            "DRIVE_ORIGINALS_FOLDER_REFERENCE": "synthetic-folder",
+            "GEMINI_API_KEY": "synthetic-gemini",
+            "AUTH_COOKIE_SECURE": "true",
+        }
+        with patch.dict(os.environ, env, clear=False):
+            with patch("letter_registry.api._transport", return_value=object()):
+                response = self.client.get(
+                    "/api/v1/capabilities",
+                    headers={"Authorization": "Bearer synthetic-user-token"},
+                )
+
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertTrue(body["synthetic_only"])
+        self.assertTrue(body["drive_upload_configured"])
+        self.assertTrue(body["original_streaming_configured"])
+        self.assertTrue(body["semantic_search_configured"])
+        self.assertTrue(body["auth_cookie_secure"])
+
+    def test_capabilities_do_not_expose_runtime_secret_values(self):
+        with patch.dict(
+            os.environ,
+            {
+                "GOOGLE_DRIVE_ACCESS_TOKEN": "very-secret-token",
+                "DRIVE_ORIGINALS_FOLDER_REFERENCE": "private-folder-id",
+            },
+            clear=False,
+        ):
+            with patch("letter_registry.api._transport", return_value=object()):
+                response = self.client.get(
+                    "/api/v1/capabilities",
+                    headers={"Authorization": "Bearer synthetic-user-token"},
+                )
+
+        serialized = response.text
+        self.assertNotIn("very-secret-token", serialized)
+        self.assertNotIn("private-folder-id", serialized)
+
     def test_pwa_manifest_and_service_worker_are_public(self):
         self.assertEqual(self.client.get("/manifest.webmanifest").status_code, 200)
         self.assertEqual(self.client.get("/sw.js").status_code, 200)
@@ -494,6 +538,8 @@ class ApiTests(unittest.TestCase):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("आधिकारिक पत्र खोज", response.text)
+        self.assertIn("पत्र जोड़ें", response.text)
+        self.assertIn("uploadForm", response.text)
 
 
 if __name__ == "__main__":
