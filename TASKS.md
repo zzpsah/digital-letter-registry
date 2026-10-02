@@ -80,7 +80,7 @@
 - [x] Confirm/reject review API with status recalculation only after confirmation.
 - [x] Preview + explicit-confirmation recursive reprocessing jobs.
 - [x] One-job processing worker orchestration with durable success/failure state.
-- [ ] Safe rename executor only after explicit approval.
+- [x] Approval-locked rename executor + private Drive rename transport implemented; no mapping approved/executed yet.
 - [ ] Historical bulk import.
 - [ ] Additional intake channels: Telegram, WhatsApp, email, watched folder.
 
