@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: record password-based login readiness
+- Commit: 2511e852c75c9b92464b452bb7becebac59d0d0c
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/multi-user-authz/TESTS.md`
+
 ## 2026-10-03 — test: cover password settings UI
 - Commit: 788ec893c8abd2c11dcff3da1fbe62c82795d6a7
 - Author: PRASHANT KUMAR SAH
