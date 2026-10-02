@@ -183,6 +183,52 @@ class ApiTests(unittest.TestCase):
             "private, no-store",
         )
 
+    def test_refresh_cookie_is_persistent_by_default(self):
+        from letter_registry.auth import SupabaseAuthSession
+
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.verify_token_hash.return_value = (
+                SupabaseAuthSession(
+                    access_token="synthetic-access",
+                    refresh_token="synthetic-refresh",
+                    expires_in=3600,
+                )
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_COOKIE_SECURE": "false",
+                    "AUTH_REFRESH_COOKIE_MAX_AGE": "",
+                },
+                clear=False,
+            ):
+                response = self.client.get(
+                    "/auth/confirm?token_hash=synthetic-hash&type=email",
+                    follow_redirects=False,
+                )
+
+        cookies = "\n".join(response.headers.get_list("set-cookie")).lower()
+        refresh = next(
+            line for line in cookies.splitlines()
+            if line.startswith("dlr_refresh_token=")
+        )
+        self.assertIn("max-age=2592000", refresh)
+        self.assertIn("httponly", refresh)
+        self.assertIn("samesite=lax", refresh)
+
+    def test_refresh_cookie_lifetime_rejects_unsafe_range(self):
+        from letter_registry.api import _refresh_cookie_max_age
+
+        with patch.dict(
+            os.environ,
+            {"AUTH_REFRESH_COOKIE_MAX_AGE": "3600"},
+            clear=False,
+        ):
+            with self.assertRaises(RuntimeError):
+                _refresh_cookie_max_age()
+
     def test_magic_link_callback_without_token_hash_serves_fragment_bridge(self):
         response = self.client.get("/auth/confirm")
         self.assertEqual(response.status_code, 200)

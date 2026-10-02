@@ -209,6 +209,25 @@ def _cookie_secure() -> bool:
     return value not in {"0", "false", "no", "off"}
 
 
+def _refresh_cookie_max_age() -> int:
+    raw = os.environ.get("AUTH_REFRESH_COOKIE_MAX_AGE", "").strip()
+    if not raw:
+        return 30 * 24 * 60 * 60
+    try:
+        seconds = int(raw)
+    except ValueError as exc:
+        raise RuntimeError(
+            "AUTH_REFRESH_COOKIE_MAX_AGE must be an integer number of seconds"
+        ) from exc
+    minimum = 24 * 60 * 60
+    maximum = 90 * 24 * 60 * 60
+    if seconds < minimum or seconds > maximum:
+        raise RuntimeError(
+            "AUTH_REFRESH_COOKIE_MAX_AGE must be between 1 and 90 days"
+        )
+    return seconds
+
+
 def _set_session_cookies(
     response: Response,
     session: SupabaseAuthSession,
@@ -228,6 +247,7 @@ def _set_session_cookies(
     response.set_cookie(
         _REFRESH_COOKIE,
         session.refresh_token,
+        max_age=_refresh_cookie_max_age(),
         **common,
     )
     response.headers["Cache-Control"] = "private, no-store"
