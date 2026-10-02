@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from .auth import SupabasePasswordlessAuth
 from .detail import SupabaseLetterDetailRepository
 from .gemini_embeddings import GeminiEmbeddingProvider
+from .google_drive_reader import GoogleDrivePrivateTransport
 from .hybrid_search import HybridSearchRepository
 from .original_access import SupabaseOriginalAccessService
 from .search import SearchFilters, SupabaseSearchRepository
@@ -102,8 +103,18 @@ def _transport(access_token: str) -> SupabasePostgrestTransport:
     )
 
 
+def _runtime_dependencies() -> ApiDependencies:
+    if os.environ.get("GOOGLE_DRIVE_ACCESS_TOKEN", "").strip():
+        return ApiDependencies(
+            original_access=SupabaseOriginalAccessService(
+                GoogleDrivePrivateTransport.from_environment()
+            )
+        )
+    return ApiDependencies()
+
+
 def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
-    deps = dependencies or ApiDependencies()
+    deps = dependencies if dependencies is not None else _runtime_dependencies()
     app = FastAPI(
         title="Official Letter Intelligence Archive",
         version="0.1.0",
