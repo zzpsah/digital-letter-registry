@@ -43,6 +43,23 @@
     <div id="loginStatus" class="muted" style="margin-top:8px"></div>
   </section>
 
+  <section id="uploadBox" class="card" style="display:none">
+    <div class="row">
+      <div>
+        <h2 style="margin:0 0 4px">पत्र जोड़ें</h2>
+        <div id="intakeMode" class="muted">Runtime status देख रहा है…</div>
+      </div>
+      <span id="intakeBadge" class="badge"></span>
+    </div>
+    <form id="uploadForm" style="margin-top:10px">
+      <div class="row">
+        <input id="uploadFile" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required style="flex:1;min-width:0">
+        <button class="primary" type="submit">Upload</button>
+      </div>
+    </form>
+    <div id="uploadStatus" class="muted" style="margin-top:8px"></div>
+  </section>
+
   <form id="searchForm">
     <div class="search">
       <input id="q" name="q" autocomplete="off" placeholder="जैसे: inter exam last date" aria-label="Search">
@@ -94,8 +111,24 @@ async function refreshSessionUi(){
   const res=await fetch("/api/v1/auth/session",{cache:"no-store"});
   const signedIn=res.ok;
   setSessionUi(signedIn);
-  if(!signedIn)$("status").textContent="Search करने के लिए secure sign-in आवश्यक है.";
-  return signedIn;
+  $("uploadBox").style.display=signedIn?"block":"none";
+  if(!signedIn){
+    $("status").textContent="Search करने के लिए secure sign-in आवश्यक है.";
+    return false;
+  }
+
+  const capabilities=await fetch("/api/v1/capabilities",{cache:"no-store"});
+  if(capabilities.ok){
+    const data=await capabilities.json();
+    $("intakeBadge").textContent=data.synthetic_only?"TEST MODE":"LIVE INTAKE";
+    $("intakeMode").textContent=data.synthetic_only
+      ?"अभी केवल synthetic/test filename वाले दस्तावेज स्वीकार होंगे."
+      :"Private archive intake enabled.";
+    if(!data.drive_upload_configured){
+      $("uploadStatus").textContent="Private Drive upload runtime अभी configure नहीं है.";
+    }
+  }
+  return true;
 }
 
 function params(){
@@ -165,6 +198,38 @@ $("logoutButton").addEventListener("click",async()=>{
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/sw.js").catch(()=>{});
 }
+
+$("uploadForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const file=$("uploadFile").files?.[0];
+  if(!file)return;
+
+  const form=new FormData();
+  form.append("file",file,file.name);
+  $("uploadStatus").className="muted";
+  $("uploadStatus").textContent="Archive में जोड़ रहा है…";
+
+  const res=await fetch("/api/v1/intake",{
+    method:"POST",
+    body:form
+  });
+  if(!res.ok){
+    let detail="Upload failed: "+res.status;
+    try{
+      const body=await res.json();
+      if(body.detail)detail=body.detail;
+    }catch{}
+    $("uploadStatus").className="error";
+    $("uploadStatus").textContent=detail;
+    return;
+  }
+
+  const data=await res.json();
+  $("uploadStatus").className="muted";
+  $("uploadStatus").textContent=
+    "Archived · processing queued · "+data.original_filename;
+  $("uploadForm").reset();
+});
 
 $("searchForm").addEventListener("submit",async e=>{
   e.preventDefault();
