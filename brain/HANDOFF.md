@@ -25,3 +25,8 @@ Do not deploy, ingest real documents, activate live connectors, rename real Driv
 - DLR code itself is not tied to that account.
 - To use another Google Drive, authorize that account separately and configure separate secret-manager OAuth keys plus archive folder references.
 - Never silently reuse another deployment's refresh token or switch its target folders.
+
+
+## Auth boundary
+
+Magic Link/passwordless email authentication is an identity/session layer only. It exists so Supabase RLS can enforce owner-scoped database access and so future users/schools can remain isolated. It does not replace Tailscale, does not grant Google Drive access, and does not authorize real ingestion/rename/delete actions by itself.
