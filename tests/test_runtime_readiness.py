@@ -25,7 +25,7 @@ class RuntimeReadinessTests(unittest.TestCase):
             ):
                 class Result:
                     returncode = 0
-                    stdout = "List of available languages\neng\nhin\n"
+                    stdout = "List of available languages" + chr(10) + "eng" + chr(10) + "hin" + chr(10)
                     stderr = ""
 
                 with patch(
