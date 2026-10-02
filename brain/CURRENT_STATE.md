@@ -52,3 +52,8 @@ PDF and image paths are both represented: PDF uses native text then OCRmyPDF/Tes
 - Verified RLS owner access and cross-user isolation without retaining test rows.
 - PWA now captures implicit magic-link sessions safely on the client and can open streamed original bytes.
 - No real letter ingestion, rename execution, or production deployment occurred.
+
+
+## Relationship intelligence
+
+The worker now generates only conservative, reviewable relationship suggestions when explicit extension/correction/superseding language references a known prior letter number. Suggestions never change status automatically. Authenticated review endpoints confirm/reject them, and only confirmed supersedes links affect the older letter's status through an RLS-aware recalculation function.
