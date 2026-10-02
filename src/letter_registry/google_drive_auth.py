@@ -23,6 +23,41 @@ class DriveAccessTokenProvider(Protocol):
         ...
 
 
+@dataclass(slots=True)
+class GoogleAuthorizedUserFileProvider:
+    credentials_path: str
+    _delegate: "GoogleRefreshTokenProvider | None" = field(default=None, init=False)
+
+    @classmethod
+    def from_environment(cls) -> "GoogleAuthorizedUserFileProvider":
+        path = os.environ.get("GOOGLE_OAUTH_CREDENTIALS_FILE", "").strip()
+        if not path:
+            raise ValueError("Google authorized-user credentials file is required")
+        return cls(credentials_path=path)
+
+    def _provider(self) -> "GoogleRefreshTokenProvider":
+        if self._delegate is not None:
+            return self._delegate
+        try:
+            with open(self.credentials_path, "r", encoding="utf-8") as handle:
+                data = json.load(handle)
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValueError("Google authorized-user credentials file is invalid") from exc
+
+        values = {
+            "client_id": str(data.get("client_id") or "").strip(),
+            "client_secret": str(data.get("client_secret") or "").strip(),
+            "refresh_token": str(data.get("refresh_token") or "").strip(),
+        }
+        if not all(values.values()):
+            raise ValueError("Google authorized-user credentials file is incomplete")
+        self._delegate = GoogleRefreshTokenProvider(**values)
+        return self._delegate
+
+    def get_access_token(self) -> str:
+        return self._provider().get_access_token()
+
+
 TextHttpExecutor = Callable[[request.Request], tuple[int, str]]
 
 
@@ -139,6 +174,12 @@ class GoogleRefreshTokenProvider:
 
 
 def drive_token_provider_from_environment() -> DriveAccessTokenProvider:
+    credentials_file = os.environ.get(
+        "GOOGLE_OAUTH_CREDENTIALS_FILE", ""
+    ).strip()
+    if credentials_file:
+        return GoogleAuthorizedUserFileProvider.from_environment()
+
     refresh_token = os.environ.get(
         "GOOGLE_DRIVE_REFRESH_TOKEN", ""
     ).strip()
