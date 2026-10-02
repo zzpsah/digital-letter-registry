@@ -199,3 +199,21 @@ PYTHONPATH=src python3 scripts/preview_historical_import.py \
 ```
 
 Use `.json` as the output extension for a JSON report. The report contains filenames, SHA-256, size, type, and duplicate/new status only. It does **not** upload files, rename files, run OCR/AI, or create archive rows.
+
+
+## Runtime readiness
+
+Before a synthetic live test, check runtime configuration and local OCR support
+without printing any secret values:
+
+```bash
+PYTHONPATH=src python3 scripts/check_runtime_readiness.py
+```
+
+The checker reports only safe status/details for Supabase runtime config, the
+`/auth/confirm` redirect, Drive credentials/folder configuration, Gemini,
+Tesseract, OCRmyPDF, Hindi+English language data, and whether real intake is
+still disabled.
+
+The authenticated web app exposes the same safe status at
+`GET /api/v1/readiness`.
