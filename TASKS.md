@@ -22,7 +22,8 @@
 
 - [x] Define document + processing-version schema.
 - [x] Implement synthetic/local ingestion preparation without provider writes.
-- [ ] Implement private Drive upload adapter with synthetic fixtures.
+- [x] Implement Drive storage adapter contract with synthetic transport tests.
+- [ ] Wire the live private Drive transport after runtime authentication/config is available.
 - [x] Preserve source identity contract and compute duplicate SHA-256.
 - [x] Map original filename + immutable private storage reference through the repository layer.
 - [x] Add credential-free Supabase repository adapter with injected authenticated transport.
