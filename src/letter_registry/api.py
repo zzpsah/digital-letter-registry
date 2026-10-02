@@ -5,8 +5,9 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
-from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile, status
 from fastapi.responses import FileResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
@@ -15,10 +16,16 @@ from .auth import SupabasePasswordlessAuth
 from .detail import SupabaseLetterDetailRepository
 from .gemini_embeddings import GeminiEmbeddingProvider
 from .google_drive_reader import GoogleDrivePrivateTransport
+from .google_drive_writer import GoogleDrivePrivateWriter
 from .hybrid_search import HybridSearchRepository
+from .intake import DuplicateSourceError, IntakePolicy, IntakeService
+from .jobs import SupabaseProcessingQueue
 from .original_access import SupabaseOriginalAccessService
 from .search import SearchFilters, SupabaseSearchRepository
 from .semantic_search import SupabaseEmbeddingRepository
+from .session import SupabaseUserSession
+from .storage import GoogleDriveOriginalStorage
+from .supabase_repository import SupabaseLetterRepository
 from .supabase_runtime import SupabasePostgrestTransport
 
 
@@ -65,6 +72,15 @@ class LetterDetailResponse(BaseModel):
     open_original_path: str
 
 
+class IntakeResponse(BaseModel):
+    record_id: str
+    original_filename: str
+    sha256: str
+    job_id: str
+    job_status: str = "pending"
+    synthetic_only: bool
+
+
 class SearchResponse(BaseModel):
     query: str
     count: int
@@ -101,6 +117,31 @@ def _transport(access_token: str) -> SupabasePostgrestTransport:
         publishable_key=_required_env("SUPABASE_PUBLISHABLE_KEY"),
         access_token=access_token,
     )
+
+
+def _truthy_env(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _runtime_intake(access_token: str) -> tuple[str, IntakeService]:
+    folder_reference = _required_env("DRIVE_ORIGINALS_FOLDER_REFERENCE")
+    owner_id = SupabaseUserSession.from_environment(
+        access_token=access_token,
+    ).user_id()
+    database = _transport(access_token)
+    storage = GoogleDriveOriginalStorage(
+        transport=GoogleDrivePrivateWriter.from_environment(),
+        originals_folder_reference=folder_reference,
+    )
+    service = IntakeService(
+        storage=storage,
+        repository=SupabaseLetterRepository(database),
+        queue=SupabaseProcessingQueue(database),
+        policy=IntakePolicy(
+            synthetic_only=not _truthy_env("ENABLE_REAL_INTAKE"),
+        ),
+    )
+    return owner_id, service
 
 
 def _runtime_dependencies() -> ApiDependencies:
@@ -152,6 +193,70 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             Path(__file__).with_name("web") / "sw.js",
             media_type="application/javascript",
             headers={"Cache-Control": "no-cache"},
+        )
+
+    @app.post(
+        "/api/v1/intake",
+        response_model=IntakeResponse,
+        status_code=status.HTTP_202_ACCEPTED,
+    )
+    async def intake_upload(
+        file: UploadFile = File(...),
+        access_token: str = Depends(_access_token),
+    ) -> IntakeResponse:
+        safe_name = Path(file.filename or "").name
+        if not safe_name or safe_name in {".", ".."}:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Valid upload filename is required",
+            )
+
+        try:
+            owner_id, service = _runtime_intake(access_token)
+        except (RuntimeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Private intake runtime is not configured",
+            ) from exc
+
+        with TemporaryDirectory() as directory:
+            source = Path(directory) / safe_name
+            total = 0
+            with source.open("wb") as handle:
+                while True:
+                    chunk = await file.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    total += len(chunk)
+                    if total > service.policy.max_bytes:
+                        raise HTTPException(
+                            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                            detail="Upload exceeds configured size limit",
+                        )
+                    handle.write(chunk)
+
+            try:
+                result = service.ingest(
+                    source,
+                    owner_id=owner_id,
+                )
+            except DuplicateSourceError as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="This file content is already archived",
+                ) from exc
+            except ValueError as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=str(exc),
+                ) from exc
+
+        return IntakeResponse(
+            record_id=result.record.record_id,
+            original_filename=result.record.original_filename,
+            sha256=result.record.original_sha256,
+            job_id=result.job.job_id,
+            synthetic_only=service.policy.synthetic_only,
         )
 
     @app.get("/api/v1/search", response_model=SearchResponse)
