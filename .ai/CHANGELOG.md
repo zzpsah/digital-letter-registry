@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover configured OCR readiness overrides
+- Commit: 2ac385c6dd08ca264310f9c6cfeadc6da7050c9d
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_runtime_readiness.py`
+
 ## 2026-10-02 — fix: honor configured OCR executables in readiness checks
 - Commit: 38e59499b50174906be56816912531d55b98905d
 - Author: PRASHANT KUMAR SAH

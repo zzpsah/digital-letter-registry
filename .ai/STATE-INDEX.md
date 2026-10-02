@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 38e59499b50174906be56816912531d55b98905d
-- Last commit: fix: honor configured OCR executables in readiness checks
+- HEAD: 2ac385c6dd08ca264310f9c6cfeadc6da7050c9d
+- Last commit: test: cover configured OCR readiness overrides
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
