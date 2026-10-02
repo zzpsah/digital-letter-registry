@@ -151,6 +151,38 @@ class ApiTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 401)
 
+    def test_reprocessing_preview_is_read_only(self):
+        class PreviewTransport:
+            def select(self, table, *, filters=None, columns="*"):
+                return [{
+                    "letter_id": "22222222-2222-4222-8222-222222222222",
+                    "ocr_version": "ocr-v1",
+                    "context_version": "context-v1",
+                    "dictionary_version": "dict-v1",
+                    "filename_rule_version": "name-v1",
+                    "category_schema_version": "cat-v1",
+                    "embedding_version": "embed-v1",
+                    "status_rule_version": "status-v1",
+                }]
+
+        with patch("letter_registry.api._transport", return_value=PreviewTransport()):
+            response = self.client.get(
+                "/api/v1/reprocessing/preview"
+                "?ocr_version=ocr-v2"
+                "&context_version=context-v2"
+                "&dictionary_version=dict-v2"
+                "&filename_rule_version=name-v2"
+                "&category_schema_version=cat-v2"
+                "&embedding_version=embed-v2"
+                "&status_rule_version=status-v2",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["count"], 1)
+        self.assertIn("ocr_version", body["items"][0]["reasons"])
+
     def test_search_requires_bearer_session(self):
         response = self.client.get("/api/v1/search?q=inter")
         self.assertEqual(response.status_code, 401)
