@@ -199,3 +199,16 @@ DLR is no longer a Gmail-specific or single-owner authorization design. Authenti
 - Backend Google Drive OAuth is separate from user authentication.
 
 Hosted state was verified on 2026-10-02: one active admin, no disabled members, no pending invites, no real archive-letter rows. Full synthetic suite: 249/249.
+
+
+## Multi-role runtime verification
+
+Hosted Supabase role behavior was verified on 2026-10-02 using synthetic JWT-claim simulation:
+- viewer read-only;
+- editor read/insert/update but not delete;
+- non-member no archive read/insert;
+- admin delete allowed.
+
+Synthetic users/rows/memberships were removed and zero residue was confirmed. Pending invites can now be onboarded with one click by sending the existing invite-validated registration Magic Link, while copy links retain invite codes only in URL fragments.
+
+The remaining auth proof is a real short-lived browser/email owner session against PostgREST; Magic Link delivery is working, but that final bearer-session completion is not yet marked complete.
