@@ -63,6 +63,7 @@
 
 - [x] Passwordless email login request endpoint for existing authorized users.
 - [x] Implement server-side token-hash auth callback + HttpOnly cookie session/refresh without browser token storage.
+- [x] Support Supabase default hosted Magic Link fragment callback: same-origin bridge validates owner session server-side, sets HttpOnly cookies, clears URL tokens, and requires no custom SMTP.
 - [x] Authenticated safe letter-detail endpoint without storage IDs.
 
 ## Phase 3.5 — Intake/runtime
@@ -72,7 +73,7 @@
 - [x] Upload → duplicate preflight → private archive → enqueue derived processing.
 - [ ] Live authenticated synthetic API vertical slice.
 - [x] Add guarded Supabase Management API helper to check/apply the checked-in Magic Link template, Site URL, and redirect allow-list without printing credentials.
-- [ ] Configure hosted Supabase Magic Link template/Site URL to the deployed/local `/auth/confirm` endpoint before live browser test.
+- [ ] Optional later: enable custom SMTP and apply the checked-in token-hash Magic Link template/Site URL if desired; this is no longer required for the default hosted login flow.
 - [x] Runtime auth callback/session exchange implemented with HttpOnly cookies and refresh rotation.
 - [x] Add same-origin CSRF protection for cookie-authenticated mutations.
 - [x] Authenticated owner upload panel with explicit synthetic/test mode status.
