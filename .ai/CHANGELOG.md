@@ -1,3 +1,11 @@
+## 2026-10-02 — feat: add one-click registration email
+- Commit: 736179ef833476699c682e78538f426f529f8568
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-03 — docs: record provider-independent account model
 - Commit: 8e70ca7dd303d4b517913bacf109acab48a7c430
 - Author: PRASHANT KUMAR SAH

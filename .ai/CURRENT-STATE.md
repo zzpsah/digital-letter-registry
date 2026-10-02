@@ -69,23 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 1c99c4dcb15c34b3e9e3f3a1191e2f9524e88a3f
-- Change: fix: harden invite-only multi-user auth UX
+- Commit: 736179ef833476699c682e78538f426f529f8568
+- Change: feat: add one-click registration email
 - Date: 2026-10-02
 - Durable context synchronization: completed
-
-
-## Multi-user account authorization — verified 2026-10-02
-
-- Hosted Supabase has the archive-membership migrations applied.
-- Current archive membership: one active admin; no editor/viewer/disabled members; no pending invites.
-- Registration is invite-only and login is provider-independent.
-- Email/password is available; Gmail is not required.
-- Google Sign-In remains optional and currently disabled at the provider level.
-- Magic Link remains available.
-- Role enforcement is database-backed with archive-aware RLS.
-- The database protects the last active admin from demotion, disablement, or removal; a live safety test verified the block and left membership unchanged.
-- Admin account-management APIs/UI are implemented.
-- Invite links use URL fragments and are cleared after browser prefill to reduce invite-code leakage.
-- Full synthetic suite passes 249/249.
-- Supabase security advisor reports leaked-password protection is disabled; enabling it remains an external Auth hardening task.
