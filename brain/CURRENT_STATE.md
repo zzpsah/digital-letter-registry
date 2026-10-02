@@ -43,3 +43,8 @@ Native PDF text/OCR provider contracts are implemented with Hindi-English fallba
 ## Concrete extraction backends
 
 Native PDF text now has a pypdf implementation. OCR fallback now has an OCRmyPDF/Tesseract implementation using Hindi+English sidecar text. Extraction text/version persistence is wired into letter_processing. Runtime verification of OCR binaries/language packs remains pending.
+
+
+## Structured context provider
+
+The provider-neutral context schema and extraction→context→persistence pipeline are implemented. Gemini is the first runtime-configurable structured-output adapter; provider/model changes do not require schema changes and can be handled by reprocessing versions.
