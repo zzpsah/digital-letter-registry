@@ -64,8 +64,9 @@ class GoogleDrivePrivateTransport:
     ) -> OriginalFile:
         if provider != "gdrive":
             raise ValueError(f"unsupported storage provider: {provider}")
+
         object_id = object_reference.strip()
-        if not object_id or "/" in object_id or "\" in object_id:
+        if not object_id or "/" in object_id or "\\" in object_id:
             raise ValueError("invalid Google Drive object reference")
 
         encoded_id = parse.quote(object_id, safe="")
