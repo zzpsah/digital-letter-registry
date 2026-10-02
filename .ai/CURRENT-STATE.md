@@ -98,3 +98,9 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - PWA service worker caches only public app-shell assets and never caches `/api/` data.
 - Original-file route remains closed (501) until a private server-side Drive resolver is injected.
 - Application CI recently exposed and led to fixes for native-PDF syntax and blank-embedding validation; final green verification is pending the newest workflow run.
+
+## Last automated change
+- Commit: 167ebb20a0282e8858b118429cdb12c6a67f3173
+- Change: ci: run vendored DevOS context sync locally
+- Date: 2026-10-02
+- Durable context synchronization: completed
