@@ -6,12 +6,13 @@ Repository evidence is authoritative over chat memory. After meaningful work, sy
 
 Current runtime checkpoint:
 - DB-level synthetic owner RLS insert/read and wrong-user denial are verified using simulated request JWT claims.
-- Checked-in magic-link template already uses the correct server-side token-hash callback, but hosted Supabase Auth still uses its default direct-confirmation template. Live hosted configuration remains pending.
-- VPS focused auth/session/API tests pass 35/35; full synthetic suite passes 201/201.
+- Checked-in magic-link template already uses the correct server-side token-hash callback, but hosted Supabase Auth still uses its default direct-confirmation template. Live hosted configuration remains pending; a guarded Management API helper is implemented and ready once a scoped runtime management token is available.
+- VPS focused auth/session/API tests pass 35/35; full synthetic suite passes 205/205; Supabase Management Auth-config helper tests pass 4/4.
 - A real short-lived authenticated HTTP/PostgREST vertical slice is still pending.
 - Connected Drive access verifies the private archive and synthetic original.
 - The existing VPS `phone_drive` rclone credential cannot enumerate archive contents even with direct folder IDs, so it is not suitable for registry Drive runtime access.
 - Gemini runtime key remains unavailable.
+- A dedicated Google OAuth client exists in a private vault from the earlier attempt, but Bitwarden CLI is unavailable locally and on the VPS, so current tooling cannot retrieve it automatically.
 - One synthetic DB verification row remains; no real archive letters exist.
 
 Do not deploy, ingest real documents, activate live connectors, rename real Drive files, configure or expose secrets, or perform destructive live-data actions without the required explicit authorization.
