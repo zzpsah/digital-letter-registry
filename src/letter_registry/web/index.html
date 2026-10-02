@@ -47,32 +47,21 @@
     <div id="passwordLoginStatus" class="muted" style="margin-top:8px"></div>
 
     <details id="registerDetails" style="margin-top:10px">
-      <summary>Invited नया account बनाएं</summary>
-      <div class="muted" style="margin-top:8px">Admin से मिला invite code use करें. Gmail जरूरी नहीं है.</div>
+      <summary>Create Account</summary>
+      <div class="muted" style="margin-top:8px">Email + password से account बनाएं. Archive access admin approval के बाद मिलेगा.</div>
       <form id="registerForm" style="margin-top:10px">
-        <input id="registerEmail" type="email" autocomplete="email" placeholder="invited email" style="width:100%;margin-bottom:8px" required>
-        <input id="registerInviteCode" autocomplete="off" placeholder="Invite code" style="width:100%;margin-bottom:8px" required>
+        <input id="registerEmail" type="email" autocomplete="email" placeholder="email@example.com" style="width:100%;margin-bottom:8px" required>
+        <input id="registerPassword" type="password" autocomplete="new-password" placeholder="New password (8+ characters)" minlength="8" style="width:100%;margin-bottom:8px" required>
         <div class="row">
-          <input id="registerPassword" type="password" autocomplete="new-password" placeholder="New password (8+ characters)" minlength="8" style="flex:1;min-width:0" required>
-          <button class="primary" type="submit">Create account</button>
+          <input id="registerConfirmPassword" type="password" autocomplete="new-password" placeholder="Confirm password" minlength="8" style="flex:1;min-width:0" required>
+          <button class="primary" type="submit">Create Account</button>
         </div>
       </form>
-      <button id="registerMagicLink" type="button" style="width:100%;margin-top:8px">Password के बिना email link भेजें</button>
       <div id="registerStatus" class="muted" style="margin-top:8px"></div>
     </details>
 
     <a id="googleLogin" class="open" href="/auth/google" style="display:none;text-align:center;width:100%;margin-top:12px">Google से साइन इन करें</a>
     <div id="googleLoginNote" class="muted" style="margin-top:8px"></div>
-
-    <details style="margin-top:10px">
-      <summary>Email link / recovery</summary>
-      <div class="muted" style="margin-top:8px">Password उपलब्ध न हो तो authorized email पर secure sign-in link भेजें.</div>
-      <form id="loginForm" class="row" style="margin-top:10px">
-        <input id="loginEmail" type="email" autocomplete="email" placeholder="email@example.com" style="flex:1;min-width:0">
-        <button type="submit">Link भेजें</button>
-      </form>
-      <div id="loginStatus" class="muted" style="margin-top:8px"></div>
-    </details>
   </section>
 
   <section id="accountBox" class="card" style="display:none">
@@ -111,17 +100,7 @@
 
   <section id="adminBox" class="card" style="display:none">
     <h2>DLR account access</h2>
-    <div class="muted">Admin users invite, role और access status manage कर सकते हैं.</div>
-    <form id="inviteForm" class="row" style="margin-top:10px;align-items:stretch">
-      <input id="inviteEmail" type="email" placeholder="user@example.com" required style="flex:1;min-width:0">
-      <select id="inviteRole">
-        <option value="viewer">Viewer</option>
-        <option value="editor">Editor</option>
-        <option value="admin">Admin</option>
-      </select>
-      <button class="primary" type="submit">Invite</button>
-    </form>
-    <div id="inviteStatus" class="muted" style="margin-top:8px"></div>
+    <div class="muted">New accounts पहले disabled रहते हैं. Role चुनकर status Active करें.</div>
     <div id="accessList" style="margin-top:10px"></div>
   </section>
 
@@ -185,7 +164,7 @@ async function refreshAuthProviders(){
       :"Google sign-in optional है; email/password login available है.";
   }catch{
     $("googleLogin").style.display="none";
-    $("googleLoginNote").textContent="Google sign-in status unavailable · email-link fallback use करें.";
+    $("googleLoginNote").textContent="Email/password login available है.";
   }
 }
 
@@ -196,8 +175,7 @@ async function refreshAdminAccess(){
     return;
   }
   const data=await res.json();
-  $("accessList").innerHTML=data.items.map(item=>{
-    if(item.kind==="member"){
+  $("accessList").innerHTML=data.items.filter(item=>item.kind==="member").map(item=>{
       const roleOptions=["viewer","editor","admin"].map(r=>
         '<option value="'+r+'" '+(r===item.role?'selected':'')+'>'+r+'</option>'
       ).join("");
@@ -211,20 +189,7 @@ async function refreshAdminAccess(){
         +'<select data-member-status="'+esc(item.user_id)+'">'+statusOptions+'</select>'
         +'<button type="button" data-save-member="'+esc(item.user_id)+'">Save</button>'
         +'</div></div>';
-    }
-    const path=item.invite_code?"/#invite="+encodeURIComponent(item.invite_code):"";
-    return '<div class="card" style="margin:8px 0;padding:10px">'
-      +'<div><strong>'+esc(item.email)+'</strong> · '+esc(item.role)+' · '+esc(item.status)+'</div>'
-      +(item.invite_code
-        ?'<div class="muted" style="word-break:break-all;margin-top:6px">Invite code: '+esc(item.invite_code)+'</div>'
-         +'<div class="row" style="margin-top:8px">'
-         +'<button type="button" data-send-invite-email="'+esc(item.record_id)+'" data-invite-email="'+esc(item.email)+'" data-invite-code="'+esc(item.invite_code)+'">Send registration email</button>'
-         +'<button type="button" data-copy-invite="'+esc(path)+'">Copy invite link</button>'
-         +'<button type="button" data-revoke-invite="'+esc(item.record_id)+'">Revoke</button>'
-         +'</div>'
-        :"")
-      +'</div>';
-  }).join("")||'<div class="muted">No access records.</div>';
+  }).join("")||'<div class="muted">No accounts yet.</div>';
 }
 
 async function refreshSessionUi(){
@@ -314,43 +279,33 @@ function render(data){
 $("registerForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const email=$("registerEmail").value.trim();
-  const invite_code=$("registerInviteCode").value.trim();
   const password=$("registerPassword").value;
+  const confirm=$("registerConfirmPassword").value;
+  if(password.length<8){
+    $("registerStatus").textContent="Password कम से कम 8 characters का रखें.";
+    return;
+  }
+  if(password!==confirm){
+    $("registerStatus").textContent="दोनों password match नहीं कर रहे.";
+    return;
+  }
   $("registerStatus").textContent="Account बना रहा है…";
-  const res=await fetch("/api/v1/auth/register",{
+  const res=await fetch("/api/v1/auth/create-account",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email,password,invite_code})
+    body:JSON.stringify({email,password})
   });
   let body={};
   try{body=await res.json();}catch{}
   if(!res.ok){
-    $("registerStatus").textContent=body.detail||"Registration failed.";
+    $("registerStatus").textContent=body.detail||"Account creation failed.";
     return;
   }
   $("registerPassword").value="";
-  $("registerStatus").textContent=body.message||"Registration started.";
-  if(body.authenticated)await refreshSessionUi();
-});
-
-$("registerMagicLink").addEventListener("click",async()=>{
-  const email=$("registerEmail").value.trim();
-  const invite_code=$("registerInviteCode").value.trim();
-  if(!email||!invite_code){
-    $("registerStatus").textContent="Invited email और invite code दोनों भरें.";
-    return;
-  }
-  $("registerStatus").textContent="Registration link भेज रहा है…";
-  const res=await fetch("/api/v1/auth/register-magic-link",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email,invite_code})
-  });
-  let body={};
-  try{body=await res.json();}catch{}
-  $("registerStatus").textContent=res.ok
-    ?(body.message||"Registration link sent.")
-    :(body.detail||"Registration link failed.");
+  $("registerConfirmPassword").value="";
+  $("registerStatus").textContent=body.confirmation_required
+    ?"Account created. Admin approval pending. Email confirmation is currently enabled."
+    :(body.message||"Account created. Admin approval pending.");
 });
 
 $("passwordLoginForm").addEventListener("submit",async e=>{
@@ -404,108 +359,23 @@ $("passwordChangeForm").addEventListener("submit",async e=>{
   $("passwordChangeStatus").textContent=body.message||"Password updated.";
 });
 
-$("loginForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const email=$("loginEmail").value.trim();
-  if(!email)return;
-  $("loginStatus").textContent="Link भेजा जा रहा है…";
-  const res=await fetch("/api/v1/auth/magic-link",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email})
-  });
-  $("loginStatus").textContent=res.ok
-    ?"अगर email authorized है तो sign-in link भेज दिया गया है."
-    :"Sign-in request failed.";
-});
-
-$("inviteForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const email=$("inviteEmail").value.trim();
-  const role=$("inviteRole").value;
-  $("inviteStatus").textContent="Invite बना रहा है…";
-  const res=await fetch("/api/v1/admin/invites",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email,role})
-  });
-  let body={};
-  try{body=await res.json();}catch{}
-  if(!res.ok){
-    $("inviteStatus").textContent=body.detail||"Invite failed.";
-    return;
-  }
-  $("inviteEmail").value="";
-  $("inviteStatus").textContent=body.registration_path
-    ?("Invite ready: "+body.registration_path)
-    :"Existing account को archive access दे दिया गया.";
-  await refreshAdminAccess();
-});
-
 $("accessList").addEventListener("click",async e=>{
   const save=e.target.closest("[data-save-member]");
-  if(save){
-    const userId=save.dataset.saveMember;
-    const roleNode=document.querySelector('[data-member-role="'+CSS.escape(userId)+'"]');
-    const statusNode=document.querySelector('[data-member-status="'+CSS.escape(userId)+'"]');
-    const res=await fetch("/api/v1/admin/members/"+encodeURIComponent(userId),{
-      method:"PATCH",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({role:roleNode.value,status:statusNode.value})
-    });
-    if(!res.ok){
-      let body={};try{body=await res.json();}catch{}
-      alert(body.detail||"Member update failed.");
-    }
-    await refreshAdminAccess();
-    return;
+  if(!save)return;
+  const userId=save.dataset.saveMember;
+  const roleNode=document.querySelector('[data-member-role="'+CSS.escape(userId)+'"]');
+  const statusNode=document.querySelector('[data-member-status="'+CSS.escape(userId)+'"]');
+  const res=await fetch("/api/v1/admin/members/"+encodeURIComponent(userId),{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({role:roleNode.value,status:statusNode.value})
+  });
+  if(!res.ok){
+    let body={};try{body=await res.json();}catch{}
+    alert(body.detail||"Member update failed.");
   }
-  const sendInvite=e.target.closest("[data-send-invite-email]");
-  if(sendInvite){
-    const email=sendInvite.dataset.inviteEmail;
-    const invite_code=sendInvite.dataset.inviteCode;
-    $("inviteStatus").textContent="Registration email भेज रहा है…";
-    const res=await fetch("/api/v1/auth/register-magic-link",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({email,invite_code})
-    });
-    let body={};
-    try{body=await res.json();}catch{}
-    $("inviteStatus").textContent=res.ok
-      ?(body.message||"Registration email sent.")
-      :(body.detail||"Registration email failed.");
-    return;
-  }
-  const revoke=e.target.closest("[data-revoke-invite]");
-  if(revoke){
-    const res=await fetch("/api/v1/admin/invites/"+encodeURIComponent(revoke.dataset.revokeInvite)+"/revoke",{method:"POST"});
-    if(!res.ok){
-      let body={};try{body=await res.json();}catch{}
-      alert(body.detail||"Invite revoke failed.");
-    }
-    await refreshAdminAccess();
-    return;
-  }
-  const copy=e.target.closest("[data-copy-invite]");
-  if(copy){
-    const url=location.origin+copy.dataset.copyInvite;
-    try{
-      await navigator.clipboard.writeText(url);
-      $("inviteStatus").textContent="Invite link copied.";
-    }catch{
-      $("inviteStatus").textContent=url;
-    }
-  }
+  await refreshAdminAccess();
 });
-
-const inviteFragment=new URLSearchParams(location.hash.slice(1));
-const inviteFromUrl=inviteFragment.get("invite");
-if(inviteFromUrl){
-  $("registerInviteCode").value=inviteFromUrl;
-  $("registerDetails").open=true;
-  history.replaceState(null,"",location.pathname+location.search);
-}
 
 refreshAuthProviders();
 refreshSessionUi();
