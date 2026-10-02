@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: add secret-safe runtime readiness checks
+- Commit: c524d74349db5bfdf589d82dc09d5f50aaf9af29
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/COMMANDS.md`
+
 ## 2026-10-02 — feat: show secret-safe runtime readiness in owner UI
 - Commit: 5e0fd91ca2fc3ecd7ffdf8e537e0c4b94d8bd7df
 - Author: PRASHANT KUMAR SAH
