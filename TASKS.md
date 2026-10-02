@@ -71,6 +71,7 @@
 - [x] Durable Supabase processing-job queue with atomic claim/complete/fail RPCs.
 - [x] Upload → duplicate preflight → private archive → enqueue derived processing.
 - [ ] Live authenticated synthetic API vertical slice.
+- [x] Add guarded Supabase Management API helper to check/apply the checked-in Magic Link template, Site URL, and redirect allow-list without printing credentials.
 - [ ] Configure hosted Supabase Magic Link template/Site URL to the deployed/local `/auth/confirm` endpoint before live browser test.
 - [x] Runtime auth callback/session exchange implemented with HttpOnly cookies and refresh rotation.
 - [x] Add same-origin CSRF protection for cookie-authenticated mutations.
