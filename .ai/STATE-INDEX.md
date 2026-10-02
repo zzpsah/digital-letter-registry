@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 4d99379575491223a7d7961ad877e8ddf3636bc1
-- Last commit: docs: align local auth commands with HttpOnly callback
+- HEAD: ca8b535baf02ecaeabc90efd415a8b06c8cb4615
+- Last commit: docs: sync current state with HttpOnly cookie auth
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
