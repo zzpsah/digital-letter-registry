@@ -44,3 +44,17 @@ Last updated: 2026-10-02.
 - Unauthenticated change attempt returns 401.
 - Full suite now passes 255/255.
 - Bootstrap admin first password setup is pending one normal browser/email session.
+
+
+## Magic Link callback fix — 2026-10-03
+
+A real bootstrap-admin Magic Link was successfully redeemed by Supabase, but the DLR fragment bridge returned HTTP 422 before session cookies were created. Supabase user identity and active admin membership matched correctly.
+
+The DLR fragment request model no longer assumes fixed provider token lengths or a minimum 60-second expiry. Token format is now treated as provider-owned; DLR still validates the access token against Supabase and confirms active archive membership before issuing HttpOnly cookies.
+
+Verification:
+- focused API tests pass;
+- full suite passes 256/256;
+- private service restarted healthy.
+
+A fresh email send was rate-limited, so browser retry is pending using an earlier unconsumed Magic Link if still valid.
