@@ -23,7 +23,7 @@ Last verified: 2026-10-02
 
 - DB-level owner RLS insert/read and cross-user isolation are verified with synthetic request-JWT claim simulation. A final HTTP/PostgREST test using a short-lived real user bearer session is still pending. One synthetic verification row currently remains in `letters`; no real archive-letter row exists.
 - Passwordless auth now uses a server-side token-hash callback with Secure HttpOnly access/refresh cookies and refresh rotation. The PWA does not persist auth tokens in browser storage.
-- Google Drive OAuth refresh-token lifecycle is implemented with in-memory access-token caching; live runtime verification is still pending.
+- Google Drive OAuth refresh-token lifecycle is implemented with in-memory access-token caching; private-runtime secret-manager-backed refresh/list/stream and disposable synthetic upload/stream/delete verification passed.
 - Live original streaming through the API still needs runtime verification.
 - Oracle OCR runtime is verified using a user-local ARM64 Tesseract 5.3.4 install with `eng`, `hin`, and `osd`, plus OCRmyPDF 16.13.0 in the project virtualenv. Synthetic PNG and image-only PDF OCR smoke tests both passed.
 - No real archive letters have been ingested.
