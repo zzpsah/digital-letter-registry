@@ -91,6 +91,35 @@ class ChannelIntakeService:
     intake: IntakeService
     provenance: ProvenanceRepository
 
+    def ingest_path(
+        self,
+        path: str | Path,
+        *,
+        owner_id: str,
+        channel: IntakeChannel,
+        external_message_id: str | None = None,
+        source_label: str | None = None,
+        metadata: Mapping[str, object] | None = None,
+        received_at: datetime | None = None,
+    ) -> IntakeResult:
+        source = Path(path)
+        result = self.intake.ingest(source, owner_id=owner_id)
+        attachment = InboundAttachment(
+            channel=channel,
+            filename=source.name,
+            content=b"provenance-only",
+            received_at=received_at or datetime.now(timezone.utc),
+            external_message_id=external_message_id,
+            source_label=source_label,
+            metadata=metadata or {},
+        )
+        self.provenance.save_source(
+            owner_id=owner_id,
+            letter_id=result.record.record_id,
+            attachment=attachment,
+        )
+        return result
+
     def ingest(
         self,
         attachment: InboundAttachment,
@@ -102,11 +131,12 @@ class ChannelIntakeService:
         with TemporaryDirectory() as directory:
             path = Path(directory) / attachment.filename
             path.write_bytes(attachment.content)
-            result = self.intake.ingest(path, owner_id=owner_id)
-
-        self.provenance.save_source(
-            owner_id=owner_id,
-            letter_id=result.record.record_id,
-            attachment=attachment,
-        )
-        return result
+            return self.ingest_path(
+                path,
+                owner_id=owner_id,
+                channel=attachment.channel,
+                external_message_id=attachment.external_message_id,
+                source_label=attachment.source_label,
+                metadata=attachment.metadata,
+                received_at=attachment.received_at,
+            )
