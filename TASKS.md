@@ -138,3 +138,15 @@
 - [ ] Enable Supabase leaked-password protection when Management/Dashboard configuration is available.
 - [ ] Create/invite an additional dedicated admin account once its actual email address is chosen.
 - [ ] Complete the real authenticated HTTP/PostgREST multi-role vertical-slice test with actual sessions.
+
+
+## Multi-user runtime verification update
+
+- [x] Verify hosted viewer read / write-deny behavior.
+- [x] Verify hosted editor insert/update / delete-deny behavior.
+- [x] Verify hosted non-member read/insert denial.
+- [x] Verify hosted admin delete behavior.
+- [x] Verify all synthetic users/rows/memberships were removed after the test.
+- [x] Add one-click registration-email onboarding for pending invites.
+- [x] Full synthetic suite passes 251/251.
+- [ ] Complete the real short-lived owner bearer-session/PostgREST vertical slice through the normal browser/email completion path.
