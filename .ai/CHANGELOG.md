@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add atomic RLS processing job claim RPC
+- Commit: 8ba5b4ba6fa047dc00fb3e4fb34a73eef2ddd621
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261002134500_add_job_claim_rpc.sql`
+
 ## 2026-10-02 — docs: add guarded intake runtime placeholders
 - Commit: 17cd43c8e3a0d8c48a071d36fa1f0accf484f6f0
 - Author: PRASHANT KUMAR SAH
