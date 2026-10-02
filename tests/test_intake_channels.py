@@ -4,6 +4,7 @@ import unittest
 
 from letter_registry.intake_channels import (
     IntakeChannelAdapter,
+    SupabaseProvenanceRepository,
     email_attachment,
     safe_attachment_filename,
     telegram_attachment,
@@ -73,6 +74,51 @@ class IntakeChannelTests(unittest.TestCase):
             [("synthetic-letter.pdf", OWNER_ID)],
         )
         self.assertEqual(result.provenance.channel, "telegram")
+
+    def test_provenance_repository_persists_channel_identity(self):
+        class Transport:
+            def __init__(self):
+                self.calls = []
+
+            def insert(self, table, row, *, on_conflict=None):
+                self.calls.append((table, row, on_conflict))
+                return row
+
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "synthetic-letter.pdf"
+            path.write_bytes(b"%PDF")
+            attachment = whatsapp_attachment(
+                path,
+                message_id="synthetic-wa-message",
+                chat_label="Synthetic EDU",
+                sender="Synthetic Sender",
+            )
+
+            class Record:
+                record_id = "22222222-2222-4222-8222-222222222222"
+
+            class Result:
+                record = Record()
+
+            class Intake:
+                def ingest(self, path, *, owner_id):
+                    return Result()
+
+            transport = Transport()
+            adapter = IntakeChannelAdapter(
+                Intake(),
+                provenance_repository=SupabaseProvenanceRepository(transport),
+            )
+            adapter.submit(attachment, owner_id=OWNER_ID)
+
+        table, row, conflict = transport.calls[0]
+        self.assertEqual(table, "letter_sources")
+        self.assertEqual(row["channel"], "whatsapp")
+        self.assertEqual(row["source_id"], "synthetic-wa-message")
+        self.assertEqual(
+            conflict,
+            "owner_id,channel,source_id",
+        )
 
     def test_filename_normalization_rejects_path_traversal(self):
         self.assertEqual(
