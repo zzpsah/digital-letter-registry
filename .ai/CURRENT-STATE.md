@@ -22,10 +22,10 @@
 - Naming preserves Hindi/English/Hinglish Unicode and uses `undated` / `no-ref` placeholders.
 - VPS OCR runtime has working Hindi/English Tesseract and OCRmyPDF through the configured commands.
 - The legacy VPS `phone_drive` rclone credential remains unsuitable for registry access and is not used by DLR.
-- A dedicated Google desktop OAuth client for DLR is now authorized for the archive owner using `drive.readonly`. Runtime credentials are stored in a private chmod-0600 authorized-user JSON file referenced by `GOOGLE_OAUTH_CREDENTIALS_FILE`; client secret/refresh token are not copied into `.env`.
+- A dedicated Google desktop OAuth client for DLR is authorized for the archive owner. The verified Oracle runtime now injects client id/client secret/refresh token from its approved secret manager; the protected authorized-user file was retired after successful secret-manager-only refresh/list/stream verification.
 - Live DLR Drive verification passed: refresh exchange succeeded, originals listing returned the single synthetic integration file, and `GoogleDrivePrivateTransport` streamed the synthetic original successfully (24,668 bytes).
 - Gemini runtime remains unconfigured; an apparent Hermes reference was only example/commented configuration and no live key was available to reuse.
-- The dedicated Google OAuth client has now been used successfully; temporary local/VPS OAuth handoff files were removed after the authorized-user credentials file was installed.
+- The dedicated Google OAuth client has been used successfully; temporary OAuth handoff files are removed after secret-manager rotation and the runtime no longer depends on a persistent authorized-user credentials file.
 - DLR runtime is isolated on its own tailnet-only HTTPS endpoint; it no longer shares the localhost/shared origin previously used during testing. The exact private endpoint is runtime-only and is not recorded in public Git.
 - Supabase Site URL and redirect allow-list are aligned to that dedicated private HTTPS origin. A device opening a magic link must be connected to the authorized tailnet; no public-internet exposure is enabled.
 - Magic-link email throttling is now surfaced safely as HTTP 429 instead of an internal 500.
@@ -62,7 +62,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Dedicated tailnet-only HTTPS routing verified from an authorized tailnet client.
 - Supabase Management Auth-config helper focused suite: 4/4 passed.
 - Existing Supabase runtime credentials are sufficient for application access but not for Management API Auth-template changes.
-- Dedicated file-based Google Drive OAuth runtime is configured and verified with `drive.readonly`; refresh/list/stream all passed against synthetic-only data.
+- Secret-manager-backed Google Drive OAuth runtime is configured and verified; refresh/list/stream all passed against synthetic-only data. The currently stored grant remains read-only until the separately approved write-capable re-consent is completed.
 - The older `phone_drive` rclone path remains separate and unused by DLR.
 - Runtime readiness now reports Drive credentials configured; Gemini is the only failing readiness check.
 - Gemini runtime key remains unavailable.
