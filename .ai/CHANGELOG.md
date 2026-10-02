@@ -1,3 +1,12 @@
+## 2026-10-02 — feat: persist authenticated refresh sessions
+- Commit: 750689f04da2139ba4f3102ed70fd0f0c2ef106d
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `.env.example`
+- `src/letter_registry/api.py`
+- `tests/test_api.py`
+
 ## 2026-10-02 — feat: add Google sign-in with email fallback
 - Commit: 1a3dbe25044307fd684f166db6ae75d2db5a3f43
 - Author: Prashant

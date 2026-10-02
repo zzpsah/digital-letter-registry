@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 1a3dbe25044307fd684f166db6ae75d2db5a3f43
-- Last commit: feat: add Google sign-in with email fallback
+- HEAD: 750689f04da2139ba4f3102ed70fd0f0c2ef106d
+- Last commit: feat: persist authenticated refresh sessions
 - Last commit date: 2026-10-02
 - Last commit author: Prashant
 
