@@ -1,5 +1,7 @@
 import os
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from letter_registry.runtime_readiness import check_runtime_readiness
@@ -45,6 +47,24 @@ class RuntimeReadinessTests(unittest.TestCase):
             "private-gemini-key",
         ):
             self.assertNotIn(secret, serialized)
+
+    def test_drive_credentials_file_counts_as_configured(self):
+        with tempfile.TemporaryDirectory() as td:
+            credentials = Path(td) / "authorized-user.json"
+            credentials.write_text("{}", encoding="utf-8")
+            env = {
+                "GOOGLE_OAUTH_CREDENTIALS_FILE": str(credentials),
+            }
+            with patch.dict(os.environ, env, clear=True):
+                with patch(
+                    "letter_registry.runtime_readiness.shutil.which",
+                    return_value=None,
+                ):
+                    readiness = check_runtime_readiness()
+
+        checks = {item.name: item for item in readiness.checks}
+        self.assertTrue(checks["drive_credentials"].ready)
+        self.assertNotIn(str(credentials), str(readiness.as_dict()))
 
     def test_missing_ocr_languages_fail_readiness(self):
         env = {
