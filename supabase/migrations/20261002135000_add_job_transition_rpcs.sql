@@ -1,7 +1,7 @@
 -- RLS-aware worker job transitions.
 
 create or replace function public.complete_processing_job(job_id uuid)
-returns boolean
+returns table (success boolean)
 language sql
 volatile
 security invoker
@@ -19,14 +19,14 @@ as $$
       and j.status = 'processing'
     returning j.id
   )
-  select exists(select 1 from updated);
+  select exists(select 1 from updated) as success;
 $$;
 
 create or replace function public.fail_processing_job(
   job_id uuid,
   error_message text
 )
-returns boolean
+returns table (success boolean)
 language sql
 volatile
 security invoker
@@ -43,7 +43,7 @@ as $$
       and j.status = 'processing'
     returning j.id
   )
-  select exists(select 1 from updated);
+  select exists(select 1 from updated) as success;
 $$;
 
 grant execute on function public.complete_processing_job(uuid) to authenticated;
