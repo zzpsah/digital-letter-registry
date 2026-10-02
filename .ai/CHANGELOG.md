@@ -1,3 +1,10 @@
+## 2026-10-02 — refactor: keep explicit-reference relationship inference canonical
+- Commit: 11cafc14e708e2000f58e4e0ffac19f4ad43db53
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/relationships.py`
+
 ## 2026-10-02 — fix: keep explicit-reference relationship inference canonical
 - Commit: 0d4114379d1fe01236669b19ca1cbbfedecff12a
 - Author: PRASHANT KUMAR SAH
