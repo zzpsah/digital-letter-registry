@@ -73,3 +73,16 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Change: feat: add one-click registration email
 - Date: 2026-10-02
 - Durable context synchronization: completed
+
+
+## 2026-10-02 multi-role hosted verification
+
+Hosted RLS role matrix passed with synthetic JWT-claim simulation:
+- viewer: read yes, update no;
+- editor: insert/update yes, delete no;
+- non-member: read no, insert no;
+- admin: delete yes.
+
+Cleanup verified zero synthetic auth users, letters, memberships, and pending invites. Pending-invite UI now includes a one-click registration-email action and fragment-safe copy links. Full suite passes 251/251.
+
+Fresh owner Magic Link delivery works; the real short-lived bearer-session/PostgREST test remains pending through normal browser completion.
