@@ -89,10 +89,7 @@ class GeminiEmbeddingProvider:
             "content": {
                 "parts": [{"text": text}],
             },
-            "embedContentConfig": {
-                "outputDimensionality": self.dimensions,
-                "autoTruncate": True,
-            },
+            "output_dimensionality": self.dimensions,
         }
 
         req = request.Request(
