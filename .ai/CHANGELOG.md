@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: clarify Drive account OAuth authorization
+- Commit: 16c1d078e7be2ad9cfc4e8705d1d6992f014855a
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-02 — docs: correct runtime Drive OAuth current state
 - Commit: 9cde82988cc65e32498616a2c2b23a16fd6f5f1e
 - Author: PRASHANT KUMAR SAH
