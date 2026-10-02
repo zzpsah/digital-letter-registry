@@ -60,7 +60,7 @@
 - [ ] Verify live runtime original streaming with short-lived/refreshable Drive credentials.
 
 - [x] Passwordless email login request endpoint for existing authorized users.
-- [ ] Complete deployment-time auth callback/session exchange without exposing tokens in the public repo.
+- [x] Implement server-side token-hash auth callback + HttpOnly cookie session/refresh without browser token storage.
 - [x] Authenticated safe letter-detail endpoint without storage IDs.
 
 ## Phase 3.5 — Intake/runtime
@@ -69,7 +69,8 @@
 - [x] Durable Supabase processing-job queue with atomic claim/complete/fail RPCs.
 - [x] Upload → duplicate preflight → private archive → enqueue derived processing.
 - [ ] Live authenticated synthetic API vertical slice.
-- [ ] Runtime auth callback/session exchange without exposing tokens.
+- [ ] Configure hosted Supabase Magic Link template/Site URL to the deployed/local `/auth/confirm` endpoint before live browser test.
+- [x] Runtime auth callback/session exchange implemented with HttpOnly cookies and refresh rotation.
 - [x] Refreshable Google Drive OAuth credential strategy with in-memory access-token caching.
 
 ## Phase 4 — Intelligence lifecycle
