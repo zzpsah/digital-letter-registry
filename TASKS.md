@@ -81,10 +81,9 @@
 - [x] Authenticated owner upload panel with explicit synthetic/test mode status.
 - [x] Secret-safe runtime readiness CLI/API/UI checks.
 - [x] Refreshable Google Drive OAuth credential strategy with in-memory access-token caching.
-- [x] Add preferred file-based authorized-user Google OAuth runtime provider and verify live refresh/list/stream with synthetic data only.
-- [ ] Verify runtime synthetic upload/write with an explicitly approved write-capable Drive scope; current verified grant is read-only.
-- [x] Add preferred file-based authorized-user Google OAuth runtime provider and verify live refresh/list/stream with synthetic data only.
-- [ ] Verify runtime synthetic upload/write with an explicitly approved write-capable Drive scope; current verified grant is read-only.
+- [x] Add authorized-user file fallback and secret-manager-injected refresh credential support.
+- [x] Verify live secret-manager-only refresh/list/stream with synthetic data; retire the Oracle runtime file credential after cutover.
+- [ ] Verify runtime synthetic upload/write after the approved write-capable Drive re-consent is completed.
 
 ## Phase 4 — Intelligence lifecycle
 
