@@ -7,12 +7,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile, status
-from fastapi.responses import FileResponse, Response
+from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile, status
+from fastapi.responses import FileResponse, RedirectResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
-from .auth import SupabasePasswordlessAuth
+from .auth import SupabaseAuthError, SupabaseAuthSession, SupabasePasswordlessAuth
 from .channel_intake import ChannelIntakeService, IntakeChannel, IntakeProvenance, SupabaseProvenanceRepository
 from .detail import SupabaseLetterDetailRepository
 from .gemini_embeddings import GeminiEmbeddingProvider
@@ -164,15 +164,76 @@ def _required_env(name: str) -> str:
     return value
 
 
+_ACCESS_COOKIE = "dlr_access_token"
+_REFRESH_COOKIE = "dlr_refresh_token"
+
+
+def _cookie_secure() -> bool:
+    value = os.environ.get("AUTH_COOKIE_SECURE", "true").strip().lower()
+    return value not in {"0", "false", "no", "off"}
+
+
+def _set_session_cookies(
+    response: Response,
+    session: SupabaseAuthSession,
+) -> None:
+    common = {
+        "httponly": True,
+        "secure": _cookie_secure(),
+        "samesite": "lax",
+        "path": "/",
+    }
+    response.set_cookie(
+        _ACCESS_COOKIE,
+        session.access_token,
+        max_age=session.expires_in,
+        **common,
+    )
+    response.set_cookie(
+        _REFRESH_COOKIE,
+        session.refresh_token,
+        **common,
+    )
+    response.headers["Cache-Control"] = "private, no-store"
+
+
+def _clear_session_cookies(response: Response) -> None:
+    response.delete_cookie(_ACCESS_COOKIE, path="/")
+    response.delete_cookie(_REFRESH_COOKIE, path="/")
+    response.headers["Cache-Control"] = "private, no-store"
+
+
 def _access_token(
+    request: Request,
+    response: Response,
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
 ) -> str:
-    if credentials is None or credentials.scheme.lower() != "bearer":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authenticated Supabase session required",
-        )
-    return credentials.credentials
+    if credentials is not None and credentials.scheme.lower() == "bearer":
+        return credentials.credentials
+
+    access_token = request.cookies.get(_ACCESS_COOKIE, "").strip()
+    if access_token:
+        return access_token
+
+    refresh_token = request.cookies.get(_REFRESH_COOKIE, "").strip()
+    if refresh_token:
+        try:
+            session = SupabasePasswordlessAuth.from_environment().refresh_session(
+                refresh_token=refresh_token,
+            )
+        except (SupabaseAuthError, ValueError) as exc:
+            _clear_session_cookies(response)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Supabase session expired",
+            ) from exc
+        _set_session_cookies(response, session)
+        return session.access_token
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Authenticated Supabase session required",
+    )
 
 
 def _transport(access_token: str) -> SupabasePostgrestTransport:
@@ -246,6 +307,35 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         return MessageResponse(
             message="If this email is authorized, a sign-in link has been sent."
         )
+
+    @app.get("/auth/confirm", include_in_schema=False)
+    def confirm_magic_link(
+        token_hash: str,
+        type: str = "email",
+    ) -> RedirectResponse:
+        try:
+            session = SupabasePasswordlessAuth.from_environment().verify_token_hash(
+                token_hash=token_hash,
+                verification_type=type,
+            )
+        except (SupabaseAuthError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Sign-in link is invalid or expired",
+            ) from exc
+
+        response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+        _set_session_cookies(response, session)
+        return response
+
+    @app.post("/api/v1/auth/logout", response_model=MessageResponse)
+    def logout() -> Response:
+        response = Response(
+            content='{"message":"Signed out"}',
+            media_type="application/json",
+        )
+        _clear_session_cookies(response)
+        return response
 
     @app.get("/manifest.webmanifest", include_in_schema=False)
     def manifest() -> FileResponse:
