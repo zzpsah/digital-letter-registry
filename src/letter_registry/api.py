@@ -767,14 +767,21 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 email=payload.email,
                 password=payload.password,
             )
-            membership = _archive_membership(session.access_token)
-        except HTTPException:
-            raise
         except (SupabaseAuthError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Email or password is invalid",
             ) from exc
+
+        try:
+            membership = _archive_membership(session.access_token)
+        except HTTPException as exc:
+            if exc.status_code == status.HTTP_403_FORBIDDEN:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Account is pending admin approval or is not authorized",
+                ) from exc
+            raise
 
         response = Response(
             content=(
@@ -986,6 +993,11 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         )
         try:
             role = ArchiveRole(payload.role)
+            if payload.status == "active":
+                SupabasePasswordlessAuth.from_environment().confirm_account_as_admin(
+                    access_token=access_token,
+                    target_user_id=user_id,
+                )
             result = SupabaseArchiveAccountAdmin(
                 transport=_raw_transport(access_token),
                 archive_id=_archive_id(),
@@ -994,6 +1006,11 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 role=role,
                 status=payload.status,
             )
+        except SupabaseAuthError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Account confirmation could not be completed",
+            ) from exc
         except ValueError as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
