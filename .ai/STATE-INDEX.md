@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 2ac385c6dd08ca264310f9c6cfeadc6da7050c9d
-- Last commit: test: cover configured OCR readiness overrides
+- HEAD: 5d3e4d904d929b029d025648900fc83061a1161c
+- Last commit: test: use real OCR language line breaks
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 

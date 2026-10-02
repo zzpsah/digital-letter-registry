@@ -1,3 +1,10 @@
+## 2026-10-02 — test: use real OCR language line breaks
+- Commit: 5d3e4d904d929b029d025648900fc83061a1161c
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-02 — test: cover configured OCR readiness overrides
 - Commit: 2ac385c6dd08ca264310f9c6cfeadc6da7050c9d
 - Author: PRASHANT KUMAR SAH
