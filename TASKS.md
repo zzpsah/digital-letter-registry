@@ -71,7 +71,9 @@
 - [x] Private upload/intake API with synthetic-first safety guard.
 - [x] Durable Supabase processing-job queue with atomic claim/complete/fail RPCs.
 - [x] Upload → duplicate preflight → private archive → enqueue derived processing.
-- [ ] Live authenticated synthetic API vertical slice.
+- [x] Isolate DLR runtime on a dedicated tailnet-only HTTPS origin and align Supabase Site URL/redirect allow-list without exposing private routing details in Git.
+- [x] Surface Supabase magic-link email throttling as HTTP 429 instead of 500.
+- [ ] Live authenticated synthetic API vertical slice (routing verified; awaiting a fresh email after Supabase send-rate throttling clears).
 - [x] Add guarded Supabase Management API helper to check/apply the checked-in Magic Link template, Site URL, and redirect allow-list without printing credentials.
 - [ ] Optional later: enable custom SMTP and apply the checked-in token-hash Magic Link template/Site URL if desired; this is no longer required for the default hosted login flow.
 - [x] Runtime auth callback/session exchange implemented with HttpOnly cookies and refresh rotation.
@@ -96,7 +98,7 @@
 ## Current safety boundary
 
 - Drive archive folders remain private; only synthetic integration data has been used.
-- Supabase currently contains one synthetic RLS-verification row and no real archive-letter rows.
+- Supabase synthetic RLS-verification row was removed; `letters` currently contains zero rows and no real archive-letter rows.
 - Rename behavior is preview/approval locked; no real rename has been approved or executed.
 - No real archive-letter ingestion has occurred.
 - No production deployment is claimed.
