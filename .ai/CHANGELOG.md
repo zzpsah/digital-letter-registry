@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: confirm account when admin activates access
+- Commit: 58d28dee74a2e3e00d015fa904ac33256115dbaa
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-03 — feat: confirm pending accounts through admin edge function
 - Commit: 1526b5b1e3a7abfd4a307060e466307192b4e451
 - Author: PRASHANT KUMAR SAH

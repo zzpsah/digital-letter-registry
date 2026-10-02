@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 1526b5b1e3a7abfd4a307060e466307192b4e451
-- Last commit: feat: confirm pending accounts through admin edge function
+- HEAD: 58d28dee74a2e3e00d015fa904ac33256115dbaa
+- Last commit: feat: confirm account when admin activates access
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
