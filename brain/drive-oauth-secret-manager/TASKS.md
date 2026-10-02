@@ -5,6 +5,6 @@
 - [x] Pass full synthetic suite after the change.
 - [x] Verify private runtime secret-manager-only refresh/list/stream.
 - [x] Retire private runtime persistent credential file after cutover.
-- [ ] Complete write-capable OAuth re-consent.
-- [ ] Rotate refresh token in approved secret manager.
-- [ ] Verify synthetic upload/write/cleanup.
+- [x] Complete write-capable OAuth re-consent.
+- [x] Rotate refresh token in approved secret manager.
+- [x] Verify synthetic upload/write/stream/delete cleanup.
