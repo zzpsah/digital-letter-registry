@@ -45,6 +45,27 @@ def record() -> DocumentRecord:
 
 
 class SupabaseRepositoryTests(unittest.TestCase):
+    def test_rename_identity_lookup_stays_server_side(self) -> None:
+        class IdentityTransport(FakeTransport):
+            def select(self, table, *, filters=None, columns="*"):
+                return [{
+                    "id": LETTER_ID,
+                    "original_filename": "DOC10086.pdf",
+                    "storage_provider": "gdrive",
+                    "storage_object_id": "private-object-reference",
+                }]
+
+        repository = SupabaseLetterRepository(IdentityTransport())
+        identity = repository.get_rename_identity(LETTER_ID)
+
+        self.assertEqual(identity.record_id, LETTER_ID)
+        self.assertEqual(identity.original_filename, "DOC10086.pdf")
+        self.assertEqual(identity.storage_provider, "gdrive")
+        self.assertEqual(
+            identity.storage_object_reference,
+            "private-object-reference",
+        )
+
     def test_source_insert_targets_letters_with_duplicate_conflict_key(self) -> None:
         transport = FakeTransport()
         repository = SupabaseLetterRepository(transport)
