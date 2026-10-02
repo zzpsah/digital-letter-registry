@@ -70,7 +70,7 @@
 - [x] Upload → duplicate preflight → private archive → enqueue derived processing.
 - [ ] Live authenticated synthetic API vertical slice.
 - [ ] Runtime auth callback/session exchange without exposing tokens.
-- [ ] Refreshable Google Drive credential strategy.
+- [x] Refreshable Google Drive OAuth credential strategy with in-memory access-token caching.
 
 ## Phase 4 — Intelligence lifecycle
 
