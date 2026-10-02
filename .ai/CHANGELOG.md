@@ -1,3 +1,10 @@
+## 2026-10-02 — test: align channel intake tests with provenance model
+- Commit: 1d54745815d41978544dfef1151773dbcd33878a
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_channel_intake.py`
+
 ## 2026-10-02 — docs: sync brain with guarded historical import
 - Commit: 1ffe49cf2b521f8a05d6ea573f7d5cb96604ad20
 - Author: PRASHANT KUMAR SAH

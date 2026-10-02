@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 1ffe49cf2b521f8a05d6ea573f7d5cb96604ad20
-- Last commit: docs: sync brain with guarded historical import
+- HEAD: 1d54745815d41978544dfef1151773dbcd33878a
+- Last commit: test: align channel intake tests with provenance model
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
