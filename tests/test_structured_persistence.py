@@ -30,6 +30,8 @@ class StructuredContextPersistenceTests(unittest.TestCase):
                 subcategory="pen-correction",
                 summary="Synthetic summary",
                 action_required="Verify PEN data",
+                issue_date="2026-10-02",
+                reference_number="REF-123/2026",
                 concepts=("udise", "pen", "correction"),
                 deadline="2026-10-10T23:59:59+05:30",
                 confidence=0.91,
@@ -67,6 +69,12 @@ class StructuredContextPersistenceTests(unittest.TestCase):
         self.assertEqual(row["authority"], "Education Department")
         self.assertEqual(row["category"], "udise")
         self.assertEqual(row["deadline_at"], "2026-10-10T23:59:59+05:30")
+        self.assertEqual(row["issue_date"], "2026-10-02")
+        self.assertEqual(row["reference_number"], "REF-123/2026")
+        self.assertEqual(
+            row["smart_filename"],
+            "udise-pen-correction-instructions__education-department__2026-10-02__REF-123-2026.pdf",
+        )
 
 
 if __name__ == "__main__":
