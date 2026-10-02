@@ -8,7 +8,7 @@ Last verified: 2026-10-02
 - A synthetic PDF was generated and uploaded successfully into the private `originals/` folder and verified private/not shared.
 - The synthetic PDF uses the approved archive filename convention and has a computed SHA-256 fingerprint.
 - Supabase archive-owner Auth identity exists and the owner email is confirmed.
-- DB-level owner access and cross-user RLS isolation are verified. The latest synthetic claim-simulation test confirmed owner insert/read, wrong-user invisibility, and cross-owner insert denial. One synthetic verification row remains; no real archive-letter row exists.
+- DB-level owner access and cross-user RLS isolation are verified. The latest synthetic claim-simulation test confirmed owner insert/read, wrong-user invisibility, and cross-owner insert denial. The synthetic verification row has been removed; no archive-letter row exists.
 - Server-side token-hash passwordless callback + HttpOnly cookie session/refresh flow are implemented.
 - Default Supabase hosted Magic Link fragment callback is also implemented, hardened, and unit-tested, so custom SMTP/template editing is optional rather than a blocker.
 - Oracle ARM64 checkout is current, a Python 3.12 project virtualenv is installed, and the synthetic suite passes 208/208.
@@ -42,4 +42,4 @@ No real archive letter has been ingested, renamed, or reprocessed. No production
 
 ## RLS verification note
 
-The latest RLS check used simulated database request JWT claims, not a real bearer session. Therefore it strengthens DB-level evidence but does not close the authenticated HTTP/PostgREST vertical-slice task. A single synthetic verification row is currently retained; cleanup remains pending through an authorized destructive path.
+The latest RLS check used simulated database request JWT claims, not a real bearer session. Therefore it strengthens DB-level evidence but does not close the authenticated HTTP/PostgREST vertical-slice task. The synthetic verification row was removed through an authorized exact-match cleanup; `letters` now contains zero rows.
