@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: support file-based Google Drive OAuth
+- Commit: 687eb7c48a7595f6a3b07b8b817d3768884cc5d5
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/google_drive_auth.py`
+
 ## 2026-10-02 — docs: update isolated runtime tasks
 - Commit: cd93bc0509610f22620179acc5d48fc6ef0e72a8
 - Author: PRASHANT KUMAR SAH
