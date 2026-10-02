@@ -21,3 +21,13 @@
 ## Next step
 
 Establish an authenticated archive owner for RLS-backed writes, then wire the live Google Drive transport and real authenticated Supabase transport using synthetic fixtures before any live-letter ingestion.
+
+
+## 2026-10-02 — Live synthetic integration checkpoint
+
+- Live private Drive upload was verified with a synthetic PDF in `originals/`.
+- The synthetic PDF uses the approved smart-filename pattern and remains private.
+- A Supabase archive-owner Auth identity was created through passwordless email signup.
+- Supabase Auth currently reports the owner email as unconfirmed.
+- RLS-backed live database insertion remains intentionally blocked until confirmation.
+- No real archive letter was ingested or renamed.
