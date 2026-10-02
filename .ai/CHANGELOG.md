@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: allow password signup without invite metadata
+- Commit: 9bf26faefa7b995996eeeb67fa3da104506bc563
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/auth.py`
+
 ## 2026-10-03 — docs: record live Vercel deployment
 - Commit: 5533692d7ef61a4398dbf1d38716be630dc35f16
 - Author: PRASHANT KUMAR SAH

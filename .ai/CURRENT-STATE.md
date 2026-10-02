@@ -69,24 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 08643f6ac583ad32944b49aad680f229f1161856
-- Change: fix: allow access-only auth callback fallback
+- Commit: 9bf26faefa7b995996eeeb67fa3da104506bc563
+- Change: feat: allow password signup without invite metadata
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## Vercel production deployment — 2026-10-03
-
-DLR now has a live Vercel production control plane at `https://digital-letter-registry.vercel.app`.
-
-Verified:
-- production deployment READY;
-- FastAPI detected and deployed as a Python function;
-- home HTTP 200;
-- health HTTP 200;
-- auth providers HTTP 200;
-- Vercel Authentication protection disabled;
-- no recent Vercel runtime errors observed;
-- real intake disabled.
-
-Vercel currently has Supabase runtime/public configuration only. Private Google Drive OAuth credentials and VPS-only OCR/worker capabilities remain outside Vercel. Supabase Magic Link redirect allow-list still needs the Vercel origin. Vercel↔GitHub auto-deploy connection is also pending because the Vercel GitHub integration has not been granted repository access.

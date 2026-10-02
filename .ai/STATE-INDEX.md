@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 5533692d7ef61a4398dbf1d38716be630dc35f16
-- Last commit: docs: record live Vercel deployment
+- HEAD: 9bf26faefa7b995996eeeb67fa3da104506bc563
+- Last commit: feat: allow password signup without invite metadata
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
