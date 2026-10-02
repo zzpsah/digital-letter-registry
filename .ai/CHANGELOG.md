@@ -1,3 +1,10 @@
+## 2026-10-02 — fix: add canonical intake path compatibility entrypoint
+- Commit: 634816fe316badef9a002ce3bd5c44d3fbf40a52
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/intake.py`
+
 ## 2026-10-02 — test: align web intake API with provenance wrapper
 - Commit: 460fd77490b261ecb617cdb3041e4e9a557d40d4
 - Author: PRASHANT KUMAR SAH

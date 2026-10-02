@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 460fd77490b261ecb617cdb3041e4e9a557d40d4
-- Last commit: test: align web intake API with provenance wrapper
+- HEAD: 634816fe316badef9a002ce3bd5c44d3fbf40a52
+- Last commit: fix: add canonical intake path compatibility entrypoint
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
