@@ -16,7 +16,21 @@ This repository uses a `src/` layout. Run tests with:
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
-Or install the package in editable mode first and then run unittest discovery.
+Recommended local setup:
+
+```bash
+python3 -m pip install -e .
+python3 -m unittest discover -s tests -v
+```
+
+For OCR fallback, runtime must also provide:
+
+- `ocrmypdf`
+- Tesseract
+- Hindi language data (`hin`)
+- English language data (`eng`)
+
+These system tools are intentionally not bundled or hard-coded into the repository.
 
 ## Guarded live synthetic Supabase integration
 
