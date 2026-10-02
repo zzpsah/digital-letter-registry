@@ -20,7 +20,15 @@
 
 ## Next step
 
-Establish an authenticated archive owner for RLS-backed writes, then wire the live Google Drive transport and real authenticated Supabase transport using synthetic fixtures before any live-letter ingestion.
+The archive-owner identity and authenticated runtime foundations already exist. The remaining safe sequence is:
+
+1. Configure refreshable Google Drive OAuth runtime credentials and verify only a synthetic upload/read.
+2. Configure Gemini runtime credentials and verify only synthetic structured analysis/embedding.
+3. Complete the authenticated owner-session HTTP/PostgREST synthetic vertical slice.
+4. Configure the hosted Supabase magic-link template and final Site URL/redirects through the dashboard.
+5. Re-check readiness before considering any real-letter intake.
+
+No real-letter ingestion, historical adoption, Drive rename, connector activation, or production deployment is authorized by this state record.
 
 
 ## 2026-10-02 — Live synthetic integration checkpoint
