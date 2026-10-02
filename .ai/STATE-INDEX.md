@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 25ee7ea892c8b9a2f0aa44b31c8983878f532f9f
-- Last commit: docs: record verified user-local OCR runtime
+- HEAD: bc21cd97f554fa2807aee0a8ead8b23dbdea58ae
+- Last commit: docs: reconcile project scope with implemented archive runtime
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
