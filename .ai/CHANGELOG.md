@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: record provider-independent account model
+- Commit: 8e70ca7dd303d4b517913bacf109acab48a7c430
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-02 — fix: harden invite-only multi-user auth UX
 - Commit: 1c99c4dcb15c34b3e9e3f3a1191e2f9524e88a3f
 - Author: Prashant
