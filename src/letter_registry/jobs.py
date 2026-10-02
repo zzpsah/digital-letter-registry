@@ -47,6 +47,15 @@ class InMemoryProcessingQueue:
 
 
 class JobTransport(Protocol):
+    def select(
+        self,
+        table: str,
+        *,
+        filters: dict[str, str] | None = None,
+        columns: str = "*",
+    ) -> list[dict[str, object]]:
+        ...
+
     def insert(
         self,
         table: str,
@@ -77,7 +86,22 @@ class SupabaseProcessingQueue:
             on_conflict="letter_id,reason",
         )
 
-        job_id = str(row.get("id") or uuid4())
+        if not row.get("id"):
+            existing = self.transport.select(
+                "processing_jobs",
+                filters={
+                    "letter_id": letter_id,
+                    "reason": "initial_processing",
+                },
+                columns="id,created_at",
+            )
+            if not existing:
+                raise RuntimeError(
+                    "processing job insert returned no row and no existing job was found"
+                )
+            row = existing[0]
+
+        job_id = str(row["id"])
         created_raw = row.get("created_at")
         created_at = (
             datetime.fromisoformat(str(created_raw).replace("Z", "+00:00"))
