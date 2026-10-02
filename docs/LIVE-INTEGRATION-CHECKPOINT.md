@@ -20,9 +20,20 @@ Last verified: 2026-10-02
 2. Run the guarded synthetic Data API insert/read/duplicate-protection command.
 3. Verify the synthetic HTTP intake → Drive → queue → worker → search/open-original vertical slice.
 4. Verify refreshable Google Drive OAuth credentials with live original streaming.
-5. Install and verify Oracle OCR runtime packages: Tesseract + `hin` + `eng` + OCRmyPDF. ARM64 packages are available, but installation currently requires interactive sudo authorization.
-6. Keep `ENABLE_REAL_INTAKE=false` until the synthetic vertical slice is fully verified.
+5. Provide runtime-only Google Drive OAuth credentials and Gemini API key.
+6. Complete the one-time authenticated owner-session verification; the auth email credential must be consumed manually/user-side rather than transferred between connected tools.
+7. Keep `ENABLE_REAL_INTAKE=false` until the synthetic vertical slice is fully verified.
 
 ## Safety
 
 No real archive letter has been ingested, renamed, or reprocessed. No production service has been deployed. Private Drive IDs/URLs, Supabase keys/tokens, Auth user IDs, OAuth secrets, SSH keys, and other credentials stay outside Git and public logs.
+
+
+## Oracle OCR verification
+
+- Tesseract 5.3.4 is installed user-locally on ARM64 without sudo.
+- Language data verified: `eng`, `hin`, `osd`.
+- OCRmyPDF 16.13.0 is installed in the project virtualenv.
+- Direct synthetic PNG OCR passed.
+- Synthetic image-only PDF → OCRmyPDF sidecar extraction passed.
+- Full Oracle synthetic test suite passed 200/200 at this checkpoint.
