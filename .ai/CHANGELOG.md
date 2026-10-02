@@ -1,3 +1,12 @@
+## 2026-10-02 — fix: harden invite-only multi-user auth UX
+- Commit: 1c99c4dcb15c34b3e9e3f3a1191e2f9524e88a3f
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_api.py`
+
 ## 2026-10-02 — docs: start multi-user authorization brain
 - Commit: 8b68ee19072484c16afb37c0df36f39b9eafbba0
 - Author: PRASHANT KUMAR SAH
