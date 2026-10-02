@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover OCR runtime dependency checker
+- Commit: e62ed5e990e4da718cbc003d1ebdf96e93364dec
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_runtime_dependencies.py`
+
 ## 2026-10-02 — docs: refresh live runtime checkpoint
 - Commit: 2b47470cd666f0e666f3202d799504f489083d51
 - Author: PRASHANT KUMAR SAH
