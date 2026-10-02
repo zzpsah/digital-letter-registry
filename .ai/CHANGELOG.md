@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: expose authenticated secret-safe readiness status
+- Commit: f3db1c66d9649f93e17a0b5659b1e2b4a7b42670
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — test: cover secret-safe runtime readiness
 - Commit: ddb1b56501fcfd5670dd579c90d13792b4f5ef58
 - Author: PRASHANT KUMAR SAH
