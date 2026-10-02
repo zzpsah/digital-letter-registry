@@ -11,8 +11,10 @@ from .extraction import (
 )
 from .extraction_backends import OcrmypdfTesseractBackend, PypdfTextBackend
 from .fingerprints import sha256_file
+from .gemini_provider import GeminiDocumentContextProvider, GeminiProviderError
 from .ingestion import prepare_source_record, persist_prepared_source
 from .orchestration import ingest_original
+from .processing_pipeline import ProcessingOutcome, process_archived_document
 from .models import (
     DocumentRecord,
     DocumentRelationship,
@@ -50,6 +52,8 @@ __all__ = [
     "VersionedTextExtractor",
     "PypdfTextBackend",
     "OcrmypdfTesseractBackend",
+    "GeminiDocumentContextProvider",
+    "GeminiProviderError",
     "DocumentRecord",
     "DocumentRelationship",
     "DocumentStatus",
@@ -65,6 +69,8 @@ __all__ = [
     "GoogleDriveOriginalStorage",
     "prepare_source_record",
     "ingest_original",
+    "ProcessingOutcome",
+    "process_archived_document",
     "persist_prepared_source",
     "SupabaseTransport",
     "SupabaseLetterRepository",
