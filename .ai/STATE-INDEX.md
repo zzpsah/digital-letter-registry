@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 634816fe316badef9a002ce3bd5c44d3fbf40a52
-- Last commit: fix: add canonical intake path compatibility entrypoint
+- HEAD: ece323fe0c1d443cd5ff59ffe8aa120db7be7217
+- Last commit: feat: add server-side magic-link verification and refresh
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
