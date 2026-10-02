@@ -38,3 +38,8 @@ A synthetic PDF upload to the private Drive `originals/` folder is verified. Sup
 ## Phase 2 progress
 
 Native PDF text/OCR provider contracts are implemented with Hindi-English fallback semantics. Government/education vocabulary and deterministic context hints are implemented before AI analysis. A concrete OCR backend and structured AI provider remain pending.
+
+
+## Concrete extraction backends
+
+Native PDF text now has a pypdf implementation. OCR fallback now has an OCRmyPDF/Tesseract implementation using Hindi+English sidecar text. Extraction text/version persistence is wired into letter_processing. Runtime verification of OCR binaries/language packs remains pending.
