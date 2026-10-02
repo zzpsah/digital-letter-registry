@@ -30,7 +30,19 @@ For OCR fallback, runtime must also provide:
 - Hindi language data (`hin`)
 - English language data (`eng`)
 
-These system tools are intentionally not bundled or hard-coded into the repository.
+Check readiness without changing the system:
+
+```bash
+python3 scripts/check_runtime_dependencies.py
+```
+
+On Debian/Ubuntu, install and verify in one step:
+
+```bash
+bash scripts/install_ocr_runtime_ubuntu.sh
+```
+
+The installer uses `sudo apt-get`, so interactive sudo authorization may be required. These system tools are intentionally not bundled or hard-coded into the repository.
 
 ## Guarded live synthetic Supabase integration
 
