@@ -41,6 +41,29 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "ok")
 
+    def test_magic_link_request_uses_runtime_redirect(self):
+        with patch("letter_registry.api.SupabasePasswordlessAuth.from_environment") as factory:
+            auth = factory.return_value
+            with patch.dict(
+                os.environ,
+                {"AUTH_REDIRECT_URL": "https://archive.example.com/auth/callback"},
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/magic-link",
+                    json={"email": "owner@example.com"},
+                )
+
+        self.assertEqual(response.status_code, 200)
+        auth.send_magic_link.assert_called_once_with(
+            email="owner@example.com",
+            redirect_to="https://archive.example.com/auth/callback",
+        )
+
+    def test_pwa_manifest_and_service_worker_are_public(self):
+        self.assertEqual(self.client.get("/manifest.webmanifest").status_code, 200)
+        self.assertEqual(self.client.get("/sw.js").status_code, 200)
+
     def test_search_requires_bearer_session(self):
         response = self.client.get("/api/v1/search?q=inter")
         self.assertEqual(response.status_code, 401)
