@@ -162,3 +162,21 @@ Practical flow:
 5. Magic Link remains available as passwordless recovery.
 
 This does not change archive roles or Google Drive permissions.
+
+
+## Vercel deployment
+
+The DLR web/auth/search control plane is now deployed on Vercel:
+
+`https://digital-letter-registry.vercel.app`
+
+Verified production behavior:
+- home page returns HTTP 200;
+- `/api/v1/health` returns HTTP 200;
+- auth provider discovery returns password + Magic Link with invite-only registration;
+- Vercel Authentication protection is disabled so DLR's own Supabase authentication is the user-facing gate;
+- real intake remains disabled on the Vercel deployment.
+
+The current Vercel deployment does not receive the private Google Drive OAuth credentials. Original-file streaming, Drive writes, OCR/system-binary processing, and other private-worker responsibilities remain on the Oracle deployment until explicitly migrated.
+
+Supabase's Auth redirect allow-list still needs the Vercel origin before Magic Link callbacks should be treated as fully portable to the public Vercel URL.
