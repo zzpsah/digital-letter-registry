@@ -12,9 +12,9 @@ Next safe action is completing the real short-lived authenticated HTTP/PostgREST
 - Connected remote execution blocked forwarding a one-time auth token to the VPS. Do not bypass this; use the proper server callback or another credential-safe path.
 - Auth/API suite passes 29/29; full VPS synthetic suite passes 212/212; Management Auth-config helper focused tests pass 4/4.
 - DLR runtime is isolated behind its own tailnet-only HTTPS origin; Supabase Site URL and redirect allow-list match that origin. Keep exact hostname/port out of public Git. Current owner-session retry is blocked only by Supabase email-send throttling.
-- Dedicated file-based Google OAuth is configured for DLR with `drive.readonly`; refresh exchange, originals listing, and synthetic-original streaming all passed.
+- Dedicated DLR Google OAuth is configured with secret-manager-injected refresh credentials; refresh exchange, originals listing, and synthetic-original streaming all passed. The currently stored grant remains read-only until the approved write-capable re-consent completes.
 - Existing VPS `phone_drive` rclone remains separate and must not be reused for DLR.
-- Runtime write/upload is not yet verified because the current grant is intentionally read-only; obtain write scope only through an explicit approval step.
+- Runtime write/upload is not yet verified because the current grant is still read-only; the approved write-capable re-consent is in progress and must still be followed by synthetic upload verification.
 - Gemini runtime key is still unavailable; no live Gemini synthetic verification has been completed.
 
 The synthetic verification row was removed through the authorized controlled cleanup path; `letters` is empty.
