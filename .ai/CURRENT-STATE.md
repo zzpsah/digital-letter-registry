@@ -104,3 +104,14 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Change: feat: add processing version registry domain
 - Date: 2026-10-02
 - Durable context synchronization: completed
+
+
+## Relationship + reprocessing lifecycle
+
+- Explicit-reference relationship inference is canonical: suggestions require an extension/correction/supersession cue plus a matching prior reference number.
+- Relationship suggestions are never auto-confirmed.
+- Authenticated relationship review API is implemented; confirmed supersession can update the older letter status, while rejected suggestions remain non-authoritative.
+- Owner-scoped processing target-version registry is deployed live.
+- Reprocessing preview reports the exact processing stages that differ per letter.
+- Reprocessing enqueue is separate from preview and requires explicit `confirm=true`.
+- Reprocessing jobs are idempotent per target-version profile hash and use the existing durable processing queue.
