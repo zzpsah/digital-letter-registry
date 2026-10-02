@@ -34,3 +34,13 @@ Last updated: 2026-10-02.
 - Copy-invite links and email onboarding use fragment-based invite secrets.
 - Full synthetic suite: 251/251 passed.
 - Fresh owner Magic Link delivery is working again. Automated redemption of the one-time email credential was not forwarded into remote execution; the real short-lived owner bearer-session/PostgREST vertical slice therefore remains pending.
+
+
+## Password setup
+
+- Authenticated archive members can set/change password through DLR.
+- The update is performed against the authenticated Supabase user and does not alter archive membership/role.
+- Signed-in Account UI includes new-password + confirmation fields.
+- Unauthenticated change attempt returns 401.
+- Full suite now passes 255/255.
+- Bootstrap admin first password setup is pending one normal browser/email session.
