@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: record 212-test Drive checkpoint
+- Commit: d80ab8e9c21af5c1b40967997f366cfb509163c3
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/runtime-verification/TESTS.md`
+
 ## 2026-10-02 — docs: prefer file-based Drive OAuth runtime
 - Commit: e9656f8bec293edc82d37767cb188cac36f41ab4
 - Author: PRASHANT KUMAR SAH
