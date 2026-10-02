@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: confirm pending accounts through admin edge function
+- Commit: 1526b5b1e3a7abfd4a307060e466307192b4e451
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/auth.py`
+
 ## 2026-10-03 — test: cover pending password account creation endpoint
 - Commit: 7c6008803f3b2e56d59be8c6cdc26b99510cf96a
 - Author: PRASHANT KUMAR SAH

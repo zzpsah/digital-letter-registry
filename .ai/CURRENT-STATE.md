@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 4f6becede525fc2d77a2c206daa06f74e3ab1969
-- Change: feat: simplify account creation and remove magic-link UI
+- Commit: 1526b5b1e3a7abfd4a307060e466307192b4e451
+- Change: feat: confirm pending accounts through admin edge function
 - Date: 2026-10-03
 - Durable context synchronization: completed
