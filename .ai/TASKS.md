@@ -38,3 +38,12 @@
 - [ ] Deploy to production.
 
 All deferred actions require explicit user authorization and must preserve the repository privacy boundary.
+
+
+## Google Sign-In
+
+- [x] Implement guarded Google Sign-In route and provider detection.
+- [x] Keep Magic Link fallback.
+- [x] Add persistent refresh-session cookie.
+- [ ] Configure Google Web OAuth client + Supabase Google provider.
+- [ ] Verify linked owner identity and real authenticated synthetic RLS flow.
