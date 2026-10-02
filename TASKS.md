@@ -32,9 +32,10 @@
 
 ## Phase 2 — Extraction/context
 
-- [ ] Extract existing PDF text before OCR.
-- [ ] Add Hindi/English OCR fallback.
-- [ ] Create government/education Hindi vocabulary.
+- [x] Add provider-neutral native PDF text extraction contract and usability heuristic.
+- [x] Add Hindi/English OCR fallback contract with versioned processing result.
+- [ ] Wire a concrete local/cloud OCR backend.
+- [x] Create government/education Hindi vocabulary and deterministic context hints.
 - [ ] Implement provider-independent structured AI analysis.
 - [x] Generate normalized smart filename.
 - [x] Use `undated` and `no-ref` placeholders.
