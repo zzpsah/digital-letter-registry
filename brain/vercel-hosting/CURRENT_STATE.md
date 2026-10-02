@@ -24,3 +24,16 @@ Not yet migrated:
 Pending:
 - Supabase Auth redirect allow-list for the Vercel origin;
 - Vercel GitHub integration authorization for automatic deployments.
+
+
+## Account UI update
+
+The canonical Vercel UI now uses password-first authentication:
+- canonical alias: `https://umv-dlr.vercel.app`;
+- simple Create Account form is visible;
+- primary Magic-Link UI is removed;
+- pending accounts are admin-approved from the access panel;
+- health and home return HTTP 200;
+- latest test suite is 257/257 PASS.
+
+The Supabase `dlr-confirm-account` Edge Function is part of account approval and runs outside Vercel. It confirms the target Auth identity only after verifying an active archive-admin caller.
