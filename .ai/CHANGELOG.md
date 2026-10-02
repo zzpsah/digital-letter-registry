@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: add Google Sign-In brain
+- Commit: 1d52b550a4f971ef79395b79330c2b60d5ade290
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/google-signin/HANDOFF.md`
+
 ## 2026-10-02 — feat: persist authenticated refresh sessions
 - Commit: 750689f04da2139ba4f3102ed70fd0f0c2ef106d
 - Author: Prashant
