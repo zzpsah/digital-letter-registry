@@ -38,7 +38,7 @@
     location.replace("/");
   }catch(error){
     history.replaceState(null,"","/auth/confirm");
-    status.textContent="Sign-in link invalid या expired है. नया link भेजें.";
+    status.textContent="Sign-in session invalid या expired है. Google sign-in या email fallback दोबारा शुरू करें.";
   }
 })();
 </script>

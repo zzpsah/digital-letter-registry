@@ -69,6 +69,57 @@ class SupabasePasswordlessAuth:
             publishable_key=publishable_key,
         )
 
+    @staticmethod
+    def _validate_redirect_to(redirect_to: str) -> str:
+        target = redirect_to.strip()
+        if not target.startswith(
+            ("https://", "http://localhost", "http://127.0.0.1")
+        ):
+            raise ValueError(
+                "redirect_to must be an HTTPS URL or local development URL"
+            )
+        return target
+
+    def social_authorize_url(
+        self,
+        *,
+        provider: str,
+        redirect_to: str,
+    ) -> str:
+        normalized_provider = provider.strip().lower()
+        if normalized_provider != "google":
+            raise ValueError("unsupported social auth provider")
+        target = self._validate_redirect_to(redirect_to)
+        query = parse.urlencode(
+            {
+                "provider": normalized_provider,
+                "redirect_to": target,
+            }
+        )
+        return f"{self.base_url.rstrip('/')}/auth/v1/authorize?{query}"
+
+    def provider_enabled(self, provider: str) -> bool:
+        normalized_provider = provider.strip().lower()
+        if normalized_provider != "google":
+            raise ValueError("unsupported social auth provider")
+        req = request.Request(
+            f"{self.base_url.rstrip('/')}/auth/v1/settings",
+            headers={"apikey": self.publishable_key},
+            method="GET",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise SupabaseAuthError(
+                f"unexpected Supabase settings HTTP status: {status}"
+            )
+        try:
+            data = json.loads(raw)
+            return bool((data.get("external") or {}).get(normalized_provider))
+        except (TypeError, json.JSONDecodeError) as exc:
+            raise SupabaseAuthError(
+                "Supabase Auth returned invalid provider settings"
+            ) from exc
+
     def send_magic_link(
         self,
         *,
@@ -82,14 +133,9 @@ class SupabasePasswordlessAuth:
             or len(normalized) > 320
         ):
             raise ValueError("valid email is required")
-        if not redirect_to.startswith(
-            ("https://", "http://localhost", "http://127.0.0.1")
-        ):
-            raise ValueError(
-                "redirect_to must be an HTTPS URL or local development URL"
-            )
+        target = self._validate_redirect_to(redirect_to)
 
-        query = parse.urlencode({"redirect_to": redirect_to})
+        query = parse.urlencode({"redirect_to": target})
         req = request.Request(
             f"{self.base_url.rstrip('/')}/auth/v1/otp?{query}",
             data=json.dumps(

@@ -35,12 +35,17 @@
 
   <section id="loginBox" class="card">
     <h2>साइन इन</h2>
-    <div class="muted">Authorized email पर secure sign-in link भेजें.</div>
-    <form id="loginForm" class="row" style="margin-top:10px">
-      <input id="loginEmail" type="email" autocomplete="email" placeholder="email@example.com" style="flex:1;min-width:0">
-      <button type="submit">Link भेजें</button>
-    </form>
-    <div id="loginStatus" class="muted" style="margin-top:8px"></div>
+    <a id="googleLogin" class="open" href="/auth/google" style="display:none;text-align:center;width:100%;margin-top:8px">Google से साइन इन करें</a>
+    <div id="googleLoginNote" class="muted" style="margin-top:8px"></div>
+    <details style="margin-top:10px">
+      <summary>Email link से साइन इन</summary>
+      <div class="muted" style="margin-top:8px">Google sign-in उपलब्ध न हो तो authorized email पर secure fallback link भेजें.</div>
+      <form id="loginForm" class="row" style="margin-top:10px">
+        <input id="loginEmail" type="email" autocomplete="email" placeholder="email@example.com" style="flex:1;min-width:0">
+        <button type="submit">Link भेजें</button>
+      </form>
+      <div id="loginStatus" class="muted" style="margin-top:8px"></div>
+    </details>
   </section>
 
   <section id="uploadBox" class="card" style="display:none">
@@ -109,6 +114,21 @@ function setSessionUi(signedIn){
   $("loginBox").style.display=signedIn?"none":"block";
   $("sessionBar").style.display=signedIn?"flex":"none";
   if(signedIn)$("status").textContent="Authenticated session active.";
+}
+
+async function refreshAuthProviders(){
+  try{
+    const res=await fetch("/api/v1/auth/providers",{cache:"no-store"});
+    if(!res.ok)throw new Error("provider status unavailable");
+    const data=await res.json();
+    $("googleLogin").style.display=data.google?"inline-block":"none";
+    $("googleLoginNote").textContent=data.google
+      ?"Primary login · Google account चुनें; valid session बाद में automatically refresh होगा."
+      :"Google sign-in setup pending · नीचे email-link fallback available है.";
+  }catch{
+    $("googleLogin").style.display="none";
+    $("googleLoginNote").textContent="Google sign-in status unavailable · email-link fallback use करें.";
+  }
 }
 
 async function refreshSessionUi(){
@@ -199,6 +219,7 @@ $("loginForm").addEventListener("submit",async e=>{
     :"Sign-in request failed.";
 });
 
+refreshAuthProviders();
 refreshSessionUi();
 
 $("logoutButton").addEventListener("click",async()=>{

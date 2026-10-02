@@ -11,6 +11,45 @@ from letter_registry.auth import (
 
 
 class SupabasePasswordlessAuthTests(unittest.TestCase):
+    def test_google_authorize_url_uses_supabase_social_endpoint(self):
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=lambda req: (200, "{}"),
+        )
+        url = auth.social_authorize_url(
+            provider="google",
+            redirect_to="https://archive.example.com/auth/confirm",
+        )
+        self.assertTrue(url.startswith(
+            "https://example.supabase.co/auth/v1/authorize?"
+        ))
+        self.assertIn("provider=google", url)
+        self.assertIn("redirect_to=", url)
+
+    def test_google_authorize_url_rejects_unsafe_redirect(self):
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=lambda req: (200, "{}"),
+        )
+        with self.assertRaises(ValueError):
+            auth.social_authorize_url(
+                provider="google",
+                redirect_to="ftp://unsafe.example.com",
+            )
+
+    def test_google_provider_enabled_reads_auth_settings(self):
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=lambda req: (
+                200,
+                json.dumps({"external": {"google": True}}),
+            ),
+        )
+        self.assertTrue(auth.provider_enabled("google"))
+
     def test_magic_link_disables_new_user_creation(self):
         seen = {}
 

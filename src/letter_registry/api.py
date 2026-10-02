@@ -69,6 +69,11 @@ class SessionStatusResponse(BaseModel):
     authenticated: bool
 
 
+class AuthProvidersResponse(BaseModel):
+    google: bool
+    magic_link: bool = True
+
+
 class FragmentSessionRequest(BaseModel):
     access_token: str = Field(min_length=20)
     refresh_token: str = Field(min_length=20)
@@ -386,6 +391,47 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     @app.get("/api/v1/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get(
+        "/api/v1/auth/providers",
+        response_model=AuthProvidersResponse,
+    )
+    def auth_providers() -> AuthProvidersResponse:
+        try:
+            google = SupabasePasswordlessAuth.from_environment().provider_enabled(
+                "google"
+            )
+        except (SupabaseAuthError, ValueError):
+            google = False
+        return AuthProvidersResponse(google=google)
+
+    @app.get("/auth/google", include_in_schema=False)
+    def google_sign_in() -> Response:
+        redirect_to = _required_env("AUTH_REDIRECT_URL")
+        auth = SupabasePasswordlessAuth.from_environment()
+        try:
+            if not auth.provider_enabled("google"):
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Google sign-in is not configured yet",
+                )
+            target = auth.social_authorize_url(
+                provider="google",
+                redirect_to=redirect_to,
+            )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Google sign-in configuration is invalid",
+            ) from exc
+        return RedirectResponse(
+            url=target,
+            status_code=status.HTTP_303_SEE_OTHER,
+            headers={
+                "Cache-Control": "private, no-store",
+                "Referrer-Policy": "no-referrer",
+            },
+        )
 
     @app.post("/api/v1/auth/magic-link", response_model=MessageResponse)
     def send_magic_link(

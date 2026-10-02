@@ -41,6 +41,69 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "ok")
 
+    def test_auth_providers_reports_google_enabled(self):
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.provider_enabled.return_value = True
+            response = self.client.get("/api/v1/auth/providers")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["google"])
+        self.assertTrue(response.json()["magic_link"])
+
+    def test_google_sign_in_redirects_to_supabase_authorize(self):
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            auth = factory.return_value
+            auth.provider_enabled.return_value = True
+            auth.social_authorize_url.return_value = (
+                "https://example.supabase.co/auth/v1/authorize?provider=google"
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL":
+                        "https://archive.example.com/auth/confirm"
+                },
+                clear=False,
+            ):
+                response = self.client.get(
+                    "/auth/google",
+                    follow_redirects=False,
+                )
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(
+            response.headers["location"],
+            "https://example.supabase.co/auth/v1/authorize?provider=google",
+        )
+        auth.social_authorize_url.assert_called_once_with(
+            provider="google",
+            redirect_to="https://archive.example.com/auth/confirm",
+        )
+
+    def test_google_sign_in_fails_closed_when_provider_disabled(self):
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.provider_enabled.return_value = False
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL":
+                        "https://archive.example.com/auth/confirm"
+                },
+                clear=False,
+            ):
+                response = self.client.get(
+                    "/auth/google",
+                    follow_redirects=False,
+                )
+
+        self.assertEqual(response.status_code, 503)
+
     def test_magic_link_request_uses_runtime_redirect(self):
         with patch("letter_registry.api.SupabasePasswordlessAuth.from_environment") as factory:
             auth = factory.return_value
