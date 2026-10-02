@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 87fbb23f8776b2b62be98d1e8afb5777107c2d87
-- Last commit: test: make OCR language fixture unambiguous
+- HEAD: cca497ac9e64ba75bea6f62999942d474fe96b1b
+- Last commit: test: isolate configured OCR override contract
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 

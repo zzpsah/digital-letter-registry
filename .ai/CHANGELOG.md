@@ -1,3 +1,10 @@
+## 2026-10-02 — test: isolate configured OCR override contract
+- Commit: cca497ac9e64ba75bea6f62999942d474fe96b1b
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_runtime_readiness.py`
+
 ## 2026-10-02 — test: make OCR language fixture unambiguous
 - Commit: 87fbb23f8776b2b62be98d1e8afb5777107c2d87
 - Author: PRASHANT KUMAR SAH
