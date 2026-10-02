@@ -61,6 +61,28 @@ class ApiTests(unittest.TestCase):
             redirect_to="https://archive.example.com/auth/confirm",
         )
 
+    def test_magic_link_rate_limit_is_reported_as_429(self):
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.send_magic_link.side_effect = (
+                __import__("letter_registry.auth", fromlist=["SupabaseAuthError"])
+                .SupabaseAuthError("Supabase Auth failed with HTTP 429")
+            )
+            with patch.dict(
+                os.environ,
+                {"AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm"},
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/magic-link",
+                    json={"email": "owner@example.com"},
+                    headers={"Origin": "https://archive.example.com"},
+                )
+
+        self.assertEqual(response.status_code, 429)
+        self.assertNotIn("Supabase", response.json()["detail"])
+
     def test_magic_link_callback_sets_httponly_session_cookies(self):
         from letter_registry.auth import SupabaseAuthSession
 
