@@ -144,7 +144,9 @@ class SessionStatusResponse(BaseModel):
 
 class AuthProvidersResponse(BaseModel):
     google: bool
+    password: bool = True
     magic_link: bool = True
+    registration_mode: str = "invite_only"
 
 
 class FragmentSessionRequest(BaseModel):
@@ -886,7 +888,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 detail="Account invitation could not be created",
             ) from exc
         registration_path = (
-            f"/?invite={result.invite_code}"
+            f"/#invite={result.invite_code}"
             if result.status == "pending"
             else None
         )

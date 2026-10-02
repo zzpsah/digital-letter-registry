@@ -52,6 +52,18 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "ok")
 
+    def test_auth_providers_reports_invite_only_password_login(self):
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.provider_enabled.return_value = False
+            response = self.client.get("/api/v1/auth/providers")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["password"])
+        self.assertTrue(response.json()["magic_link"])
+        self.assertEqual(response.json()["registration_mode"], "invite_only")
+
     def test_auth_providers_reports_google_enabled(self):
         with patch(
             "letter_registry.api.SupabasePasswordlessAuth.from_environment"
@@ -356,7 +368,7 @@ class ApiTests(unittest.TestCase):
                 )
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            "44444444-4444-4444-8444-444444444444",
+            "#invite=44444444-4444-4444-8444-444444444444",
             response.json()["registration_path"],
         )
 

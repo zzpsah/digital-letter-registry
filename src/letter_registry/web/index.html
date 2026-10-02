@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#1f5e46">
+  <meta name="referrer" content="no-referrer">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>Official Letter Intelligence Archive</title>
   <style>
@@ -437,10 +438,12 @@ $("accessList").addEventListener("click",async e=>{
   }
 });
 
-const inviteFromUrl=new URLSearchParams(location.search).get("invite");
+const inviteFragment=new URLSearchParams(location.hash.slice(1));
+const inviteFromUrl=inviteFragment.get("invite");
 if(inviteFromUrl){
   $("registerInviteCode").value=inviteFromUrl;
   $("registerDetails").open=true;
+  history.replaceState(null,"",location.pathname+location.search);
 }
 
 refreshAuthProviders();
