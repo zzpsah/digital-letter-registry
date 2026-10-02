@@ -69,6 +69,12 @@ class SessionStatusResponse(BaseModel):
     authenticated: bool
 
 
+class FragmentSessionRequest(BaseModel):
+    access_token: str = Field(min_length=20)
+    refresh_token: str = Field(min_length=20)
+    expires_in: int = Field(default=3600, ge=60, le=86400)
+
+
 class RuntimeCapabilitiesResponse(BaseModel):
     synthetic_only: bool
     drive_upload_configured: bool
@@ -395,9 +401,14 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
 
     @app.get("/auth/confirm", include_in_schema=False)
     def confirm_magic_link(
-        token_hash: str,
+        token_hash: str | None = None,
         type: str = "email",
-    ) -> RedirectResponse:
+    ) -> Response:
+        if not token_hash:
+            return FileResponse(
+                Path(__file__).with_name("web") / "auth-confirm.html",
+                headers={"Cache-Control": "private, no-store"},
+            )
         try:
             session = SupabasePasswordlessAuth.from_environment().verify_token_hash(
                 token_hash=token_hash,
@@ -410,6 +421,43 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             ) from exc
 
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+        _set_session_cookies(response, session)
+        return response
+
+    @app.post(
+        "/api/v1/auth/session-from-fragment",
+        response_model=SessionStatusResponse,
+    )
+    def session_from_fragment(
+        payload: FragmentSessionRequest,
+        _: None = Depends(_require_same_origin),
+    ) -> Response:
+        try:
+            user_id = SupabaseUserSession.from_environment(
+                access_token=payload.access_token,
+            ).user_id()
+        except (ValueError, Exception) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid Supabase session",
+            ) from exc
+
+        owner_id = _required_env("SUPABASE_OWNER_ID")
+        if user_id != owner_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This account is not authorized for the archive",
+            )
+
+        session = SupabaseAuthSession(
+            access_token=payload.access_token,
+            refresh_token=payload.refresh_token,
+            expires_in=payload.expires_in,
+        )
+        response = Response(
+            content='{"authenticated":true}',
+            media_type="application/json",
+        )
         _set_session_cookies(response, session)
         return response
 
