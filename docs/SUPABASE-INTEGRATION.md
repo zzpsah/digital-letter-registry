@@ -76,9 +76,13 @@ DB-level synthetic RLS verification has passed using simulated request JWT claim
 
 This does **not** replace the pending real short-lived bearer-session/PostgREST test. One synthetic RLS verification row currently remains in `letters`; no real archive-letter row exists.
 
+Current auth implementation supports both Supabase paths:
+- custom token-hash template callback when custom SMTP/template editing is enabled,
+- default hosted Magic Link fragment callback without custom SMTP. The fragment bridge validates the Supabase user server-side, requires the configured archive owner, stores session tokens only in HttpOnly cookies, clears the browser URL, and serves no-store/no-referrer/CSP headers.
+
 Before real ingestion:
 
-1. Obtain a real authenticated owner session at runtime.
+1. Obtain a real authenticated owner session at runtime using the default hosted Magic Link flow or the optional custom token-hash flow.
 2. Run the guarded synthetic HTTP/PostgREST insert/read test with that session.
 3. Verify the full synthetic intake → private Drive → queue/worker → search/open-original path.
 4. Verify refreshable Drive OAuth/original streaming.
