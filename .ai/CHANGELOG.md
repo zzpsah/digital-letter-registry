@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: expose official filename rule version
+- Commit: 9efc0d869cd6c9ba977861ac06134d5148035401
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/naming.py`
+
 ## 2026-10-02 — feat: add issue date and reference number to structured context
 - Commit: 81681895269767f51963a072851bcf903fc0877f
 - Author: PRASHANT KUMAR SAH

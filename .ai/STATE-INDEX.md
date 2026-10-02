@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 81681895269767f51963a072851bcf903fc0877f
-- Last commit: feat: add issue date and reference number to structured context
+- HEAD: 9efc0d869cd6c9ba977861ac06134d5148035401
+- Last commit: feat: expose official filename rule version
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
