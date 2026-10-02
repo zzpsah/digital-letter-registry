@@ -43,6 +43,9 @@ def _present(name: str) -> bool:
 
 
 def _drive_credentials_ready() -> bool:
+    credentials_file = os.environ.get("GOOGLE_OAUTH_CREDENTIALS_FILE", "").strip()
+    if credentials_file and os.path.isfile(credentials_file):
+        return True
     if _present("GOOGLE_DRIVE_ACCESS_TOKEN"):
         return True
     return all(
