@@ -7,12 +7,14 @@ UUID identifiers are enforced only at this boundary.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Protocol
 from uuid import UUID
 
 from .extraction import ExtractionResult
 from .structured_analysis import ContextAnalysisResult
 from .models import DocumentRecord
+from .naming import FILENAME_RULE_VERSION, build_smart_filename
 
 
 def _validated_uuid(value: str, *, field_name: str) -> str:
@@ -154,6 +156,11 @@ def build_supabase_context_processing_patch(
         "structured_context": result.context.to_json_dict(),
         "concepts": list(result.context.concepts),
         "context_version": result.version,
+        "filename_rule_version": (
+            FILENAME_RULE_VERSION
+            if result.context.title and result.context.authority
+            else record.processing.filename_rule
+        ),
     }
 
 
@@ -176,11 +183,30 @@ def build_supabase_letter_context_patch(
         "authority": context.authority,
         "category": context.category,
         "subcategory": context.subcategory,
+        "summary": context.summary,
+        "reference_number": context.reference_number,
         "action_required": context.action_required,
     }
     for key, value in optional_values.items():
         if value is not None and str(value).strip():
             row[key] = value
+
+    parsed_issue_date: date | None = None
+    if context.issue_date:
+        try:
+            parsed_issue_date = date.fromisoformat(context.issue_date)
+            row["issue_date"] = parsed_issue_date.isoformat()
+        except ValueError:
+            parsed_issue_date = None
+
+    if context.title and context.authority:
+        row["smart_filename"] = build_smart_filename(
+            short_title=context.title,
+            issuer=context.authority,
+            issue_date=parsed_issue_date,
+            reference_number=context.reference_number,
+            original_filename=record.original_filename,
+        )
 
     if context.deadline:
         row["deadline_at"] = context.deadline
