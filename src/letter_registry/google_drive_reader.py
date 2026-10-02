@@ -7,11 +7,11 @@ must never be committed or returned to the browser.
 from __future__ import annotations
 
 import mimetypes
-import os
 from dataclasses import dataclass
 from typing import Callable
 from urllib import error, parse, request
 
+from .google_drive_auth import DriveAccessTokenProvider, StaticAccessTokenProvider, drive_token_provider_from_environment
 from .original_access import OriginalFile
 
 
@@ -45,15 +45,20 @@ def _default_binary_http_executor(
 
 @dataclass(slots=True)
 class GoogleDrivePrivateTransport:
-    access_token: str
+    access_token: str | None = None
+    token_provider: DriveAccessTokenProvider | None = None
     http_executor: BinaryHttpExecutor = _default_binary_http_executor
 
     @classmethod
     def from_environment(cls) -> "GoogleDrivePrivateTransport":
-        token = os.environ.get("GOOGLE_DRIVE_ACCESS_TOKEN", "").strip()
-        if not token:
-            raise ValueError("GOOGLE_DRIVE_ACCESS_TOKEN is required at runtime")
-        return cls(access_token=token)
+        return cls(token_provider=drive_token_provider_from_environment())
+
+    def _token(self) -> str:
+        if self.token_provider is not None:
+            return self.token_provider.get_access_token()
+        if self.access_token is not None:
+            return StaticAccessTokenProvider(self.access_token).get_access_token()
+        raise ValueError("Google Drive token provider is not configured")
 
     def download(
         self,
@@ -76,7 +81,7 @@ class GoogleDrivePrivateTransport:
         )
         req = request.Request(
             url,
-            headers={"Authorization": f"Bearer {self.access_token}"},
+            headers={"Authorization": f"Bearer {self._token()}"},
             method="GET",
         )
         status, content, response_type = self.http_executor(req)
