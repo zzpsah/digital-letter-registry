@@ -30,7 +30,7 @@
 - [x] Implement runtime authenticated Supabase transport and guarded synthetic integration command.
 - [x] Verify DB-level owner insert/read isolation and wrong-user RLS denial using synthetic JWT-claim simulation.
 - [ ] Execute authenticated live synthetic insert/read + RLS denial test with a real short-lived runtime bearer/session.
-- [ ] Remove the retained synthetic RLS verification row after an authorized destructive cleanup path is available.
+- [x] Remove the retained synthetic RLS verification row through a controlled exact-match cleanup; verified `letters` contains zero rows afterward.
 
 ## Phase 2 — Extraction/context
 
