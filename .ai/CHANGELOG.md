@@ -1,3 +1,10 @@
+## 2026-10-02 — security: harden magic-link fragment callback
+- Commit: adf84d9f3d83d86060eebfb1867583d4caa9e94f
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — test: cover default magic-link fragment callback
 - Commit: fb4e4870f7aa0d5eced9c8a0ab5f550747f6c307
 - Author: PRASHANT KUMAR SAH

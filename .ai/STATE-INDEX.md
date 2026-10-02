@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: fb4e4870f7aa0d5eced9c8a0ab5f550747f6c307
-- Last commit: test: cover default magic-link fragment callback
+- HEAD: adf84d9f3d83d86060eebfb1867583d4caa9e94f
+- Last commit: security: harden magic-link fragment callback
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
