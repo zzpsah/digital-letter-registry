@@ -9,10 +9,17 @@ description = "Domain foundations for a private official letter intelligence arc
 requires-python = ">=3.12"
 dependencies = [
   "pypdf>=5.0,<7",
+  "fastapi[standard-no-fastapi-cloud-cli]>=0.142.2,<0.143.0",
 ]
+
+[tool.fastapi]
+entrypoint = "letter_registry.api:app"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+letter_registry = ["web/*.html"]
