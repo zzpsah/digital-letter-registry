@@ -198,12 +198,13 @@ async function refreshAdminAccess(){
         +'<button type="button" data-save-member="'+esc(item.user_id)+'">Save</button>'
         +'</div></div>';
     }
-    const path=item.invite_code?"/?invite="+encodeURIComponent(item.invite_code):"";
+    const path=item.invite_code?"/#invite="+encodeURIComponent(item.invite_code):"";
     return '<div class="card" style="margin:8px 0;padding:10px">'
       +'<div><strong>'+esc(item.email)+'</strong> · '+esc(item.role)+' · '+esc(item.status)+'</div>'
       +(item.invite_code
         ?'<div class="muted" style="word-break:break-all;margin-top:6px">Invite code: '+esc(item.invite_code)+'</div>'
          +'<div class="row" style="margin-top:8px">'
+         +'<button type="button" data-send-invite-email="'+esc(item.record_id)+'" data-invite-email="'+esc(item.email)+'" data-invite-code="'+esc(item.invite_code)+'">Send registration email</button>'
          +'<button type="button" data-copy-invite="'+esc(path)+'">Copy invite link</button>'
          +'<button type="button" data-revoke-invite="'+esc(item.record_id)+'">Revoke</button>'
          +'</div>'
@@ -414,6 +415,23 @@ $("accessList").addEventListener("click",async e=>{
       alert(body.detail||"Member update failed.");
     }
     await refreshAdminAccess();
+    return;
+  }
+  const sendInvite=e.target.closest("[data-send-invite-email]");
+  if(sendInvite){
+    const email=sendInvite.dataset.inviteEmail;
+    const invite_code=sendInvite.dataset.inviteCode;
+    $("inviteStatus").textContent="Registration email भेज रहा है…";
+    const res=await fetch("/api/v1/auth/register-magic-link",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email,invite_code})
+    });
+    let body={};
+    try{body=await res.json();}catch{}
+    $("inviteStatus").textContent=res.ok
+      ?(body.message||"Registration email sent.")
+      :(body.detail||"Registration email failed.");
     return;
   }
   const revoke=e.target.closest("[data-revoke-invite]");

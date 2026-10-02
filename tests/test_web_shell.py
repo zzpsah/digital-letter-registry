@@ -23,6 +23,19 @@ class WebShellTests(unittest.TestCase):
         self.assertNotIn('sessionStorage.setItem("dlr_refresh_token"', self.html)
         self.assertNotIn('localStorage.setItem("dlr_refresh_token"', self.html)
 
+    def test_admin_can_send_pending_registration_email(self) -> None:
+        self.assertIn('data-send-invite-email=', self.html)
+        self.assertIn(
+            'fetch("/api/v1/auth/register-magic-link"',
+            self.html,
+        )
+
+    def test_invite_secret_uses_fragment_and_is_cleared(self) -> None:
+        self.assertIn('"/#invite="', self.html)
+        self.assertIn("location.hash.slice(1)", self.html)
+        self.assertIn("history.replaceState", self.html)
+        self.assertNotIn('location.search).get("invite")', self.html)
+
     def test_streamed_original_response_is_opened_from_blob(self) -> None:
         self.assertIn("const blob=await res.blob()", self.html)
         self.assertIn("URL.createObjectURL(blob)", self.html)
