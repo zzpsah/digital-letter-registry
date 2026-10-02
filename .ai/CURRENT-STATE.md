@@ -69,12 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: d8bcbc5887ed052e4a033b1bb58de88c0774b66b
-- Change: fix: relax fragment token shape assumptions
+- Commit: 31c42df96f4e84d369dac08515230f2bced6aed2
+- Change: fix: expose safe auth callback diagnostics
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## Magic Link bridge repair
-
-Real owner Magic Link verification reached Supabase successfully, but DLR session bridging returned 422. The fragment payload model was made provider-format tolerant while retaining server-side Supabase token validation and archive-membership authorization. Full suite passes 256/256 and the private service is healthy. Browser retry remains pending.

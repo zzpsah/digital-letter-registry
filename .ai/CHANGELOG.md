@@ -1,3 +1,10 @@
+## 2026-10-03 — fix: expose safe auth callback diagnostics
+- Commit: 31c42df96f4e84d369dac08515230f2bced6aed2
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/auth-confirm.html`
+
 ## 2026-10-03 — docs: record second admin onboarding
 - Commit: 082da81b242e5abcc8506bbfa1587dd3fac19d8c
 - Author: PRASHANT KUMAR SAH
