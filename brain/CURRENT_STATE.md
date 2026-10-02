@@ -36,3 +36,10 @@ Implement the private upload/intake API and durable processing-queue boundary us
 ## Safety
 
 Never commit real letters, Drive IDs/URLs, Supabase project references/keys, OAuth tokens, credentials, SSH keys, or server details. Do not rename existing Drive files without an approved preview mapping. No production deployment without explicit approval.
+
+
+## Intake + processing worker
+
+Synthetic-first private intake is implemented end-to-end in code: authenticated owner lookup, duplicate SHA preflight, immutable Drive upload, source/processing rows, durable queued job, atomic RLS-aware claim, private original download, extraction/OCR, structured context, smart filename metadata, embeddings, and durable completed/failed job transition. Real intake remains disabled by default and no production deployment has occurred.
+
+PDF and image paths are both represented: PDF uses native text then OCRmyPDF/Tesseract fallback; JPG/JPEG/PNG uses direct Tesseract Hindi+English OCR. The remaining milestone is live synthetic runtime verification with short-lived user/Drive credentials and locally available OCR binaries.
