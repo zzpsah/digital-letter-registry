@@ -42,3 +42,12 @@ The application foundation is implemented in the public repository:
 - Each deployment must use an explicitly authorized OAuth identity plus configured archive folder references.
 - Current private runtime is a single archive-owner deployment.
 - A second Google account must use separate OAuth/secret-manager configuration and archive references. Authorization is also subject to the Google OAuth consent-screen publishing/testing policy.
+
+
+## Authentication responsibility
+
+- Passwordless email/Magic Link identifies the DLR user and establishes the browser session.
+- Supabase RLS consumes that identity to enforce row ownership/isolation.
+- Tailscale controls private network reachability.
+- Google OAuth controls backend access to the configured Drive archive.
+- Real document mutation remains separately approval-gated even for a successfully authenticated owner.
