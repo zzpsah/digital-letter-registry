@@ -83,6 +83,8 @@
 - [x] Refreshable Google Drive OAuth credential strategy with in-memory access-token caching.
 - [x] Add preferred file-based authorized-user Google OAuth runtime provider and verify live refresh/list/stream with synthetic data only.
 - [ ] Verify runtime synthetic upload/write with an explicitly approved write-capable Drive scope; current verified grant is read-only.
+- [x] Add preferred file-based authorized-user Google OAuth runtime provider and verify live refresh/list/stream with synthetic data only.
+- [ ] Verify runtime synthetic upload/write with an explicitly approved write-capable Drive scope; current verified grant is read-only.
 
 ## Phase 4 — Intelligence lifecycle
 
