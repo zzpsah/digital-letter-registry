@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover approval-locked historical Drive adoption
+- Commit: 194bba4f1a67be36517541f1e857e75164e3b14d
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_historical_import.py`
+
 ## 2026-10-02 — feat: expose storage-reference duplicate check
 - Commit: fd7cb4c9e0b5b77dda2570232d5aa5692aacebe8
 - Author: PRASHANT KUMAR SAH
