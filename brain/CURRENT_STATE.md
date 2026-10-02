@@ -33,3 +33,8 @@ Do not commit real letters, Drive IDs/URLs, Supabase keys, credentials, SSH keys
 ## 2026-10-02 — Live integration checkpoint
 
 A synthetic PDF upload to the private Drive `originals/` folder is verified. Supabase archive-owner email confirmation is complete. Runtime authenticated PostgREST transport and a guarded synthetic integration command are now implemented. The remaining live step is to execute the command with a short-lived authenticated user session and verify RLS denial for an unauthenticated caller.
+
+
+## Phase 2 progress
+
+Native PDF text/OCR provider contracts are implemented with Hindi-English fallback semantics. Government/education vocabulary and deterministic context hints are implemented before AI analysis. A concrete OCR backend and structured AI provider remain pending.
