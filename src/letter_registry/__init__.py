@@ -11,7 +11,9 @@ from .extraction import (
 )
 from .extraction_backends import OcrmypdfTesseractBackend, PypdfTextBackend
 from .fingerprints import sha256_file
+from .gemini_embeddings import GeminiEmbeddingProvider, GeminiEmbeddingError
 from .gemini_provider import GeminiDocumentContextProvider, GeminiProviderError
+from .hybrid_search import HybridSearchRepository, HybridSearchResult
 from .ingestion import prepare_source_record, persist_prepared_source
 from .orchestration import ingest_original
 from .processing_pipeline import ProcessingOutcome, process_archived_document
@@ -35,6 +37,7 @@ from .rename_preview import (
     render_rename_preview_csv,
 )
 from .search import SearchResult, SupabaseSearchRepository
+from .semantic_search import SupabaseEmbeddingRepository
 from .storage import (
     GoogleDriveOriginalStorage,
     GoogleDriveTransport,
@@ -54,6 +57,8 @@ __all__ = [
     "PypdfTextBackend",
     "OcrmypdfTesseractBackend",
     "GeminiDocumentContextProvider",
+    "GeminiEmbeddingProvider",
+    "GeminiEmbeddingError",
     "GeminiProviderError",
     "DocumentRecord",
     "DocumentRelationship",
@@ -78,6 +83,9 @@ __all__ = [
     "SupabasePostgrestTransport",
     "SupabaseRuntimeError",
     "SearchResult",
+    "SupabaseEmbeddingRepository",
+    "HybridSearchRepository",
+    "HybridSearchResult",
     "SupabaseSearchRepository",
     "detect_context_hints",
     "is_usable_native_text",
