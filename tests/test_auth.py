@@ -84,6 +84,33 @@ class SupabasePasswordlessAuthTests(unittest.TestCase):
                 redirect_to="ftp://unsafe.example.com",
             )
 
+    def test_password_sign_in_normalizes_email_and_returns_session(self):
+        seen = {}
+
+        def executor(req):
+            seen["url"] = req.full_url
+            seen["body"] = json.loads(req.data.decode("utf-8"))
+            return 200, json.dumps({
+                "access_token": "synthetic-access",
+                "refresh_token": "synthetic-refresh",
+                "expires_in": 3600,
+            })
+
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=executor,
+        )
+        session = auth.sign_in_with_password(
+            email="USER@example.com",
+            password="synthetic-password",
+        )
+
+        self.assertEqual(session.access_token, "synthetic-access")
+        self.assertIn("grant_type=password", seen["url"])
+        self.assertEqual(seen["body"]["email"], "user@example.com")
+        self.assertEqual(seen["body"]["password"], "synthetic-password")
+
     def test_token_hash_verification_returns_session(self):
         seen = {}
 

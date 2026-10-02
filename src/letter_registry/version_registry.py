@@ -102,7 +102,7 @@ class SupabaseProcessingVersionRegistry:
                 "embedding_version": versions.embedding,
                 "status_rule_version": versions.status_rule,
             },
-            on_conflict="owner_id",
+            on_conflict="archive_id",
         )
 
     def get_profile(
@@ -113,7 +113,7 @@ class SupabaseProcessingVersionRegistry:
         UUID(owner_id)
         rows = self.transport.select(
             "processing_profiles",
-            filters={"owner_id": owner_id},
+            filters=None,
             columns=(
                 "extraction_version,context_version,dictionary_version,"
                 "filename_rule_version,category_schema_version,"

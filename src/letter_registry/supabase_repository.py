@@ -90,7 +90,6 @@ class SupabaseLetterRepository:
         rows = self.transport.select(
             "letters",
             filters={
-                "owner_id": owner_id,
                 "storage_provider": self.storage_provider,
                 "storage_object_id": object_reference,
             },
@@ -102,7 +101,6 @@ class SupabaseLetterRepository:
         rows = self.transport.select(
             "letters",
             filters={
-                "owner_id": owner_id,
                 "original_sha256": sha256.lower(),
             },
             columns="id",

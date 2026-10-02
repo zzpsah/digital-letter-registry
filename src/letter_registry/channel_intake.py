@@ -94,7 +94,7 @@ class SupabaseProvenanceRepository:
                 "metadata": dict(provenance.metadata),
             },
             on_conflict=(
-                "owner_id,source_channel,external_message_id"
+                "archive_id,source_channel,external_message_id"
                 if provenance.external_message_id
                 else None
             ),

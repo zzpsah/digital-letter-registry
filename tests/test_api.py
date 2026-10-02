@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
+from letter_registry.access import ArchiveMembership, ArchiveRole
 from letter_registry.api import ApiDependencies, create_app
 
 
@@ -33,6 +34,16 @@ class FakeTransport:
 
 class ApiTests(unittest.TestCase):
     def setUp(self):
+        self.membership_patcher = patch(
+            "letter_registry.api._archive_membership",
+            return_value=ArchiveMembership(
+                archive_id="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                user_id="11111111-1111-4111-8111-111111111111",
+                role=ArchiveRole.ADMIN,
+            ),
+        )
+        self.archive_membership = self.membership_patcher.start()
+        self.addCleanup(self.membership_patcher.stop)
         self.app = create_app(ApiDependencies())
         self.client = TestClient(self.app)
 
@@ -103,6 +114,101 @@ class ApiTests(unittest.TestCase):
                 )
 
         self.assertEqual(response.status_code, 503)
+
+    def test_password_login_sets_session_for_archive_member(self):
+        from letter_registry.auth import SupabaseAuthSession
+
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.sign_in_with_password.return_value = (
+                SupabaseAuthSession(
+                    access_token="synthetic-access",
+                    refresh_token="synthetic-refresh",
+                    expires_in=3600,
+                )
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL":
+                        "https://archive.example.com/auth/confirm",
+                    "AUTH_COOKIE_SECURE": "false",
+                },
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/password",
+                    headers={"Origin": "https://archive.example.com"},
+                    json={
+                        "email": "ADMIN@example.com",
+                        "password": "synthetic-password",
+                    },
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["authenticated"])
+        self.assertEqual(response.json()["role"], "admin")
+        factory.return_value.sign_in_with_password.assert_called_once_with(
+            email="ADMIN@example.com",
+            password="synthetic-password",
+        )
+        cookies = "\n".join(response.headers.get_list("set-cookie")).lower()
+        self.assertIn("dlr_access_token=", cookies)
+        self.assertIn("dlr_refresh_token=", cookies)
+
+    def test_password_login_rejects_non_member(self):
+        from fastapi import HTTPException
+        from letter_registry.auth import SupabaseAuthSession
+
+        self.archive_membership.side_effect = HTTPException(
+            status_code=403,
+            detail="This account is not authorized for the archive",
+        )
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.sign_in_with_password.return_value = (
+                SupabaseAuthSession(
+                    access_token="synthetic-access",
+                    refresh_token="synthetic-refresh",
+                    expires_in=3600,
+                )
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL":
+                        "https://archive.example.com/auth/confirm",
+                },
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/password",
+                    headers={"Origin": "https://archive.example.com"},
+                    json={
+                        "email": "outsider@example.com",
+                        "password": "synthetic-password",
+                    },
+                )
+        self.assertEqual(response.status_code, 403)
+
+    def test_viewer_cannot_open_intake_runtime(self):
+        from fastapi import HTTPException
+
+        self.archive_membership.side_effect = HTTPException(
+            status_code=403,
+            detail="archive role does not permit this action",
+        )
+        with patch.dict(
+            os.environ,
+            {"DRIVE_ORIGINALS_FOLDER_REFERENCE": "synthetic-folder"},
+            clear=False,
+        ):
+            from letter_registry.api import _runtime_intake
+            with self.assertRaises(HTTPException) as ctx:
+                _runtime_intake("synthetic-access")
+        self.assertEqual(ctx.exception.status_code, 403)
 
     def test_magic_link_request_uses_runtime_redirect(self):
         with patch("letter_registry.api.SupabasePasswordlessAuth.from_environment") as factory:
@@ -251,7 +357,6 @@ class ApiTests(unittest.TestCase):
                 {
                     "AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm",
                     "AUTH_COOKIE_SECURE": "false",
-                    "SUPABASE_OWNER_ID": owner_id,
                 },
                 clear=False,
             ):
@@ -274,7 +379,13 @@ class ApiTests(unittest.TestCase):
         self.assertIn("dlr_refresh_token=", cookies)
         self.assertIn("httponly", cookies)
 
-    def test_fragment_session_bridge_rejects_non_owner(self):
+    def test_fragment_session_bridge_rejects_non_member(self):
+        from fastapi import HTTPException
+
+        self.archive_membership.side_effect = HTTPException(
+            status_code=403,
+            detail="This account is not authorized for the archive",
+        )
         with patch(
             "letter_registry.api.SupabaseUserSession.from_environment"
         ) as factory:
@@ -284,8 +395,8 @@ class ApiTests(unittest.TestCase):
             with patch.dict(
                 os.environ,
                 {
-                    "AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm",
-                    "SUPABASE_OWNER_ID": "11111111-1111-4111-8111-111111111111",
+                    "AUTH_REDIRECT_URL":
+                        "https://archive.example.com/auth/confirm",
                 },
                 clear=False,
             ):

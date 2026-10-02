@@ -164,3 +164,120 @@ class SupabasePostgrestTransport:
         if isinstance(result, list):
             return [item for item in result if isinstance(item, dict)]
         raise SupabaseRuntimeError("unexpected select response shape")
+
+
+_ARCHIVE_SCOPED_TABLES = frozenset({
+    "letters",
+    "letter_processing",
+    "letter_relationships",
+    "letter_chunks",
+    "processing_jobs",
+    "processing_profiles",
+    "letter_sources",
+})
+
+_ARCHIVE_SCOPED_RPCS = frozenset()
+
+
+_ARCHIVE_CONFLICT_REWRITES = {
+    ("letters", "owner_id,original_sha256"): "archive_id,original_sha256",
+    (
+        "letter_sources",
+        "owner_id,source_channel,external_message_id",
+    ): "archive_id,source_channel,external_message_id",
+    ("processing_profiles", "owner_id"): "archive_id",
+}
+
+
+@dataclass(slots=True)
+class ArchiveScopedSupabaseTransport:
+    """Scope all archive-domain table operations to one configured archive."""
+
+    transport: SupabasePostgrestTransport
+    archive_id: str
+
+    def __post_init__(self) -> None:
+        from uuid import UUID
+
+        self.archive_id = str(UUID(self.archive_id))
+
+    def _row(self, table: str, row: dict[str, object]) -> dict[str, object]:
+        prepared = dict(row)
+        if table in _ARCHIVE_SCOPED_TABLES:
+            existing = prepared.get("archive_id")
+            if existing is not None and str(existing) != self.archive_id:
+                raise ValueError("cross-archive write rejected")
+            prepared["archive_id"] = self.archive_id
+        return prepared
+
+    def _filters(
+        self,
+        table: str,
+        filters: dict[str, str] | None,
+    ) -> dict[str, str] | None:
+        if table not in _ARCHIVE_SCOPED_TABLES:
+            return dict(filters) if filters is not None else None
+        prepared = dict(filters or {})
+        existing = prepared.get("archive_id")
+        if existing is not None and str(existing) != self.archive_id:
+            raise ValueError("cross-archive read rejected")
+        prepared["archive_id"] = self.archive_id
+        return prepared
+
+    @staticmethod
+    def _conflict(table: str, on_conflict: str | None) -> str | None:
+        if on_conflict is None:
+            return None
+        return _ARCHIVE_CONFLICT_REWRITES.get(
+            (table, on_conflict),
+            on_conflict,
+        )
+
+    def insert(
+        self,
+        table: str,
+        row: dict[str, object],
+        *,
+        on_conflict: str | None = None,
+    ) -> dict[str, object]:
+        return self.transport.insert(
+            table,
+            self._row(table, row),
+            on_conflict=self._conflict(table, on_conflict),
+        )
+
+    def upsert(
+        self,
+        table: str,
+        row: dict[str, object],
+        *,
+        on_conflict: str,
+    ) -> dict[str, object]:
+        return self.transport.upsert(
+            table,
+            self._row(table, row),
+            on_conflict=self._conflict(table, on_conflict) or on_conflict,
+        )
+
+    def select(
+        self,
+        table: str,
+        *,
+        filters: dict[str, str] | None = None,
+        columns: str = "*",
+    ) -> list[dict[str, object]]:
+        return self.transport.select(
+            table,
+            filters=self._filters(table, filters),
+            columns=columns,
+        )
+
+    def rpc(
+        self,
+        function: str,
+        params: dict[str, object],
+    ) -> list[dict[str, object]]:
+        scoped = dict(params)
+        if function in _ARCHIVE_SCOPED_RPCS:
+            scoped.setdefault("target_archive_id", self.archive_id)
+        return self.transport.rpc(function, scoped)

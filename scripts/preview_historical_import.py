@@ -6,6 +6,8 @@ authenticated archive database if Supabase runtime credentials are provided.
 
 from __future__ import annotations
 
+import os
+
 import argparse
 import csv
 import json
@@ -14,7 +16,10 @@ from pathlib import Path
 from letter_registry.historical_import import preview_historical_import
 from letter_registry.session import SupabaseUserSession
 from letter_registry.supabase_repository import SupabaseLetterRepository
-from letter_registry.supabase_runtime import SupabasePostgrestTransport
+from letter_registry.supabase_runtime import (
+    ArchiveScopedSupabaseTransport,
+    SupabasePostgrestTransport,
+)
 
 
 def candidate_files(root: Path, *, recursive: bool) -> list[Path]:
@@ -33,7 +38,10 @@ def main() -> int:
     if not root.is_dir():
         raise SystemExit("folder must exist")
 
-    transport = SupabasePostgrestTransport.from_environment()
+    transport = ArchiveScopedSupabaseTransport(
+        transport=SupabasePostgrestTransport.from_environment(),
+        archive_id=os.environ["DLR_ARCHIVE_ID"],
+    )
     owner_id = SupabaseUserSession.from_environment(
         access_token=transport.access_token,
     ).user_id()

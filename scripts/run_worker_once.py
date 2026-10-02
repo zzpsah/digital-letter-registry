@@ -23,7 +23,10 @@ from letter_registry.relationships import SupabaseRelationshipRepository
 from letter_registry.semantic_search import SupabaseEmbeddingRepository
 from letter_registry.source_loader import SupabaseSourceLoader
 from letter_registry.supabase_repository import SupabaseLetterRepository
-from letter_registry.supabase_runtime import SupabasePostgrestTransport
+from letter_registry.supabase_runtime import (
+    ArchiveScopedSupabaseTransport,
+    SupabasePostgrestTransport,
+)
 from letter_registry.worker import DocumentProcessingWorker
 
 
@@ -37,7 +40,10 @@ def _truthy(name: str) -> bool:
 
 
 def main() -> int:
-    transport = SupabasePostgrestTransport.from_environment()
+    transport = ArchiveScopedSupabaseTransport(
+        transport=SupabasePostgrestTransport.from_environment(),
+        archive_id=os.environ["DLR_ARCHIVE_ID"],
+    )
     repository = SupabaseLetterRepository(transport)
     embedding_provider = GeminiEmbeddingProvider.from_environment()
 

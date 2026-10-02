@@ -9,24 +9,20 @@ from __future__ import annotations
 import argparse
 import os
 from pathlib import Path
-from uuid import UUID
 
 from letter_registry.ingestion import prepare_source_record
+from letter_registry.session import SupabaseUserSession
 from letter_registry.supabase_repository import SupabaseLetterRepository
-from letter_registry.supabase_runtime import SupabasePostgrestTransport
+from letter_registry.supabase_runtime import (
+    ArchiveScopedSupabaseTransport,
+    SupabasePostgrestTransport,
+)
 
 
 def _synthetic_only(path: Path) -> None:
     name = path.name.lower()
     if "synthetic" not in name and "test" not in name:
         raise ValueError("refusing live integration: file must be clearly synthetic/test data")
-
-
-def _owner_id_from_environment() -> str:
-    value = os.environ.get("SUPABASE_OWNER_ID", "").strip()
-    if not value:
-        raise ValueError("SUPABASE_OWNER_ID is required at runtime")
-    return str(UUID(value))
 
 
 def main() -> int:
@@ -41,8 +37,14 @@ def main() -> int:
 
     path = Path(args.file)
     _synthetic_only(path)
-    owner_id = _owner_id_from_environment()
-    transport = SupabasePostgrestTransport.from_environment()
+    raw_transport = SupabasePostgrestTransport.from_environment()
+    owner_id = SupabaseUserSession.from_environment(
+        access_token=raw_transport.access_token,
+    ).user_id()
+    transport = ArchiveScopedSupabaseTransport(
+        transport=raw_transport,
+        archive_id=os.environ["DLR_ARCHIVE_ID"],
+    )
     repository = SupabaseLetterRepository(transport)
 
     record = prepare_source_record(
@@ -59,7 +61,7 @@ def main() -> int:
         columns="id,owner_id,original_sha256,original_filename",
     )
     if len(owner_rows) != 1:
-        raise RuntimeError(f"expected exactly one owner-visible source row, got {len(owner_rows)}")
+        raise RuntimeError(f"expected exactly one archive-visible source row, got {len(owner_rows)}")
 
     repository.save_source(record, owner_id=owner_id)
     duplicate_rows = transport.select(

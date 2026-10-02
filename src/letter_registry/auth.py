@@ -1,4 +1,4 @@
-"""Server-safe Supabase passwordless authentication helpers."""
+"""Server-safe Supabase authentication helpers."""
 
 from __future__ import annotations
 
@@ -155,6 +155,46 @@ class SupabasePasswordlessAuth:
             raise SupabaseAuthError(
                 f"unexpected Supabase Auth HTTP status: {status}"
             )
+
+    def sign_in_with_password(
+        self,
+        *,
+        email: str,
+        password: str,
+    ) -> SupabaseAuthSession:
+        normalized = email.strip().lower()
+        if (
+            not normalized
+            or "@" not in normalized
+            or len(normalized) > 320
+        ):
+            raise ValueError("valid email is required")
+        if len(password) < 6 or len(password) > 256:
+            raise ValueError("password must be between 6 and 256 characters")
+
+        req = request.Request(
+            (
+                f"{self.base_url.rstrip('/')}/auth/v1/token"
+                "?grant_type=password"
+            ),
+            data=json.dumps(
+                {
+                    "email": normalized,
+                    "password": password,
+                }
+            ).encode("utf-8"),
+            headers={
+                "apikey": self.publishable_key,
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise SupabaseAuthError(
+                f"unexpected Supabase password auth HTTP status: {status}"
+            )
+        return self._session_from_response(raw)
 
     def verify_token_hash(
         self,

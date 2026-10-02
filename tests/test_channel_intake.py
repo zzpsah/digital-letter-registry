@@ -110,7 +110,7 @@ class ChannelIntakeTests(unittest.TestCase):
         self.assertEqual(row["metadata"], {"forwarded": True})
         self.assertEqual(
             conflict,
-            "owner_id,source_channel,external_message_id",
+            "archive_id,source_channel,external_message_id",
         )
 
     def test_empty_attachment_is_rejected(self):

@@ -61,7 +61,7 @@ class VersionRegistryTests(unittest.TestCase):
 
         self.assertEqual(loaded, versions)
         self.assertEqual(transport.upserts[0][0], "processing_profiles")
-        self.assertEqual(transport.upserts[0][2], "owner_id")
+        self.assertEqual(transport.upserts[0][2], "archive_id")
 
     def test_enqueue_reprocessing_returns_inserted_count(self):
         transport = FakeTransport()

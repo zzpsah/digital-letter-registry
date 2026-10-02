@@ -7,12 +7,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urlsplit
+from uuid import UUID
 
 from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile, status
 from fastapi.responses import FileResponse, RedirectResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
+from .access import ArchiveMembership, ArchiveRole, SupabaseArchiveAccess
 from .auth import SupabaseAuthError, SupabaseAuthSession, SupabasePasswordlessAuth
 from .channel_intake import ChannelIntakeService, IntakeChannel, IntakeProvenance, SupabaseProvenanceRepository
 from .detail import SupabaseLetterDetailRepository
@@ -31,7 +33,11 @@ from .semantic_search import SupabaseEmbeddingRepository
 from .session import SupabaseSessionError, SupabaseUserSession
 from .storage import GoogleDriveOriginalStorage
 from .supabase_repository import SupabaseLetterRepository
-from .supabase_runtime import SupabasePostgrestTransport
+from .supabase_runtime import (
+    ArchiveScopedSupabaseTransport,
+    SupabasePostgrestTransport,
+    SupabaseRuntimeError,
+)
 from .versions import current_processing_versions
 from .version_registry import ProcessingTargetVersions, SupabaseProcessingVersionRegistry
 
@@ -61,12 +67,18 @@ class MagicLinkRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
 
 
+class PasswordLoginRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    password: str = Field(min_length=6, max_length=256)
+
+
 class MessageResponse(BaseModel):
     message: str
 
 
 class SessionStatusResponse(BaseModel):
     authenticated: bool
+    role: str | None = None
 
 
 class AuthProvidersResponse(BaseModel):
@@ -336,11 +348,55 @@ def _require_same_origin(
         )
 
 
-def _transport(access_token: str) -> SupabasePostgrestTransport:
+def _archive_id() -> str:
+    try:
+        return str(UUID(_required_env("DLR_ARCHIVE_ID")))
+    except ValueError as exc:
+        raise RuntimeError("DLR_ARCHIVE_ID must be a valid UUID") from exc
+
+
+def _raw_transport(access_token: str) -> SupabasePostgrestTransport:
     return SupabasePostgrestTransport(
         base_url=_required_env("SUPABASE_URL"),
         publishable_key=_required_env("SUPABASE_PUBLISHABLE_KEY"),
         access_token=access_token,
+    )
+
+
+def _archive_membership(
+    access_token: str,
+    *,
+    roles: set[ArchiveRole] | None = None,
+) -> ArchiveMembership:
+    try:
+        user_id = SupabaseUserSession.from_environment(
+            access_token=access_token,
+        ).user_id()
+        return SupabaseArchiveAccess(
+            transport=_raw_transport(access_token),
+            archive_id=_archive_id(),
+        ).require(user_id, roles=roles)
+    except PermissionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This account is not authorized for the archive",
+        ) from exc
+    except (SupabaseSessionError, SupabaseRuntimeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired archive session",
+        ) from exc
+
+
+def _transport(
+    access_token: str,
+    *,
+    roles: set[ArchiveRole] | None = None,
+) -> ArchiveScopedSupabaseTransport:
+    _archive_membership(access_token, roles=roles)
+    return ArchiveScopedSupabaseTransport(
+        transport=_raw_transport(access_token),
+        archive_id=_archive_id(),
     )
 
 
@@ -350,10 +406,15 @@ def _truthy_env(name: str) -> bool:
 
 def _runtime_intake(access_token: str) -> tuple[str, ChannelIntakeService]:
     folder_reference = _required_env("DRIVE_ORIGINALS_FOLDER_REFERENCE")
-    owner_id = SupabaseUserSession.from_environment(
-        access_token=access_token,
-    ).user_id()
-    database = _transport(access_token)
+    membership = _archive_membership(
+        access_token,
+        roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR},
+    )
+    owner_id = membership.user_id
+    database = _transport(
+        access_token,
+        roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR},
+    )
     storage = GoogleDriveOriginalStorage(
         transport=GoogleDrivePrivateWriter.from_environment(),
         originals_folder_reference=folder_reference,
@@ -453,6 +514,39 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             },
         )
 
+    @app.post(
+        "/api/v1/auth/password",
+        response_model=SessionStatusResponse,
+    )
+    def password_sign_in(
+        payload: PasswordLoginRequest,
+        _: None = Depends(_require_same_origin),
+    ) -> Response:
+        try:
+            session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
+                email=payload.email,
+                password=payload.password,
+            )
+            membership = _archive_membership(session.access_token)
+        except HTTPException:
+            raise
+        except (SupabaseAuthError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Email or password is invalid",
+            ) from exc
+
+        response = Response(
+            content=(
+                '{"authenticated":true,"role":"'
+                + membership.role.value
+                + '"}'
+            ),
+            media_type="application/json",
+        )
+        _set_session_cookies(response, session)
+        return response
+
     @app.post("/api/v1/auth/magic-link", response_model=MessageResponse)
     def send_magic_link(
         payload: MagicLinkRequest,
@@ -508,6 +602,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 detail="Sign-in link is invalid or expired",
             ) from exc
 
+        _archive_membership(session.access_token)
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
         _set_session_cookies(response, session)
         return response
@@ -530,8 +625,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 detail="Invalid Supabase session",
             ) from exc
 
-        owner_id = _required_env("SUPABASE_OWNER_ID")
-        if user_id != owner_id:
+        membership = _archive_membership(payload.access_token)
+        if membership.user_id != user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="This account is not authorized for the archive",
@@ -543,7 +638,11 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             expires_in=payload.expires_in,
         )
         response = Response(
-            content='{"authenticated":true}',
+            content=(
+                '{"authenticated":true,"role":"'
+                + membership.role.value
+                + '"}'
+            ),
             media_type="application/json",
         )
         _set_session_cookies(response, session)
@@ -601,10 +700,11 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     def session_status(
         access_token: str = Depends(_access_token),
     ) -> SessionStatusResponse:
-        SupabaseUserSession.from_environment(
-            access_token=access_token,
-        ).user_id()
-        return SessionStatusResponse(authenticated=True)
+        membership = _archive_membership(access_token)
+        return SessionStatusResponse(
+            authenticated=True,
+            role=membership.role.value,
+        )
 
     @app.post("/api/v1/auth/logout", response_model=MessageResponse)
     def logout(
@@ -730,6 +830,10 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         status_rule_version: str | None = Query(default=None, min_length=1),
         access_token: str = Depends(_access_token),
     ) -> ReprocessingPreviewResponse:
+        _archive_membership(
+            access_token,
+            roles={ArchiveRole.ADMIN},
+        )
         current = current_processing_versions().reprocessing_targets()
         targets = ReprocessingTargets(
             ocr_version=ocr_version or current.ocr_version,
@@ -927,6 +1031,10 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         access_token: str = Depends(_access_token),
         _: None = Depends(_require_same_origin),
     ) -> MessageResponse:
+        _archive_membership(
+            access_token,
+            roles={ArchiveRole.ADMIN},
+        )
         try:
             decision = RelationshipReviewStatus(payload.decision)
         except ValueError as exc:

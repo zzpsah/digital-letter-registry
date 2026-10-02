@@ -35,11 +35,22 @@
 
   <section id="loginBox" class="card">
     <h2>साइन इन</h2>
-    <a id="googleLogin" class="open" href="/auth/google" style="display:none;text-align:center;width:100%;margin-top:8px">Google से साइन इन करें</a>
+    <div class="muted">DLR account से login करें. Gmail जरूरी नहीं है.</div>
+    <form id="passwordLoginForm" style="margin-top:10px">
+      <input id="passwordLoginEmail" type="email" autocomplete="username" placeholder="email@example.com" style="width:100%;margin-bottom:8px" required>
+      <div class="row">
+        <input id="passwordLoginPassword" type="password" autocomplete="current-password" placeholder="Password" style="flex:1;min-width:0" required>
+        <button class="primary" type="submit">Sign in</button>
+      </div>
+    </form>
+    <div id="passwordLoginStatus" class="muted" style="margin-top:8px"></div>
+
+    <a id="googleLogin" class="open" href="/auth/google" style="display:none;text-align:center;width:100%;margin-top:12px">Google से साइन इन करें</a>
     <div id="googleLoginNote" class="muted" style="margin-top:8px"></div>
+
     <details style="margin-top:10px">
-      <summary>Email link से साइन इन</summary>
-      <div class="muted" style="margin-top:8px">Google sign-in उपलब्ध न हो तो authorized email पर secure fallback link भेजें.</div>
+      <summary>Email link / recovery</summary>
+      <div class="muted" style="margin-top:8px">Password उपलब्ध न हो तो authorized email पर secure sign-in link भेजें.</div>
       <form id="loginForm" class="row" style="margin-top:10px">
         <input id="loginEmail" type="email" autocomplete="email" placeholder="email@example.com" style="flex:1;min-width:0">
         <button type="submit">Link भेजें</button>
@@ -100,7 +111,7 @@
   </form>
 
   <div id="sessionBar" class="row" style="display:none;margin:8px 0">
-    <span class="muted">Authenticated session active.</span>
+    <span id="sessionLabel" class="muted">Authenticated session active.</span>
     <button id="logoutButton" type="button">Sign out</button>
   </div>
 
@@ -123,8 +134,8 @@ async function refreshAuthProviders(){
     const data=await res.json();
     $("googleLogin").style.display=data.google?"inline-block":"none";
     $("googleLoginNote").textContent=data.google
-      ?"Primary login · Google account चुनें; valid session बाद में automatically refresh होगा."
-      :"Google sign-in setup pending · नीचे email-link fallback available है.";
+      ?"Optional · Google account से भी वही DLR membership/session use होगी."
+      :"Google sign-in optional है; email/password login available है.";
   }catch{
     $("googleLogin").style.display="none";
     $("googleLoginNote").textContent="Google sign-in status unavailable · email-link fallback use करें.";
@@ -134,8 +145,17 @@ async function refreshAuthProviders(){
 async function refreshSessionUi(){
   const res=await fetch("/api/v1/auth/session",{cache:"no-store"});
   const signedIn=res.ok;
+  let session=null;
+  if(signedIn){
+    try{session=await res.json();}catch{}
+  }
   setSessionUi(signedIn);
-  $("uploadBox").style.display=signedIn?"block":"none";
+  const role=session?.role||"member";
+  const canWrite=role==="admin"||role==="editor";
+  $("uploadBox").style.display=signedIn&&canWrite?"block":"none";
+  if(signedIn){
+    $("sessionLabel").textContent="Signed in · "+role;
+  }
   if(!signedIn){
     $("status").textContent="Search करने के लिए secure sign-in आवश्यक है.";
     return false;
@@ -204,6 +224,28 @@ function render(data){
     setTimeout(()=>URL.revokeObjectURL(objectUrl),60000);
   }));
 }
+$("passwordLoginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const email=$("passwordLoginEmail").value.trim();
+  const password=$("passwordLoginPassword").value;
+  if(!email||!password)return;
+  $("passwordLoginStatus").textContent="Sign in हो रहा है…";
+  const res=await fetch("/api/v1/auth/password",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email,password})
+  });
+  if(!res.ok){
+    let detail="Email/password login failed.";
+    try{const body=await res.json();if(body.detail)detail=body.detail;}catch{}
+    $("passwordLoginStatus").textContent=detail;
+    return;
+  }
+  $("passwordLoginPassword").value="";
+  $("passwordLoginStatus").textContent="Signed in.";
+  await refreshSessionUi();
+});
+
 $("loginForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const email=$("loginEmail").value.trim();
