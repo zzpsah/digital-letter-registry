@@ -71,6 +71,7 @@
 - [ ] Live authenticated synthetic API vertical slice.
 - [ ] Configure hosted Supabase Magic Link template/Site URL to the deployed/local `/auth/confirm` endpoint before live browser test.
 - [x] Runtime auth callback/session exchange implemented with HttpOnly cookies and refresh rotation.
+- [x] Add same-origin CSRF protection for cookie-authenticated mutations.
 - [x] Refreshable Google Drive OAuth credential strategy with in-memory access-token caching.
 
 ## Phase 4 — Intelligence lifecycle
