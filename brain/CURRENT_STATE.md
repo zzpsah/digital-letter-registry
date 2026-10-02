@@ -69,3 +69,8 @@ A live processing-version registry and reprocessing preview/enqueue flow now exi
 ## Rename execution
 
 A dormant Google Drive rename path now exists behind an approval-locked executor. It cannot run from an arbitrary proposed name: the exact reviewed mapping must match its deterministic digest, explicit confirmation is required, and the current stored filename is revalidated before any mutation. No rename mapping has been approved or executed.
+
+
+## Historical import
+
+Historical import is implemented as preview-first, approval-locked adoption. Local candidate files can be hashed in a non-mutating preview. Existing private Drive files can be listed read-only, classified as eligible/unsupported/already archived/real-document-blocked, and only after explicit confirmation are their bytes read for SHA-256 duplicate verification, source identity persisted against the existing Drive object, and a historical processing job queued. Real historical documents remain blocked by default and no real historical import has been executed.
