@@ -1,3 +1,10 @@
+## 2026-10-02 — test: ensure duplicate intake stops before storage write
+- Commit: 23b5513b0fcda0d6ea6a82766f7e45485b446fdf
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_intake.py`
+
 ## 2026-10-02 — feat: add authenticated synthetic-first intake API
 - Commit: 9d8d2156f2580673e2fe0dc708653616d5d648e6
 - Author: PRASHANT KUMAR SAH
