@@ -407,6 +407,30 @@ class ApiTests(unittest.TestCase):
                 _runtime_intake("synthetic-access")
         self.assertEqual(ctx.exception.status_code, 403)
 
+    def test_authenticated_member_can_change_password(self):
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            with patch.dict(
+                os.environ,
+                {"AUTH_APP_ORIGIN": "https://archive.example.com"},
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/password/change",
+                    headers={
+                        "Authorization": "Bearer synthetic-user-token",
+                        "Origin": "https://archive.example.com",
+                    },
+                    json={"password": "synthetic-password-123"},
+                )
+
+        self.assertEqual(response.status_code, 200)
+        factory.return_value.update_password.assert_called_once_with(
+            access_token="synthetic-user-token",
+            password="synthetic-password-123",
+        )
+
     def test_magic_link_request_uses_runtime_redirect(self):
         with patch("letter_registry.api.SupabasePasswordlessAuth.from_environment") as factory:
             auth = factory.return_value
