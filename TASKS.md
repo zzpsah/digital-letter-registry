@@ -51,9 +51,13 @@
 - [x] Semantic/context search foundation with versioned 768-dimension embeddings.
 - [x] Ranking combining filename + text + semantic score.
 - [x] Add live full-text + trigram search RPC with combined text/fuzzy ranking.
-- [ ] Responsive mobile web/PWA.
-- [ ] Filters: date/year, authority, category, file type, validity/status.
-- [ ] Open/download original from every result.
+- [x] Responsive Hindi-first mobile web/PWA shell.
+- [x] Filters: year, authority, category, file type, validity/status.
+- [ ] Open/download original from every result after private server-side Drive resolver is wired.
+
+- [x] Passwordless email login request endpoint for existing authorized users.
+- [ ] Complete deployment-time auth callback/session exchange without exposing tokens in the public repo.
+- [x] Authenticated safe letter-detail endpoint without storage IDs.
 
 ## Phase 4 — Intelligence lifecycle
 
