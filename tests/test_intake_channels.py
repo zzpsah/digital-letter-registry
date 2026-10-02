@@ -113,11 +113,11 @@ class IntakeChannelTests(unittest.TestCase):
 
         table, row, conflict = transport.calls[0]
         self.assertEqual(table, "letter_sources")
-        self.assertEqual(row["channel"], "whatsapp")
-        self.assertEqual(row["source_id"], "synthetic-wa-message")
+        self.assertEqual(row["source_channel"], "whatsapp")
+        self.assertEqual(row["external_message_id"], "synthetic-wa-message")
         self.assertEqual(
             conflict,
-            "owner_id,channel,source_id",
+            "owner_id,source_channel,external_message_id",
         )
 
     def test_filename_normalization_rejects_path_traversal(self):
