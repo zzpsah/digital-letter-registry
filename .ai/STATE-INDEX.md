@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: d8bcbc5887ed052e4a033b1bb58de88c0774b66b
-- Last commit: fix: relax fragment token shape assumptions
+- HEAD: 6f3ca89bdc9442a69ad2dad74bbfc93a614cfe27
+- Last commit: test: accept Supabase fragment token shapes
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

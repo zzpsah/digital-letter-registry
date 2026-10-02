@@ -1,3 +1,10 @@
+## 2026-10-03 — test: accept Supabase fragment token shapes
+- Commit: 6f3ca89bdc9442a69ad2dad74bbfc93a614cfe27
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-03 — fix: relax fragment token shape assumptions
 - Commit: d8bcbc5887ed052e4a033b1bb58de88c0774b66b
 - Author: PRASHANT KUMAR SAH
