@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add authenticated synthetic-first upload panel
+- Commit: f637acd9a5d8be941625ae20d0e0cbdcf31c49b2
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-02 — test: cover OCR runtime dependency checker
 - Commit: e62ed5e990e4da718cbc003d1ebdf96e93364dec
 - Author: PRASHANT KUMAR SAH
