@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover browser auth callback and original streaming
+- Commit: f635be3e78a98a1c9d6deb3f8f43ccbcc2a781d2
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_web_shell.py`
+
 ## 2026-10-02 — feat: complete browser magic-link session handling
 - Commit: 479cde5b8305184ca160097cd6ba12f36ae6951d
 - Author: PRASHANT KUMAR SAH
