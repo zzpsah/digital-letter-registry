@@ -48,3 +48,8 @@ Native PDF text now has a pypdf implementation. OCR fallback now has an OCRmyPDF
 ## Structured context provider
 
 The provider-neutral context schema and extraction→context→persistence pipeline are implemented. Gemini is the first runtime-configurable structured-output adapter; provider/model changes do not require schema changes and can be handled by reprocessing versions.
+
+
+## Search foundation
+
+The separate archive database now has live full-text + trigram search via `search_letters`, plus covering indexes for reported foreign-key gaps. Search remains RLS-protected. Semantic embeddings/ranking are the next search layer.
