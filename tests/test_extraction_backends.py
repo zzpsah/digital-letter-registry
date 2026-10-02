@@ -53,6 +53,28 @@ class OcrmypdfBackendTests(unittest.TestCase):
             backend.extract_text(Path("synthetic.pdf"), languages=())
 
 
+    def test_runtime_executable_overrides(self):
+        import os
+        from unittest.mock import patch
+
+        with patch.dict(
+            os.environ,
+            {
+                "TESSERACT_CMD": "/private/tesseract",
+                "OCRMY_PDF_CMD": "/private/ocrmypdf",
+            },
+            clear=False,
+        ):
+            self.assertEqual(
+                TesseractImageBackend().executable,
+                "/private/tesseract",
+            )
+            self.assertEqual(
+                OcrmypdfTesseractBackend().executable,
+                "/private/ocrmypdf",
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
 
