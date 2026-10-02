@@ -61,6 +61,13 @@ class VersionRegistryTests(unittest.TestCase):
         self.assertEqual(transport.upserts[0][0], "processing_profiles")
         self.assertEqual(transport.upserts[0][2], "owner_id")
 
+    def test_enqueue_reprocessing_returns_inserted_count(self):
+        transport = FakeTransport()
+        transport.rpc = lambda function, params: [{"enqueued": 3}]
+        registry = SupabaseProcessingVersionRegistry(transport)
+
+        self.assertEqual(registry.enqueue_reprocessing(limit=50), 3)
+
     def test_preview_returns_differing_stages(self):
         registry = SupabaseProcessingVersionRegistry(FakeTransport())
 
