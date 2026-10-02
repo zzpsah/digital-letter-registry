@@ -122,3 +122,43 @@ GOOGLE_DRIVE_ACCESS_TOKEN=...
 The token is used only by the backend. The browser receives file bytes through the authenticated API and never receives the Drive object ID or private Drive URL.
 
 The current adapter accepts a short-lived access token. A refresh-token/service credential lifecycle is intentionally still pending before production use.
+
+
+## Synthetic-first private intake runtime
+
+The HTTP intake endpoint is `POST /api/v1/intake` and requires an authenticated Supabase bearer session.
+
+Runtime-only configuration:
+
+```bash
+SUPABASE_URL=...
+SUPABASE_PUBLISHABLE_KEY=...
+SUPABASE_ACCESS_TOKEN=...
+GOOGLE_DRIVE_ACCESS_TOKEN=...
+DRIVE_ORIGINALS_FOLDER_REFERENCE=...
+ENABLE_REAL_INTAKE=false
+```
+
+With `ENABLE_REAL_INTAKE=false` (default), intake and processing accept only filenames clearly containing `synthetic` or `test`. Duplicate SHA-256 content is rejected before a second Drive upload.
+
+## One-job synthetic worker
+
+The worker claims at most one pending job and then exits:
+
+```bash
+PYTHONPATH=src python3 scripts/run_worker_once.py
+```
+
+It performs:
+
+```text
+claim job
+  → private original download
+  → native PDF text / Hindi+English OCR fallback
+  → structured context extraction
+  → smart filename + metadata persistence
+  → chunk embeddings
+  → complete or fail durable job
+```
+
+For PDF OCR install OCRmyPDF + Tesseract `hin`/`eng`; image OCR uses Tesseract directly. This command is for synthetic integration verification until real intake is explicitly approved.
