@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover approval-gated recursive reprocessing scheduling
+- Commit: b183212e5b64b62a30bf4ce56b4662f0bfa0c766
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_version_registry.py`
+
 ## 2026-10-02 — test: cover read-only reprocessing preview API
 - Commit: f7660b8a3d938d9d59af949471b4ec55bbd99510
 - Author: PRASHANT KUMAR SAH
