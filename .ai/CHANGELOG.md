@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover non-destructive reprocessing preview
+- Commit: 7981dc9eb44f8ce4675642345051e474e1482e63
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_reprocessing.py`
+
 ## 2026-10-02 — refactor: keep explicit-reference relationship inference canonical
 - Commit: 11cafc14e708e2000f58e4e0ffac19f4ad43db53
 - Author: PRASHANT KUMAR SAH
