@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: correct runtime Drive OAuth current state
+- Commit: 9cde82988cc65e32498616a2c2b23a16fd6f5f1e
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/runtime-verification/CURRENT_STATE.md`
+
 ## 2026-10-02 — docs: correct brain Drive OAuth handoff
 - Commit: 4d870870fcd025b47d2c88ce24873fdf2e8cedbc
 - Author: PRASHANT KUMAR SAH
