@@ -73,3 +73,14 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Change: feat: persist authenticated refresh sessions
 - Date: 2026-10-02
 - Durable context synchronization: completed
+
+
+## Google Sign-In runtime state
+
+- Google Sign-In application support is implemented and synthetic-tested.
+- UI enables the Google button only when Supabase reports the provider enabled.
+- Current hosted Supabase Google provider is still disabled.
+- A separate Google Web OAuth client is not yet configured in the approved secret store.
+- Magic Link remains operational fallback.
+- Refresh-session cookie persists for 30 days by default and rotates with Supabase session refresh.
+- Full synthetic suite passes 220/220 after these changes.
