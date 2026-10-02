@@ -1,3 +1,10 @@
+## 2026-10-02 — test: correct OCR language fixture newlines
+- Commit: 2c1d27769c1ebd89fe07bcebfcc5e8e50f7fd8cb
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-02 — test: use real OCR language line breaks
 - Commit: 5d3e4d904d929b029d025648900fc83061a1161c
 - Author: PRASHANT KUMAR SAH

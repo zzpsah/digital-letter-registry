@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 5d3e4d904d929b029d025648900fc83061a1161c
-- Last commit: test: use real OCR language line breaks
+- HEAD: 2c1d27769c1ebd89fe07bcebfcc5e8e50f7fd8cb
+- Last commit: test: correct OCR language fixture newlines
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
