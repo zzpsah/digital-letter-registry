@@ -6,8 +6,8 @@ Repository evidence is authoritative over chat memory. After meaningful work, sy
 
 Current runtime checkpoint:
 - DB-level synthetic owner RLS insert/read and wrong-user denial are verified using simulated request JWT claims.
-- Checked-in magic-link template already uses the correct server-side token-hash callback, but hosted Supabase Auth still uses its default direct-confirmation template. Live hosted configuration remains pending; a guarded Management API helper is implemented and ready once a scoped runtime management token is available.
-- VPS focused auth/session/API tests pass 35/35; full synthetic suite passes 205/205; Supabase Management Auth-config helper tests pass 4/4.
+- Checked-in magic-link template uses the server-side token-hash callback, but hosted Supabase email templates cannot be edited on the current default mailer without custom SMTP. This is no longer a blocker: the app now supports Supabase's default fragment callback, validates the owner server-side, converts the session to HttpOnly cookies, and clears fragment tokens. The Management API helper remains available for an optional future custom-SMTP path.
+- VPS auth/API tests pass 28/28; full synthetic suite passes 208/208; Supabase Management Auth-config helper tests pass 4/4.
 - A real short-lived authenticated HTTP/PostgREST vertical slice is still pending.
 - Connected Drive access verifies the private archive and synthetic original.
 - The existing VPS `phone_drive` rclone credential cannot enumerate archive contents even with direct folder IDs, so it is not suitable for registry Drive runtime access.
