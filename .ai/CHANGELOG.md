@@ -1,3 +1,10 @@
+## 2026-10-02 — fix: honor configured OCR executables in readiness checks
+- Commit: 38e59499b50174906be56816912531d55b98905d
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/runtime_readiness.py`
+
 ## 2026-10-02 — docs: add runtime verification enhancement brain
 - Commit: 9e5f6e8fb5f3c559d82588611820c24e7bc41f3d
 - Author: PRASHANT KUMAR SAH

@@ -40,3 +40,9 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - This is DB-level claim simulation only; it does not replace the pending real user bearer-session/PostgREST test.
 - Exactly one synthetic verification row remains in `letters`; no real archive record exists.
 - No private project reference, owner UUID, token, Drive ID, credential, or server detail is recorded in Git.
+
+## Last automated change
+- Commit: 38e59499b50174906be56816912531d55b98905d
+- Change: fix: honor configured OCR executables in readiness checks
+- Date: 2026-10-02
+- Durable context synchronization: completed
