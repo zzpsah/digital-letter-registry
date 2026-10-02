@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: record focused OCR readiness test
+- Commit: c42087ba725112765e186ac296855832227ad9ae
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/runtime-verification/TESTS.md`
+
 ## 2026-10-02 — test: isolate configured OCR override contract
 - Commit: cca497ac9e64ba75bea6f62999942d474fe96b1b
 - Author: PRASHANT KUMAR SAH
