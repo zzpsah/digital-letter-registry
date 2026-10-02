@@ -74,7 +74,7 @@ DB-level synthetic RLS verification has passed using simulated request JWT claim
 - a different synthetic user sees zero rows,
 - cross-owner insert is denied by RLS.
 
-This does **not** replace the pending real short-lived bearer-session/PostgREST test. One synthetic RLS verification row currently remains in `letters`; no real archive-letter row exists.
+This does **not** replace the pending real short-lived bearer-session/PostgREST test. The retained synthetic RLS verification row was removed through a controlled exact-match cleanup; `letters` now contains zero rows.
 
 Current auth implementation supports both Supabase paths:
 - custom token-hash template callback when custom SMTP/template editing is enabled,
@@ -87,7 +87,7 @@ Before real ingestion:
 3. Verify the full synthetic intake → private Drive → queue/worker → search/open-original path.
 4. Verify refreshable Drive OAuth/original streaming.
 5. Verify Gemini only with synthetic content.
-6. Clean up temporary synthetic verification rows through an authorized destructive path.
+6. Temporary synthetic DB verification row cleanup is complete; re-check any future synthetic rows after integration tests.
 7. Only after the synthetic vertical slice is complete should real intake even be considered.
 
 ## Safety
