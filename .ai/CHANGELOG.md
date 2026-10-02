@@ -1,3 +1,10 @@
+## 2026-10-03 — test: cover password settings UI
+- Commit: 788ec893c8abd2c11dcff3da1fbe62c82795d6a7
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_web_shell.py`
+
 ## 2026-10-03 — feat: add signed-in password settings UI
 - Commit: c6eb35b285929816b8cc9aa04133a18c9e461687
 - Author: PRASHANT KUMAR SAH
