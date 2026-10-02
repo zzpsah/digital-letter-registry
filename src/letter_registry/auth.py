@@ -1,4 +1,4 @@
-"""Minimal Supabase passwordless-auth client for the private web app."""
+"""Server-safe Supabase passwordless authentication helpers."""
 
 from __future__ import annotations
 
@@ -26,7 +26,24 @@ def _default_http_executor(req: request.Request) -> tuple[int, str]:
             f"Supabase Auth failed with HTTP {exc.code}: {body}"
         ) from exc
     except error.URLError as exc:
-        raise SupabaseAuthError(f"Supabase Auth failed: {exc.reason}") from exc
+        raise SupabaseAuthError(
+            f"Supabase Auth failed: {exc.reason}"
+        ) from exc
+
+
+@dataclass(frozen=True, slots=True)
+class SupabaseAuthSession:
+    access_token: str
+    refresh_token: str
+    expires_in: int
+
+    def __post_init__(self) -> None:
+        if not self.access_token.strip():
+            raise ValueError("access_token is required")
+        if not self.refresh_token.strip():
+            raise ValueError("refresh_token is required")
+        if self.expires_in <= 0:
+            raise ValueError("expires_in must be positive")
 
 
 @dataclass(slots=True)
@@ -38,19 +55,39 @@ class SupabasePasswordlessAuth:
     @classmethod
     def from_environment(cls) -> "SupabasePasswordlessAuth":
         base_url = os.environ.get("SUPABASE_URL", "").strip()
-        publishable_key = os.environ.get("SUPABASE_PUBLISHABLE_KEY", "").strip()
+        publishable_key = os.environ.get(
+            "SUPABASE_PUBLISHABLE_KEY", ""
+        ).strip()
         if not base_url:
             raise ValueError("SUPABASE_URL is required at runtime")
         if not publishable_key:
-            raise ValueError("SUPABASE_PUBLISHABLE_KEY is required at runtime")
-        return cls(base_url=base_url, publishable_key=publishable_key)
+            raise ValueError(
+                "SUPABASE_PUBLISHABLE_KEY is required at runtime"
+            )
+        return cls(
+            base_url=base_url,
+            publishable_key=publishable_key,
+        )
 
-    def send_magic_link(self, *, email: str, redirect_to: str) -> None:
+    def send_magic_link(
+        self,
+        *,
+        email: str,
+        redirect_to: str,
+    ) -> None:
         normalized = email.strip().lower()
-        if not normalized or "@" not in normalized or len(normalized) > 320:
+        if (
+            not normalized
+            or "@" not in normalized
+            or len(normalized) > 320
+        ):
             raise ValueError("valid email is required")
-        if not redirect_to.startswith(("https://", "http://localhost", "http://127.0.0.1")):
-            raise ValueError("redirect_to must be an HTTPS URL or local development URL")
+        if not redirect_to.startswith(
+            ("https://", "http://localhost", "http://127.0.0.1")
+        ):
+            raise ValueError(
+                "redirect_to must be an HTTPS URL or local development URL"
+            )
 
         query = parse.urlencode({"redirect_to": redirect_to})
         req = request.Request(
@@ -69,4 +106,88 @@ class SupabasePasswordlessAuth:
         )
         status, _ = self.http_executor(req)
         if status < 200 or status >= 300:
-            raise SupabaseAuthError(f"unexpected Supabase Auth HTTP status: {status}")
+            raise SupabaseAuthError(
+                f"unexpected Supabase Auth HTTP status: {status}"
+            )
+
+    def verify_token_hash(
+        self,
+        *,
+        token_hash: str,
+        verification_type: str = "email",
+    ) -> SupabaseAuthSession:
+        token = token_hash.strip()
+        if not token:
+            raise ValueError("token_hash is required")
+        if verification_type != "email":
+            raise ValueError("only email token verification is supported")
+
+        req = request.Request(
+            f"{self.base_url.rstrip('/')}/auth/v1/verify",
+            data=json.dumps(
+                {
+                    "token_hash": token,
+                    "type": verification_type,
+                }
+            ).encode("utf-8"),
+            headers={
+                "apikey": self.publishable_key,
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise SupabaseAuthError(
+                f"unexpected Supabase verify HTTP status: {status}"
+            )
+        return self._session_from_response(raw)
+
+    def refresh_session(
+        self,
+        *,
+        refresh_token: str,
+    ) -> SupabaseAuthSession:
+        token = refresh_token.strip()
+        if not token:
+            raise ValueError("refresh_token is required")
+
+        req = request.Request(
+            (
+                f"{self.base_url.rstrip('/')}/auth/v1/token"
+                "?grant_type=refresh_token"
+            ),
+            data=json.dumps(
+                {"refresh_token": token}
+            ).encode("utf-8"),
+            headers={
+                "apikey": self.publishable_key,
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise SupabaseAuthError(
+                f"unexpected Supabase refresh HTTP status: {status}"
+            )
+        return self._session_from_response(raw)
+
+    @staticmethod
+    def _session_from_response(raw: str) -> SupabaseAuthSession:
+        try:
+            data = json.loads(raw)
+            return SupabaseAuthSession(
+                access_token=str(data["access_token"]),
+                refresh_token=str(data["refresh_token"]),
+                expires_in=int(data.get("expires_in", 3600)),
+            )
+        except (
+            KeyError,
+            TypeError,
+            ValueError,
+            json.JSONDecodeError,
+        ) as exc:
+            raise SupabaseAuthError(
+                "Supabase Auth returned an invalid session response"
+            ) from exc
