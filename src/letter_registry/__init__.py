@@ -1,6 +1,7 @@
 """Provider-independent domain rules for Digital Letter Registry."""
 
 from .fingerprints import sha256_file
+from .ingestion import prepare_source_record, persist_prepared_source
 from .models import (
     DocumentRecord,
     DocumentRelationship,
@@ -31,6 +32,8 @@ __all__ = [
     "RenamePreview",
     "LetterRepository",
     "InMemoryLetterRepository",
+    "prepare_source_record",
+    "persist_prepared_source",
     "SupabaseTransport",
     "SupabaseLetterRepository",
     "build_rename_preview",
