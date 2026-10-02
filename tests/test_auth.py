@@ -212,6 +212,49 @@ class SupabasePasswordlessAuthTests(unittest.TestCase):
         self.assertEqual(seen["body"]["email"], "user@example.com")
         self.assertEqual(seen["body"]["password"], "synthetic-password")
 
+    def test_update_password_uses_authenticated_user_endpoint(self):
+        seen = {}
+
+        def executor(req):
+            seen["url"] = req.full_url
+            seen["method"] = req.method
+            seen["authorization"] = req.get_header("Authorization")
+            seen["body"] = json.loads(req.data.decode("utf-8"))
+            return 200, "{}"
+
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=executor,
+        )
+        auth.update_password(
+            access_token="synthetic-access-token",
+            password="synthetic-password-123",
+        )
+
+        self.assertTrue(seen["url"].endswith("/auth/v1/user"))
+        self.assertEqual(seen["method"], "PUT")
+        self.assertEqual(
+            seen["authorization"],
+            "Bearer synthetic-access-token",
+        )
+        self.assertEqual(
+            seen["body"],
+            {"password": "synthetic-password-123"},
+        )
+
+    def test_update_password_rejects_short_password(self):
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=lambda req: (200, "{}"),
+        )
+        with self.assertRaises(ValueError):
+            auth.update_password(
+                access_token="synthetic-access-token",
+                password="short",
+            )
+
     def test_token_hash_verification_returns_session(self):
         seen = {}
 
