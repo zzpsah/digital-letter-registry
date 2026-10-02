@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add authenticated synthetic-first intake API
+- Commit: 9d8d2156f2580673e2fe0dc708653616d5d648e6
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — feat: reject duplicate content before private storage upload
 - Commit: 68e6fe652ab39d73c0fcb3e2ff2a42e9ef5304ed
 - Author: PRASHANT KUMAR SAH
