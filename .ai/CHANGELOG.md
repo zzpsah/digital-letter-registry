@@ -1,3 +1,15 @@
+## 2026-10-02 — feat: add Google sign-in with email fallback
+- Commit: 1a3dbe25044307fd684f166db6ae75d2db5a3f43
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `src/letter_registry/auth.py`
+- `src/letter_registry/web/auth-confirm.html`
+- `src/letter_registry/web/index.html`
+- `tests/test_api.py`
+- `tests/test_auth.py`
+
 ## 2026-10-02 — docs: reconcile verified DLR Drive write state
 - Commit: c9216fec32ab9a1aee088e10dadaa63e0fbec8e8
 - Author: Prashant

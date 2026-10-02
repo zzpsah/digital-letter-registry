@@ -69,14 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 25ebe28102ec812f7135ff86fd0b397b498bb333
-- Change: feat: prefer injected Drive OAuth refresh credentials
+- Commit: 1a3dbe25044307fd684f166db6ae75d2db5a3f43
+- Change: feat: add Google sign-in with email fallback
 - Date: 2026-10-02
 - Durable context synchronization: completed
-
-
-## Drive account/configuration boundary
-
-- The private runtime currently targets one explicitly configured archive-owner Google Drive.
-- DLR source is reusable with another Google account, but that account must complete OAuth consent and receive separate secret-manager credentials and archive folder references.
-- The write-capable OAuth grant is broader than the archive-specific application boundary; DLR real intake/rename/delete permissions remain independent safety decisions.
