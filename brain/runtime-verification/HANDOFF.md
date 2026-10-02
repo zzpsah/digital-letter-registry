@@ -14,7 +14,7 @@ Next safe action is completing the real short-lived authenticated HTTP/PostgREST
 - DLR runtime is isolated behind its own tailnet-only HTTPS origin; Supabase Site URL and redirect allow-list match that origin. Keep exact hostname/port out of public Git. Current owner-session retry is blocked only by Supabase email-send throttling.
 - Dedicated DLR Google OAuth is configured with secret-manager-injected refresh credentials; refresh exchange, originals listing, and synthetic-original streaming all passed. The write-capable grant is now verified with synthetic upload/stream/delete cleanup.
 - Existing VPS `phone_drive` rclone remains separate and must not be reused for DLR.
-- Runtime write/upload is not yet verified because the current grant is still read-only; the approved write-capable re-consent is in progress and must still be followed by synthetic upload verification.
+- Runtime write/upload is verified with the write-capable grant using a disposable synthetic object; upload, stream/content verification, delete cleanup, and catalog restoration all passed.
 - Gemini runtime key is still unavailable; no live Gemini synthetic verification has been completed.
 
 The synthetic verification row was removed through the authorized controlled cleanup path; `letters` is empty.
