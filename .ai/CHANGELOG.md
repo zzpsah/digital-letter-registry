@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: prefer file-based Drive OAuth runtime
+- Commit: e9656f8bec293edc82d37767cb188cac36f41ab4
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `.env.example`
+
 ## 2026-10-02 — test: cover Drive credentials file readiness
 - Commit: 793e8d0d46e0c4ea462696abaab409044061b0d0
 - Author: PRASHANT KUMAR SAH
