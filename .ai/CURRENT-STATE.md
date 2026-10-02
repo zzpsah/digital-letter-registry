@@ -38,3 +38,12 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - `src/letter_registry/supabase_runtime.py` provides environment-only authenticated PostgREST transport.
 - `scripts/run_synthetic_supabase_integration.py` refuses non-synthetic filenames and performs no Drive upload.
 - No project URL, publishable key, access token, owner UUID, or Drive object ID is stored in Git.
+
+
+## Phase 2 extraction/context foundation
+
+- Provider-neutral native PDF extraction contract is implemented.
+- Native-text usability heuristic prefers embedded text and requests OCR only when needed.
+- Hindi + English OCR fallback contract is implemented and versioned, but no concrete OCR engine is wired yet.
+- Hindi/English/Hinglish government and education vocabulary is implemented.
+- Deterministic pre-AI context hints detect concepts such as registration, exam form, deadline/extension, UDISE, PEN, scholarship, correction, verification, training, and government letter structure markers.
