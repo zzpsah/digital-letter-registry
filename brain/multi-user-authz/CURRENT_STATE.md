@@ -67,3 +67,20 @@ A second administrator invitation is pending through the normal invite-only onbo
 The existing database trigger `dlr_claim_archive_invite_on_auth_user` runs after user insert or email confirmation update. Once the invited email is confirmed, it will atomically create/update the active archive admin membership and mark the invite accepted.
 
 No raw Auth-user insertion or confirmation bypass was used.
+
+
+## Self-registration and approval flow
+
+The active product flow is now password-first rather than Magic-Link-first.
+
+1. A person chooses **Create Account** and submits email + password.
+2. Supabase Auth creates the identity.
+3. A hosted Auth trigger creates `archive_members` as `viewer / disabled` for non-invite signups.
+4. The account appears in the DLR admin access panel.
+5. An active DLR admin chooses the desired role and changes status to `active`.
+6. Before membership activation, the DLR backend calls the protected Supabase Edge Function `dlr-confirm-account` using the admin session. The function verifies the caller is an active archive admin and confirms the target Auth account.
+7. The approved user then signs in directly with email + password.
+
+The primary UI no longer exposes Magic Link controls. Legacy invite/Magic-Link backend endpoints remain for compatibility but are not the normal user workflow.
+
+Current second administrator: `zzpsah@gmail.com` is active with role `admin`.
