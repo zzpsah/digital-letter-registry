@@ -21,6 +21,7 @@ from .hybrid_search import HybridSearchRepository
 from .intake import DuplicateSourceError, IntakePolicy, IntakeService
 from .jobs import SupabaseProcessingQueue
 from .original_access import SupabaseOriginalAccessService
+from .relationships import RelationshipReviewStatus, SupabaseRelationshipRepository
 from .search import SearchFilters, SupabaseSearchRepository
 from .semantic_search import SupabaseEmbeddingRepository
 from .session import SupabaseUserSession
@@ -74,6 +75,22 @@ class LetterDetailResponse(BaseModel):
     concepts: list[str] = Field(default_factory=list)
     structured_context: dict[str, object] = Field(default_factory=dict)
     open_original_path: str
+
+
+class RelationshipResponse(BaseModel):
+    id: str
+    source_letter_id: str
+    target_letter_id: str
+    relationship_type: str
+    confidence: float | None = None
+    review_status: str
+    relationship_version: str
+    rationale: str | None = None
+    reviewed_at: str | None = None
+
+
+class RelationshipReviewRequest(BaseModel):
+    decision: str
 
 
 class IntakeResponse(BaseModel):
@@ -380,6 +397,82 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             concepts=list(detail.concepts),
             structured_context=detail.structured_context,
             open_original_path=f"/api/v1/letters/{detail.record_id}/original",
+        )
+
+    @app.get(
+        "/api/v1/letters/{record_id}/relationships",
+        response_model=list[RelationshipResponse],
+    )
+    def letter_relationships(
+        record_id: str,
+        access_token: str = Depends(_access_token),
+    ) -> list[RelationshipResponse]:
+        rows = SupabaseRelationshipRepository(
+            _transport(access_token)
+        ).list_for_letter(record_id)
+        return [
+            RelationshipResponse(
+                id=str(row["id"]),
+                source_letter_id=str(row["source_letter_id"]),
+                target_letter_id=str(row["target_letter_id"]),
+                relationship_type=str(row["relationship_type"]),
+                confidence=(
+                    float(row["confidence"])
+                    if row.get("confidence") is not None
+                    else None
+                ),
+                review_status=str(row["review_status"]),
+                relationship_version=str(row["relationship_version"]),
+                rationale=(
+                    str(row["rationale"])
+                    if row.get("rationale") is not None
+                    else None
+                ),
+                reviewed_at=(
+                    str(row["reviewed_at"])
+                    if row.get("reviewed_at") is not None
+                    else None
+                ),
+            )
+            for row in rows
+        ]
+
+    @app.post(
+        "/api/v1/relationships/{relationship_id}/review",
+        response_model=MessageResponse,
+    )
+    def review_relationship(
+        relationship_id: str,
+        payload: RelationshipReviewRequest,
+        access_token: str = Depends(_access_token),
+    ) -> MessageResponse:
+        try:
+            decision = RelationshipReviewStatus(payload.decision)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="decision must be confirmed or rejected",
+            ) from exc
+
+        if decision is RelationshipReviewStatus.SUGGESTED:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="decision must be confirmed or rejected",
+            )
+
+        ok = SupabaseRelationshipRepository(
+            _transport(access_token)
+        ).review(
+            relationship_id,
+            decision=decision,
+        )
+        if not ok:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Relationship not found",
+            )
+        return MessageResponse(
+            message=f"Relationship {decision.value}."
         )
 
     @app.get("/api/v1/letters/{record_id}/original", include_in_schema=True)
