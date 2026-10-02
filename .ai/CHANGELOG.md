@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: add guarded intake runtime placeholders
+- Commit: 17cd43c8e3a0d8c48a071d36fa1f0accf484f6f0
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-02 — test: ensure duplicate intake stops before storage write
 - Commit: 23b5513b0fcda0d6ea6a82766f7e45485b446fdf
 - Author: PRASHANT KUMAR SAH
