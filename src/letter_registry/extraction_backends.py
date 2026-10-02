@@ -6,8 +6,9 @@ Tesseract language packs, supplied by the runtime environment.
 
 from __future__ import annotations
 
+import os
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -32,7 +33,7 @@ class PypdfTextBackend:
 class OcrmypdfTesseractBackend:
     """OCR PDFs with OCRmyPDF and read the generated sidecar text."""
 
-    executable: str = "ocrmypdf"
+    executable: str = field(default_factory=lambda: os.environ.get("OCRMY_PDF_CMD", "ocrmypdf"))
     timeout_seconds: int = 180
 
     def extract_text(self, path: Path, *, languages: tuple[str, ...]) -> str:
@@ -88,7 +89,7 @@ class OcrmypdfTesseractBackend:
 class TesseractImageBackend:
     """OCR JPG/JPEG/PNG images directly with Tesseract."""
 
-    executable: str = "tesseract"
+    executable: str = field(default_factory=lambda: os.environ.get("TESSERACT_CMD", "tesseract"))
     timeout_seconds: int = 120
 
     def extract_text(self, path: Path, *, languages: tuple[str, ...]) -> str:
