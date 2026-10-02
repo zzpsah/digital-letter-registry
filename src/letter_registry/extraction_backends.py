@@ -25,8 +25,7 @@ class PypdfTextBackend:
             ) from exc
 
         reader = PdfReader(str(path))
-        return "
-".join((page.extract_text() or "") for page in reader.pages)
+        return "\n".join((page.extract_text() or "") for page in reader.pages)
 
 
 @dataclass(slots=True)
