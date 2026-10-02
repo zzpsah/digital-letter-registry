@@ -89,3 +89,12 @@ See:
 ## Workflow
 
 `READ → UNDERSTAND → PLAN → IMPLEMENT → TEST → REVIEW → FIX → COMMIT → UPDATE DOCUMENTATION`
+
+
+## Google Drive account model
+
+- DLR source code is not tied to one Google account.
+- A deployment connects to an explicitly authorized Google Drive account through OAuth and uses configured private archive folder references.
+- The current private deployment is single-archive-owner configured; another account requires its own OAuth consent, secret-manager credentials, and archive-folder configuration.
+- The verified private runtime uses a write-capable Google Drive OAuth grant for direct Drive API operations. The OAuth permission is broader than the application's intended archive boundary, so DLR must operate only on configured archive objects and preserve separate approval gates for real mutations.
+- Do not reuse unrelated Drive/rclone credentials between deployments or projects.
