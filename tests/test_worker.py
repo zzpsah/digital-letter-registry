@@ -161,6 +161,70 @@ class WorkerTests(unittest.TestCase):
             "fake-embedding-v1",
         )
 
+    def test_worker_saves_reviewable_relationship_suggestion(self):
+        class RelationshipDatabase:
+            def select(self, table, *, filters=None, columns="*"):
+                if table == "letters":
+                    return [{
+                        "id": "55555555-5555-4555-8555-555555555555",
+                        "reference_number": "BSEB/123/2026",
+                        "authority": "BSEB",
+                        "category": "exam",
+                        "title": "Prior Notice",
+                        "summary": "Prior synthetic notice",
+                    }]
+                return []
+
+        class RelationshipRepo:
+            def __init__(self):
+                self.saved = []
+
+            def save_suggestion(self, suggestion, *, owner_id):
+                self.saved.append((suggestion, owner_id))
+
+        class ExtensionContextProvider:
+            version = "fake-context-v1"
+
+            def analyze(self, *, extracted_text, hints):
+                return StructuredDocumentContext(
+                    title="Synthetic Extension",
+                    authority="BSEB",
+                    category="exam",
+                    reference_number="BSEB/456/2026",
+                    summary="Extension",
+                )
+
+        class ExtensionPdfBackend:
+            def extract_text(self, path):
+                return (
+                    "BSEB/123/2026 के संदर्भ में परीक्षा प्रपत्र की "
+                    "अंतिम तिथि हेतु तिथि विस्तार किया जाता है। "
+                    "Synthetic text with enough content for native extraction."
+                )
+
+        relations = RelationshipRepo()
+        queue = FakeQueue(job())
+        worker = DocumentProcessingWorker(
+            queue=queue,
+            source_loader=FakeSourceLoader(record()),
+            database=RelationshipDatabase(),
+            original_access=FakeOriginalAccess(),
+            repository=FakeRepository(),
+            extractor=VersionedTextExtractor(ExtensionPdfBackend()),
+            context_provider=ExtensionContextProvider(),
+            embeddings=FakeEmbeddings(),
+            relationship_repository=relations,
+        )
+
+        result = worker.run_once()
+
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(len(relations.saved), 1)
+        self.assertEqual(
+            relations.saved[0][0].relationship_type.value,
+            "extends",
+        )
+
     def test_missing_source_marks_job_failed(self):
         queue = FakeQueue(job())
         worker = DocumentProcessingWorker(
