@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from letter_registry.extraction_backends import (
     OcrmypdfTesseractBackend,
+    TesseractImageBackend,
 )
 
 
@@ -54,3 +55,31 @@ class OcrmypdfBackendTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
+class TesseractImageBackendTests(unittest.TestCase):
+    def test_image_backend_uses_hindi_and_english(self) -> None:
+        seen = {}
+
+        def fake_run(command, **kwargs):
+            seen["command"] = command
+
+            class Result:
+                returncode = 0
+                stderr = ""
+                stdout = "शिक्षा विभाग synthetic image text"
+
+            return Result()
+
+        backend = TesseractImageBackend()
+        with patch("subprocess.run", side_effect=fake_run):
+            text = backend.extract_text(
+                Path("synthetic.jpg"),
+                languages=("hin", "eng"),
+            )
+
+        self.assertIn("शिक्षा विभाग", text)
+        self.assertIn("hin+eng", seen["command"])
+
+
