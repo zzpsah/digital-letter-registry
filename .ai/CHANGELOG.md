@@ -1,3 +1,26 @@
+## 2026-10-02 — feat: add archive membership roles and password login
+- Commit: b11409fbe34a8ff6a50abc6219ba83f29bc648e5
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `.env.example`
+- `scripts/preview_historical_import.py`
+- `scripts/run_synthetic_supabase_integration.py`
+- `scripts/run_worker_once.py`
+- `src/letter_registry/access.py`
+- `src/letter_registry/api.py`
+- `src/letter_registry/auth.py`
+- `src/letter_registry/channel_intake.py`
+- `src/letter_registry/supabase_repository.py`
+- `src/letter_registry/supabase_runtime.py`
+- `src/letter_registry/version_registry.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_api.py`
+- `tests/test_archive_access.py`
+- `tests/test_auth.py`
+- `tests/test_channel_intake.py`
+- `tests/test_version_registry.py`
+
 ## 2026-10-02 — feat: support Google provider in Supabase auth config
 - Commit: 8ba30ee6e42e7fe2dc005a1bc07cd89b218ecb94
 - Author: Prashant

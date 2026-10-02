@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 8ba30ee6e42e7fe2dc005a1bc07cd89b218ecb94
-- Change: feat: support Google provider in Supabase auth config
+- Commit: b11409fbe34a8ff6a50abc6219ba83f29bc648e5
+- Change: feat: add archive membership roles and password login
 - Date: 2026-10-02
 - Durable context synchronization: completed
