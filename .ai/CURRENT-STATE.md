@@ -100,14 +100,7 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Application CI is green after fixing native-PDF, blank-embedding, and Drive-reader source-generation regressions. DevOS context-sync is also green using the vendored local helper.
 
 ## Last automated change
-- Commit: 8212058d3f30aca4db42b4838e3a74fbf8276e82
-- Change: fix: repair Google Drive object reference validation syntax
+- Commit: 68e6fe652ab39d73c0fcb3e2ff2a42e9ef5304ed
+- Change: feat: reject duplicate content before private storage upload
 - Date: 2026-10-02
 - Durable context synchronization: completed
-
-
-## Verified CI baseline
-
-- Application unit-test workflow is green on the latest Google Drive reader syntax fix.
-- Development OS context-sync is green and no longer depends on cross-repository workflow access.
-- DevOS self-sync commits are guarded against recursive triggering.

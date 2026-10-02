@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: reject duplicate content before private storage upload
+- Commit: 68e6fe652ab39d73c0fcb3e2ff2a42e9ef5304ed
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/intake.py`
+
 ## 2026-10-02 — test: cover private Google Drive immutable uploader
 - Commit: 1c99e2a0bbdbb3feaa4917451e48873dab4c41a6
 - Author: PRASHANT KUMAR SAH
