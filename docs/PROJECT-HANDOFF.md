@@ -144,10 +144,15 @@ No production deployment or live archive import is authorized yet. Synthetic/pri
 
 ## 2026-10-02 runtime verification checkpoint
 
-- Dedicated refreshable Google Drive OAuth is configured through a private authorized-user credentials file; no refresh token/client secret is stored in Git.
-- Current live Drive grant is read-only.
+- Dedicated refreshable Google Drive OAuth is configured through runtime secret-manager injection; no refresh token/client secret is stored in Git, and the persistent authorized-user runtime file was retired after verification.
+- Current private-runtime Drive grant is write-capable; disposable synthetic upload/stream/delete verification passed.
 - Live token refresh, originals listing, and server-side streaming of the existing synthetic original are verified.
 - Full synthetic test suite passes 212/212.
 - Runtime readiness has Supabase, auth callback, Drive credentials/folder, OCR tooling/languages, and synthetic-only safety ready; Gemini is the only failing readiness check.
 - Real Supabase owner-session/PostgREST vertical-slice verification remains blocked by the hosted email-send throttle.
-- Runtime Drive write/upload verification remains pending a separately approved write-capable scope.
+- Runtime Drive write/upload verification is complete with a disposable synthetic object; real archive mutation remains separately approval-gated.
+
+
+## Drive account portability
+
+The codebase is Google-account portable. A deployment uses the Google account that explicitly completes OAuth consent plus that deployment's configured archive-folder references. The current private deployment is single-owner/single-archive configured. A different account requires separate OAuth consent, secret-manager credentials and folder configuration; do not silently reuse or repoint another deployment's credentials.
