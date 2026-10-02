@@ -1,3 +1,11 @@
+## 2026-10-02 — feat: prefer injected Drive OAuth refresh credentials
+- Commit: 25ebe28102ec812f7135ff86fd0b397b498bb333
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/google_drive_auth.py`
+- `tests/test_google_drive_auth.py`
+
 ## 2026-10-02 — docs: add Drive runtime checkpoint
 - Commit: 0689f9f068d7e54ecc090e69533748fdabaaf77f
 - Author: PRASHANT KUMAR SAH

@@ -6,10 +6,10 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 0689f9f068d7e54ecc090e69533748fdabaaf77f
-- Last commit: docs: add Drive runtime checkpoint
+- HEAD: 25ebe28102ec812f7135ff86fd0b397b498bb333
+- Last commit: feat: prefer injected Drive OAuth refresh credentials
 - Last commit date: 2026-10-02
-- Last commit author: PRASHANT KUMAR SAH
+- Last commit author: Prashant
 
 ## Context health
 - Overall: healthy
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

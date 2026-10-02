@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification, write-capable Drive upload verification, and the real owner bearer-session vertical slice remain pending.
 
 ## Last automated change
-- Commit: 04a82a445366afdab5ba7778d11e4099af2f02fe
-- Change: feat: recognize Drive authorized-user credentials file
+- Commit: 25ebe28102ec812f7135ff86fd0b397b498bb333
+- Change: feat: prefer injected Drive OAuth refresh credentials
 - Date: 2026-10-02
 - Durable context synchronization: completed
