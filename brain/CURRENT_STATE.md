@@ -28,3 +28,8 @@ Create/establish the archive owner authentication identity, then wire the privat
 ## Safety
 
 Do not commit real letters, Drive IDs/URLs, Supabase keys, credentials, SSH keys, or server details to this public repository. Existing Drive files must not be renamed without an approved preview mapping.
+
+
+## 2026-10-02 — Live integration checkpoint
+
+A synthetic PDF upload to the private Drive `originals/` folder is verified. Supabase Auth now contains the intended archive-owner identity, but email confirmation is still pending. Do not bypass RLS; complete the authenticated database test only after confirmation.
