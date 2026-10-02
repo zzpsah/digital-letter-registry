@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: b11409fbe34a8ff6a50abc6219ba83f29bc648e5
-- Change: feat: add archive membership roles and password login
+- Commit: b324abab8c7e9b60b4ecd0a6e613f6e02f9c3d6f
+- Change: db: record enforce_archive_role_model migration
 - Date: 2026-10-02
 - Durable context synchronization: completed
