@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add relationship review API
+- Commit: 51ae5c9377619c8aae0716514146fac64492cae0
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — test: cover reviewable relationship lifecycle
 - Commit: dabc7e0f998391e1e57f147d5483b2ae4acf4d0e
 - Author: PRASHANT KUMAR SAH
