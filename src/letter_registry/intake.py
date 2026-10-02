@@ -61,6 +61,16 @@ class IntakeService:
     queue: ProcessingQueue
     policy: IntakePolicy = IntakePolicy()
 
+    def ingest_path(
+        self,
+        path: str | Path,
+        *,
+        owner_id: str,
+        provenance: object | None = None,
+    ) -> IntakeResult:
+        """Compatibility path-entrypoint; provenance is handled by channel wrappers."""
+        return self.ingest(path, owner_id=owner_id)
+
     def ingest(
         self,
         path: str | Path,
