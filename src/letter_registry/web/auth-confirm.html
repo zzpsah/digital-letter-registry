@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Signing in…</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:#17202a;background:#f5f7f9}
+    body{margin:0;display:grid;place-items:center;min-height:100vh;padding:20px}
+    main{max-width:520px;background:#fff;border:1px solid #dde3e8;border-radius:16px;padding:20px}
+    h1{font-size:1.2rem;margin:0 0 8px}.muted{color:#65717d;line-height:1.45}
+  </style>
+</head>
+<body>
+<main>
+  <h1>साइन इन हो रहा है…</h1>
+  <div id="status" class="muted">Secure session तैयार की जा रही है.</div>
+</main>
+<script>
+(async()=>{
+  const status=document.getElementById("status");
+  try{
+    const hash=new URLSearchParams(location.hash.slice(1));
+    const access_token=hash.get("access_token")||"";
+    const refresh_token=hash.get("refresh_token")||"";
+    const expires_in=Number(hash.get("expires_in")||3600);
+    if(!access_token||!refresh_token)throw new Error("Missing session tokens");
+
+    const res=await fetch("/api/v1/auth/session-from-fragment",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({access_token,refresh_token,expires_in})
+    });
+
+    history.replaceState(null,"","/auth/confirm");
+    if(!res.ok)throw new Error("Session validation failed");
+    location.replace("/");
+  }catch(error){
+    history.replaceState(null,"","/auth/confirm");
+    status.textContent="Sign-in link invalid या expired है. नया link भेजें.";
+  }
+})();
+</script>
+</body>
+</html>
