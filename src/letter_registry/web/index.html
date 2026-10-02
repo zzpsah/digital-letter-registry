@@ -84,25 +84,18 @@
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const token=()=>sessionStorage.getItem("dlr_access_token")||"";
-
-function captureImplicitSession(){
-  if(!location.hash||location.hash.length<2)return false;
-  const fragment=new URLSearchParams(location.hash.slice(1));
-  const accessToken=fragment.get("access_token");
-  const tokenType=(fragment.get("token_type")||"").toLowerCase();
-  if(!accessToken||tokenType!=="bearer")return false;
-
-  sessionStorage.setItem("dlr_access_token",accessToken);
-  history.replaceState(null,"",location.pathname+location.search);
-  return true;
-}
-
-function setSessionUi(){
-  const signedIn=Boolean(token());
+function setSessionUi(signedIn){
   $("loginBox").style.display=signedIn?"none":"block";
   $("sessionBar").style.display=signedIn?"flex":"none";
   if(signedIn)$("status").textContent="Authenticated session active.";
+}
+
+async function refreshSessionUi(){
+  const res=await fetch("/api/v1/auth/session",{cache:"no-store"});
+  const signedIn=res.ok;
+  setSessionUi(signedIn);
+  if(!signedIn)$("status").textContent="Search करने के लिए secure sign-in आवश्यक है.";
+  return signedIn;
 }
 
 function params(){
@@ -134,8 +127,7 @@ function render(data){
     </article>`).join("");
   document.querySelectorAll("[data-original]").forEach(a=>a.addEventListener("click",async e=>{
     e.preventDefault();
-    if(!token()){alert("Authenticated session required");return}
-    const res=await fetch(a.href,{headers:{Authorization:`Bearer ${token()}`},redirect:"manual"});
+    const res=await fetch(a.href,{redirect:"manual",cache:"no-store"});
     if(res.status===501){alert("Private Drive resolver अभी configure नहीं है.");return}
     if(res.status===307||res.status===302){location.href=res.headers.get("location");return}
     if(!res.ok){alert("Original नहीं खुल सका");return}
@@ -161,14 +153,13 @@ $("loginForm").addEventListener("submit",async e=>{
     :"Sign-in request failed.";
 });
 
-captureImplicitSession();
-setSessionUi();
+refreshSessionUi();
 
-$("logoutButton").addEventListener("click",()=>{
-  sessionStorage.removeItem("dlr_access_token");
+$("logoutButton").addEventListener("click",async()=>{
+  await fetch("/api/v1/auth/logout",{method:"POST"});
   $("results").innerHTML="";
   $("status").textContent="Signed out.";
-  setSessionUi();
+  setSessionUi(false);
 });
 
 if("serviceWorker" in navigator){
@@ -177,13 +168,8 @@ if("serviceWorker" in navigator){
 
 $("searchForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  if(!token()){
-    $("status").className="error";
-    $("status").textContent="Supabase authenticated access token missing.";
-    return;
-  }
   $("status").textContent="खोज रहा है…";
-  const res=await fetch("/api/v1/search?"+params(),{headers:{Authorization:`Bearer ${token()}`}});
+  const res=await fetch("/api/v1/search?"+params(),{cache:"no-store"});
   if(!res.ok){
     $("status").className="error";
     $("status").textContent="Search failed: "+res.status;
