@@ -1,3 +1,17 @@
+## 2026-10-02 — feat: add invite-based DLR account administration
+- Commit: 9d4ca1bf9bc52abc55d5c53d622387fad10bfb21
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/account_admin.py`
+- `src/letter_registry/api.py`
+- `src/letter_registry/auth.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261002174100_add_archive_member_invites.sql`
+- `tests/test_account_admin.py`
+- `tests/test_api.py`
+- `tests/test_auth.py`
+
 ## 2026-10-02 — docs: start account admin enhancement brain
 - Commit: c58ce5dfb37e387ebc088c0a78023d6e2ff655dd
 - Author: PRASHANT KUMAR SAH
