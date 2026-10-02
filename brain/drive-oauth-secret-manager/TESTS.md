@@ -9,5 +9,5 @@ Passed:
 - private service health after secret-manager cutover.
 
 Pending:
-- synthetic upload with the new write-capable grant;
-- optional approval-locked rename transport proof with a disposable synthetic object.
+- synthetic upload with the new write-capable grant: passed;
+- optional approval-locked rename transport proof with a disposable synthetic object remains optional; upload/write permission itself is verified.
