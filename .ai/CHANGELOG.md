@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover preview-first historical bulk import
+- Commit: 79e3351ecb8e87d6a72f0c9e9aae53ce082c60d4
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_bulk_import.py`
+
 ## 2026-10-02 — refactor: keep canonical Google Drive OAuth provider
 - Commit: c75ec4b65de2092466bc2427aac2141c4d9bd508
 - Author: PRASHANT KUMAR SAH

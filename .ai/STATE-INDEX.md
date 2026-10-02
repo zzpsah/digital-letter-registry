@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: c75ec4b65de2092466bc2427aac2141c4d9bd508
-- Last commit: refactor: keep canonical Google Drive OAuth provider
+- HEAD: 79e3351ecb8e87d6a72f0c9e9aae53ce082c60d4
+- Last commit: test: cover preview-first historical bulk import
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
