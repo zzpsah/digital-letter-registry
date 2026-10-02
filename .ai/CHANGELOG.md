@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: define server-side Supabase passwordless auth flow
+- Commit: aadc1155be964cca7d56362d7880ddbabf5b5741
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/AUTH.md`
+
 ## 2026-10-02 — test: cover HttpOnly cookie auth callback and API session
 - Commit: cac4f53a816cd2a574f08c04bd5d6383e95a1de0
 - Author: PRASHANT KUMAR SAH

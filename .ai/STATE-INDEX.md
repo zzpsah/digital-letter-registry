@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: cac4f53a816cd2a574f08c04bd5d6383e95a1de0
-- Last commit: test: cover HttpOnly cookie auth callback and API session
+- HEAD: aadc1155be964cca7d56362d7880ddbabf5b5741
+- Last commit: docs: define server-side Supabase passwordless auth flow
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
