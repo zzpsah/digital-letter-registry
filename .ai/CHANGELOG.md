@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: correct brain Drive OAuth handoff
+- Commit: 4d870870fcd025b47d2c88ce24873fdf2e8cedbc
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/HANDOFF.md`
+
 ## 2026-10-02 — docs: finalize Drive OAuth handoff state
 - Commit: c901eefd3be0bb43921df26a762d9d5ce9cb6ef1
 - Author: PRASHANT KUMAR SAH
