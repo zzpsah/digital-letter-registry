@@ -43,6 +43,15 @@ class RelationshipSuggestion:
 
 
 class RelationshipTransport(Protocol):
+    def select(
+        self,
+        table: str,
+        *,
+        filters: dict[str, str] | None = None,
+        columns: str = "*",
+    ) -> list[dict[str, object]]:
+        ...
+
     def upsert(
         self,
         table: str,
@@ -87,6 +96,48 @@ class SupabaseRelationshipRepository:
                 "source_letter_id,target_letter_id,relationship_type"
             ),
         )
+
+    def list_for_letter(
+        self,
+        record_id: str,
+    ) -> list[dict[str, object]]:
+        UUID(record_id)
+        columns = (
+            "id,source_letter_id,target_letter_id,relationship_type,"
+            "confidence,review_status,relationship_version,rationale,reviewed_at"
+        )
+        outgoing = self.transport.select(
+            "letter_relationships",
+            filters={"source_letter_id": record_id},
+            columns=columns,
+        )
+        incoming = self.transport.select(
+            "letter_relationships",
+            filters={"target_letter_id": record_id},
+            columns=columns,
+        )
+        merged: dict[str, dict[str, object]] = {}
+        for row in (*outgoing, *incoming):
+            merged[str(row["id"])] = row
+        return list(merged.values())
+
+    def review(
+        self,
+        relationship_id: str,
+        *,
+        decision: RelationshipReviewStatus,
+    ) -> bool:
+        UUID(relationship_id)
+        if decision is RelationshipReviewStatus.SUGGESTED:
+            raise ValueError("review decision must be confirmed or rejected")
+        rows = self.transport.rpc(
+            "review_letter_relationship",
+            {
+                "relationship_id": relationship_id,
+                "decision": decision.value,
+            },
+        )
+        return bool(rows and rows[0].get("success"))
 
     def recalculate_statuses(
         self,
