@@ -224,3 +224,21 @@ Live verification:
 - Account UI deployed;
 - unauthenticated password-change request returns 401;
 - full synthetic suite 255/255.
+
+
+## Vercel hosting checkpoint
+
+A production DLR control plane is live at `https://digital-letter-registry.vercel.app`.
+
+Architecture at this checkpoint:
+- Vercel: browser UI, auth/session endpoints, search/admin control plane;
+- Supabase: Auth, RLS and archive data authorization;
+- Oracle/private runtime: Google Drive OAuth/original access, OCR/system binaries, and private-worker responsibilities;
+- real intake remains disabled on Vercel.
+
+Production verification passed for the home page, health endpoint, and auth provider discovery. Vercel Authentication was disabled because DLR already enforces its own Supabase-backed identity and archive membership.
+
+Remaining portability tasks:
+1. add the Vercel production origin to the Supabase Auth redirect allow-list;
+2. grant Vercel GitHub integration access if automatic `main` deployments are desired;
+3. explicitly decide which Drive/original-access operations, if any, should migrate from Oracle to Vercel.
