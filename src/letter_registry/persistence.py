@@ -11,6 +11,7 @@ from typing import Protocol
 from uuid import UUID
 
 from .extraction import ExtractionResult
+from .structured_analysis import ContextAnalysisResult
 from .models import DocumentRecord
 
 
@@ -125,3 +126,51 @@ def build_supabase_extraction_patch(
         "extracted_text": result.text,
         "ocr_version": result.version,
     }
+
+
+def build_supabase_context_processing_patch(
+    record: DocumentRecord,
+    *,
+    owner_id: str,
+    result: ContextAnalysisResult,
+) -> dict[str, object]:
+    """Build letter_processing patch for structured context + concepts."""
+
+    return {
+        "letter_id": _validated_uuid(record.record_id, field_name="record_id"),
+        "owner_id": _validated_uuid(owner_id, field_name="owner_id"),
+        "structured_context": result.context.to_json_dict(),
+        "concepts": list(result.context.concepts),
+        "context_version": result.version,
+    }
+
+
+def build_supabase_letter_context_patch(
+    record: DocumentRecord,
+    *,
+    owner_id: str,
+    result: ContextAnalysisResult,
+) -> dict[str, object]:
+    """Build searchable public.letters metadata patch from structured context."""
+
+    context = result.context
+    row: dict[str, object] = {
+        "id": _validated_uuid(record.record_id, field_name="record_id"),
+        "owner_id": _validated_uuid(owner_id, field_name="owner_id"),
+    }
+
+    optional_values = {
+        "title": context.title,
+        "authority": context.authority,
+        "category": context.category,
+        "subcategory": context.subcategory,
+        "action_required": context.action_required,
+    }
+    for key, value in optional_values.items():
+        if value is not None and str(value).strip():
+            row[key] = value
+
+    if context.deadline:
+        row["deadline_at"] = context.deadline
+
+    return row
