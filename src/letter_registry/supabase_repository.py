@@ -138,3 +138,23 @@ class SupabaseLetterRepository:
             letter_row,
             on_conflict="id",
         )
+
+
+    def save_embedding_version(
+        self,
+        record: DocumentRecord,
+        *,
+        owner_id: str,
+        embedding_version: str,
+    ) -> None:
+        if not embedding_version.strip():
+            raise ValueError("embedding_version is required")
+        self.transport.upsert(
+            "letter_processing",
+            {
+                "letter_id": record.record_id,
+                "owner_id": owner_id,
+                "embedding_version": embedding_version,
+            },
+            on_conflict="letter_id",
+        )
