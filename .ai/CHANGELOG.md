@@ -1,3 +1,10 @@
+## 2026-10-02 — security: enforce same-origin cookie mutations
+- Commit: 5b4450801d9e81c3c1a593a3b45f5f8eaee7b04a
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — docs: sync current state with HttpOnly cookie auth
 - Commit: ca8b535baf02ecaeabc90efd415a8b06c8cb4615
 - Author: PRASHANT KUMAR SAH

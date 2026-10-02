@@ -100,7 +100,7 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Application CI is green after fixing native-PDF, blank-embedding, and Drive-reader source-generation regressions. DevOS context-sync is also green using the vendored local helper.
 
 ## Last automated change
-- Commit: a8cdd621a0a8b89090df2035e3c7f7b6eef4da0c
-- Change: feat: move mobile UI to HttpOnly cookie sessions
+- Commit: 5b4450801d9e81c3c1a593a3b45f5f8eaee7b04a
+- Change: security: enforce same-origin cookie mutations
 - Date: 2026-10-02
 - Durable context synchronization: completed
