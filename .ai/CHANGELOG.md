@@ -1,3 +1,10 @@
+## 2026-10-02 — fix: return row-shaped worker transition results
+- Commit: e1d1a6439fd9c37821f1732174e507b771827bd2
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261002135000_add_job_transition_rpcs.sql`
+
 ## 2026-10-02 — feat: add RPC-only durable worker queue lifecycle
 - Commit: beef2aec515654ec0561a2f79c6fd48aec484205
 - Author: PRASHANT KUMAR SAH

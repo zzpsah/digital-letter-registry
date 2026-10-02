@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: beef2aec515654ec0561a2f79c6fd48aec484205
-- Last commit: feat: add RPC-only durable worker queue lifecycle
+- HEAD: e1d1a6439fd9c37821f1732174e507b771827bd2
+- Last commit: fix: return row-shaped worker transition results
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
