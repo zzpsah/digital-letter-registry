@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: record project operating memory
+- Commit: bd48c9838bd9371b63a4b8d64465a637950fa720
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/MEMORY.md`
+
 ## 2026-10-02 — docs: update Supabase verification state
 - Commit: 0bef3dbdb1ececce59fd6851390f1b85f914f9fc
 - Author: PRASHANT KUMAR SAH
