@@ -35,3 +35,20 @@ Magic Link/passwordless email authentication is an identity/session layer only. 
 ## Google Sign-In handoff
 
 Application support is complete and 220/220 synthetic tests pass. Supabase currently reports Google provider disabled. Resume from `brain/google-signin/`. Create a separate Google Web OAuth client, configure Supabase Google provider, then prove the existing archive-owner user id is preserved through automatic identity linking before running the real authenticated synthetic RLS vertical slice.
+
+
+## Multi-user authorization handoff
+
+The hosted archive now uses membership/role authorization rather than a configured single-owner check.
+
+- Authentication providers are interchangeable; Gmail/Google is not required.
+- Email/password and Magic Link work under the same membership model; Google Sign-In is optional.
+- Registration is invite-only.
+- Roles are admin/editor/viewer and are enforced by RLS plus API checks.
+- The bootstrap owner is currently the sole active admin.
+- The database prevents loss of the last active admin; live disable test passed.
+- Admin invite/member management is implemented.
+- Invite links use fragments rather than query parameters.
+- Full synthetic suite passes 249/249.
+- Supabase leaked-password protection is still disabled and should be enabled when Auth configuration access is available.
+- Resume from `brain/multi-user-authz/`.
