@@ -81,3 +81,46 @@ class OcrmypdfTesseractBackend:
                 raise RuntimeError("OCRmyPDF completed without producing sidecar text")
 
             return sidecar.read_text(encoding="utf-8", errors="replace")
+
+
+
+@dataclass(slots=True)
+class TesseractImageBackend:
+    """OCR JPG/JPEG/PNG images directly with Tesseract."""
+
+    executable: str = "tesseract"
+    timeout_seconds: int = 120
+
+    def extract_text(self, path: Path, *, languages: tuple[str, ...]) -> str:
+        if not languages:
+            raise ValueError("at least one OCR language is required")
+
+        command = [
+            self.executable,
+            str(path),
+            "stdout",
+            "-l",
+            "+".join(languages),
+        ]
+        try:
+            completed = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                timeout=self.timeout_seconds,
+                check=False,
+            )
+        except FileNotFoundError as exc:
+            raise RuntimeError(
+                "Tesseract executable was not found"
+            ) from exc
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError("Tesseract image OCR timed out") from exc
+
+        if completed.returncode != 0:
+            detail = (completed.stderr or completed.stdout or "").strip()
+            raise RuntimeError(
+                f"Tesseract image OCR failed with exit code "
+                f"{completed.returncode}: {detail}"
+            )
+        return completed.stdout
