@@ -47,6 +47,13 @@ class InMemoryProcessingQueue:
 
 
 class JobTransport(Protocol):
+    def rpc(
+        self,
+        function: str,
+        params: dict[str, object],
+    ) -> list[dict[str, object]]:
+        ...
+
     def select(
         self,
         table: str,
@@ -113,4 +120,38 @@ class SupabaseProcessingQueue:
             letter_id=letter_id,
             owner_id=owner_id,
             created_at=created_at,
+        )
+
+
+    def claim_next(self) -> ProcessingJob | None:
+        rows = self.transport.rpc("claim_processing_job", {})
+        if not rows:
+            return None
+
+        row = rows[0]
+        return ProcessingJob(
+            job_id=str(row["id"]),
+            letter_id=str(row["letter_id"]),
+            owner_id=str(row["owner_id"]),
+            created_at=datetime.fromisoformat(
+                str(row["created_at"]).replace("Z", "+00:00")
+            ),
+            reason=str(row.get("reason") or "initial_processing"),
+        )
+
+    def complete(self, job: ProcessingJob) -> None:
+        rows = self.transport.rpc(
+            "complete_processing_job",
+            {"job_id": job.job_id},
+        )
+        if not rows:
+            return
+
+    def fail(self, job: ProcessingJob, *, error_message: str) -> None:
+        self.transport.rpc(
+            "fail_processing_job",
+            {
+                "job_id": job.job_id,
+                "error_message": error_message[:2000],
+            },
         )
