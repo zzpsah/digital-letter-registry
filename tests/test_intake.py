@@ -34,6 +34,27 @@ class IntakeTests(unittest.TestCase):
         self.assertEqual(len(queue.jobs), 1)
         self.assertEqual(queue.jobs[0].letter_id, result.record.record_id)
 
+    def test_duplicate_is_rejected_before_second_storage_write(self):
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "synthetic-letter.pdf"
+            path.write_bytes(b"%PDF-same-content")
+
+            storage = InMemoryOriginalStorage()
+            repository = InMemoryLetterRepository()
+            queue = InMemoryProcessingQueue()
+            service = IntakeService(
+                storage=storage,
+                repository=repository,
+                queue=queue,
+            )
+
+            service.ingest(path, owner_id=OWNER_ID)
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                service.ingest(path, owner_id=OWNER_ID)
+
+            self.assertEqual(len(storage.objects), 1)
+            self.assertEqual(len(queue.jobs), 1)
+
     def test_real_looking_filename_is_blocked_by_default(self):
         with TemporaryDirectory() as directory:
             path = Path(directory) / "official-letter.pdf"
