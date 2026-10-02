@@ -74,3 +74,13 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Foreign-key covering indexes reported by the performance advisor were added.
 - Performance advisor now reports only unused-index informational notices, expected for the nearly empty archive.
 - Supabase security advisor currently warns that leaked-password protection is disabled at the Auth project setting; no RLS/schema warning was reported.
+
+
+## Semantic + hybrid search
+
+- Gemini embedding adapter uses runtime-configurable `gemini-embedding-2` with 768 dimensions.
+- Extracted text is deterministically chunked and each chunk stores its own embedding version.
+- Live Supabase `letter_chunks.embedding` is constrained to vector(768).
+- HNSW cosine index and `search_letter_chunks_semantic` RPC are deployed.
+- Hybrid search combines text/fuzzy rank with semantic similarity.
+- Embedding spaces remain explicitly versioned so future provider/model changes require controlled re-embedding rather than mixed-vector comparison.
