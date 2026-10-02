@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: add signed-in password settings UI
+- Commit: c6eb35b285929816b8cc9aa04133a18c9e461687
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-03 — feat: add member password change endpoint
 - Commit: d9acc8e7741b3215c765f6b5b1b5e9448db5f8a2
 - Author: PRASHANT KUMAR SAH
