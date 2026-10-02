@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Official Letter Intelligence Archive</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:#17202a;background:#f5f7f9}
+    *{box-sizing:border-box} body{margin:0} main{max-width:760px;margin:auto;padding:16px}
+    .hero{padding:20px 4px 12px}.hero h1{font-size:1.45rem;margin:0 0 6px}.muted{color:#65717d;font-size:.9rem}
+    .search{display:flex;gap:8px;position:sticky;top:0;background:#f5f7f9;padding:10px 0;z-index:2}
+    input,select,button{font:inherit;border:1px solid #cbd3da;border-radius:12px;padding:12px;background:white}
+    .search input{flex:1;min-width:0}button{cursor:pointer;font-weight:650}.primary{background:#1f5e46;color:white;border-color:#1f5e46}
+    details{background:white;border:1px solid #dde3e8;border-radius:12px;padding:10px 12px;margin:8px 0 14px}
+    .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.filters input,.filters select{width:100%}
+    .card{background:white;border:1px solid #dde3e8;border-radius:16px;padding:14px;margin:10px 0;box-shadow:0 1px 2px #0000000d}
+    .card h2{font-size:1.05rem;margin:0 0 7px}.meta{display:flex;gap:8px;flex-wrap:wrap;font-size:.82rem;color:#56616b}
+    .badge{padding:3px 8px;border-radius:999px;background:#eef3f1}.snippet{margin:10px 0;line-height:1.45}
+    .action{background:#fff7dc;border-radius:10px;padding:9px;margin:9px 0;font-size:.9rem}
+    .concepts{font-size:.8rem;color:#49665b}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .open{display:inline-block;text-decoration:none;background:#1f5e46;color:white;padding:9px 12px;border-radius:10px;font-weight:650}
+    #status{font-size:.9rem;margin:8px 2px}.error{color:#a52a2a}
+    @media(max-width:520px){.filters{grid-template-columns:1fr}.hero h1{font-size:1.25rem}}
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <h1>आधिकारिक पत्र खोज</h1>
+    <div class="muted">Official Letter Intelligence Archive · Hindi / English / Hinglish</div>
+  </section>
+
+  <form id="searchForm">
+    <div class="search">
+      <input id="q" name="q" autocomplete="off" placeholder="जैसे: inter exam last date" aria-label="Search">
+      <button class="primary" type="submit">खोजें</button>
+    </div>
+    <details>
+      <summary>फ़िल्टर</summary>
+      <div class="filters">
+        <input id="authority" placeholder="विभाग / Authority">
+        <input id="category" placeholder="Category">
+        <select id="statusFilter">
+          <option value="">सभी status</option>
+          <option value="current">Current</option>
+          <option value="expired">Expired</option>
+          <option value="historical">Historical</option>
+          <option value="superseded">Superseded</option>
+          <option value="unknown">Unknown</option>
+        </select>
+        <input id="year" inputmode="numeric" placeholder="Year, e.g. 2026">
+        <select id="fileType">
+          <option value="">सभी file types</option>
+          <option value="pdf">PDF</option>
+          <option value="jpg">JPG</option>
+          <option value="jpeg">JPEG</option>
+          <option value="png">PNG</option>
+        </select>
+      </div>
+    </details>
+  </form>
+
+  <div id="status">Search करने के लिए Supabase access token इस browser session में सेट होना चाहिए.</div>
+  <section id="results"></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const token=()=>sessionStorage.getItem("dlr_access_token")||"";
+
+function params(){
+  const p=new URLSearchParams();
+  [["q","q"],["authority","authority"],["category","category"],["status","statusFilter"],["year","year"],["file_type","fileType"]]
+    .forEach(([k,id])=>{const v=$(id).value.trim();if(v)p.set(k,v)});
+  return p;
+}
+function render(data){
+  $("status").className="";
+  $("status").textContent=`${data.count} result · ${data.mode} search`;
+  $("results").innerHTML=data.results.map(r=>`
+    <article class="card">
+      <h2>${esc(r.title)}</h2>
+      <div class="meta">
+        ${r.authority?`<span>${esc(r.authority)}</span>`:""}
+        ${r.issue_date?`<span>${esc(r.issue_date)}</span>`:""}
+        <span class="badge">${esc(r.status)}</span>
+        ${r.file_type?`<span class="badge">${esc(r.file_type.toUpperCase())}</span>`:""}
+      </div>
+      ${r.context_snippet?`<div class="snippet">${esc(r.context_snippet)}</div>`:""}
+      ${r.action_required?`<div class="action"><strong>Action:</strong> ${esc(r.action_required)}</div>`:""}
+      ${r.concepts?.length?`<div class="concepts">${r.concepts.map(esc).join(" · ")}</div>`:""}
+      <div class="row" style="margin-top:12px">
+        <span class="muted">${r.category?esc(r.category):""}</span>
+        <a class="open" href="${esc(r.open_original_path)}" data-original>Original खोलें</a>
+      </div>
+    </article>`).join("");
+  document.querySelectorAll("[data-original]").forEach(a=>a.addEventListener("click",async e=>{
+    e.preventDefault();
+    if(!token()){alert("Authenticated session required");return}
+    const res=await fetch(a.href,{headers:{Authorization:`Bearer ${token()}`},redirect:"manual"});
+    if(res.status===501){alert("Private Drive resolver अभी configure नहीं है.");return}
+    if(res.status===307||res.status===302){location.href=res.headers.get("location");return}
+    if(!res.ok) alert("Original नहीं खुल सका");
+  }));
+}
+$("searchForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!token()){
+    $("status").className="error";
+    $("status").textContent="Supabase authenticated access token missing.";
+    return;
+  }
+  $("status").textContent="खोज रहा है…";
+  const res=await fetch("/api/v1/search?"+params(),{headers:{Authorization:`Bearer ${token()}`}});
+  if(!res.ok){
+    $("status").className="error";
+    $("status").textContent="Search failed: "+res.status;
+    return;
+  }
+  render(await res.json());
+});
+</script>
+</body>
+</html>
