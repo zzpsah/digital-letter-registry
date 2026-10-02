@@ -1,3 +1,10 @@
+## 2026-10-02 — fix: remove duplicate reprocessing response model
+- Commit: 7c196032d45d0d028b4c9f68ec26c036991d5782
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — test: cover refreshable Google OAuth provider
 - Commit: 3e29c38f5a5bc00e96d956e62382d87a8c8ccf5f
 - Author: PRASHANT KUMAR SAH

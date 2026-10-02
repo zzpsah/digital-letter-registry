@@ -100,36 +100,7 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Application CI is green after fixing native-PDF, blank-embedding, and Drive-reader source-generation regressions. DevOS context-sync is also green using the vendored local helper.
 
 ## Last automated change
-- Commit: 13d48a0767f77320624483900b421b6859343afb
-- Change: feat: add processing version registry domain
+- Commit: 7c196032d45d0d028b4c9f68ec26c036991d5782
+- Change: fix: remove duplicate reprocessing response model
 - Date: 2026-10-02
 - Durable context synchronization: completed
-
-
-## Relationship + reprocessing lifecycle
-
-- Explicit-reference relationship inference is canonical: suggestions require an extension/correction/supersession cue plus a matching prior reference number.
-- Relationship suggestions are never auto-confirmed.
-- Authenticated relationship review API is implemented; confirmed supersession can update the older letter status, while rejected suggestions remain non-authoritative.
-- Owner-scoped processing target-version registry is deployed live.
-- Reprocessing preview reports the exact processing stages that differ per letter.
-- Reprocessing enqueue is separate from preview and requires explicit `confirm=true`.
-- Reprocessing jobs are idempotent per target-version profile hash and use the existing durable processing queue.
-
-
-## Reprocessing/version registry
-
-- Canonical current processing-version registry is implemented for native PDF extraction, PDF OCR, image OCR, configured Gemini context model, dictionary, filename rule, category schema, embedding model/dimensions, and relationship status rules.
-- Authenticated `/api/v1/processing/versions` exposes the current version snapshot without secrets.
-- Read-only `/api/v1/reprocessing/preview` compares every stored processing row with either current registry defaults or explicit target overrides.
-- Preview returns exact component mismatches per letter; it performs no mutation and enqueues nothing.
-- Reprocessing execution remains intentionally separate and is not enabled yet.
-
-
-## Rename execution safety
-
-- Rename preview remains a separate, side-effect-free mapping stage.
-- Rename execution is approval-locked by a deterministic SHA-256 digest over record ID + old filename + proposed filename.
-- Execution requires `confirmed=true`, an exact digest match, and a fresh server-side check that the current stored filename still matches the approved preview.
-- RLS storage identity lookup and a private Google Drive PATCH transport are implemented.
-- No rename endpoint is exposed in the UI/API and no Drive rename has been executed or approved.
