@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: record verified user-local OCR runtime
+- Commit: 25ee7ea892c8b9a2f0aa44b31c8983878f532f9f
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/LIVE-INTEGRATION-CHECKPOINT.md`
+
 ## 2026-10-02 — test: cover runtime OCR executable overrides
 - Commit: 21ca0c5538265895eef8e3afc589755170895d99
 - Author: PRASHANT KUMAR SAH

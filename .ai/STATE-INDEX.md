@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 21ca0c5538265895eef8e3afc589755170895d99
-- Last commit: test: cover runtime OCR executable overrides
+- HEAD: 25ee7ea892c8b9a2f0aa44b31c8983878f532f9f
+- Last commit: docs: record verified user-local OCR runtime
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
