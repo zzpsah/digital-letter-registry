@@ -98,3 +98,23 @@ See:
 - The current private deployment is single-archive-owner configured; another account requires its own OAuth consent, secret-manager credentials, and archive-folder configuration. Depending on the Google OAuth consent-screen status, a new account may also need to be an allowed test user before authorization succeeds.
 - The verified private runtime uses a write-capable Google Drive OAuth grant for direct Drive API operations. The OAuth permission is broader than the application's intended archive boundary, so DLR must operate only on configured archive objects and preserve separate approval gates for real mutations.
 - Do not reuse unrelated Drive/rclone credentials between deployments or projects.
+
+
+## Authentication scope
+
+DLR uses passwordless email login (commonly called a Magic Link) to establish the identity of the person using the private application.
+
+Its scope is deliberately narrow:
+
+- **Identity/session:** prove which authorized user is using DLR and create the authenticated browser session.
+- **Database authorization:** Supabase RLS uses that authenticated user identity to decide which archive rows the user may read or write.
+- **Future multi-user isolation:** different authorized users/schools can share the same application while remaining separated by database ownership/policies.
+
+Magic Link authentication does **not**:
+
+- provide Google Drive access — that is handled separately by server-side Google OAuth;
+- replace Tailscale/private-network protection;
+- authorize real letter ingestion, rename, delete, historical adoption, or bulk mutation;
+- grant access to unrelated users merely because they can reach the DLR URL.
+
+In short: **Tailscale protects how the app is reached; Magic Link identifies the user; Supabase RLS controls that user's database access; Google OAuth controls the backend Drive connection.**
