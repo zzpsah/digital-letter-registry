@@ -69,20 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 736179ef833476699c682e78538f426f529f8568
-- Change: feat: add one-click registration email
-- Date: 2026-10-02
+- Commit: 8235d4c3f0716761a433b445fde90f1a06e797ff
+- Change: feat: add authenticated password update helper
+- Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## 2026-10-02 multi-role hosted verification
-
-Hosted RLS role matrix passed with synthetic JWT-claim simulation:
-- viewer: read yes, update no;
-- editor: insert/update yes, delete no;
-- non-member: read no, insert no;
-- admin: delete yes.
-
-Cleanup verified zero synthetic auth users, letters, memberships, and pending invites. Pending-invite UI now includes a one-click registration-email action and fragment-safe copy links. Full suite passes 251/251.
-
-Fresh owner Magic Link delivery works; the real short-lived bearer-session/PostgREST test remains pending through normal browser completion.

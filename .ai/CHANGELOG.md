@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: add authenticated password update helper
+- Commit: 8235d4c3f0716761a433b445fde90f1a06e797ff
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/auth.py`
+
 ## 2026-10-03 — docs: record hosted multi-role verification
 - Commit: 99cbf999c03cd61be72ec6d273905464957428e3
 - Author: PRASHANT KUMAR SAH
