@@ -40,8 +40,6 @@ class SupabaseAuthSession:
     def __post_init__(self) -> None:
         if not self.access_token.strip():
             raise ValueError("access_token is required")
-        if not self.refresh_token.strip():
-            raise ValueError("refresh_token is required")
         if self.expires_in <= 0:
             raise ValueError("expires_in must be positive")
 
