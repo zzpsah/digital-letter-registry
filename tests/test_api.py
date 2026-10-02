@@ -65,15 +65,23 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.client.get("/sw.js").status_code, 200)
 
     def test_synthetic_intake_returns_archive_and_job_ids_only(self):
+        from letter_registry.channel_intake import ChannelIntakeService
         from letter_registry.intake import IntakeService
         from letter_registry.jobs import InMemoryProcessingQueue
         from letter_registry.persistence import InMemoryLetterRepository
         from letter_registry.storage import InMemoryOriginalStorage
 
-        service = IntakeService(
-            storage=InMemoryOriginalStorage(),
-            repository=InMemoryLetterRepository(),
-            queue=InMemoryProcessingQueue(),
+        class Provenance:
+            def save_source(self, *, owner_id, letter_id, provenance):
+                pass
+
+        service = ChannelIntakeService(
+            intake=IntakeService(
+                storage=InMemoryOriginalStorage(),
+                repository=InMemoryLetterRepository(),
+                queue=InMemoryProcessingQueue(),
+            ),
+            provenance=Provenance(),
         )
 
         with patch(
