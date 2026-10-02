@@ -31,18 +31,18 @@ class WebShellTests(unittest.TestCase):
         )
         self.assertIn('id="confirmPassword"', self.html)
 
-    def test_admin_can_send_pending_registration_email(self) -> None:
-        self.assertIn('data-send-invite-email=', self.html)
+    def test_self_service_password_account_creation_is_exposed(self) -> None:
+        self.assertIn('<summary>Create Account</summary>', self.html)
+        self.assertIn('id="registerConfirmPassword"', self.html)
         self.assertIn(
-            'fetch("/api/v1/auth/register-magic-link"',
+            'fetch("/api/v1/auth/create-account"',
             self.html,
         )
 
-    def test_invite_secret_uses_fragment_and_is_cleared(self) -> None:
-        self.assertIn('"/#invite="', self.html)
-        self.assertIn("location.hash.slice(1)", self.html)
-        self.assertIn("history.replaceState", self.html)
-        self.assertNotIn('location.search).get("invite")', self.html)
+    def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
+        self.assertNotIn('id="loginForm"', self.html)
+        self.assertNotIn('id="registerMagicLink"', self.html)
+        self.assertNotIn('data-send-invite-email=', self.html)
 
     def test_streamed_original_response_is_opened_from_blob(self) -> None:
         self.assertIn("const blob=await res.blob()", self.html)
