@@ -18,3 +18,17 @@ Next safe action is completing the real short-lived authenticated HTTP/PostgREST
 - Gemini runtime key is still unavailable; no live Gemini synthetic verification has been completed.
 
 The synthetic verification row was removed through the authorized controlled cleanup path; `letters` is empty.
+
+
+## Authentication scope
+
+The pending real owner-session test is specifically an **identity + Supabase RLS authorization proof**.
+
+Passwordless email/Magic Link login should prove that:
+1. the intended archive owner receives and completes the login;
+2. DLR establishes a server-managed authenticated session;
+3. Supabase sees the real authenticated user identity;
+4. owner-scoped rows are accessible only to that identity;
+5. an unauthorized/wrong-user session is denied by RLS.
+
+This test is not a Google Drive authorization test and does not authorize real archive mutation. Drive OAuth, network access, and mutation approvals remain separate controls.
