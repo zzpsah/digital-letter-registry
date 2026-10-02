@@ -20,7 +20,7 @@
 ## Runtime verification next
 
 - [ ] Complete authenticated synthetic HTTP/PostgREST owner-session vertical-slice verification using a real short-lived session.
-- [x] Configure and verify refreshable Google Drive OAuth runtime credentials using a private authorized-user credentials file and synthetic data only.
+- [x] Configure and verify refreshable Google Drive OAuth runtime credentials using secret-manager injection and synthetic data only.
 - [ ] Configure and verify Gemini runtime credentials using synthetic data only.
 - [x] Configure the final private Site URL/redirects through the Supabase dashboard.
 - [ ] Optional later: configure custom SMTP and hosted token-hash email template.
