@@ -28,7 +28,7 @@ from .runtime_readiness import check_runtime_readiness
 from .reprocessing import ReprocessingTargets, SupabaseReprocessingPlanner
 from .search import SearchFilters, SupabaseSearchRepository
 from .semantic_search import SupabaseEmbeddingRepository
-from .session import SupabaseUserSession
+from .session import SupabaseSessionError, SupabaseUserSession
 from .storage import GoogleDriveOriginalStorage
 from .supabase_repository import SupabaseLetterRepository
 from .supabase_runtime import SupabasePostgrestTransport
@@ -436,7 +436,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             user_id = SupabaseUserSession.from_environment(
                 access_token=payload.access_token,
             ).user_id()
-        except (ValueError, Exception) as exc:
+        except (SupabaseSessionError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid Supabase session",
