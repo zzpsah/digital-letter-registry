@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: document private original streaming runtime
+- Commit: 0d2e98d1bc8a02c1632ae151934d26621bd57abd
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/COMMANDS.md`
+
 ## 2026-10-02 — fix: repair Google Drive object reference validation syntax
 - Commit: 8212058d3f30aca4db42b4838e3a74fbf8276e82
 - Author: PRASHANT KUMAR SAH
