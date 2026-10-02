@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
+import json
 from typing import Protocol
 from uuid import UUID
 
@@ -37,6 +39,17 @@ class ReprocessingPreview:
     title: str | None
     smart_filename: str | None
     differences: tuple[str, ...]
+
+
+class ReprocessingQueue(Protocol):
+    def enqueue(
+        self,
+        *,
+        letter_id: str,
+        owner_id: str,
+        reason: str = "initial_processing",
+    ):
+        ...
 
 
 class VersionRegistryTransport(Protocol):
@@ -147,3 +160,59 @@ class SupabaseProcessingVersionRegistry:
             )
             for row in rows
         ]
+
+
+
+def reprocessing_reason(versions: ProcessingTargetVersions) -> str:
+    payload = json.dumps(
+        {
+            "extraction": versions.extraction,
+            "context": versions.context,
+            "dictionary": versions.dictionary,
+            "filename_rule": versions.filename_rule,
+            "category_schema": versions.category_schema,
+            "embedding": versions.embedding,
+            "status_rule": versions.status_rule,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    digest = sha256(payload).hexdigest()[:16]
+    return f"reprocess:{digest}"
+
+
+@dataclass(frozen=True, slots=True)
+class ReprocessingScheduleResult:
+    reason: str
+    queued_letter_ids: tuple[str, ...]
+
+
+def schedule_reprocessing_preview(
+    *,
+    owner_id: str,
+    versions: ProcessingTargetVersions,
+    preview: list[ReprocessingPreview],
+    queue: ReprocessingQueue,
+    approved: bool = False,
+) -> ReprocessingScheduleResult:
+    UUID(owner_id)
+    if not approved:
+        raise PermissionError(
+            "reprocessing scheduling requires explicit approval"
+        )
+
+    reason = reprocessing_reason(versions)
+    queued: list[str] = []
+    for item in preview:
+        UUID(item.letter_id)
+        queue.enqueue(
+            letter_id=item.letter_id,
+            owner_id=owner_id,
+            reason=reason,
+        )
+        queued.append(item.letter_id)
+
+    return ReprocessingScheduleResult(
+        reason=reason,
+        queued_letter_ids=tuple(queued),
+    )
