@@ -68,6 +68,14 @@ class SessionStatusResponse(BaseModel):
     authenticated: bool
 
 
+class RuntimeCapabilitiesResponse(BaseModel):
+    synthetic_only: bool
+    drive_upload_configured: bool
+    original_streaming_configured: bool
+    semantic_search_configured: bool
+    auth_cookie_secure: bool
+
+
 class LetterDetailResponse(BaseModel):
     id: str
     smart_filename: str | None = None
@@ -321,8 +329,21 @@ def _runtime_intake(access_token: str) -> tuple[str, ChannelIntakeService]:
     return owner_id, service
 
 
-def _runtime_dependencies() -> ApiDependencies:
+def _drive_credentials_configured() -> bool:
     if os.environ.get("GOOGLE_DRIVE_ACCESS_TOKEN", "").strip():
+        return True
+    return all(
+        os.environ.get(name, "").strip()
+        for name in (
+            "GOOGLE_OAUTH_CLIENT_ID",
+            "GOOGLE_OAUTH_CLIENT_SECRET",
+            "GOOGLE_DRIVE_REFRESH_TOKEN",
+        )
+    )
+
+
+def _runtime_dependencies() -> ApiDependencies:
+    if _drive_credentials_configured():
         return ApiDependencies(
             original_access=SupabaseOriginalAccessService(
                 GoogleDrivePrivateTransport.from_environment()
@@ -379,6 +400,33 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
         _set_session_cookies(response, session)
         return response
+
+    @app.get(
+        "/api/v1/capabilities",
+        response_model=RuntimeCapabilitiesResponse,
+    )
+    def capabilities(
+        access_token: str = Depends(_access_token),
+    ) -> RuntimeCapabilitiesResponse:
+        _transport(access_token)
+        drive_credentials = _drive_credentials_configured()
+        return RuntimeCapabilitiesResponse(
+            synthetic_only=not _truthy_env("ENABLE_REAL_INTAKE"),
+            drive_upload_configured=(
+                drive_credentials
+                and bool(
+                    os.environ.get(
+                        "DRIVE_ORIGINALS_FOLDER_REFERENCE",
+                        "",
+                    ).strip()
+                )
+            ),
+            original_streaming_configured=drive_credentials,
+            semantic_search_configured=bool(
+                os.environ.get("GEMINI_API_KEY", "").strip()
+            ),
+            auth_cookie_secure=_cookie_secure(),
+        )
 
     @app.get("/api/v1/auth/session", response_model=SessionStatusResponse)
     def session_status(
