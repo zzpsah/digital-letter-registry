@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: document historical import preview workflow
+- Commit: e749cb11cb703e6f6ea4c5e37af013f851c8eac5
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/COMMANDS.md`
+
 ## 2026-10-02 — test: cover preview-first historical bulk import
 - Commit: 79e3351ecb8e87d6a72f0c9e9aae53ce082c60d4
 - Author: PRASHANT KUMAR SAH
