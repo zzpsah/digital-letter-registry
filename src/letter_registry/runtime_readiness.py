@@ -71,8 +71,14 @@ def _auth_redirect_ready() -> bool:
     return False
 
 
-def _ocr_languages() -> set[str]:
-    executable = shutil.which("tesseract")
+def _runtime_executable(env_name: str, default: str) -> str | None:
+    """Resolve an explicit runtime command before falling back to PATH."""
+
+    configured = os.environ.get(env_name, "").strip()
+    return shutil.which(configured or default)
+
+
+def _ocr_languages(executable: str | None) -> set[str]:
     if not executable:
         return set()
     try:
@@ -97,9 +103,11 @@ def _ocr_languages() -> set[str]:
 def check_runtime_readiness() -> RuntimeReadiness:
     """Check configuration/tool presence without returning secret values."""
 
-    languages = _ocr_languages()
-    tesseract_ready = shutil.which("tesseract") is not None
-    ocrmypdf_ready = shutil.which("ocrmypdf") is not None
+    tesseract = _runtime_executable("TESSERACT_CMD", "tesseract")
+    ocrmypdf = _runtime_executable("OCRMYPDF_CMD", "ocrmypdf")
+    languages = _ocr_languages(tesseract)
+    tesseract_ready = tesseract is not None
+    ocrmypdf_ready = ocrmypdf is not None
 
     checks = (
         ReadinessCheck(
