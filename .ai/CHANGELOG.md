@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover file-based Drive OAuth
+- Commit: 39bd57ac6ebba2f2d1b9200d78d91e801e03dfef
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_google_drive_auth.py`
+
 ## 2026-10-02 — feat: recognize Drive authorized-user credentials file
 - Commit: 04a82a445366afdab5ba7778d11e4099af2f02fe
 - Author: PRASHANT KUMAR SAH
