@@ -106,3 +106,16 @@
 - No real archive-letter ingestion has occurred.
 - No production deployment is claimed.
 - No Drive IDs/URLs, Supabase credentials, SSH keys, tokens, or server details belong in public Git.
+
+
+## Google Sign-In / persistent session
+
+- [x] Add provider-aware Google Sign-In application flow.
+- [x] Keep Magic Link as fallback/recovery.
+- [x] Add persistent 30-day refresh-session cookie with bounded configuration.
+- [x] Preserve archive-owner user-id validation before setting DLR cookies.
+- [x] Pass full synthetic suite: 220/220.
+- [ ] Create/configure separate Google Web OAuth client.
+- [ ] Enable Google provider in Supabase Auth.
+- [ ] Verify same-email Google identity links to the existing archive-owner user id.
+- [ ] Complete the authenticated synthetic owner/RLS vertical slice.
