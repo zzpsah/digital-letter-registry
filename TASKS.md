@@ -36,7 +36,7 @@
 - [x] Add concrete pypdf native-text backend.
 - [x] Add Hindi/English OCR fallback contract with versioned processing result.
 - [x] Add concrete OCRmyPDF PDF fallback + direct Tesseract image OCR backends.
-- [ ] Verify OCRmyPDF + Tesseract Hindi/English language packs in the eventual runtime environment.
+- [x] Verify OCRmyPDF + Tesseract Hindi/English language packs in Oracle runtime (user-local ARM64 install; synthetic PNG and image-only PDF OCR passed).
 - [x] Create government/education Hindi vocabulary and deterministic context hints.
 - [x] Implement provider-independent structured AI analysis.
 - [x] Add configurable Gemini structured-output provider as the first adapter.
