@@ -2,6 +2,7 @@
 
 from .fingerprints import sha256_file
 from .ingestion import prepare_source_record, persist_prepared_source
+from .orchestration import ingest_original
 from .models import (
     DocumentRecord,
     DocumentRelationship,
@@ -21,6 +22,13 @@ from .rename_preview import (
     build_rename_preview,
     render_rename_preview_csv,
 )
+from .storage import (
+    GoogleDriveOriginalStorage,
+    GoogleDriveTransport,
+    InMemoryOriginalStorage,
+    OriginalStorage,
+    StoredOriginal,
+)
 from .supabase_repository import SupabaseLetterRepository, SupabaseTransport
 
 __all__ = [
@@ -32,7 +40,13 @@ __all__ = [
     "RenamePreview",
     "LetterRepository",
     "InMemoryLetterRepository",
+    "StoredOriginal",
+    "OriginalStorage",
+    "InMemoryOriginalStorage",
+    "GoogleDriveTransport",
+    "GoogleDriveOriginalStorage",
     "prepare_source_record",
+    "ingest_original",
     "persist_prepared_source",
     "SupabaseTransport",
     "SupabaseLetterRepository",
