@@ -1,11 +1,19 @@
 # Multi-user authorization — Tasks
 
-- [ ] Inspect current schema/RLS/API assumptions.
-- [ ] Add archive + membership role schema/migration.
-- [ ] Bootstrap existing owner as admin safely.
-- [ ] Replace owner-only API session authorization with membership authorization.
-- [ ] Define admin/editor/viewer permissions.
-- [ ] Add controlled user/invite lifecycle foundation.
-- [ ] Add synthetic tests for role boundaries and non-member denial.
-- [ ] Apply and verify migration in Supabase using synthetic/empty archive state.
-- [ ] Update docs/tasks/.ai/handoffs.
+- [x] Inspect current schema/RLS/API assumptions.
+- [x] Add archive + membership role schema/migrations.
+- [x] Bootstrap existing owner as admin.
+- [x] Replace owner-only session authorization with membership authorization.
+- [x] Define admin/editor/viewer permissions.
+- [x] Add invite-only user/account lifecycle foundation.
+- [x] Add email/password login independent of Gmail.
+- [x] Add admin access-management API/UI.
+- [x] Add last-admin database protection.
+- [x] Apply membership/role/invite migrations to hosted Supabase.
+- [x] Verify hosted membership state.
+- [x] Verify last-admin protection live.
+- [x] Harden invite links to URL fragments.
+- [x] Full synthetic suite passes 249/249.
+- [ ] Enable Supabase leaked-password protection.
+- [ ] Invite/create an additional dedicated admin when the intended email is chosen.
+- [ ] Complete real authenticated multi-role HTTP/PostgREST vertical slice.
