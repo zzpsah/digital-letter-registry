@@ -214,7 +214,7 @@ class SupabasePasswordlessAuth:
         *,
         email: str,
         password: str,
-        invite_code: str,
+        invite_code: str | None = None,
     ) -> SupabaseSignupResult:
         normalized = email.strip().lower()
         if (
@@ -225,19 +225,20 @@ class SupabasePasswordlessAuth:
             raise ValueError("valid email is required")
         if len(password) < 8 or len(password) > 256:
             raise ValueError("password must be between 8 and 256 characters")
-        code = invite_code.strip()
-        if not code:
-            raise ValueError("invite_code is required")
+
+        payload: dict[str, object] = {
+            "email": normalized,
+            "password": password,
+        }
+        if invite_code is not None:
+            code = invite_code.strip()
+            if not code:
+                raise ValueError("invite_code is required")
+            payload["data"] = {"dlr_invite_code": code}
 
         req = request.Request(
             f"{self.base_url.rstrip('/')}/auth/v1/signup",
-            data=json.dumps(
-                {
-                    "email": normalized,
-                    "password": password,
-                    "data": {"dlr_invite_code": code},
-                }
-            ).encode("utf-8"),
+            data=json.dumps(payload).encode("utf-8"),
             headers={
                 "apikey": self.publishable_key,
                 "Content-Type": "application/json",
