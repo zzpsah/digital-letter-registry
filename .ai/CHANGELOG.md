@@ -1,3 +1,10 @@
+## 2026-10-02 — refactor: keep canonical Google Drive OAuth provider
+- Commit: c75ec4b65de2092466bc2427aac2141c4d9bd508
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_google_oauth.py`
+
 ## 2026-10-02 — feat: use refreshable Drive token provider for rename
 - Commit: 18f19b0156b01a1f2cacc27a08e31379eed7f17c
 - Author: PRASHANT KUMAR SAH
