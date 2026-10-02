@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 5418451069bc0ff9140f37ab032cdcf3f641ef85
-- Last commit: feat: allow streamed files to retain intake provenance
+- HEAD: 1ffe49cf2b521f8a05d6ea573f7d5cb96604ad20
+- Last commit: docs: sync brain with guarded historical import
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

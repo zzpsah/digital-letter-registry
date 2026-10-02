@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: sync brain with guarded historical import
+- Commit: 1ffe49cf2b521f8a05d6ea573f7d5cb96604ad20
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/CURRENT_STATE.md`
+
 ## 2026-10-02 — feat: allow streamed files to retain intake provenance
 - Commit: 5418451069bc0ff9140f37ab032cdcf3f641ef85
 - Author: PRASHANT KUMAR SAH
