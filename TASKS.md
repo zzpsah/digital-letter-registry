@@ -16,18 +16,18 @@
 - [x] Add Unicode-safe Hindi/English/Hinglish filename generation.
 - [x] Add preview-only rename mapping.
 - [ ] Confirm initial AI provider/model and fallback adapter contract.
-- [ ] Establish the archive owner authentication identity for RLS-backed writes.
+- [ ] Confirm the newly created archive-owner email identity for RLS-backed writes.
 
 ## Phase 1 — Archive foundation
 
 - [x] Define document + processing-version schema.
 - [x] Implement synthetic/local ingestion preparation without provider writes.
 - [x] Implement Drive storage adapter contract with synthetic transport tests.
-- [ ] Wire the live private Drive transport after runtime authentication/config is available.
+- [x] Verify a live synthetic upload into the private Drive originals folder.
 - [x] Preserve source identity contract and compute duplicate SHA-256.
 - [x] Map original filename + immutable private storage reference through the repository layer.
 - [x] Add credential-free Supabase repository adapter with injected authenticated transport.
-- [ ] Wire a real authenticated Supabase transport after archive-owner Auth exists.
+- [ ] Complete real authenticated Supabase RLS insert/read test after email confirmation.
 
 ## Phase 2 — Extraction/context
 
