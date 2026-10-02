@@ -22,6 +22,8 @@ class LetterDetail:
     record_id: str
     smart_filename: str | None
     title: str | None
+    summary: str | None
+    reference_number: str | None
     authority: str | None
     category: str | None
     subcategory: str | None
@@ -42,8 +44,8 @@ class SupabaseLetterDetailRepository:
             "letters",
             filters={"id": record_id},
             columns=(
-                "id,smart_filename,title,authority,category,subcategory,"
-                "issue_date,status,action_required,deadline_at"
+                "id,smart_filename,title,summary,reference_number,authority,"
+                "category,subcategory,issue_date,status,action_required,deadline_at"
             ),
         )
         if not letter_rows:
@@ -61,6 +63,8 @@ class SupabaseLetterDetailRepository:
             record_id=str(letter["id"]),
             smart_filename=letter.get("smart_filename"),
             title=letter.get("title"),
+            summary=letter.get("summary"),
+            reference_number=letter.get("reference_number"),
             authority=letter.get("authority"),
             category=letter.get("category"),
             subcategory=letter.get("subcategory"),
