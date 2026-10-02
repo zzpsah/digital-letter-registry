@@ -1,4 +1,4 @@
-# Project-side caller for the reusable Development OS context synchronizer.
+# Repository-local caller for the Development OS durable context synchronizer.
 name: Development OS Context Sync
 
 on:
@@ -10,6 +10,25 @@ permissions:
 
 jobs:
   sync:
-    uses: zzpsah/chatgpt-development-os/.github/workflows/context-sync.yml@main
-    permissions:
-      contents: write
+    if: ${{ !contains(github.event.head_commit.message, '[devos-context-sync]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout Development OS tools
+        uses: actions/checkout@v4
+        with:
+          repository: zzpsah/chatgpt-development-os
+          ref: main
+          path: .devos
+          fetch-depth: 1
+
+      - name: Synchronize durable project context
+        env:
+          DEVOS_CONTEXT_DIRECTORY: .ai
+          DEVOS_BEFORE_SHA: ${{ github.event.before }}
+          DEVOS_MEANINGFUL_PATTERNS: src/**,app/**,pages/**,components/**,api/**,lib/**,public/**,supabase/**,migrations/**,prisma/**,db/**,database/**,package.json,package-lock.json,pnpm-lock.yaml,yarn.lock,pyproject.toml,requirements.txt,poetry.lock,Cargo.toml,Cargo.lock,go.mod,go.sum,composer.json,pom.xml,build.gradle,Dockerfile,*.csproj,*.sln,.github/workflows/**
+        run: python .devos/tools/context-sync.py
