@@ -30,3 +30,8 @@ Do not deploy, ingest real documents, activate live connectors, rename real Driv
 ## Auth boundary
 
 Magic Link/passwordless email authentication is an identity/session layer only. It exists so Supabase RLS can enforce owner-scoped database access and so future users/schools can remain isolated. It does not replace Tailscale, does not grant Google Drive access, and does not authorize real ingestion/rename/delete actions by itself.
+
+
+## Google Sign-In handoff
+
+Application support is complete and 220/220 synthetic tests pass. Supabase currently reports Google provider disabled. Resume from `brain/google-signin/`. Create a separate Google Web OAuth client, configure Supabase Google provider, then prove the existing archive-owner user id is preserved through automatic identity linking before running the real authenticated synthetic RLS vertical slice.
