@@ -115,3 +115,14 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Verified the private Drive `originals/` folder contains only the existing synthetic integration PDF and no real archive letter.
 - Added client-side implicit magic-link callback handling and streamed-original blob opening to the PWA.
 - GitHub Actions was triggered for the new web-shell tests; final completion should be checked before treating this exact commit as green.
+
+
+## Relationship/status intelligence
+
+- Canonical live migration adds `suggested/confirmed/rejected` review state, rationale, relationship version, and review timestamp.
+- Conservative deterministic inference only suggests `extends`, `corrects`, or `supersedes` when an explicit relationship cue and referenced prior-letter number are both present.
+- The worker saves inferred relationships only as `suggested`.
+- Authenticated API can list letter relationships and explicitly confirm/reject one.
+- Status recalculation is RLS-aware; only confirmed `supersedes` relationships mark the target letter `superseded`.
+- Rejecting/removing the last confirmed superseding relationship allows recalculation back to `current`.
+- Duplicate relationship migration created during an interrupted attempt was removed; the already-applied canonical relationship-review migration remains authoritative.
