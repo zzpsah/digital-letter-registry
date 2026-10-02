@@ -73,3 +73,8 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Change: fix: relax fragment token shape assumptions
 - Date: 2026-10-03
 - Durable context synchronization: completed
+
+
+## Magic Link bridge repair
+
+Real owner Magic Link verification reached Supabase successfully, but DLR session bridging returned 422. The fragment payload model was made provider-format tolerant while retaining server-side Supabase token validation and archive-membership authorization. Full suite passes 256/256 and the private service is healthy. Browser retry remains pending.
