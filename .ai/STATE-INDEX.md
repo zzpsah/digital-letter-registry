@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 98f420164749a6b1362d4be2b72d9d6914190ad1
-- Last commit: feat: support default Supabase magic-link callback
+- HEAD: fb4e4870f7aa0d5eced9c8a0ab5f550747f6c307
+- Last commit: test: cover default magic-link fragment callback
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover default magic-link fragment callback
+- Commit: fb4e4870f7aa0d5eced9c8a0ab5f550747f6c307
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-02 — feat: support default Supabase magic-link callback
 - Commit: 98f420164749a6b1362d4be2b72d9d6914190ad1
 - Author: PRASHANT KUMAR SAH
