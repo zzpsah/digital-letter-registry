@@ -209,6 +209,35 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(body["title"], "Synthetic")
         self.assertNotIn("storage_object_id", body)
 
+    def test_relationship_review_endpoint(self):
+        class RelationshipTransport:
+            def rpc(self, function, params):
+                return [{"success": True}]
+
+            def select(self, table, *, filters=None, columns="*"):
+                return []
+
+        with patch("letter_registry.api._transport", return_value=RelationshipTransport()):
+            response = self.client.post(
+                "/api/v1/relationships/44444444-4444-4444-8444-444444444444/review",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+                json={"decision": "confirmed"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()["message"],
+            "Relationship confirmed.",
+        )
+
+    def test_relationship_review_rejects_suggested_decision(self):
+        response = self.client.post(
+            "/api/v1/relationships/44444444-4444-4444-8444-444444444444/review",
+            headers={"Authorization": "Bearer synthetic-user-token"},
+            json={"decision": "suggested"},
+        )
+        self.assertEqual(response.status_code, 400)
+
     def test_original_endpoint_streams_private_bytes_without_storage_id(self):
         from letter_registry.original_access import OriginalFile, SupabaseOriginalAccessService
 
