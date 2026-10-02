@@ -100,7 +100,7 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Application CI is green after fixing native-PDF, blank-embedding, and Drive-reader source-generation regressions. DevOS context-sync is also green using the vendored local helper.
 
 ## Last automated change
-- Commit: c174d213f52227bffd4972931d5c563bcfcb7077
-- Change: feat: add HttpOnly Supabase magic-link session callback
+- Commit: b77daf9e4251b8e475489544c2b713d081eecfcf
+- Change: feat: add cookie-backed session status endpoint
 - Date: 2026-10-02
 - Durable context synchronization: completed
