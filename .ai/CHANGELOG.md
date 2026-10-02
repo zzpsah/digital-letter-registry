@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: mark refreshable Drive credential strategy implemented
+- Commit: 7bb39f18cbd95aa5508999f681f722c574c8cc3e
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+
 ## 2026-10-02 — docs: sync AI state for versioned reprocessing preview
 - Commit: 932b0b530c93bbf2195da848a1ca881a7a6ebebb
 - Author: PRASHANT KUMAR SAH
