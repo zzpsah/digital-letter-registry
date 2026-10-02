@@ -95,11 +95,12 @@ function render(data){
       <h2>${esc(r.title)}</h2>
       <div class="meta">
         ${r.authority?`<span>${esc(r.authority)}</span>`:""}
+        ${r.reference_number?`<span>Ref: ${esc(r.reference_number)}</span>`:""}
         ${r.issue_date?`<span>${esc(r.issue_date)}</span>`:""}
         <span class="badge">${esc(r.status)}</span>
         ${r.file_type?`<span class="badge">${esc(r.file_type.toUpperCase())}</span>`:""}
       </div>
-      ${r.context_snippet?`<div class="snippet">${esc(r.context_snippet)}</div>`:""}
+      ${(r.summary||r.context_snippet)?`<div class="snippet">${esc(r.summary||r.context_snippet)}</div>`:""}
       ${r.action_required?`<div class="action"><strong>Action:</strong> ${esc(r.action_required)}</div>`:""}
       ${r.concepts?.length?`<div class="concepts">${r.concepts.map(esc).join(" · ")}</div>`:""}
       <div class="row" style="margin-top:12px">
