@@ -275,6 +275,35 @@ class SupabasePasswordlessAuth:
             confirmation_required=True,
         )
 
+    def confirm_account_as_admin(
+        self,
+        *,
+        access_token: str,
+        target_user_id: str,
+    ) -> None:
+        token = access_token.strip()
+        user_id = target_user_id.strip()
+        if not token:
+            raise ValueError("access_token is required")
+        if not user_id:
+            raise ValueError("target_user_id is required")
+
+        req = request.Request(
+            f"{self.base_url.rstrip('/')}/functions/v1/dlr-confirm-account",
+            data=json.dumps({"target_user_id": user_id}).encode("utf-8"),
+            headers={
+                "apikey": self.publishable_key,
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        status, _ = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise SupabaseAuthError(
+                f"unexpected DLR account confirmation HTTP status: {status}"
+            )
+
     def sign_in_with_password(
         self,
         *,
