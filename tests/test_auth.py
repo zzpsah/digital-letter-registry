@@ -50,6 +50,107 @@ class SupabasePasswordlessAuthTests(unittest.TestCase):
         )
         self.assertTrue(auth.provider_enabled("google"))
 
+    def test_magic_link_invite_can_create_user_with_invite_metadata(self):
+        seen = {}
+
+        def executor(req):
+            seen["body"] = json.loads(req.data.decode("utf-8"))
+            return 200, "{}"
+
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=executor,
+        )
+        auth.send_magic_link(
+            email="new@example.com",
+            redirect_to="https://archive.example.com/auth/confirm",
+            create_user=True,
+            invite_code="11111111-1111-4111-8111-111111111111",
+        )
+
+        self.assertTrue(seen["body"]["create_user"])
+        self.assertEqual(
+            seen["body"]["data"]["dlr_invite_code"],
+            "11111111-1111-4111-8111-111111111111",
+        )
+
+    def test_invite_validation_returns_boolean(self):
+        seen = {}
+
+        def executor(req):
+            seen["url"] = req.full_url
+            seen["body"] = json.loads(req.data.decode("utf-8"))
+            return 200, "true"
+
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=executor,
+        )
+        self.assertTrue(
+            auth.validate_archive_invite(
+                email="USER@example.com",
+                invite_code="11111111-1111-4111-8111-111111111111",
+            )
+        )
+        self.assertIn("dlr_validate_archive_invite", seen["url"])
+        self.assertEqual(seen["body"]["target_email"], "user@example.com")
+
+    def test_password_signup_returns_session_when_autoconfirmed(self):
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=lambda req: (
+                200,
+                json.dumps(
+                    {
+                        "access_token": "synthetic-access",
+                        "refresh_token": "synthetic-refresh",
+                        "expires_in": 3600,
+                    }
+                ),
+            ),
+        )
+        result = auth.sign_up_with_password(
+            email="new@example.com",
+            password="synthetic-password",
+            invite_code="11111111-1111-4111-8111-111111111111",
+        )
+        self.assertFalse(result.confirmation_required)
+        self.assertIsNotNone(result.session)
+        self.assertEqual(result.session.access_token, "synthetic-access")
+
+    def test_password_signup_reports_email_confirmation_required(self):
+        seen = {}
+
+        def executor(req):
+            seen["body"] = json.loads(req.data.decode("utf-8"))
+            return 200, json.dumps(
+                {
+                    "user": {
+                        "id": "11111111-1111-4111-8111-111111111111"
+                    }
+                }
+            )
+
+        auth = SupabasePasswordlessAuth(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            http_executor=executor,
+        )
+        result = auth.sign_up_with_password(
+            email="new@example.com",
+            password="synthetic-password",
+            invite_code="22222222-2222-4222-8222-222222222222",
+        )
+        self.assertTrue(result.confirmation_required)
+        self.assertIsNone(result.session)
+        self.assertEqual(
+            seen["body"]["data"]["dlr_invite_code"],
+            "22222222-2222-4222-8222-222222222222",
+        )
+
     def test_magic_link_disables_new_user_creation(self):
         seen = {}
 

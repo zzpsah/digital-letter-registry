@@ -46,6 +46,12 @@ class SupabaseAuthSession:
             raise ValueError("expires_in must be positive")
 
 
+@dataclass(frozen=True, slots=True)
+class SupabaseSignupResult:
+    session: SupabaseAuthSession | None
+    confirmation_required: bool
+
+
 @dataclass(slots=True)
 class SupabasePasswordlessAuth:
     base_url: str
@@ -125,6 +131,8 @@ class SupabasePasswordlessAuth:
         *,
         email: str,
         redirect_to: str,
+        create_user: bool = False,
+        invite_code: str | None = None,
     ) -> None:
         normalized = email.strip().lower()
         if (
@@ -136,14 +144,16 @@ class SupabasePasswordlessAuth:
         target = self._validate_redirect_to(redirect_to)
 
         query = parse.urlencode({"redirect_to": target})
+        payload: dict[str, object] = {
+            "email": normalized,
+            "create_user": create_user,
+        }
+        if invite_code:
+            payload["data"] = {"dlr_invite_code": invite_code.strip()}
+
         req = request.Request(
             f"{self.base_url.rstrip('/')}/auth/v1/otp?{query}",
-            data=json.dumps(
-                {
-                    "email": normalized,
-                    "create_user": False,
-                }
-            ).encode("utf-8"),
+            data=json.dumps(payload).encode("utf-8"),
             headers={
                 "apikey": self.publishable_key,
                 "Content-Type": "application/json",
@@ -155,6 +165,116 @@ class SupabasePasswordlessAuth:
             raise SupabaseAuthError(
                 f"unexpected Supabase Auth HTTP status: {status}"
             )
+
+    def validate_archive_invite(
+        self,
+        *,
+        email: str,
+        invite_code: str,
+    ) -> bool:
+        normalized = email.strip().lower()
+        if (
+            not normalized
+            or "@" not in normalized
+            or len(normalized) > 320
+        ):
+            raise ValueError("valid email is required")
+        code = invite_code.strip()
+        if not code:
+            raise ValueError("invite_code is required")
+
+        req = request.Request(
+            f"{self.base_url.rstrip('/')}/rest/v1/rpc/dlr_validate_archive_invite",
+            data=json.dumps(
+                {
+                    "target_email": normalized,
+                    "target_invite_code": code,
+                }
+            ).encode("utf-8"),
+            headers={
+                "apikey": self.publishable_key,
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            method="POST",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise SupabaseAuthError(
+                f"unexpected invite validation HTTP status: {status}"
+            )
+        try:
+            value = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise SupabaseAuthError(
+                "Supabase invite validation returned invalid JSON"
+            ) from exc
+        return value is True
+
+    def sign_up_with_password(
+        self,
+        *,
+        email: str,
+        password: str,
+        invite_code: str,
+    ) -> SupabaseSignupResult:
+        normalized = email.strip().lower()
+        if (
+            not normalized
+            or "@" not in normalized
+            or len(normalized) > 320
+        ):
+            raise ValueError("valid email is required")
+        if len(password) < 8 or len(password) > 256:
+            raise ValueError("password must be between 8 and 256 characters")
+        code = invite_code.strip()
+        if not code:
+            raise ValueError("invite_code is required")
+
+        req = request.Request(
+            f"{self.base_url.rstrip('/')}/auth/v1/signup",
+            data=json.dumps(
+                {
+                    "email": normalized,
+                    "password": password,
+                    "data": {"dlr_invite_code": code},
+                }
+            ).encode("utf-8"),
+            headers={
+                "apikey": self.publishable_key,
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise SupabaseAuthError(
+                f"unexpected Supabase signup HTTP status: {status}"
+            )
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise SupabaseAuthError(
+                "Supabase signup returned invalid JSON"
+            ) from exc
+
+        access = str(data.get("access_token") or "").strip()
+        refresh = str(data.get("refresh_token") or "").strip()
+        if access and refresh:
+            session = SupabaseAuthSession(
+                access_token=access,
+                refresh_token=refresh,
+                expires_in=int(data.get("expires_in", 3600)),
+            )
+            return SupabaseSignupResult(
+                session=session,
+                confirmation_required=False,
+            )
+
+        return SupabaseSignupResult(
+            session=None,
+            confirmation_required=True,
+        )
 
     def sign_in_with_password(
         self,

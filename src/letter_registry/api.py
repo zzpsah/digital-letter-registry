@@ -15,6 +15,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from .access import ArchiveMembership, ArchiveRole, SupabaseArchiveAccess
+from .account_admin import SupabaseArchiveAccountAdmin
 from .auth import SupabaseAuthError, SupabaseAuthSession, SupabasePasswordlessAuth
 from .channel_intake import ChannelIntakeService, IntakeChannel, IntakeProvenance, SupabaseProvenanceRepository
 from .detail import SupabaseLetterDetailRepository
@@ -70,6 +71,66 @@ class MagicLinkRequest(BaseModel):
 class PasswordLoginRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=6, max_length=256)
+
+
+class RegistrationRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    password: str = Field(min_length=8, max_length=256)
+    invite_code: str = Field(min_length=36, max_length=36)
+
+
+class RegistrationMagicLinkRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    invite_code: str = Field(min_length=36, max_length=36)
+
+
+class RegistrationResponse(BaseModel):
+    authenticated: bool
+    confirmation_required: bool
+    role: str | None = None
+    message: str
+
+
+class AdminInviteRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    role: str = Field(default="viewer", min_length=5, max_length=6)
+
+
+class AdminMemberUpdateRequest(BaseModel):
+    role: str = Field(min_length=5, max_length=6)
+    status: str = Field(min_length=6, max_length=8)
+
+
+class ArchiveAccessEntryResponse(BaseModel):
+    kind: str
+    record_id: str
+    user_id: str | None = None
+    email: str
+    role: str
+    status: str
+    invite_code: str | None = None
+    created_at: str | None = None
+
+
+class ArchiveAccessListResponse(BaseModel):
+    items: list[ArchiveAccessEntryResponse]
+
+
+class AdminInviteResponse(BaseModel):
+    invite_id: str
+    email: str
+    role: str
+    status: str
+    invite_code: str
+    user_id: str | None = None
+    registration_path: str | None = None
+
+
+class AdminMemberResponse(BaseModel):
+    user_id: str
+    email: str
+    role: str
+    status: str
 
 
 class MessageResponse(BaseModel):
@@ -515,6 +576,115 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         )
 
     @app.post(
+        "/api/v1/auth/register",
+        response_model=RegistrationResponse,
+    )
+    def register_with_password(
+        payload: RegistrationRequest,
+        _: None = Depends(_require_same_origin),
+    ) -> Response:
+        auth = SupabasePasswordlessAuth.from_environment()
+        try:
+            valid = auth.validate_archive_invite(
+                email=payload.email,
+                invite_code=payload.invite_code,
+            )
+        except (SupabaseAuthError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Registration invitation is invalid",
+            ) from exc
+        if not valid:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="A valid DLR invitation is required",
+            )
+
+        try:
+            result = auth.sign_up_with_password(
+                email=payload.email,
+                password=payload.password,
+                invite_code=payload.invite_code,
+            )
+        except (SupabaseAuthError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Account registration failed",
+            ) from exc
+
+        if result.session is None:
+            body = RegistrationResponse(
+                authenticated=False,
+                confirmation_required=True,
+                message="Account created. Confirm the email, then sign in.",
+            )
+            return Response(
+                content=body.model_dump_json(),
+                media_type="application/json",
+                status_code=status.HTTP_202_ACCEPTED,
+            )
+
+        membership = _archive_membership(result.session.access_token)
+        body = RegistrationResponse(
+            authenticated=True,
+            confirmation_required=False,
+            role=membership.role.value,
+            message="DLR account created and signed in.",
+        )
+        response = Response(
+            content=body.model_dump_json(),
+            media_type="application/json",
+        )
+        _set_session_cookies(response, result.session)
+        return response
+
+    @app.post(
+        "/api/v1/auth/register-magic-link",
+        response_model=MessageResponse,
+    )
+    def register_with_magic_link(
+        payload: RegistrationMagicLinkRequest,
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        auth = SupabasePasswordlessAuth.from_environment()
+        try:
+            valid = auth.validate_archive_invite(
+                email=payload.email,
+                invite_code=payload.invite_code,
+            )
+            if not valid:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="A valid DLR invitation is required",
+                )
+            auth.send_magic_link(
+                email=payload.email,
+                redirect_to=_required_env("AUTH_REDIRECT_URL"),
+                create_user=True,
+                invite_code=payload.invite_code,
+            )
+        except HTTPException:
+            raise
+        except SupabaseAuthError as exc:
+            if "HTTP 429" in str(exc):
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="Sign-in email rate limit reached. Try again shortly.",
+                ) from exc
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Registration email provider is temporarily unavailable.",
+            ) from exc
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Registration invitation is invalid",
+            ) from exc
+        return MessageResponse(
+            message="Registration link sent to the invited email."
+        )
+
+    @app.post(
         "/api/v1/auth/password",
         response_model=SessionStatusResponse,
     )
@@ -647,6 +817,164 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         )
         _set_session_cookies(response, session)
         return response
+
+    @app.get(
+        "/api/v1/admin/access",
+        response_model=ArchiveAccessListResponse,
+    )
+    def list_archive_access(
+        access_token: str = Depends(_access_token),
+    ) -> ArchiveAccessListResponse:
+        _archive_membership(
+            access_token,
+            roles={ArchiveRole.ADMIN},
+        )
+        service = SupabaseArchiveAccountAdmin(
+            transport=_raw_transport(access_token),
+            archive_id=_archive_id(),
+        )
+        try:
+            items = service.list_access()
+        except (SupabaseRuntimeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Archive access list is temporarily unavailable",
+            ) from exc
+        return ArchiveAccessListResponse(
+            items=[
+                ArchiveAccessEntryResponse(
+                    kind=item.kind,
+                    record_id=item.record_id,
+                    user_id=item.user_id,
+                    email=item.email,
+                    role=item.role.value,
+                    status=item.status,
+                    invite_code=item.invite_code,
+                    created_at=item.created_at,
+                )
+                for item in items
+            ]
+        )
+
+    @app.post(
+        "/api/v1/admin/invites",
+        response_model=AdminInviteResponse,
+    )
+    def create_archive_invite(
+        payload: AdminInviteRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> AdminInviteResponse:
+        _archive_membership(
+            access_token,
+            roles={ArchiveRole.ADMIN},
+        )
+        try:
+            role = ArchiveRole(payload.role)
+            result = SupabaseArchiveAccountAdmin(
+                transport=_raw_transport(access_token),
+                archive_id=_archive_id(),
+            ).invite(email=payload.email, role=role)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid account invitation",
+            ) from exc
+        except SupabaseRuntimeError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Account invitation could not be created",
+            ) from exc
+        registration_path = (
+            f"/?invite={result.invite_code}"
+            if result.status == "pending"
+            else None
+        )
+        return AdminInviteResponse(
+            invite_id=result.invite_id,
+            email=result.email,
+            role=result.role.value,
+            status=result.status,
+            invite_code=result.invite_code,
+            user_id=result.user_id,
+            registration_path=registration_path,
+        )
+
+    @app.patch(
+        "/api/v1/admin/members/{user_id}",
+        response_model=AdminMemberResponse,
+    )
+    def update_archive_member(
+        user_id: str,
+        payload: AdminMemberUpdateRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> AdminMemberResponse:
+        _archive_membership(
+            access_token,
+            roles={ArchiveRole.ADMIN},
+        )
+        try:
+            role = ArchiveRole(payload.role)
+            result = SupabaseArchiveAccountAdmin(
+                transport=_raw_transport(access_token),
+                archive_id=_archive_id(),
+            ).update_member(
+                user_id=user_id,
+                role=role,
+                status=payload.status,
+            )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid member update",
+            ) from exc
+        except SupabaseRuntimeError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Member update was rejected",
+            ) from exc
+        return AdminMemberResponse(
+            user_id=result.user_id,
+            email=result.email,
+            role=result.role.value,
+            status=result.status,
+        )
+
+    @app.post(
+        "/api/v1/admin/invites/{invite_id}/revoke",
+        response_model=MessageResponse,
+    )
+    def revoke_archive_invite(
+        invite_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(
+            access_token,
+            roles={ArchiveRole.ADMIN},
+        )
+        try:
+            revoked = SupabaseArchiveAccountAdmin(
+                transport=_raw_transport(access_token),
+                archive_id=_archive_id(),
+            ).revoke_invite(invite_id)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid invitation id",
+            ) from exc
+        except SupabaseRuntimeError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Invitation could not be revoked",
+            ) from exc
+        if not revoked:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Pending invitation not found",
+            )
+        return MessageResponse(message="Invitation revoked")
 
     @app.get(
         "/api/v1/readiness",

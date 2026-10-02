@@ -193,6 +193,191 @@ class ApiTests(unittest.TestCase):
                 )
         self.assertEqual(response.status_code, 403)
 
+    def test_registration_rejects_invalid_invite(self):
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.validate_archive_invite.return_value = False
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL":
+                        "https://archive.example.com/auth/confirm",
+                },
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/register",
+                    headers={"Origin": "https://archive.example.com"},
+                    json={
+                        "email": "new@example.com",
+                        "password": "synthetic-password",
+                        "invite_code":
+                            "22222222-2222-4222-8222-222222222222",
+                    },
+                )
+        self.assertEqual(response.status_code, 403)
+
+    def test_registration_can_require_email_confirmation(self):
+        from letter_registry.auth import SupabaseSignupResult
+
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            auth = factory.return_value
+            auth.validate_archive_invite.return_value = True
+            auth.sign_up_with_password.return_value = SupabaseSignupResult(
+                session=None,
+                confirmation_required=True,
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL":
+                        "https://archive.example.com/auth/confirm",
+                },
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/register",
+                    headers={"Origin": "https://archive.example.com"},
+                    json={
+                        "email": "new@example.com",
+                        "password": "synthetic-password",
+                        "invite_code":
+                            "22222222-2222-4222-8222-222222222222",
+                    },
+                )
+        self.assertEqual(response.status_code, 202)
+        self.assertTrue(response.json()["confirmation_required"])
+        self.assertFalse(response.json()["authenticated"])
+
+    def test_registration_magic_link_uses_invite_metadata(self):
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            auth = factory.return_value
+            auth.validate_archive_invite.return_value = True
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL":
+                        "https://archive.example.com/auth/confirm",
+                },
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/register-magic-link",
+                    headers={"Origin": "https://archive.example.com"},
+                    json={
+                        "email": "new@example.com",
+                        "invite_code":
+                            "22222222-2222-4222-8222-222222222222",
+                    },
+                )
+        self.assertEqual(response.status_code, 200)
+        auth.send_magic_link.assert_called_once_with(
+            email="new@example.com",
+            redirect_to="https://archive.example.com/auth/confirm",
+            create_user=True,
+            invite_code="22222222-2222-4222-8222-222222222222",
+        )
+
+    def test_admin_can_list_archive_access(self):
+        from letter_registry.account_admin import ArchiveAccessEntry
+
+        with patch(
+            "letter_registry.api._raw_transport",
+            return_value=object(),
+        ), patch(
+            "letter_registry.api.SupabaseArchiveAccountAdmin"
+        ) as service_cls:
+            service_cls.return_value.list_access.return_value = [
+                ArchiveAccessEntry(
+                    kind="member",
+                    record_id="11111111-1111-4111-8111-111111111111",
+                    user_id="11111111-1111-4111-8111-111111111111",
+                    email="admin@example.com",
+                    role=ArchiveRole.ADMIN,
+                    status="active",
+                    invite_code=None,
+                    created_at="2026-10-02T00:00:00Z",
+                )
+            ]
+            with patch.dict(
+                os.environ,
+                {"DLR_ARCHIVE_ID": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"},
+                clear=False,
+            ):
+                response = self.client.get(
+                    "/api/v1/admin/access",
+                    headers={"Authorization": "Bearer synthetic-user-token"},
+                )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["items"][0]["role"], "admin")
+
+    def test_admin_can_create_invite(self):
+        from letter_registry.account_admin import ArchiveInviteResult
+
+        with patch(
+            "letter_registry.api._raw_transport",
+            return_value=object(),
+        ), patch(
+            "letter_registry.api.SupabaseArchiveAccountAdmin"
+        ) as service_cls:
+            service_cls.return_value.invite.return_value = ArchiveInviteResult(
+                invite_id="33333333-3333-4333-8333-333333333333",
+                email="new@example.com",
+                role=ArchiveRole.VIEWER,
+                status="pending",
+                invite_code="44444444-4444-4444-8444-444444444444",
+                user_id=None,
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL":
+                        "https://archive.example.com/auth/confirm",
+                    "DLR_ARCHIVE_ID":
+                        "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                },
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/admin/invites",
+                    headers={
+                        "Authorization": "Bearer synthetic-user-token",
+                        "Origin": "https://archive.example.com",
+                    },
+                    json={
+                        "email": "new@example.com",
+                        "role": "viewer",
+                    },
+                )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            "44444444-4444-4444-8444-444444444444",
+            response.json()["registration_path"],
+        )
+
+    def test_non_admin_cannot_manage_access(self):
+        from fastapi import HTTPException
+
+        self.archive_membership.side_effect = HTTPException(
+            status_code=403,
+            detail="archive role does not permit this action",
+        )
+        with patch.dict(
+            os.environ,
+            {"DLR_ARCHIVE_ID": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"},
+            clear=False,
+        ):
+            response = self.client.get(
+                "/api/v1/admin/access",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+            )
+        self.assertEqual(response.status_code, 403)
+
     def test_viewer_cannot_open_intake_runtime(self):
         from fastapi import HTTPException
 
