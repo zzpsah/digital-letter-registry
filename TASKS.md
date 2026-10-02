@@ -16,7 +16,7 @@
 - [x] Add Unicode-safe Hindi/English/Hinglish filename generation.
 - [x] Add preview-only rename mapping.
 - [ ] Confirm initial AI provider/model and fallback adapter contract.
-- [ ] Confirm the newly created archive-owner email identity for RLS-backed writes.
+- [x] Confirm the archive-owner email identity for RLS-backed writes.
 
 ## Phase 1 — Archive foundation
 
@@ -27,7 +27,8 @@
 - [x] Preserve source identity contract and compute duplicate SHA-256.
 - [x] Map original filename + immutable private storage reference through the repository layer.
 - [x] Add credential-free Supabase repository adapter with injected authenticated transport.
-- [ ] Complete real authenticated Supabase RLS insert/read test after email confirmation.
+- [x] Implement runtime authenticated Supabase transport and guarded synthetic integration command.
+- [ ] Execute authenticated live synthetic insert/read + RLS denial test with runtime session.
 
 ## Phase 2 — Extraction/context
 
