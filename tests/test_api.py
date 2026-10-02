@@ -205,6 +205,40 @@ class ApiTests(unittest.TestCase):
                 )
         self.assertEqual(response.status_code, 403)
 
+    def test_create_account_uses_password_signup_without_invite(self):
+        from letter_registry.auth import SupabaseSignupResult
+
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.sign_up_with_password.return_value = (
+                SupabaseSignupResult(
+                    session=None,
+                    confirmation_required=True,
+                )
+            )
+            with patch.dict(
+                os.environ,
+                {"AUTH_APP_ORIGIN": "https://archive.example.com"},
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/create-account",
+                    headers={"Origin": "https://archive.example.com"},
+                    json={
+                        "email": "new@example.com",
+                        "password": "synthetic-password",
+                    },
+                )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertFalse(response.json()["authenticated"])
+        self.assertTrue(response.json()["confirmation_required"])
+        factory.return_value.sign_up_with_password.assert_called_once_with(
+            email="new@example.com",
+            password="synthetic-password",
+        )
+
     def test_registration_rejects_invalid_invite(self):
         with patch(
             "letter_registry.api.SupabasePasswordlessAuth.from_environment"
