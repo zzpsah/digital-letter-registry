@@ -154,9 +154,12 @@ class AuthProvidersResponse(BaseModel):
 
 
 class FragmentSessionRequest(BaseModel):
-    access_token: str = Field(min_length=20)
-    refresh_token: str = Field(min_length=20)
-    expires_in: int = Field(default=3600, ge=60)
+    # Token format/length is owned by Supabase and may change. Keep request
+    # validation permissive here; the access token is validated against
+    # Supabase immediately before any DLR session cookie is issued.
+    access_token: str = Field(min_length=1, max_length=16384)
+    refresh_token: str = Field(min_length=1, max_length=8192)
+    expires_in: int = Field(default=3600, ge=1, le=604800)
 
 
 class RuntimeCapabilitiesResponse(BaseModel):
