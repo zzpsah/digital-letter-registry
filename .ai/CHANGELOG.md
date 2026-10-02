@@ -1,3 +1,10 @@
+## 2026-10-02 — fix: accept project session expiry
+- Commit: 117deba5e1cb607599424fce366b5b4822615877
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — docs: record synthetic RLS cleanup
 - Commit: bee23e8f22bd6df302e1101438cf8ae10bd5c443
 - Author: PRASHANT KUMAR SAH

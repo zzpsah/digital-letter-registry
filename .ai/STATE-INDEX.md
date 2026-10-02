@@ -6,10 +6,10 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: bee23e8f22bd6df302e1101438cf8ae10bd5c443
-- Last commit: docs: record synthetic RLS cleanup
+- HEAD: 117deba5e1cb607599424fce366b5b4822615877
+- Last commit: fix: accept project session expiry
 - Last commit date: 2026-10-02
-- Last commit author: PRASHANT KUMAR SAH
+- Last commit author: Prashant
 
 ## Context health
 - Overall: healthy
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

@@ -63,7 +63,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Refreshable Drive OAuth, original streaming, live Gemini verification, and the real owner bearer-session vertical slice remain pending.
 
 ## Last automated change
-- Commit: adf84d9f3d83d86060eebfb1867583d4caa9e94f
-- Change: security: harden magic-link fragment callback
+- Commit: 117deba5e1cb607599424fce366b5b4822615877
+- Change: fix: accept project session expiry
 - Date: 2026-10-02
 - Durable context synchronization: completed
