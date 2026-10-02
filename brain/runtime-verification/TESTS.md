@@ -12,3 +12,9 @@ Not yet passed:
 - Gemini runtime synthetic test.
 
 Data note: one synthetic verification row remains; no real archive-letter row exists.
+
+## OCR readiness override verification
+
+Passed:
+- Focused runtime-readiness unit suite: 5/5.
+- The configured-command test confirms explicit OCR paths are resolved without exposing them in readiness output.
