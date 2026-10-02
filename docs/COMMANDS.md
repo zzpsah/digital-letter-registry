@@ -79,3 +79,33 @@ Do not commit the real API key. The model name is configurable so the archive ca
 ## Production
 
 No production deployment command is defined.
+
+
+## FastAPI local development
+
+Install the package, then run the private app locally:
+
+```bash
+python3 -m pip install -e .
+fastapi dev
+```
+
+Required runtime configuration for authenticated search:
+
+```bash
+SUPABASE_URL=...
+SUPABASE_PUBLISHABLE_KEY=...
+AUTH_REDIRECT_URL=http://localhost:8000/auth/callback
+```
+
+For hybrid semantic search also provide:
+
+```bash
+GEMINI_API_KEY=...
+EMBEDDING_MODEL=gemini-embedding-2
+EMBEDDING_DIMENSIONS=768
+```
+
+The passwordless redirect URL must be explicitly allowlisted in Supabase Auth settings. Do not use a private Drive URL or object ID as an auth redirect.
+
+The PWA service worker caches only the application shell. It intentionally does not cache `/api/` responses or private letter data.
