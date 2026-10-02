@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: define Magic Link authentication scope
+- Commit: c41060e2828255bd6006a27c4439617de046525a
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/HANDOFF.md`
+
 ## 2026-10-02 — docs: remove stale Drive read-only handoff state
 - Commit: 6a7046fd1a00746f0aba92fc54d1ee63fbb67c77
 - Author: PRASHANT KUMAR SAH

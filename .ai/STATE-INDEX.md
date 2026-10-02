@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 6a7046fd1a00746f0aba92fc54d1ee63fbb67c77
-- Last commit: docs: remove stale Drive read-only handoff state
+- HEAD: c41060e2828255bd6006a27c4439617de046525a
+- Last commit: docs: define Magic Link authentication scope
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
