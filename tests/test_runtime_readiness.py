@@ -125,23 +125,18 @@ class RuntimeReadinessTests(unittest.TestCase):
                 "letter_registry.runtime_readiness.shutil.which",
                 side_effect=lambda name: name if name.startswith("/private/tools/") else None,
             ):
-                class Result:
-                    returncode = 0
-                    stdout = "List of available languages\\neng\\nhin\\n"
-                    stderr = ""
-
                 with patch(
-                    "letter_registry.runtime_readiness.subprocess.run",
-                    return_value=Result(),
-                ):
+                    "letter_registry.runtime_readiness._ocr_languages",
+                    return_value={"eng", "hin"},
+                ) as languages:
                     readiness = check_runtime_readiness()
 
         checks = {item.name: item for item in readiness.checks}
         self.assertTrue(checks["tesseract"].ready)
         self.assertTrue(checks["ocrmypdf"].ready)
         self.assertTrue(checks["ocr_languages_hin_eng"].ready)
+        languages.assert_called_once_with("/private/tools/tesseract")
         self.assertNotIn("/private/tools/", str(readiness.as_dict()))
-
 
 if __name__ == "__main__":
     unittest.main()
