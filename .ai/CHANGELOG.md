@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add processing version registry domain
+- Commit: 13d48a0767f77320624483900b421b6859343afb
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/version_registry.py`
+
 ## 2026-10-02 — test: cover non-destructive reprocessing preview
 - Commit: 7981dc9eb44f8ce4675642345051e474e1482e63
 - Author: PRASHANT KUMAR SAH

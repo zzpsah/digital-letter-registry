@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 7981dc9eb44f8ce4675642345051e474e1482e63
-- Last commit: test: cover non-destructive reprocessing preview
+- HEAD: 13d48a0767f77320624483900b421b6859343afb
+- Last commit: feat: add processing version registry domain
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
