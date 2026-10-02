@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: update Drive OAuth tasks for Bitwarden cutover
+- Commit: a0b5f293c7a230d03e31f7762f08d8c096eda863
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+
 ## 2026-10-02 — docs: sync DLR Drive OAuth secret-manager state
 - Commit: 9b74b472f87549a7a4e8216428cbcd0b1822d552
 - Author: PRASHANT KUMAR SAH
