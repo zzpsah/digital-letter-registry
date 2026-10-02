@@ -75,6 +75,19 @@
     </details>
   </section>
 
+  <section id="accountBox" class="card" style="display:none">
+    <h2>Account</h2>
+    <div class="muted">Password set/change करें. बाद में इसी email + password से किसी भी computer पर sign in कर सकते हैं.</div>
+    <form id="passwordChangeForm" style="margin-top:10px">
+      <input id="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="New password (8+ characters)" style="width:100%;margin-bottom:8px" required>
+      <div class="row">
+        <input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Confirm password" style="flex:1;min-width:0" required>
+        <button class="primary" type="submit">Save password</button>
+      </div>
+    </form>
+    <div id="passwordChangeStatus" class="muted" style="margin-top:8px"></div>
+  </section>
+
   <section id="uploadBox" class="card" style="display:none">
     <div class="row">
       <div>
@@ -156,6 +169,7 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 function setSessionUi(signedIn){
   $("loginBox").style.display=signedIn?"none":"block";
   $("sessionBar").style.display=signedIn?"flex":"none";
+  $("accountBox").style.display=signedIn?"block":"none";
   if(!signedIn)$("adminBox").style.display="none";
   if(signedIn)$("status").textContent="Authenticated session active.";
 }
@@ -359,6 +373,35 @@ $("passwordLoginForm").addEventListener("submit",async e=>{
   $("passwordLoginPassword").value="";
   $("passwordLoginStatus").textContent="Signed in.";
   await refreshSessionUi();
+});
+
+$("passwordChangeForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const password=$("newPassword").value;
+  const confirm=$("confirmPassword").value;
+  if(password.length<8){
+    $("passwordChangeStatus").textContent="Password कम से कम 8 characters का रखें.";
+    return;
+  }
+  if(password!==confirm){
+    $("passwordChangeStatus").textContent="दोनों password match नहीं कर रहे.";
+    return;
+  }
+  $("passwordChangeStatus").textContent="Password update हो रहा है…";
+  const res=await fetch("/api/v1/auth/password/change",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({password})
+  });
+  let body={};
+  try{body=await res.json();}catch{}
+  if(!res.ok){
+    $("passwordChangeStatus").textContent=body.detail||"Password update failed.";
+    return;
+  }
+  $("newPassword").value="";
+  $("confirmPassword").value="";
+  $("passwordChangeStatus").textContent=body.message||"Password updated.";
 });
 
 $("loginForm").addEventListener("submit",async e=>{
