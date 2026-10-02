@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: prefer secret-manager Drive OAuth injection
+- Commit: d0fd41d92183397a4a9bd70a8b1907007ed4a116
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `.env.example`
+
 ## 2026-10-02 — feat: prefer injected Drive OAuth refresh credentials
 - Commit: 25ebe28102ec812f7135ff86fd0b397b498bb333
 - Author: Prashant
