@@ -23,3 +23,14 @@ Last updated: 2026-10-02.
 ## Security observations
 - Supabase security advisor reports leaked-password protection disabled; enabling it is pending external Auth configuration.
 - SECURITY DEFINER advisor warnings exist for invitation/admin RPCs. These functions are intentionally privileged but contain explicit archive-admin or invite-secret checks and fixed search paths; retain review before changing them.
+
+
+## Latest verification
+
+- Hosted admin/editor/viewer/non-member RLS matrix verified with synthetic JWT-claim simulation.
+- All expected role boundaries passed.
+- Cleanup verified with no synthetic residue.
+- Admin UI now supports one-click registration email for pending invites using the existing invite-validated registration Magic Link path.
+- Copy-invite links and email onboarding use fragment-based invite secrets.
+- Full synthetic suite: 251/251 passed.
+- Fresh owner Magic Link delivery is working again. Automated redemption of the one-time email credential was not forwarded into remote execution; the real short-lived owner bearer-session/PostgREST vertical slice therefore remains pending.
