@@ -5,10 +5,9 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
 
-from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi.responses import FileResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
@@ -16,6 +15,7 @@ from .auth import SupabasePasswordlessAuth
 from .detail import SupabaseLetterDetailRepository
 from .gemini_embeddings import GeminiEmbeddingProvider
 from .hybrid_search import HybridSearchRepository
+from .original_access import SupabaseOriginalAccessService
 from .search import SearchFilters, SupabaseSearchRepository
 from .semantic_search import SupabaseEmbeddingRepository
 from .supabase_runtime import SupabasePostgrestTransport
@@ -71,15 +71,9 @@ class SearchResponse(BaseModel):
     results: list[SearchCard]
 
 
-class OriginalAccessService(Protocol):
-    def resolve(self, *, record_id: str, access_token: str) -> str:
-        """Return a short-lived authenticated URL without exposing storage IDs."""
-        ...
-
-
 @dataclass(slots=True)
 class ApiDependencies:
-    original_access: OriginalAccessService | None = None
+    original_access: SupabaseOriginalAccessService | None = None
 
 
 def _required_env(name: str) -> str:
@@ -266,17 +260,32 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     def open_original(
         record_id: str,
         access_token: str = Depends(_access_token),
-    ) -> RedirectResponse:
+    ) -> Response:
         if deps.original_access is None:
             raise HTTPException(
                 status_code=status.HTTP_501_NOT_IMPLEMENTED,
                 detail="Private original-file resolver is not configured yet",
             )
-        url = deps.original_access.resolve(
+
+        original = deps.original_access.fetch(
             record_id=record_id,
-            access_token=access_token,
+            database=_transport(access_token),
         )
-        return RedirectResponse(url=url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+        if original is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Letter not found",
+            )
+
+        safe_name = original.filename.replace('"', "")
+        return Response(
+            content=original.content,
+            media_type=original.content_type,
+            headers={
+                "Content-Disposition": f'inline; filename="{safe_name}"',
+                "Cache-Control": "private, no-store",
+            },
+        )
 
     return app
 
