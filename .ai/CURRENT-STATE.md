@@ -100,7 +100,7 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Application CI recently exposed and led to fixes for native-PDF syntax and blank-embedding validation; final green verification is pending the newest workflow run.
 
 ## Last automated change
-- Commit: 167ebb20a0282e8858b118429cdb12c6a67f3173
-- Change: ci: run vendored DevOS context sync locally
+- Commit: 8212058d3f30aca4db42b4838e3a74fbf8276e82
+- Change: fix: repair Google Drive object reference validation syntax
 - Date: 2026-10-02
 - Durable context synchronization: completed
