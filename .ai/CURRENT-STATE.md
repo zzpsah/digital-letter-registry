@@ -34,8 +34,8 @@
 ## Next step
 
 1. Complete the authenticated owner-session HTTP/PostgREST synthetic vertical slice with a real short-lived session using the dedicated tailnet-only HTTPS callback. Current blocker is Supabase email-send throttling, not routing or application health.
-2. Refreshable Google Drive OAuth + private original streaming are complete for read-only access.
-3. Verify the synthetic upload/write path only after an explicitly approved write-capable Drive scope is configured.
+2. Refreshable Google Drive OAuth is complete with secret-manager-backed write-capable access; read/list/stream plus disposable synthetic upload/delete verification passed.
+3. Synthetic upload/write verification is complete; real archive mutations remain separately disabled/approval-gated.
 4. Configure and verify Gemini runtime credentials using synthetic data only.
 5. Retained synthetic DB verification row cleanup is complete; no rows remain in `letters`.
 6. Re-check readiness before considering any real-letter intake.
@@ -62,14 +62,21 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Dedicated tailnet-only HTTPS routing verified from an authorized tailnet client.
 - Supabase Management Auth-config helper focused suite: 4/4 passed.
 - Existing Supabase runtime credentials are sufficient for application access but not for Management API Auth-template changes.
-- Secret-manager-backed Google Drive OAuth runtime is configured and verified; refresh/list/stream all passed against synthetic-only data. The currently stored grant remains read-only until the separately approved write-capable re-consent is completed.
+- Secret-manager-backed Google Drive OAuth runtime is configured and verified with a write-capable grant; refresh/list/stream and disposable synthetic upload/stream/delete cleanup all passed.
 - The older `phone_drive` rclone path remains separate and unused by DLR.
 - Runtime readiness now reports Drive credentials configured; Gemini is the only failing readiness check.
 - Gemini runtime key remains unavailable.
-- Live Gemini verification, write-capable Drive upload verification, and the real owner bearer-session vertical slice remain pending.
+- Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
 - Commit: 25ebe28102ec812f7135ff86fd0b397b498bb333
 - Change: feat: prefer injected Drive OAuth refresh credentials
 - Date: 2026-10-02
 - Durable context synchronization: completed
+
+
+## Drive account/configuration boundary
+
+- The private runtime currently targets one explicitly configured archive-owner Google Drive.
+- DLR source is reusable with another Google account, but that account must complete OAuth consent and receive separate secret-manager credentials and archive folder references.
+- The write-capable OAuth grant is broader than the archive-specific application boundary; DLR real intake/rename/delete permissions remain independent safety decisions.
