@@ -55,3 +55,12 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - `OcrmypdfTesseractBackend` provides local Hindi+English OCR via OCRmyPDF/Tesseract and sidecar text.
 - OCR binaries/language packs are runtime dependencies, not bundled into the repo.
 - Extraction results now map into `letter_processing.extracted_text` and `ocr_version`.
+
+
+## Structured AI analysis
+
+- Provider-neutral structured document context schema is implemented.
+- Extracted text flows through deterministic Hindi/education hints before provider analysis.
+- Gemini is the first configurable adapter, using structured JSON output.
+- AI provider/model/key are runtime configuration only; database schema remains vendor-neutral.
+- Structured context persists full JSON + concepts + context version, while searchable metadata is projected into `letters`.
