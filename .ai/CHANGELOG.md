@@ -1,3 +1,10 @@
+## 2026-10-02 — fix: surface magic-link rate limits safely
+- Commit: e9172a264f896ac7e8840b8309cc19d741dc097d
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — fix: accept project session expiry
 - Commit: 117deba5e1cb607599424fce366b5b4822615877
 - Author: Prashant

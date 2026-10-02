@@ -63,7 +63,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Refreshable Drive OAuth, original streaming, live Gemini verification, and the real owner bearer-session vertical slice remain pending.
 
 ## Last automated change
-- Commit: 117deba5e1cb607599424fce366b5b4822615877
-- Change: fix: accept project session expiry
+- Commit: e9172a264f896ac7e8840b8309cc19d741dc097d
+- Change: fix: surface magic-link rate limits safely
 - Date: 2026-10-02
 - Durable context synchronization: completed

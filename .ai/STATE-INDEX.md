@@ -6,10 +6,10 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 117deba5e1cb607599424fce366b5b4822615877
-- Last commit: fix: accept project session expiry
+- HEAD: e9172a264f896ac7e8840b8309cc19d741dc097d
+- Last commit: fix: surface magic-link rate limits safely
 - Last commit date: 2026-10-02
-- Last commit author: Prashant
+- Last commit author: PRASHANT KUMAR SAH
 
 ## Context health
 - Overall: healthy
