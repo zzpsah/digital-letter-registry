@@ -17,3 +17,9 @@
 - [ ] Enable Supabase leaked-password protection.
 - [ ] Invite/create an additional dedicated admin when the intended email is chosen.
 - [ ] Complete real authenticated multi-role HTTP/PostgREST vertical slice.
+
+
+- [x] Verify hosted admin/editor/viewer/non-member RLS matrix with synthetic JWT claims.
+- [x] Verify zero synthetic residue after hosted role tests.
+- [x] Add one-click registration email action for pending invites.
+- [ ] Complete real owner bearer-session/PostgREST vertical slice through normal browser completion.
