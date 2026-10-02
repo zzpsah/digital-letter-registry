@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: show secret-safe runtime readiness in owner UI
+- Commit: 5e0fd91ca2fc3ecd7ffdf8e537e0c4b94d8bd7df
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-02 — feat: expose authenticated secret-safe readiness status
 - Commit: f3db1c66d9649f93e17a0b5659b1e2b4a7b42670
 - Author: PRASHANT KUMAR SAH
