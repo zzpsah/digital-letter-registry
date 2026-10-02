@@ -34,6 +34,7 @@ from .rename_preview import (
     build_rename_preview,
     render_rename_preview_csv,
 )
+from .search import SearchResult, SupabaseSearchRepository
 from .storage import (
     GoogleDriveOriginalStorage,
     GoogleDriveTransport,
@@ -76,6 +77,8 @@ __all__ = [
     "SupabaseLetterRepository",
     "SupabasePostgrestTransport",
     "SupabaseRuntimeError",
+    "SearchResult",
+    "SupabaseSearchRepository",
     "detect_context_hints",
     "is_usable_native_text",
     "normalize_extracted_text",
