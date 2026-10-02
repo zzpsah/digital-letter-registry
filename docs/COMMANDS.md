@@ -95,7 +95,8 @@ Required runtime configuration for authenticated search:
 ```bash
 SUPABASE_URL=...
 SUPABASE_PUBLISHABLE_KEY=...
-AUTH_REDIRECT_URL=http://localhost:8000/auth/callback
+AUTH_REDIRECT_URL=http://localhost:8000/auth/confirm
+AUTH_COOKIE_SECURE=false
 ```
 
 For hybrid semantic search also provide:
@@ -107,6 +108,8 @@ EMBEDDING_DIMENSIONS=768
 ```
 
 The passwordless redirect URL must be explicitly allowlisted in Supabase Auth settings. Do not use a private Drive URL or object ID as an auth redirect.
+
+For hosted Supabase, copy `supabase/templates/magic-link.html` into **Auth → Email Templates → Magic Link** and set the project Site URL to the app origin. The template sends `TokenHash` to `/auth/confirm`; the FastAPI server verifies it and stores the resulting access/refresh session only in HttpOnly cookies.
 
 The PWA service worker caches only the application shell. It intentionally does not cache `/api/` responses or private letter data.
 
