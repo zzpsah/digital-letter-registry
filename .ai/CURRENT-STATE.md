@@ -69,18 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: c6eb35b285929816b8cc9aa04133a18c9e461687
-- Change: feat: add signed-in password settings UI
+- Commit: d8bcbc5887ed052e4a033b1bb58de88c0774b66b
+- Change: fix: relax fragment token shape assumptions
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## Password login readiness
-
-- Authenticated members can set/change their Supabase Auth password from DLR.
-- DLR never stores or logs the password.
-- Account UI is deployed on the private runtime.
-- Unauthenticated password update is rejected with HTTP 401.
-- Email/password, Magic Link, and invite-only registration remain enabled; Google provider remains optional/off.
-- Full synthetic suite passes 255/255.
-- The bootstrap admin still needs one normal browser/email session to set its first DLR password.

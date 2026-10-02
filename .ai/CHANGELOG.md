@@ -1,3 +1,10 @@
+## 2026-10-03 — fix: relax fragment token shape assumptions
+- Commit: d8bcbc5887ed052e4a033b1bb58de88c0774b66b
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-03 — docs: record password-based login readiness
 - Commit: 2511e852c75c9b92464b452bb7becebac59d0d0c
 - Author: PRASHANT KUMAR SAH

@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 2511e852c75c9b92464b452bb7becebac59d0d0c
-- Last commit: docs: record password-based login readiness
+- HEAD: d8bcbc5887ed052e4a033b1bb58de88c0774b66b
+- Last commit: fix: relax fragment token shape assumptions
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
