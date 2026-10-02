@@ -33,10 +33,13 @@
 ## Phase 2 — Extraction/context
 
 - [x] Add provider-neutral native PDF text extraction contract and usability heuristic.
+- [x] Add concrete pypdf native-text backend.
 - [x] Add Hindi/English OCR fallback contract with versioned processing result.
-- [ ] Wire a concrete local/cloud OCR backend.
+- [x] Add concrete local OCRmyPDF/Tesseract backend contract.
+- [ ] Verify OCRmyPDF + Hindi/English language packs in the eventual runtime environment.
 - [x] Create government/education Hindi vocabulary and deterministic context hints.
 - [ ] Implement provider-independent structured AI analysis.
+- [x] Persist extracted text and extraction version into letter_processing.
 - [x] Generate normalized smart filename.
 - [x] Use `undated` and `no-ref` placeholders.
 - [x] Preserve Hindi/English/Hinglish Unicode text.
