@@ -102,6 +102,15 @@ class ReprocessingPreviewItemResponse(BaseModel):
     target_versions: dict[str, str]
 
 
+class ReprocessingEnqueueRequest(BaseModel):
+    confirm: bool = False
+    limit: int = Field(default=500, ge=1, le=500)
+
+
+class ReprocessingEnqueueResponse(BaseModel):
+    enqueued: int
+
+
 class ReprocessingPreviewResponse(BaseModel):
     count: int
     items: list[ReprocessingPreviewItemResponse]
