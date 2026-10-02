@@ -29,6 +29,7 @@ from .session import SupabaseUserSession
 from .storage import GoogleDriveOriginalStorage
 from .supabase_repository import SupabaseLetterRepository
 from .supabase_runtime import SupabasePostgrestTransport
+from .versions import current_processing_versions
 from .version_registry import ProcessingTargetVersions, SupabaseProcessingVersionRegistry
 
 
@@ -109,6 +110,10 @@ class ReprocessingEnqueueRequest(BaseModel):
 
 class ReprocessingEnqueueResponse(BaseModel):
     enqueued: int
+
+
+class ProcessingVersionsResponse(BaseModel):
+    versions: dict[str, str]
 
 
 class ReprocessingPreviewResponse(BaseModel):
@@ -325,27 +330,44 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         )
 
     @app.get(
+        "/api/v1/processing/versions",
+        response_model=ProcessingVersionsResponse,
+    )
+    def processing_versions(
+        access_token: str = Depends(_access_token),
+    ) -> ProcessingVersionsResponse:
+        _transport(access_token)
+        return ProcessingVersionsResponse(
+            versions=current_processing_versions().to_dict()
+        )
+
+    @app.get(
         "/api/v1/reprocessing/preview",
         response_model=ReprocessingPreviewResponse,
     )
     def preview_reprocessing(
-        ocr_version: str = Query(..., min_length=1),
-        context_version: str = Query(..., min_length=1),
-        dictionary_version: str = Query(..., min_length=1),
-        filename_rule_version: str = Query(..., min_length=1),
-        category_schema_version: str = Query(..., min_length=1),
-        embedding_version: str = Query(..., min_length=1),
-        status_rule_version: str = Query(..., min_length=1),
+        ocr_version: str | None = Query(default=None, min_length=1),
+        context_version: str | None = Query(default=None, min_length=1),
+        dictionary_version: str | None = Query(default=None, min_length=1),
+        filename_rule_version: str | None = Query(default=None, min_length=1),
+        category_schema_version: str | None = Query(default=None, min_length=1),
+        embedding_version: str | None = Query(default=None, min_length=1),
+        status_rule_version: str | None = Query(default=None, min_length=1),
         access_token: str = Depends(_access_token),
     ) -> ReprocessingPreviewResponse:
+        current = current_processing_versions().reprocessing_targets()
         targets = ReprocessingTargets(
-            ocr_version=ocr_version,
-            context_version=context_version,
-            dictionary_version=dictionary_version,
-            filename_rule_version=filename_rule_version,
-            category_schema_version=category_schema_version,
-            embedding_version=embedding_version,
-            status_rule_version=status_rule_version,
+            ocr_version=ocr_version or current.ocr_version,
+            context_version=context_version or current.context_version,
+            dictionary_version=dictionary_version or current.dictionary_version,
+            filename_rule_version=(
+                filename_rule_version or current.filename_rule_version
+            ),
+            category_schema_version=(
+                category_schema_version or current.category_schema_version
+            ),
+            embedding_version=embedding_version or current.embedding_version,
+            status_rule_version=status_rule_version or current.status_rule_version,
         )
         items = SupabaseReprocessingPlanner(
             _transport(access_token)
