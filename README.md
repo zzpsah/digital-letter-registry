@@ -180,3 +180,16 @@ Verified production behavior:
 The current Vercel deployment does not receive the private Google Drive OAuth credentials. Original-file streaming, Drive writes, OCR/system-binary processing, and other private-worker responsibilities remain on the Oracle deployment until explicitly migrated.
 
 Supabase's Auth redirect allow-list still needs the Vercel origin before Magic Link callbacks should be treated as fully portable to the public Vercel URL.
+
+
+## Account creation
+
+DLR uses a password-first account workflow:
+
+1. Open `https://umv-dlr.vercel.app`.
+2. Choose **Create Account** and enter email + password.
+3. The account is created with archive access disabled.
+4. A DLR admin chooses the role and changes the account to Active.
+5. The user signs in directly with email + password.
+
+The normal UI does not require a Magic Link. New accounts do not receive archive access until an admin explicitly activates them.
