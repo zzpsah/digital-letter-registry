@@ -180,3 +180,17 @@
 - [x] Confirm the Auth user was created with invite metadata but remains unconfirmed.
 - [x] Confirm database trigger activates membership only after email confirmation.
 - [ ] Complete email confirmation; expected result is accepted invite + active admin membership.
+
+
+## Vercel hosting
+
+- [x] Add native Vercel FastAPI entrypoint and function configuration.
+- [x] Create and link the `digital-letter-registry` Vercel project.
+- [x] Configure production/preview Supabase URL, publishable key, archive ID, and real-intake-off flag.
+- [x] Deploy production successfully.
+- [x] Disable redundant Vercel Authentication protection.
+- [x] Verify home/health/auth endpoints return HTTP 200.
+- [x] Verify recent Vercel error log scan is clean.
+- [ ] Add Vercel origin to Supabase Auth redirect allow-list.
+- [ ] Authorize Vercel GitHub integration so pushes to `main` auto-deploy.
+- [ ] Migrate only the intended Drive/original-access secrets if/when Vercel should serve originals directly.
