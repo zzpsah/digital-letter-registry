@@ -135,13 +135,6 @@ class ProcessingProfileResponse(ProcessingProfileRequest):
     pass
 
 
-class ReprocessingPreviewResponse(BaseModel):
-    letter_id: str
-    title: str | None = None
-    smart_filename: str | None = None
-    differences: list[str] = Field(default_factory=list)
-
-
 class IntakeResponse(BaseModel):
     record_id: str
     original_filename: str
