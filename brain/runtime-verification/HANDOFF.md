@@ -17,4 +17,4 @@ Next safe action is completing the real short-lived authenticated HTTP/PostgREST
 - A dedicated Google OAuth client exists in the private vault from the earlier attempt, but Bitwarden CLI is unavailable on both the connected Windows host and VPS, so automatic credential retrieval is not currently possible.
 - Gemini runtime key is still unavailable; no live Gemini synthetic verification has been completed.
 
-One synthetic verification row currently remains and should be removed only through an authorized successful cleanup path.
+The synthetic verification row was removed through the authorized controlled cleanup path; `letters` is empty.
