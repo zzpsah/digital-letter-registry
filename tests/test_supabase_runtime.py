@@ -90,6 +90,30 @@ class SupabaseRuntimeTransportTests(unittest.TestCase):
         self.assertEqual(rows[0]["id"], "synthetic")
         self.assertIn("original_sha256=eq.abc", seen["url"])
 
+    def test_rpc_posts_parameters(self) -> None:
+        seen = {}
+
+        def executor(req):
+            seen["url"] = req.full_url
+            seen["body"] = json.loads(req.data.decode("utf-8"))
+            return 200, '[{"id":"synthetic"}]'
+
+        transport = SupabasePostgrestTransport(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            access_token="synthetic-token",
+            http_executor=executor,
+        )
+
+        rows = transport.rpc(
+            "search_letters",
+            {"search_query": "inter exam", "result_limit": 10},
+        )
+
+        self.assertEqual(rows[0]["id"], "synthetic")
+        self.assertTrue(seen["url"].endswith("/rest/v1/rpc/search_letters"))
+        self.assertEqual(seen["body"]["result_limit"], 10)
+
     def test_non_success_status_raises(self) -> None:
         def executor(req):
             return 401, '{"message":"denied"}'
