@@ -82,6 +82,7 @@ class DocumentProcessingWorker:
     extractor: VersionedTextExtractor
     context_provider: DocumentContextProvider
     embeddings: EmbeddingRepository
+    allow_real_documents: bool = False
 
     def run_once(self) -> WorkerRunResult:
         job = self.queue.claim_next()
@@ -92,6 +93,13 @@ class DocumentProcessingWorker:
             record = self.source_loader.load(job.letter_id)
             if record is None:
                 raise RuntimeError("archived source record was not found")
+
+            if not self.allow_real_documents:
+                name = record.original_filename.casefold()
+                if "synthetic" not in name and "test" not in name:
+                    raise RuntimeError(
+                        "real document processing is disabled by runtime safety policy"
+                    )
 
             original = self.original_access.fetch(
                 record_id=record.record_id,
