@@ -1,3 +1,10 @@
+## 2026-10-03 — test: cover simple password account creation UI
+- Commit: 24d8f646bf405a1a8c6a79fafcf63585d4f9603b
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_web_shell.py`
+
 ## 2026-10-03 — feat: simplify account creation and remove magic-link UI
 - Commit: 4f6becede525fc2d77a2c206daa06f74e3ab1969
 - Author: PRASHANT KUMAR SAH
