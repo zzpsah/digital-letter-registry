@@ -64,3 +64,8 @@ The worker now generates only conservative, reviewable relationship suggestions 
 Relationship inference is deliberately conservative and reviewable: explicit relationship wording plus a referenced prior letter is required before a suggestion is created. Suggestions do not change status until confirmed by the authenticated owner.
 
 A live processing-version registry and reprocessing preview/enqueue flow now exist. Version changes can be previewed per letter/stage first; recursive reprocessing is queued only after explicit confirmation and is idempotent for the same target-version profile.
+
+
+## Rename execution
+
+A dormant Google Drive rename path now exists behind an approval-locked executor. It cannot run from an arbitrary proposed name: the exact reviewed mapping must match its deterministic digest, explicit confirmation is required, and the current stored filename is revalidated before any mutation. No rename mapping has been approved or executed.
