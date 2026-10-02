@@ -7,11 +7,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
-from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
+from .auth import SupabasePasswordlessAuth
 from .gemini_embeddings import GeminiEmbeddingProvider
 from .hybrid_search import HybridSearchRepository
 from .search import SearchFilters, SupabaseSearchRepository
@@ -36,6 +37,14 @@ class SearchCard(BaseModel):
     rank: float
     semantic_similarity: float | None = None
     open_original_path: str
+
+
+class MagicLinkRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+
+
+class MessageResponse(BaseModel):
+    message: str
 
 
 class SearchResponse(BaseModel):
@@ -98,6 +107,30 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     @app.get("/api/v1/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.post("/api/v1/auth/magic-link", response_model=MessageResponse)
+    def send_magic_link(payload: MagicLinkRequest) -> MessageResponse:
+        redirect_to = _required_env("AUTH_REDIRECT_URL")
+        auth = SupabasePasswordlessAuth.from_environment()
+        auth.send_magic_link(email=payload.email, redirect_to=redirect_to)
+        return MessageResponse(
+            message="If this email is authorized, a sign-in link has been sent."
+        )
+
+    @app.get("/manifest.webmanifest", include_in_schema=False)
+    def manifest() -> FileResponse:
+        return FileResponse(
+            Path(__file__).with_name("web") / "manifest.webmanifest",
+            media_type="application/manifest+json",
+        )
+
+    @app.get("/sw.js", include_in_schema=False)
+    def service_worker() -> FileResponse:
+        return FileResponse(
+            Path(__file__).with_name("web") / "sw.js",
+            media_type="application/javascript",
+            headers={"Cache-Control": "no-cache"},
+        )
 
     @app.get("/api/v1/search", response_model=SearchResponse)
     def search_letters(
