@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: refresh live integration checkpoint
+- Commit: b5bd43c3d3f9a019fb42d64b3cf05ec9524c9e38
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/LIVE-INTEGRATION-CHECKPOINT.md`
+
 ## 2026-10-02 — security: harden magic-link fragment callback
 - Commit: adf84d9f3d83d86060eebfb1867583d4caa9e94f
 - Author: PRASHANT KUMAR SAH
