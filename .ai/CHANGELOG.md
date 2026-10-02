@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: add Drive runtime checkpoint
+- Commit: 0689f9f068d7e54ecc090e69533748fdabaaf77f
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-02 — docs: record verified Drive runtime
 - Commit: c3b983cbd15f7cdb309a5c9e007eb4aca83dbd19
 - Author: PRASHANT KUMAR SAH
