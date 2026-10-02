@@ -122,6 +122,44 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(body["title"], "Synthetic")
         self.assertNotIn("storage_object_id", body)
 
+    def test_original_endpoint_streams_private_bytes_without_storage_id(self):
+        from letter_registry.original_access import OriginalFile, SupabaseOriginalAccessService
+
+        class Database:
+            def select(self, table, *, filters=None, columns="*"):
+                return [{
+                    "original_filename": "synthetic.pdf",
+                    "storage_provider": "gdrive",
+                    "storage_object_id": "private-object-reference",
+                }]
+
+        class Storage:
+            def download(self, *, provider, object_reference, filename):
+                return OriginalFile(
+                    filename=filename,
+                    content_type="application/pdf",
+                    content=b"%PDF-synthetic",
+                )
+
+        app = create_app(
+            ApiDependencies(
+                original_access=SupabaseOriginalAccessService(Storage())
+            )
+        )
+        client = TestClient(app)
+        with patch("letter_registry.api._transport", return_value=Database()):
+            response = client.get(
+                "/api/v1/letters/22222222-2222-4222-8222-222222222222/original",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"%PDF-synthetic")
+        self.assertEqual(response.headers["cache-control"], "private, no-store")
+        self.assertIn("synthetic.pdf", response.headers["content-disposition"])
+        self.assertNotIn("private-object-reference", str(response.headers))
+        self.assertNotIn(b"private-object-reference", response.content)
+
     def test_original_endpoint_is_closed_until_private_resolver_exists(self):
         response = self.client.get(
             "/api/v1/letters/22222222-2222-4222-8222-222222222222/original",
