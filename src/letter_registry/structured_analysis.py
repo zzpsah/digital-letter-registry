@@ -28,6 +28,8 @@ class StructuredDocumentContext:
     subcategory: str | None = None
     summary: str | None = None
     action_required: str | None = None
+    issue_date: str | None = None
+    reference_number: str | None = None
     concepts: tuple[str, ...] = ()
     important_dates: tuple[ImportantDate, ...] = ()
     deadline: str | None = None
@@ -84,6 +86,8 @@ def analyze_document_context(
             subcategory=context.subcategory,
             summary=context.summary,
             action_required=context.action_required,
+            issue_date=context.issue_date,
+            reference_number=context.reference_number,
             concepts=merged_concepts,
             important_dates=context.important_dates,
             deadline=context.deadline,
