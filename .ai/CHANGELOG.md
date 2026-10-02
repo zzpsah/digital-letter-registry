@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: allow streamed files to retain intake provenance
+- Commit: 5418451069bc0ff9140f37ab032cdcf3f641ef85
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/channel_intake.py`
+
 ## 2026-10-02 — test: cover approval-locked historical Drive adoption
 - Commit: 194bba4f1a67be36517541f1e857e75164e3b14d
 - Author: PRASHANT KUMAR SAH

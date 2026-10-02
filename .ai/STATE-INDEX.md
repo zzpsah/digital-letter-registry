@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 194bba4f1a67be36517541f1e857e75164e3b14d
-- Last commit: test: cover approval-locked historical Drive adoption
+- HEAD: 5418451069bc0ff9140f37ab032cdcf3f641ef85
+- Last commit: feat: allow streamed files to retain intake provenance
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
