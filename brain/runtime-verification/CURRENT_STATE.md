@@ -14,7 +14,7 @@ Observed on 2026-10-02:
 - Guarded Supabase Management Auth-config helper is implemented and its focused suite passes 4/4 tests. It preserves existing redirect allow-list entries and never persists/prints the management token.
 - Hosted Supabase uses its default direct-confirmation email behavior. Dashboard inspection confirmed custom SMTP is required before editing template subject/body, so custom template application is now optional rather than a live-login blocker.
 - VPS project environment has Supabase runtime/publishable configuration but no Supabase Management API token or CLI login. The new helper is therefore ready but cannot apply hosted Auth settings until an authorized scoped management token is supplied at runtime.
-- Dedicated DLR Drive OAuth is now configured through a private chmod-0600 authorized-user JSON credentials file referenced at runtime. The grant is currently `drive.readonly`.
+- Dedicated DLR Drive OAuth is configured through secret-manager-injected refresh credentials. The persistent authorized-user runtime file was retired after cutover, and the current grant is write-capable with disposable synthetic upload/stream/delete verification.
 - Live refresh-token exchange passed. Originals listing returned one synthetic file, and the DLR GoogleDrivePrivateTransport streamed that synthetic original successfully (24,668 bytes).
 - The existing VPS `phone_drive` rclone credential remains unsuitable and is not used by DLR.
 - Gemini runtime remains unconfigured; no reusable live key was found in the inspected VPS runtime files.
