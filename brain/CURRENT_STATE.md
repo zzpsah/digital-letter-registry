@@ -21,8 +21,8 @@ Last verified: 2026-10-02
 
 ## Current gaps
 
-- Final authenticated live Supabase insert/read + anonymous/RLS denial test with a real user session is still pending.
-- Passwordless auth callback/session exchange is a runtime/deployment integration and is not implemented as raw token-handling code in this public repo.
+- Live DB-level owner RLS read/insert and cross-user isolation are verified with rollback-only synthetic transactions. A final HTTP/PostgREST test using a short-lived real user bearer session is still pending.
+- The current passwordless implicit-flow callback is implemented in the PWA: access token is kept in sessionStorage and URL fragments are scrubbed. Refresh/session renewal is intentionally not implemented yet.
 - Google Drive access-token refresh/credential lifecycle is not yet implemented.
 - Live original streaming through the API still needs runtime verification.
 - OCRmyPDF/Tesseract Hindi+English packages still need runtime-environment verification.
@@ -43,3 +43,12 @@ Never commit real letters, Drive IDs/URLs, Supabase project references/keys, OAu
 Synthetic-first private intake is implemented end-to-end in code: authenticated owner lookup, duplicate SHA preflight, immutable Drive upload, source/processing rows, durable queued job, atomic RLS-aware claim, private original download, extraction/OCR, structured context, smart filename metadata, embeddings, and durable completed/failed job transition. Real intake remains disabled by default and no production deployment has occurred.
 
 PDF and image paths are both represented: PDF uses native text then OCRmyPDF/Tesseract fallback; JPG/JPEG/PNG uses direct Tesseract Hindi+English OCR. The remaining milestone is live synthetic runtime verification with short-lived user/Drive credentials and locally available OCR binaries.
+
+
+## 2026-10-02 — Schema sync and auth shell
+
+- Applied the pending relationship-review migration to the empty archive database.
+- Live schema now includes processing jobs, search/semantic RPCs, summary/reference metadata, and reviewable relationship lifecycle.
+- Verified RLS owner access and cross-user isolation without retaining test rows.
+- PWA now captures implicit magic-link sessions safely on the client and can open streamed original bytes.
+- No real letter ingestion, rename execution, or production deployment occurred.
