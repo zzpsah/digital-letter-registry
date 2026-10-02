@@ -53,3 +53,8 @@ The provider-neutral context schema and extraction→context→persistence pipel
 ## Search foundation
 
 The separate archive database now has live full-text + trigram search via `search_letters`, plus covering indexes for reported foreign-key gaps. Search remains RLS-protected. Semantic embeddings/ranking are the next search layer.
+
+
+## Semantic search
+
+The live archive database now has 768-dimensional pgvector storage, HNSW cosine indexing, semantic chunk search, and application-level hybrid ranking that merges text/fuzzy relevance with semantic similarity. Embeddings are version-filtered to support safe future reprocessing.
