@@ -17,12 +17,12 @@ Last verified: 2026-10-02
 - FastAPI + Hindi-first mobile PWA, filtered search, safe letter detail, and passwordless login-request endpoint are implemented.
 - Original-file access stays server-side; private Drive object IDs are not returned to the browser.
 - Google Drive server-side reader is implemented using runtime-only OAuth access token.
-- Application tests and DevOS context-sync are green.
+- Application tests and DevOS context-sync are green. Oracle ARM64 runtime has a Python 3.12 virtual environment and passes the full synthetic suite (188/188). A localhost-only FastAPI smoke test verified health/PWA 200 responses and unauthenticated session/search 401 boundaries.
 
 ## Current gaps
 
 - Live DB-level owner RLS read/insert and cross-user isolation are verified with rollback-only synthetic transactions. A final HTTP/PostgREST test using a short-lived real user bearer session is still pending.
-- The current passwordless implicit-flow callback is implemented in the PWA: access token is kept in sessionStorage and URL fragments are scrubbed. Refresh/session renewal is intentionally not implemented yet.
+- Passwordless auth now uses a server-side token-hash callback with Secure HttpOnly access/refresh cookies and refresh rotation. The PWA does not persist auth tokens in browser storage.
 - Google Drive OAuth refresh-token lifecycle is implemented with in-memory access-token caching; live runtime verification is still pending.
 - Live original streaming through the API still needs runtime verification.
 - OCRmyPDF/Tesseract Hindi+English packages still need runtime-environment verification.
@@ -31,7 +31,7 @@ Last verified: 2026-10-02
 
 ## Next action
 
-Implement the private upload/intake API and durable processing-queue boundary using synthetic fixtures, then run one complete authenticated synthetic vertical slice before any real-letter intake.
+Complete the authenticated synthetic HTTP/PostgREST vertical slice with a short-lived owner session and refreshable Drive credentials. OCR runtime verification is also pending because Oracle package installation currently requires interactive sudo authorization.
 
 ## Safety
 
@@ -79,3 +79,12 @@ Historical import is implemented as preview-first, approval-locked adoption. Loc
 ## Intake channels
 
 Provider-neutral adapters now normalize Telegram, WhatsApp, email, watched-folder, and web-style attachments into the canonical IntakeService. Owner-scoped source provenance is persisted in the live `letter_sources` schema without storing attachment bytes in provenance records. No live external connector has been activated yet; runtime connector wiring and synthetic end-to-end verification remain pending.
+
+
+## Oracle runtime verification
+
+- Oracle repository was fast-forwarded cleanly to the current main branch; no local source changes were present.
+- A project-local Python 3.12 virtual environment is installed and the full synthetic test suite passes: 188/188.
+- A temporary localhost-only FastAPI smoke run verified `/api/v1/health` = 200, Hindi PWA shell = 200, unauthenticated session = 401, and unauthenticated search = 401; the temporary process was stopped afterward.
+- ARM64 Ubuntu repositories provide Tesseract, Hindi/English language packs, and OCRmyPDF, but package installation is still pending because the `prashant` account requires interactive sudo authorization.
+- Supabase performance advisor no longer reports duplicate processing-profile RLS policies after cleanup. Remaining unused-index notices are informational while the archive is nearly empty.
