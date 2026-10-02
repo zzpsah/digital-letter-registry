@@ -58,3 +58,12 @@ Verification:
 - private service restarted healthy.
 
 A fresh email send was rate-limited, so browser retry is pending using an earlier unconsumed Magic Link if still valid.
+
+
+## Second admin onboarding
+
+A second administrator invitation is pending through the normal invite-only onboarding flow. The registration email was sent successfully. Supabase created the unconfirmed Auth user with the invite metadata, while archive membership remains absent until email ownership is confirmed.
+
+The existing database trigger `dlr_claim_archive_invite_on_auth_user` runs after user insert or email confirmation update. Once the invited email is confirmed, it will atomically create/update the active archive admin membership and mark the invite accepted.
+
+No raw Auth-user insertion or confirmation bypass was used.
