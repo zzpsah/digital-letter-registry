@@ -53,11 +53,21 @@
 - [x] Add live full-text + trigram search RPC with combined text/fuzzy ranking.
 - [x] Responsive Hindi-first mobile web/PWA shell.
 - [x] Filters: year, authority, category, file type, validity/status.
-- [ ] Open/download original from every result after private server-side Drive resolver is wired.
+- [x] Server-side private original streaming contract + Google Drive reader implemented.
+- [ ] Verify live runtime original streaming with short-lived/refreshable Drive credentials.
 
 - [x] Passwordless email login request endpoint for existing authorized users.
 - [ ] Complete deployment-time auth callback/session exchange without exposing tokens in the public repo.
 - [x] Authenticated safe letter-detail endpoint without storage IDs.
+
+## Phase 3.5 — Intake/runtime
+
+- [ ] Private upload/intake API with synthetic-first safety guard.
+- [ ] Durable processing-job queue contract.
+- [ ] Upload → archive source → enqueue derived processing.
+- [ ] Live authenticated synthetic API vertical slice.
+- [ ] Runtime auth callback/session exchange without exposing tokens.
+- [ ] Refreshable Google Drive credential strategy.
 
 ## Phase 4 — Intelligence lifecycle
 
@@ -70,8 +80,8 @@
 
 ## Current safety boundary
 
-- Drive archive folders remain private and empty.
+- Drive archive folders remain private; only a synthetic integration test file has been used.
 - Rename behavior is preview-only.
-- No live document ingestion has occurred.
+- No real archive-letter ingestion has occurred; only synthetic integration data has been used.
 - No production deployment is claimed.
 - No Drive IDs/URLs, Supabase credentials, SSH keys, or server details belong in public Git.
