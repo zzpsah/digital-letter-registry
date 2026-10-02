@@ -70,10 +70,37 @@ class ExtractionTests(unittest.TestCase):
             )
             result = extractor.extract(self._file(directory))
 
-        self.assertEqual(result.method, "ocr")
-        self.assertEqual(result.version, "ocr-hi-en-v1")
+        self.assertEqual(result.method, "ocr_pdf")
+        self.assertEqual(result.version, "ocr-pdf-hi-en-v1")
         self.assertEqual(ocr.languages, ("hin", "eng"))
         self.assertFalse(result.needs_ocr)
+
+    def test_image_uses_dedicated_ocr_backend(self) -> None:
+        image_ocr = FakeOcrBackend("छात्रवृत्ति आवेदन अंतिम तिथि")
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "synthetic.jpg"
+            path.write_bytes(b"synthetic-image")
+            extractor = VersionedTextExtractor(
+                FakePdfBackend("must-not-be-used"),
+                image_ocr_backend=image_ocr,
+            )
+            result = extractor.extract(path)
+
+        self.assertEqual(result.method, "ocr_image")
+        self.assertEqual(result.version, "ocr-image-hi-en-v1")
+        self.assertEqual(image_ocr.languages, ("hin", "eng"))
+        self.assertIn("छात्रवृत्ति", result.text)
+
+    def test_image_without_backend_requests_ocr(self) -> None:
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "synthetic.png"
+            path.write_bytes(b"synthetic-image")
+            result = VersionedTextExtractor(
+                FakePdfBackend("unused")
+            ).extract(path)
+
+        self.assertTrue(result.needs_ocr)
+        self.assertEqual(result.method, "image_ocr_unavailable")
 
     def test_usability_rejects_symbol_noise(self) -> None:
         self.assertFalse(is_usable_native_text("### --- ... " * 20))
