@@ -112,3 +112,10 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Auth callback is configured for localhost `/auth/confirm`.
 - OCR no longer requires sudo: Tesseract 5.3.4 and Hindi/English language data are installed under the user account; OCRmyPDF 16.13.0 is installed in the project virtualenv.
 - Current readiness blockers are only Google Drive runtime OAuth credentials and a Gemini API key. The authenticated owner-session test also still requires a user-approved/manual one-time login boundary because transferring a one-time email credential directly between connected tools is not permitted.
+
+## 2026-10-02 - Repository context reconciliation
+
+- Source and test configuration confirm that the project is no longer planning-only: the private API/PWA, guarded synthetic intake, worker, storage/persistence adapters, OCR contracts, structured analysis, search, historical-import preview, and approval-locked rename path are implemented.
+- Project-level AI scope and task records were reconciled to the implemented source.
+- This reconciliation does not verify external runtime credentials, hosted Supabase Auth settings, live provider behavior, real-letter ingestion, Drive rename execution, or production deployment.
+- The next safe runtime work remains synthetic-only: refreshable Drive OAuth verification, Gemini credential verification, and an authenticated owner-session HTTP/PostgREST vertical slice.
