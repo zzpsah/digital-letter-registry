@@ -48,8 +48,8 @@
 ## Phase 3 — Search/UI
 
 - [x] Full-text/metadata search.
-- [ ] Semantic/context search.
-- [ ] Ranking combining filename + text + semantic score.
+- [x] Semantic/context search foundation with versioned 768-dimension embeddings.
+- [x] Ranking combining filename + text + semantic score.
 - [x] Add live full-text + trigram search RPC with combined text/fuzzy ranking.
 - [ ] Responsive mobile web/PWA.
 - [ ] Filters: date/year, authority, category, file type, validity/status.
