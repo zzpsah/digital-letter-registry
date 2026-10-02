@@ -94,7 +94,7 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Search API uses the caller's Supabase bearer session, preserving RLS as the data boundary.
 - Search/detail responses never expose private storage object identifiers.
 - Safe authenticated letter-detail endpoint is implemented.
-- Passwordless email link request is implemented with `create_user=false`. The PWA now completes the existing implicit magic-link flow client-side: it captures the bearer access token from the URL fragment into `sessionStorage`, immediately scrubs the fragment from browser history, and supports explicit sign-out. Refresh tokens are not persisted by this shell.
+- Passwordless email link request is implemented with `create_user=false`. The server now verifies the Supabase token-hash callback and stores access/refresh credentials only in Secure HttpOnly cookies. The PWA checks `/api/v1/auth/session` and signs out through `/api/v1/auth/logout`; it does not persist auth tokens in sessionStorage or localStorage.
 - PWA service worker caches only public app-shell assets and never caches `/api/` data.
 - Server-side original streaming is implemented: the API resolves private storage references under RLS and can stream Google Drive bytes without exposing Drive object IDs. The PWA now opens successful streamed `200` responses as browser blobs. Live runtime credential verification remains pending.
 - Application CI is green after fixing native-PDF, blank-embedding, and Drive-reader source-generation regressions. DevOS context-sync is also green using the vendored local helper.
