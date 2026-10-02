@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: expose storage-reference duplicate check
+- Commit: fd7cb4c9e0b5b77dda2570232d5aa5692aacebe8
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/persistence.py`
+
 ## 2026-10-02 — docs: document historical import preview workflow
 - Commit: e749cb11cb703e6f6ea4c5e37af013f851c8eac5
 - Author: PRASHANT KUMAR SAH

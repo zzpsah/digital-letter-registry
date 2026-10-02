@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: e749cb11cb703e6f6ea4c5e37af013f851c8eac5
-- Last commit: docs: document historical import preview workflow
+- HEAD: fd7cb4c9e0b5b77dda2570232d5aa5692aacebe8
+- Last commit: feat: expose storage-reference duplicate check
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
