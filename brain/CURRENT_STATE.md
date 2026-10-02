@@ -16,7 +16,7 @@ Last verified: 2026-10-02
 
 ## Current gaps
 
-- Supabase Auth currently has no archive owner user, so normal RLS-backed inserts are not ready.
+- Supabase archive-owner Auth identity exists and its email is confirmed.
 - No live Google Drive transport or authenticated Supabase transport is wired yet.
 - No OCR, AI context extraction, embeddings pipeline, search UI, or live ingestion exists.
 - No rename executor is authorized.
@@ -32,4 +32,4 @@ Do not commit real letters, Drive IDs/URLs, Supabase keys, credentials, SSH keys
 
 ## 2026-10-02 — Live integration checkpoint
 
-A synthetic PDF upload to the private Drive `originals/` folder is verified. Supabase Auth now contains the intended archive-owner identity, but email confirmation is still pending. Do not bypass RLS; complete the authenticated database test only after confirmation.
+A synthetic PDF upload to the private Drive `originals/` folder is verified. Supabase archive-owner email confirmation is complete. Runtime authenticated PostgREST transport and a guarded synthetic integration command are now implemented. The remaining live step is to execute the command with a short-lived authenticated user session and verify RLS denial for an unauthenticated caller.
