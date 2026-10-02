@@ -62,6 +62,20 @@ The command verifies:
 
 Actual values must never be committed or pasted into public logs.
 
+## Structured AI runtime
+
+The first adapter is Gemini, but the stored schema remains provider-neutral.
+
+Runtime variables:
+
+```bash
+AI_PROVIDER=gemini
+AI_MODEL=gemini-3.8-flash
+GEMINI_API_KEY=...
+```
+
+Do not commit the real API key. The model name is configurable so the archive can be reprocessed later with a different provider/model.
+
 ## Production
 
 No production deployment command is defined.
