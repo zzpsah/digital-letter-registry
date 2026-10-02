@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 9b94a3d3ebbd984df19f4451e9dea9724f888e0d
-- Last commit: feat: add pending password account creation endpoint
+- HEAD: 4f6becede525fc2d77a2c206daa06f74e3ab1969
+- Last commit: feat: simplify account creation and remove magic-link UI
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 

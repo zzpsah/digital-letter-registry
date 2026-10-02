@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: simplify account creation and remove magic-link UI
+- Commit: 4f6becede525fc2d77a2c206daa06f74e3ab1969
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-03 — feat: add pending password account creation endpoint
 - Commit: 9b94a3d3ebbd984df19f4451e9dea9724f888e0d
 - Author: PRASHANT KUMAR SAH
