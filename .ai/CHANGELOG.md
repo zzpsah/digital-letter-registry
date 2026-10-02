@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover worker archived-source loading
+- Commit: 48efcb19c76caffbd9c82d814ef2c886af9fff35
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_source_loader.py`
+
 ## 2026-10-02 — fix: return row-shaped worker transition results
 - Commit: e1d1a6439fd9c37821f1732174e507b771827bd2
 - Author: PRASHANT KUMAR SAH
