@@ -30,7 +30,15 @@ The application foundation is implemented in the public repository:
 
 ## Current integration gaps
 
-- Live Google Drive OAuth credentials are not yet verified in the runtime.
+- Google Drive OAuth is verified in the private runtime through secret-manager-injected refresh credentials; read/list/stream and disposable synthetic write/delete checks passed.
 - Gemini runtime credentials are not yet configured/verified.
 - A final authenticated HTTP/PostgREST synthetic vertical-slice check remains pending.
 - Hosted Supabase magic-link template and production redirect/Site URL setup remain an external dashboard task.
+
+
+## Drive deployment model
+
+- Source code is not bound to a specific Google account.
+- Each deployment must use an explicitly authorized OAuth identity plus configured archive folder references.
+- Current private runtime is a single archive-owner deployment.
+- A second Google account must use separate OAuth/secret-manager configuration and archive references.
