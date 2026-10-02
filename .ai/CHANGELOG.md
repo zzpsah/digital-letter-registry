@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: record secret-manager Drive OAuth runtime
+- Commit: 2b07cf860ff9134a52c1fabd62dcdee397b58382
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `README.md`
+
 ## 2026-10-02 — docs: prefer secret-manager Drive OAuth injection
 - Commit: d0fd41d92183397a4a9bd70a8b1907007ed4a116
 - Author: PRASHANT KUMAR SAH
