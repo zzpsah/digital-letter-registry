@@ -182,6 +182,46 @@ class ApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_readiness_endpoint_returns_only_safe_status(self):
+        from letter_registry.runtime_readiness import (
+            ReadinessCheck,
+            RuntimeReadiness,
+        )
+
+        safe = RuntimeReadiness(
+            checks=(
+                ReadinessCheck(
+                    name="drive_credentials",
+                    ready=True,
+                    detail="configured",
+                ),
+                ReadinessCheck(
+                    name="synthetic_safety",
+                    ready=True,
+                    detail="synthetic-only mode",
+                ),
+            )
+        )
+        with patch(
+            "letter_registry.api.check_runtime_readiness",
+            return_value=safe,
+        ):
+            with patch("letter_registry.api._transport", return_value=object()):
+                response = self.client.get(
+                    "/api/v1/readiness",
+                    headers={"Authorization": "Bearer synthetic-user-token"},
+                )
+
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertTrue(body["ready"])
+        self.assertEqual(
+            body["checks"][0]["name"],
+            "drive_credentials",
+        )
+        self.assertNotIn("token", response.text.lower())
+        self.assertNotIn("folder-id", response.text.lower())
+
     def test_capabilities_report_synthetic_mode_and_refresh_drive_config(self):
         env = {
             "ENABLE_REAL_INTAKE": "false",
