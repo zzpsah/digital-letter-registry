@@ -8,12 +8,15 @@ Observed on 2026-10-02:
 - Verification used simulated database request JWT claims, not a real PostgREST/browser bearer session.
 - One synthetic verification row remains in the letters table.
 - No real archive-letter row exists.
-- Repository auth/template implementation is ready: the checked-in magic-link template points to the server callback with `token_hash`, and the auth/session/API focused suite passes 35/35 tests on the VPS.
+- Repository auth/template implementation is ready: the checked-in magic-link template points to the server callback with `token_hash`.
+- VPS focused auth/session/API suite passes 35/35 tests.
 - Full VPS synthetic unit suite passes 201/201 tests.
 - Hosted Supabase still uses its default direct-confirmation email behavior, so the checked-in template/Site URL configuration has not yet been applied to the live Auth project.
-- VPS project environment has Supabase runtime/publishable configuration but no Supabase Management API token or CLI login, so hosted Auth settings cannot currently be changed from the VPS without an additional authorized management credential or dashboard/browser action.
+- VPS project environment has Supabase runtime/publishable configuration but no Supabase Management API token or CLI login.
+- Connected Drive access sees the private archive and synthetic original, but the existing VPS `phone_drive` rclone credential cannot enumerate the archive contents even with direct folder IDs. It is not suitable for registry runtime access.
+- Gemini runtime remains unconfigured; no reusable live key was found in the inspected VPS runtime files.
 
-Pending: apply hosted magic-link/Site URL configuration, real short-lived owner-session HTTP/PostgREST test, Drive OAuth/original streaming verification, Gemini synthetic verification, and synthetic-row cleanup when authorized tooling permits.
+Pending: apply hosted magic-link/Site URL configuration, real short-lived owner-session HTTP/PostgREST test, correct Drive OAuth/original streaming verification, Gemini synthetic verification, and synthetic-row cleanup when authorized tooling permits.
 
 ## OCR readiness correction
 
