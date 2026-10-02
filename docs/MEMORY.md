@@ -17,3 +17,11 @@ Important preferences:
 - Web search must provide optional date/category/authority filters.
 - Old documents must be recursively reprocessable when rules/models improve.
 - Keep the user workflow close to “forward/upload and forget”.
+
+
+## Project operating memory
+
+- Repository-local rules and evidence are authoritative over chat memory.
+- Before meaningful implementation/integration work, read README/RULES/AGENTS, relevant docs, `.ai/`, root tasks, and the relevant `brain/` enhancement context.
+- After meaningful work, synchronize all affected README/docs, tasks, `.ai/`, and brain records with the verified implementation state.
+- Never claim a cleanup, deployment, migration, provider verification, or other external action unless it actually completed.
