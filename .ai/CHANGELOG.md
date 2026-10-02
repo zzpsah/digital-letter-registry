@@ -1,3 +1,10 @@
+## 2026-10-03 — fix: allow access-only auth callback fallback
+- Commit: 08643f6ac583ad32944b49aad680f229f1161856
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/auth-confirm.html`
+
 ## 2026-10-03 — fix: allow access-only callback sessions
 - Commit: 4e11c985114228af40ac8014302cfb9a4f9f6bf2
 - Author: PRASHANT KUMAR SAH
