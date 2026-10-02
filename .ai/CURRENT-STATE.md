@@ -124,3 +124,12 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Read-only `/api/v1/reprocessing/preview` compares every stored processing row with either current registry defaults or explicit target overrides.
 - Preview returns exact component mismatches per letter; it performs no mutation and enqueues nothing.
 - Reprocessing execution remains intentionally separate and is not enabled yet.
+
+
+## Rename execution safety
+
+- Rename preview remains a separate, side-effect-free mapping stage.
+- Rename execution is approval-locked by a deterministic SHA-256 digest over record ID + old filename + proposed filename.
+- Execution requires `confirmed=true`, an exact digest match, and a fresh server-side check that the current stored filename still matches the approved preview.
+- RLS storage identity lookup and a private Google Drive PATCH transport are implemented.
+- No rename endpoint is exposed in the UI/API and no Drive rename has been executed or approved.
