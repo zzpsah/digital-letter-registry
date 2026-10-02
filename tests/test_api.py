@@ -46,7 +46,7 @@ class ApiTests(unittest.TestCase):
             auth = factory.return_value
             with patch.dict(
                 os.environ,
-                {"AUTH_REDIRECT_URL": "https://archive.example.com/auth/callback"},
+                {"AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm"},
                 clear=False,
             ):
                 response = self.client.post(
@@ -57,8 +57,82 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         auth.send_magic_link.assert_called_once_with(
             email="owner@example.com",
-            redirect_to="https://archive.example.com/auth/callback",
+            redirect_to="https://archive.example.com/auth/confirm",
         )
+
+    def test_magic_link_callback_sets_httponly_session_cookies(self):
+        from letter_registry.auth import SupabaseAuthSession
+
+        with patch(
+            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
+        ) as factory:
+            factory.return_value.verify_token_hash.return_value = (
+                SupabaseAuthSession(
+                    access_token="synthetic-access",
+                    refresh_token="synthetic-refresh",
+                    expires_in=3600,
+                )
+            )
+            with patch.dict(
+                os.environ,
+                {"AUTH_COOKIE_SECURE": "false"},
+                clear=False,
+            ):
+                response = self.client.get(
+                    "/auth/confirm"
+                    "?token_hash=synthetic-hash&type=email",
+                    follow_redirects=False,
+                )
+
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(response.headers["location"], "/")
+        cookies = response.headers.get_list("set-cookie")
+        joined = "\n".join(cookies).lower()
+        self.assertIn("dlr_access_token=", joined)
+        self.assertIn("dlr_refresh_token=", joined)
+        self.assertIn("httponly", joined)
+        self.assertIn("samesite=lax", joined)
+        self.assertEqual(
+            response.headers["cache-control"],
+            "private, no-store",
+        )
+
+    def test_cookie_authenticated_search_needs_no_bearer_header(self):
+        fake = FakeTransport()
+        self.client.cookies.set(
+            "dlr_access_token",
+            "synthetic-cookie-access",
+        )
+        with patch("letter_registry.api._transport", return_value=fake):
+            with patch.dict(
+                os.environ,
+                {"GEMINI_API_KEY": ""},
+                clear=False,
+            ):
+                response = self.client.get("/api/v1/search?q=inter")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 1)
+
+    def test_logout_clears_session_cookies(self):
+        self.client.cookies.set(
+            "dlr_access_token",
+            "synthetic-cookie-access",
+        )
+        self.client.cookies.set(
+            "dlr_refresh_token",
+            "synthetic-cookie-refresh",
+        )
+
+        response = self.client.post("/api/v1/auth/logout")
+
+        self.assertEqual(response.status_code, 200)
+        joined = "\n".join(
+            response.headers.get_list("set-cookie")
+        ).lower()
+        self.assertIn("dlr_access_token=", joined)
+        self.assertIn("dlr_refresh_token=", joined)
+        self.assertIn("max-age=0", joined)
 
     def test_pwa_manifest_and_service_worker_are_public(self):
         self.assertEqual(self.client.get("/manifest.webmanifest").status_code, 200)
@@ -113,15 +187,23 @@ class ApiTests(unittest.TestCase):
         self.assertNotIn("storage_reference", body)
 
     def test_real_looking_upload_is_blocked_by_default(self):
+        from letter_registry.channel_intake import ChannelIntakeService
         from letter_registry.intake import IntakeService
         from letter_registry.jobs import InMemoryProcessingQueue
         from letter_registry.persistence import InMemoryLetterRepository
         from letter_registry.storage import InMemoryOriginalStorage
 
-        service = IntakeService(
-            storage=InMemoryOriginalStorage(),
-            repository=InMemoryLetterRepository(),
-            queue=InMemoryProcessingQueue(),
+        class Provenance:
+            def save_source(self, *, owner_id, letter_id, provenance):
+                pass
+
+        service = ChannelIntakeService(
+            intake=IntakeService(
+                storage=InMemoryOriginalStorage(),
+                repository=InMemoryLetterRepository(),
+                queue=InMemoryProcessingQueue(),
+            ),
+            provenance=Provenance(),
         )
 
         with patch(
