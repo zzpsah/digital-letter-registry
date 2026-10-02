@@ -12,6 +12,7 @@ from .jobs import ProcessingJob
 from .models import DocumentRecord
 from .original_access import SupabaseOriginalAccessService
 from .processing_pipeline import ProcessingOutcome, process_archived_document
+from .relationship_inference import RelationshipCandidate, infer_relationship_suggestions
 from .structured_analysis import DocumentContextProvider
 
 
@@ -45,6 +46,11 @@ class WorkerRepository(Protocol):
         owner_id: str,
         embedding_version: str,
     ) -> None:
+        ...
+
+
+class RelationshipSuggestionRepository(Protocol):
+    def save_suggestion(self, suggestion, *, owner_id: str) -> None:
         ...
 
 
@@ -82,6 +88,7 @@ class DocumentProcessingWorker:
     extractor: VersionedTextExtractor
     context_provider: DocumentContextProvider
     embeddings: EmbeddingRepository
+    relationship_repository: RelationshipSuggestionRepository | None = None
     allow_real_documents: bool = False
 
     def run_once(self) -> WorkerRunResult:
@@ -130,6 +137,59 @@ class DocumentProcessingWorker:
                     letter_id=job.letter_id,
                     extracted_text=outcome.extraction.text,
                 )
+
+            if self.relationship_repository is not None:
+                candidate_rows = self.database.select(
+                    "letters",
+                    filters={"owner_id": job.owner_id},
+                    columns=(
+                        "id,reference_number,authority,category,title,summary"
+                    ),
+                )
+                candidates = [
+                    RelationshipCandidate(
+                        record_id=str(row["id"]),
+                        reference_number=(
+                            str(row["reference_number"])
+                            if row.get("reference_number") is not None
+                            else None
+                        ),
+                        authority=(
+                            str(row["authority"])
+                            if row.get("authority") is not None
+                            else None
+                        ),
+                        category=(
+                            str(row["category"])
+                            if row.get("category") is not None
+                            else None
+                        ),
+                        title=(
+                            str(row["title"])
+                            if row.get("title") is not None
+                            else None
+                        ),
+                        summary=(
+                            str(row["summary"])
+                            if row.get("summary") is not None
+                            else None
+                        ),
+                    )
+                    for row in candidate_rows
+                ]
+                suggestions = infer_relationship_suggestions(
+                    source_letter_id=record.record_id,
+                    source_reference_number=outcome.context.context.reference_number,
+                    source_authority=outcome.context.context.authority,
+                    source_category=outcome.context.context.category,
+                    source_text=outcome.extraction.text,
+                    candidates=candidates,
+                )
+                for suggestion in suggestions:
+                    self.relationship_repository.save_suggestion(
+                        suggestion,
+                        owner_id=job.owner_id,
+                    )
 
             version = str(getattr(self.embeddings.provider, "version"))
             self.repository.save_embedding_version(
