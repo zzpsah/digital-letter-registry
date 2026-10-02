@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: record live Vercel deployment
+- Commit: 5533692d7ef61a4398dbf1d38716be630dc35f16
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/vercel-hosting/HANDOFF.md`
+
 ## 2026-10-03 — build: configure Vercel Python function
 - Commit: 5f676a0e8b978ca9430b9f01443df0be8698e600
 - Author: PRASHANT KUMAR SAH
