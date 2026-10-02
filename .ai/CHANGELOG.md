@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: align local auth commands with HttpOnly callback
+- Commit: 4d99379575491223a7d7961ad877e8ddf3636bc1
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/COMMANDS.md`
+
 ## 2026-10-02 — docs: define server-side Supabase passwordless auth flow
 - Commit: aadc1155be964cca7d56362d7880ddbabf5b5741
 - Author: PRASHANT KUMAR SAH
