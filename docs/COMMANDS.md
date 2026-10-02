@@ -121,7 +121,15 @@ GOOGLE_DRIVE_ACCESS_TOKEN=...
 
 The token is used only by the backend. The browser receives file bytes through the authenticated API and never receives the Drive object ID or private Drive URL.
 
-The current adapter accepts a short-lived access token. A refresh-token/service credential lifecycle is intentionally still pending before production use.
+Preferred long-running runtime configuration uses OAuth refresh credentials:
+
+```bash
+GOOGLE_OAUTH_CLIENT_ID=...
+GOOGLE_OAUTH_CLIENT_SECRET=...
+GOOGLE_DRIVE_REFRESH_TOKEN=...
+```
+
+The backend refreshes access tokens in memory and reuses them until near expiry. `GOOGLE_DRIVE_ACCESS_TOKEN` remains an optional short-lived development fallback. Refresh tokens and client secrets must stay in runtime secret storage and never appear in Git or browser responses.
 
 
 ## Synthetic-first private intake runtime
