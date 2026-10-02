@@ -7,6 +7,8 @@ import unicodedata
 from datetime import date
 from pathlib import PurePath
 
+FILENAME_RULE_VERSION = "official-v1"
+
 _MAX_FILENAME_LENGTH = 220
 _MAX_TITLE_LENGTH = 90
 _MAX_ISSUER_LENGTH = 60
