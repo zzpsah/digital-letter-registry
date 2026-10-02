@@ -1,5 +1,14 @@
 """Provider-independent domain rules for Digital Letter Registry."""
 
+from .context_hints import ContextHints, detect_context_hints
+from .extraction import (
+    ExtractionResult,
+    OcrBackend,
+    PdfTextBackend,
+    VersionedTextExtractor,
+    is_usable_native_text,
+    normalize_extracted_text,
+)
 from .fingerprints import sha256_file
 from .ingestion import prepare_source_record, persist_prepared_source
 from .orchestration import ingest_original
@@ -33,6 +42,11 @@ from .supabase_repository import SupabaseLetterRepository, SupabaseTransport
 from .supabase_runtime import SupabasePostgrestTransport, SupabaseRuntimeError
 
 __all__ = [
+    "ContextHints",
+    "ExtractionResult",
+    "PdfTextBackend",
+    "OcrBackend",
+    "VersionedTextExtractor",
     "DocumentRecord",
     "DocumentRelationship",
     "DocumentStatus",
@@ -53,6 +67,9 @@ __all__ = [
     "SupabaseLetterRepository",
     "SupabasePostgrestTransport",
     "SupabaseRuntimeError",
+    "detect_context_hints",
+    "is_usable_native_text",
+    "normalize_extracted_text",
     "build_rename_preview",
     "build_smart_filename",
     "build_supabase_letter_row",
