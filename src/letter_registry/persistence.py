@@ -73,6 +73,14 @@ def build_supabase_processing_row(
 class LetterRepository(Protocol):
     """Minimal persistence port used by ingestion before OCR/AI exists."""
 
+    def storage_reference_exists(
+        self,
+        *,
+        owner_id: str,
+        object_reference: str,
+    ) -> bool:
+        ...
+
     def source_exists_by_hash(self, *, owner_id: str, sha256: str) -> bool:
         ...
 
@@ -89,6 +97,19 @@ class InMemoryLetterRepository:
 
     letters: dict[str, dict[str, object]] = field(default_factory=dict)
     processing: dict[str, dict[str, object]] = field(default_factory=dict)
+
+    def storage_reference_exists(
+        self,
+        *,
+        owner_id: str,
+        object_reference: str,
+    ) -> bool:
+        owner = _validated_uuid(owner_id, field_name="owner_id")
+        return any(
+            row["owner_id"] == owner
+            and row["storage_object_id"] == object_reference
+            for row in self.letters.values()
+        )
 
     def source_exists_by_hash(self, *, owner_id: str, sha256: str) -> bool:
         owner = _validated_uuid(owner_id, field_name="owner_id")
