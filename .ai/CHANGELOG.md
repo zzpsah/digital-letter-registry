@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: start multi-user authorization brain
+- Commit: 8b68ee19072484c16afb37c0df36f39b9eafbba0
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/multi-user-authz/HANDOFF.md`
+
 ## 2026-10-02 — db: index archive invite foreign keys
 - Commit: 03d22221bfbb7c240fcc3e81b43cb6e73bd6976f
 - Author: Prashant
