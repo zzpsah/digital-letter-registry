@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 9bf26faefa7b995996eeeb67fa3da104506bc563
-- Last commit: feat: allow password signup without invite metadata
+- HEAD: 9b94a3d3ebbd984df19f4451e9dea9724f888e0d
+- Last commit: feat: add pending password account creation endpoint
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 

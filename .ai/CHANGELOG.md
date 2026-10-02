@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: add pending password account creation endpoint
+- Commit: 9b94a3d3ebbd984df19f4451e9dea9724f888e0d
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-03 — feat: allow password signup without invite metadata
 - Commit: 9bf26faefa7b995996eeeb67fa3da104506bc563
 - Author: PRASHANT KUMAR SAH
