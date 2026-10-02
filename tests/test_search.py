@@ -49,7 +49,7 @@ class SearchRepositoryTests(unittest.TestCase):
         self.assertEqual(results[0].authority, "BSEB")
         self.assertEqual(results[0].file_type, "pdf")
         self.assertIn("deadline_extension", results[0].concepts)
-        self.assertEqual(transport.calls[0][0], "search_letters_filtered")
+        self.assertEqual(transport.calls[0][0], "search_letter_cards")
         self.assertEqual(
             transport.calls[0][1],
             {
