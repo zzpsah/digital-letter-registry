@@ -1,0 +1,109 @@
+import json
+import os
+import unittest
+from unittest.mock import patch
+
+from letter_registry.supabase_runtime import (
+    SupabasePostgrestTransport,
+    SupabaseRuntimeError,
+)
+
+
+class SupabaseRuntimeTransportTests(unittest.TestCase):
+    def test_from_environment_requires_runtime_only_values(self) -> None:
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(ValueError, "SUPABASE_URL"):
+                SupabasePostgrestTransport.from_environment()
+
+    def test_insert_sends_bearer_token_and_publishable_key(self) -> None:
+        seen = {}
+
+        def executor(req):
+            seen["url"] = req.full_url
+            seen["authorization"] = req.headers["Authorization"]
+            seen["apikey"] = req.headers["Apikey"]
+            seen["prefer"] = req.headers["Prefer"]
+            seen["body"] = json.loads(req.data.decode("utf-8"))
+            return 201, '[{"id":"synthetic-id"}]'
+
+        transport = SupabasePostgrestTransport(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-publishable-key",
+            access_token="synthetic-user-token",
+            http_executor=executor,
+        )
+
+        result = transport.insert(
+            "letters",
+            {"original_filename": "synthetic.pdf"},
+            on_conflict="owner_id,original_sha256",
+        )
+
+        self.assertEqual(result["id"], "synthetic-id")
+        self.assertIn("/rest/v1/letters?", seen["url"])
+        self.assertEqual(seen["authorization"], "Bearer synthetic-user-token")
+        self.assertEqual(seen["apikey"], "synthetic-publishable-key")
+        self.assertIn("resolution=ignore-duplicates", seen["prefer"])
+
+    def test_upsert_uses_merge_duplicate_resolution(self) -> None:
+        seen = {}
+
+        def executor(req):
+            seen["prefer"] = req.headers["Prefer"]
+            return 201, '[{"letter_id":"synthetic"}]'
+
+        transport = SupabasePostgrestTransport(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            access_token="synthetic-token",
+            http_executor=executor,
+        )
+
+        transport.upsert(
+            "letter_processing",
+            {"letter_id": "synthetic"},
+            on_conflict="letter_id",
+        )
+
+        self.assertIn("resolution=merge-duplicates", seen["prefer"])
+
+    def test_select_builds_eq_filters(self) -> None:
+        seen = {}
+
+        def executor(req):
+            seen["url"] = req.full_url
+            return 200, '[{"id":"synthetic"}]'
+
+        transport = SupabasePostgrestTransport(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            access_token="synthetic-token",
+            http_executor=executor,
+        )
+
+        rows = transport.select(
+            "letters",
+            filters={"original_sha256": "abc"},
+            columns="id,original_sha256",
+        )
+
+        self.assertEqual(rows[0]["id"], "synthetic")
+        self.assertIn("original_sha256=eq.abc", seen["url"])
+
+    def test_non_success_status_raises(self) -> None:
+        def executor(req):
+            return 401, '{"message":"denied"}'
+
+        transport = SupabasePostgrestTransport(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            access_token="synthetic-token",
+            http_executor=executor,
+        )
+
+        with self.assertRaises(SupabaseRuntimeError):
+            transport.select("letters")
+
+
+if __name__ == "__main__":
+    unittest.main()
