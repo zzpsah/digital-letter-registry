@@ -2,7 +2,16 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from letter_registry.historical_import import preview_historical_import
+from datetime import datetime, timezone
+
+from letter_registry.google_drive_catalog import HistoricalDriveItem
+from letter_registry.historical_import import (
+    HistoricalDriveImportService,
+    preview_historical_import,
+)
+from letter_registry.jobs import InMemoryProcessingQueue
+from letter_registry.original_access import OriginalFile
+from letter_registry.persistence import InMemoryLetterRepository
 
 
 OWNER_ID = "11111111-1111-4111-8111-111111111111"
@@ -74,3 +83,124 @@ class HistoricalImportPreviewTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
+class FakeHistoricalReader:
+    def download(self, *, provider, object_reference, filename):
+        return OriginalFile(
+            filename=filename,
+            content_type="application/pdf",
+            content=b"%PDF-synthetic-history",
+        )
+
+
+def drive_item(
+    name="synthetic-history.pdf",
+    object_reference="synthetic-drive-history-1",
+):
+    return HistoricalDriveItem(
+        object_reference=object_reference,
+        filename=name,
+        mime_type="application/pdf",
+        size_bytes=123,
+        modified_at=datetime(
+            2026, 1, 2, tzinfo=timezone.utc
+        ),
+    )
+
+
+class HistoricalDriveImportTests(unittest.TestCase):
+    def service(self):
+        return HistoricalDriveImportService(
+            repository=InMemoryLetterRepository(),
+            queue=InMemoryProcessingQueue(),
+            reader=FakeHistoricalReader(),
+        )
+
+    def test_preview_does_not_mutate_and_marks_synthetic_eligible(self):
+        service = self.service()
+        rows = service.preview(
+            [drive_item()],
+            owner_id=OWNER_ID,
+        )
+
+        self.assertEqual(rows[0].status, "eligible")
+        self.assertEqual(service.repository.letters, {})
+        self.assertEqual(service.queue.jobs, [])
+
+    def test_real_historical_file_is_blocked_by_default(self):
+        rows = self.service().preview(
+            [drive_item(name="official-2024.pdf")],
+            owner_id=OWNER_ID,
+        )
+        self.assertEqual(
+            rows[0].status,
+            "real_document_blocked",
+        )
+
+    def test_adoption_requires_confirmation(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "explicit confirmation",
+        ):
+            self.service().adopt(
+                drive_item(),
+                owner_id=OWNER_ID,
+                confirmed=False,
+            )
+
+    def test_confirmed_adoption_reuses_drive_object_and_queues(self):
+        service = self.service()
+        result = service.adopt(
+            drive_item(),
+            owner_id=OWNER_ID,
+            confirmed=True,
+        )
+
+        self.assertEqual(
+            result.record.original_storage_reference,
+            "synthetic-drive-history-1",
+        )
+        self.assertEqual(len(service.repository.letters), 1)
+        self.assertEqual(len(service.queue.jobs), 1)
+        self.assertEqual(
+            service.queue.jobs[0].reason,
+            "historical_import",
+        )
+
+    def test_existing_drive_object_is_skipped(self):
+        service = self.service()
+        source = drive_item()
+        service.adopt(
+            source,
+            owner_id=OWNER_ID,
+            confirmed=True,
+        )
+        rows = service.preview(
+            [source],
+            owner_id=OWNER_ID,
+        )
+        self.assertEqual(
+            rows[0].status,
+            "already_archived",
+        )
+
+    def test_same_content_under_new_object_is_rejected(self):
+        service = self.service()
+        service.adopt(
+            drive_item(),
+            owner_id=OWNER_ID,
+            confirmed=True,
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "content is already archived",
+        ):
+            service.adopt(
+                drive_item(
+                    object_reference="synthetic-drive-history-2"
+                ),
+                owner_id=OWNER_ID,
+                confirmed=True,
+            )
