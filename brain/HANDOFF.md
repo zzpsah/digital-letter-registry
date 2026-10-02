@@ -10,10 +10,18 @@ Current runtime checkpoint:
 - VPS auth/API tests pass 29/29; full synthetic suite passes 212/212; Supabase Management Auth-config helper tests pass 4/4.
 - DLR has a dedicated tailnet-only HTTPS runtime origin; Supabase Site URL/redirect configuration is aligned to it. Do not publish the private hostname/port in Git.
 - A real short-lived authenticated HTTP/PostgREST vertical slice is still pending. The current blocker is Supabase email-send throttling; magic-link throttles now return HTTP 429 rather than 500.
-- Dedicated DLR Google OAuth is configured through a private authorized-user JSON file with `drive.readonly`; live refresh, originals listing, and synthetic-original streaming passed.
+- Dedicated DLR Google OAuth is configured through secret-manager-injected refresh credentials with a write-capable Drive grant; refresh/list/stream and disposable synthetic upload/stream/delete verification passed.
 - The existing `phone_drive` rclone credential remains separate and unused by DLR.
 - Current runtime readiness has Drive configured; Gemini is the only failing readiness check.
 - Gemini runtime key remains unavailable.
 - The synthetic DB verification row was removed through controlled cleanup; no archive-letter rows exist.
 
 Do not deploy, ingest real documents, activate live connectors, rename real Drive files, configure or expose secrets, or perform destructive live-data actions without the required explicit authorization.
+
+
+## Drive account handoff
+
+- Current private deployment is single archive-owner/single archive tree.
+- DLR code itself is not tied to that account.
+- To use another Google Drive, authorize that account separately and configure separate secret-manager OAuth keys plus archive folder references.
+- Never silently reuse another deployment's refresh token or switch its target folders.
