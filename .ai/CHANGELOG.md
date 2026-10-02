@@ -1,3 +1,10 @@
+## 2026-10-02 — test: make OCR language fixture unambiguous
+- Commit: 87fbb23f8776b2b62be98d1e8afb5777107c2d87
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_runtime_readiness.py`
+
 ## 2026-10-02 — test: correct OCR language fixture newlines
 - Commit: 2c1d27769c1ebd89fe07bcebfcc5e8e50f7fd8cb
 - Author: PRASHANT KUMAR SAH
