@@ -62,6 +62,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Refreshable Drive OAuth, original streaming, live Gemini verification, and the real owner bearer-session vertical slice remain pending.
 
 ## Last automated change
-- Change: synchronize VPS runtime verification, credential findings, and canonical filename handoff
+- Commit: 98f420164749a6b1362d4be2b72d9d6914190ad1
+- Change: feat: support default Supabase magic-link callback
 - Date: 2026-10-02
 - Durable context synchronization: completed

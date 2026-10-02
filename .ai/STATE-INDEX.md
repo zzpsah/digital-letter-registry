@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 188acc6b2425c3ff2c2d74337863b03921d5de08
-- Last commit: docs: sync runtime handoff helper checkpoint
+- HEAD: 98f420164749a6b1362d4be2b72d9d6914190ad1
+- Last commit: feat: support default Supabase magic-link callback
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: support default Supabase magic-link callback
+- Commit: 98f420164749a6b1362d4be2b72d9d6914190ad1
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-02 — docs: sync runtime handoff helper checkpoint
 - Commit: 188acc6b2425c3ff2c2d74337863b03921d5de08
 - Author: PRASHANT KUMAR SAH
