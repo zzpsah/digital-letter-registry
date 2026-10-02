@@ -64,3 +64,13 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Gemini is the first configurable adapter, using structured JSON output.
 - AI provider/model/key are runtime configuration only; database schema remains vendor-neutral.
 - Structured context persists full JSON + concepts + context version, while searchable metadata is projected into `letters`.
+
+
+## Search foundation
+
+- Live Supabase migration adds full-text search over extracted text and fuzzy trigram matching for smart filename/title/authority.
+- `search_letters` RPC is deployed with security-invoker semantics so RLS remains authoritative.
+- Search ranking currently combines text rank (75%) and fuzzy rank (25%).
+- Foreign-key covering indexes reported by the performance advisor were added.
+- Performance advisor now reports only unused-index informational notices, expected for the nearly empty archive.
+- Supabase security advisor currently warns that leaked-password protection is disabled at the Auth project setting; no RLS/schema warning was reported.
