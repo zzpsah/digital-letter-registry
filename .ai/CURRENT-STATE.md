@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 9d4ca1bf9bc52abc55d5c53d622387fad10bfb21
-- Change: feat: add invite-based DLR account administration
+- Commit: 2460bd3f68bb16bf9a0dc412e777245362a6d190
+- Change: fix: harden archive invite admin RPCs
 - Date: 2026-10-02
 - Durable context synchronization: completed

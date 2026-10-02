@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 9d4ca1bf9bc52abc55d5c53d622387fad10bfb21
-- Last commit: feat: add invite-based DLR account administration
+- HEAD: 2460bd3f68bb16bf9a0dc412e777245362a6d190
+- Last commit: fix: harden archive invite admin RPCs
 - Last commit date: 2026-10-02
 - Last commit author: Prashant
 

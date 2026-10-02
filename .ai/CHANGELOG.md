@@ -1,3 +1,12 @@
+## 2026-10-02 — fix: harden archive invite admin RPCs
+- Commit: 2460bd3f68bb16bf9a0dc412e777245362a6d190
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261002174100_add_archive_member_invites.sql`
+- `supabase/migrations/20261002181000_harden_archive_invite_admin_checks.sql`
+- `supabase/migrations/20261002182000_fix_archive_invite_conflict_target.sql`
+
 ## 2026-10-02 — feat: add invite-based DLR account administration
 - Commit: 9d4ca1bf9bc52abc55d5c53d622387fad10bfb21
 - Author: Prashant
