@@ -22,3 +22,11 @@ Use the existing remote execution helper's script transport to update the privat
 ## Public-repository boundary
 
 This checkpoint deliberately contains no credential values, token material, private URLs, Drive folder IDs, or host information.
+
+
+## Follow-up verification
+
+- Existing VPS `phone_drive` rclone credentials were tested against the archive and originals folder IDs directly.
+- The calls do not hard-fail on the supplied folder IDs, but listings are empty and the known synthetic original is not enumerable; treat that rclone credential as unsuitable for the registry runtime.
+- Bitwarden CLI is not installed on either the connected Windows host or the VPS, so the vault-stored dedicated OAuth client cannot currently be retrieved automatically.
+- A fresh authorized OAuth handoff is still required before runtime Drive streaming/upload can be verified.
