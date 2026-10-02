@@ -109,3 +109,16 @@ EMBEDDING_DIMENSIONS=768
 The passwordless redirect URL must be explicitly allowlisted in Supabase Auth settings. Do not use a private Drive URL or object ID as an auth redirect.
 
 The PWA service worker caches only the application shell. It intentionally does not cache `/api/` responses or private letter data.
+
+
+## Private original streaming
+
+The server-side Google Drive reader requires a runtime-only OAuth access token:
+
+```bash
+GOOGLE_DRIVE_ACCESS_TOKEN=...
+```
+
+The token is used only by the backend. The browser receives file bytes through the authenticated API and never receives the Drive object ID or private Drive URL.
+
+The current adapter accepts a short-lived access token. A refresh-token/service credential lifecycle is intentionally still pending before production use.
