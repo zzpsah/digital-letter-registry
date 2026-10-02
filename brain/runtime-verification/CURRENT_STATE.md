@@ -6,7 +6,7 @@ Observed on 2026-10-02:
 - Wrong-user read returned zero rows.
 - Cross-owner synthetic insert was rejected by RLS.
 - Verification used simulated database request JWT claims, not a real PostgREST/browser bearer session.
-- One synthetic verification row remains in the letters table.
+- The synthetic verification row was removed; the letters table now contains zero rows.
 - No real archive-letter row exists.
 - Repository auth implementation supports both paths: the checked-in custom template uses `token_hash`, and the default Supabase hosted email flow uses a hardened browser-fragment bridge that exchanges a validated owner session for HttpOnly cookies and clears the URL.
 - VPS auth/API suite passes 28/28 tests.
