@@ -21,10 +21,12 @@
 ## Phase 1 — Archive foundation
 
 - [x] Define document + processing-version schema.
-- [ ] Implement private upload with synthetic fixtures.
+- [x] Implement synthetic/local ingestion preparation without provider writes.
+- [ ] Implement private Drive upload adapter with synthetic fixtures.
 - [x] Preserve source identity contract and compute duplicate SHA-256.
-- [ ] Store original filename + immutable private storage reference through a repository adapter.
-- [ ] Add Supabase repository adapter using authenticated owner identity.
+- [x] Map original filename + immutable private storage reference through the repository layer.
+- [x] Add credential-free Supabase repository adapter with injected authenticated transport.
+- [ ] Wire a real authenticated Supabase transport after archive-owner Auth exists.
 
 ## Phase 2 — Extraction/context
 
