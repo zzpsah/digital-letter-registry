@@ -90,6 +90,38 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(fake.last_function, "search_letters_filtered")
         self.assertEqual(fake.last_params["year_filter"], 2026)
 
+    def test_authenticated_letter_detail_excludes_storage_reference(self):
+        class DetailTransport:
+            def select(self, table, *, filters=None, columns="*"):
+                if table == "letters":
+                    return [{
+                        "id": "22222222-2222-4222-8222-222222222222",
+                        "smart_filename": "synthetic.pdf",
+                        "title": "Synthetic",
+                        "authority": "Education Department",
+                        "category": "exam",
+                        "subcategory": "form",
+                        "issue_date": "2026-10-02",
+                        "status": "current",
+                        "action_required": "Review",
+                        "deadline_at": None,
+                    }]
+                return [{
+                    "concepts": ["exam_form"],
+                    "structured_context": {"summary": "Synthetic summary"},
+                }]
+
+        with patch("letter_registry.api._transport", return_value=DetailTransport()):
+            response = self.client.get(
+                "/api/v1/letters/22222222-2222-4222-8222-222222222222",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["title"], "Synthetic")
+        self.assertNotIn("storage_object_id", body)
+
     def test_original_endpoint_is_closed_until_private_resolver_exists(self):
         response = self.client.get(
             "/api/v1/letters/22222222-2222-4222-8222-222222222222/original",
