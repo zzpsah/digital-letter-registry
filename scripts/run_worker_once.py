@@ -19,6 +19,7 @@ from letter_registry.gemini_provider import GeminiDocumentContextProvider
 from letter_registry.google_drive_reader import GoogleDrivePrivateTransport
 from letter_registry.jobs import SupabaseProcessingQueue
 from letter_registry.original_access import SupabaseOriginalAccessService
+from letter_registry.relationships import SupabaseRelationshipRepository
 from letter_registry.semantic_search import SupabaseEmbeddingRepository
 from letter_registry.source_loader import SupabaseSourceLoader
 from letter_registry.supabase_repository import SupabaseLetterRepository
@@ -58,6 +59,7 @@ def main() -> int:
             transport=transport,
             provider=embedding_provider,
         ),
+        relationship_repository=SupabaseRelationshipRepository(transport),
         allow_real_documents=_truthy("ENABLE_REAL_INTAKE"),
     )
 
