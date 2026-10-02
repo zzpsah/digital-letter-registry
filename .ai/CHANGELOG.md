@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: add Drive OAuth secret-manager brain
+- Commit: 4450b4fc0eaa93f8f4bd3abb4b50ba6d93e7c23b
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/drive-oauth-secret-manager/HANDOFF.md`
+
 ## 2026-10-02 — docs: update Drive OAuth tasks for Bitwarden cutover
 - Commit: a0b5f293c7a230d03e31f7762f08d8c096eda863
 - Author: PRASHANT KUMAR SAH
