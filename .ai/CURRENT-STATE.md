@@ -47,3 +47,11 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Hindi + English OCR fallback contract is implemented and versioned, but no concrete OCR engine is wired yet.
 - Hindi/English/Hinglish government and education vocabulary is implemented.
 - Deterministic pre-AI context hints detect concepts such as registration, exam form, deadline/extension, UDISE, PEN, scholarship, correction, verification, training, and government letter structure markers.
+
+
+## Concrete extraction backends
+
+- `PypdfTextBackend` provides native embedded PDF text extraction.
+- `OcrmypdfTesseractBackend` provides local Hindi+English OCR via OCRmyPDF/Tesseract and sidecar text.
+- OCR binaries/language packs are runtime dependencies, not bundled into the repo.
+- Extraction results now map into `letter_processing.extracted_text` and `ocr_version`.
