@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover synthetic-first archive intake and queueing
+- Commit: 03b914d1049fbb12f891fbbee143bbeaf1dead2e
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_intake.py`
+
 ## 2026-10-02 — test: cover authenticated Supabase session identity
 - Commit: 7e371f22c7f07ad0ac03c13b2fab6db8399a04f7
 - Author: PRASHANT KUMAR SAH
