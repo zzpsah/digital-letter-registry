@@ -59,7 +59,7 @@
 - [x] Responsive Hindi-first mobile web/PWA shell.
 - [x] Filters: year, authority, category, file type, validity/status.
 - [x] Server-side private original streaming contract + Google Drive reader implemented.
-- [ ] Verify live runtime original streaming with short-lived/refreshable Drive credentials.
+- [x] Verify live runtime original streaming with refreshable Drive credentials (authorized-user file, synthetic original only).
 
 - [x] Passwordless email login request endpoint for existing authorized users.
 - [x] Implement server-side token-hash auth callback + HttpOnly cookie session/refresh without browser token storage.
@@ -81,6 +81,8 @@
 - [x] Authenticated owner upload panel with explicit synthetic/test mode status.
 - [x] Secret-safe runtime readiness CLI/API/UI checks.
 - [x] Refreshable Google Drive OAuth credential strategy with in-memory access-token caching.
+- [x] Add preferred file-based authorized-user Google OAuth runtime provider and verify live refresh/list/stream with synthetic data only.
+- [ ] Verify runtime synthetic upload/write with an explicitly approved write-capable Drive scope; current verified grant is read-only.
 
 ## Phase 4 — Intelligence lifecycle
 
