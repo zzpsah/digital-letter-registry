@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from typing import Protocol
 from uuid import UUID
 
+from .extraction import ExtractionResult
 from .models import DocumentRecord
 
 
@@ -108,3 +109,19 @@ class InMemoryLetterRepository:
         if letter_id not in self.letters:
             raise ValueError("source record must be saved before processing state")
         self.processing[letter_id] = row
+
+
+def build_supabase_extraction_patch(
+    record: DocumentRecord,
+    *,
+    owner_id: str,
+    result: ExtractionResult,
+) -> dict[str, object]:
+    """Build the processing-row patch for extracted text/version."""
+
+    return {
+        "letter_id": _validated_uuid(record.record_id, field_name="record_id"),
+        "owner_id": _validated_uuid(owner_id, field_name="owner_id"),
+        "extracted_text": result.text,
+        "ocr_version": result.version,
+    }
