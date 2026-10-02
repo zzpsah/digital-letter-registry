@@ -171,3 +171,12 @@
 - [x] Remove unnecessary fixed token-shape assumptions while preserving Supabase + membership validation.
 - [x] Pass full synthetic suite: 256/256.
 - [ ] Complete browser retry and verify DLR HttpOnly session cookie creation.
+
+
+## Second admin onboarding
+
+- [x] Create a second administrator invite through the normal archive-admin RPC.
+- [x] Send invite-validated registration email.
+- [x] Confirm the Auth user was created with invite metadata but remains unconfirmed.
+- [x] Confirm database trigger activates membership only after email confirmation.
+- [ ] Complete email confirmation; expected result is accepted invite + active admin membership.
