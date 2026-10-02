@@ -58,3 +58,8 @@ The separate archive database now has live full-text + trigram search via `searc
 ## Semantic search
 
 The live archive database now has 768-dimensional pgvector storage, HNSW cosine indexing, semantic chunk search, and application-level hybrid ranking that merges text/fuzzy relevance with semantic similarity. Embeddings are version-filtered to support safe future reprocessing.
+
+
+## Private mobile API/PWA
+
+A FastAPI + Hindi-first mobile PWA shell now sits on top of the RLS-protected search layer. Filtered search and safe letter detail are implemented without leaking Drive object IDs. Passwordless login-request flow exists for pre-authorized users, while callback/session exchange and the private original-file resolver remain deployment/runtime tasks. No production deployment has occurred.
