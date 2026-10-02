@@ -150,3 +150,14 @@
 - [x] Add one-click registration-email onboarding for pending invites.
 - [x] Full synthetic suite passes 251/251.
 - [ ] Complete the real short-lived owner bearer-session/PostgREST vertical slice through the normal browser/email completion path.
+
+
+## Password-based independent login
+
+- [x] Add authenticated member password set/change endpoint.
+- [x] Add signed-in Account UI with password confirmation.
+- [x] Keep Magic Link as recovery/passwordless login.
+- [x] Require active archive membership before password update.
+- [x] Unauthenticated password update fails closed with HTTP 401.
+- [x] Full synthetic suite passes 255/255.
+- [ ] Complete one real owner browser session and set the bootstrap admin password.
