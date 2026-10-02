@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: b183212e5b64b62a30bf4ce56b4662f0bfa0c766
-- Last commit: test: cover approval-gated recursive reprocessing scheduling
+- HEAD: 69a5c693fc317779bd6abcf4c40b392c5f45aabb
+- Last commit: docs: sync brain with lifecycle intelligence
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
