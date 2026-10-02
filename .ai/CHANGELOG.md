@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add reviewable relationship lifecycle
+- Commit: 34cd40d70cdaca4885d7e0821942170c3c03bfe8
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261002143000_add_reviewable_relationships.sql`
+
 ## 2026-10-02 — feat: add reviewable relationship suggestion repository
 - Commit: 9f9131bcb5e5957fb138a601c8e2668b7c3d989d
 - Author: PRASHANT KUMAR SAH
