@@ -28,7 +28,9 @@
 - [x] Map original filename + immutable private storage reference through the repository layer.
 - [x] Add credential-free Supabase repository adapter with injected authenticated transport.
 - [x] Implement runtime authenticated Supabase transport and guarded synthetic integration command.
-- [ ] Execute authenticated live synthetic insert/read + RLS denial test with runtime session.
+- [x] Verify DB-level owner insert/read isolation and wrong-user RLS denial using synthetic JWT-claim simulation.
+- [ ] Execute authenticated live synthetic insert/read + RLS denial test with a real short-lived runtime bearer/session.
+- [ ] Remove the retained synthetic RLS verification row after an authorized destructive cleanup path is available.
 
 ## Phase 2 — Extraction/context
 
@@ -91,8 +93,9 @@
 
 ## Current safety boundary
 
-- Drive archive folders remain private; only a synthetic integration test file has been used.
-- Rename behavior is preview-only.
-- No real archive-letter ingestion has occurred; only synthetic integration data has been used.
+- Drive archive folders remain private; only synthetic integration data has been used.
+- Supabase currently contains one synthetic RLS-verification row and no real archive-letter rows.
+- Rename behavior is preview/approval locked; no real rename has been approved or executed.
+- No real archive-letter ingestion has occurred.
 - No production deployment is claimed.
-- No Drive IDs/URLs, Supabase credentials, SSH keys, or server details belong in public Git.
+- No Drive IDs/URLs, Supabase credentials, SSH keys, tokens, or server details belong in public Git.
