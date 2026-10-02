@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: recognize Drive authorized-user credentials file
+- Commit: 04a82a445366afdab5ba7778d11e4099af2f02fe
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/runtime_readiness.py`
+
 ## 2026-10-02 — feat: support file-based Google Drive OAuth
 - Commit: 687eb7c48a7595f6a3b07b8b817d3768884cc5d5
 - Author: PRASHANT KUMAR SAH

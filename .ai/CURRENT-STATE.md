@@ -67,7 +67,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Refreshable Drive OAuth, original streaming, live Gemini verification, and the real owner bearer-session vertical slice remain pending.
 
 ## Last automated change
-- Commit: 687eb7c48a7595f6a3b07b8b817d3768884cc5d5
-- Change: feat: support file-based Google Drive OAuth
+- Commit: 04a82a445366afdab5ba7778d11e4099af2f02fe
+- Change: feat: recognize Drive authorized-user credentials file
 - Date: 2026-10-02
 - Durable context synchronization: completed
