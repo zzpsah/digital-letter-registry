@@ -4,62 +4,35 @@ Last verified: 2026-10-02
 
 ## Working
 
-- DevOS lifecycle is MANAGED.
+- DevOS lifecycle is MANAGED and its local context-sync workflow is green.
 - Public-safe repository scaffold and domain package exist.
 - Private UMV Drive is selected for archive originals.
-- Archive folder structure exists and is empty: `originals/`, `quarantine/`, `exports/`.
+- Archive structure exists: `originals/`, `quarantine/`, `exports/`; only synthetic integration data has been used.
 - Separate Supabase archive database exists with four core RLS-protected tables.
-- Security advisor is clean.
+- Archive-owner Supabase Auth identity exists and is confirmed.
 - Unicode-safe official naming and preview-only rename mapping are implemented.
-- Persistence ports, Supabase row mapping, injected-transport repository adapter, synthetic ingestion preparation, storage ports, and a Drive adapter contract are implemented.
-- GitHub CI is configured for synthetic unit tests.
+- Persistence, Supabase runtime, private storage contracts, and guarded synthetic ingestion are implemented.
+- Native PDF extraction, Hindi/English OCR fallback, structured AI context, embeddings, full-text/fuzzy/semantic/hybrid search are implemented.
+- Live Supabase search migrations and pgvector HNSW index are applied.
+- FastAPI + Hindi-first mobile PWA, filtered search, safe letter detail, and passwordless login-request endpoint are implemented.
+- Original-file access stays server-side; private Drive object IDs are not returned to the browser.
+- Google Drive server-side reader is implemented using runtime-only OAuth access token.
+- Application tests and DevOS context-sync are green.
 
 ## Current gaps
 
-- Supabase archive-owner Auth identity exists and its email is confirmed.
-- No live Google Drive transport or authenticated Supabase transport is wired yet.
-- No OCR, AI context extraction, embeddings pipeline, search UI, or live ingestion exists.
+- Final authenticated live Supabase insert/read + anonymous/RLS denial test with a real user session is still pending.
+- Passwordless auth callback/session exchange is a runtime/deployment integration and is not implemented as raw token-handling code in this public repo.
+- Google Drive access-token refresh/credential lifecycle is not yet implemented.
+- Live original streaming through the API still needs runtime verification.
+- OCRmyPDF/Tesseract Hindi+English packages still need runtime-environment verification.
+- No real archive letters have been ingested.
 - No rename executor is authorized.
 
 ## Next action
 
-Create/establish the archive owner authentication identity, then wire the private Drive upload adapter and authenticated Supabase transport with synthetic fixtures only.
+Implement the private upload/intake API and durable processing-queue boundary using synthetic fixtures, then run one complete authenticated synthetic vertical slice before any real-letter intake.
 
 ## Safety
 
-Do not commit real letters, Drive IDs/URLs, Supabase keys, credentials, SSH keys, or server details to this public repository. Existing Drive files must not be renamed without an approved preview mapping.
-
-
-## 2026-10-02 — Live integration checkpoint
-
-A synthetic PDF upload to the private Drive `originals/` folder is verified. Supabase archive-owner email confirmation is complete. Runtime authenticated PostgREST transport and a guarded synthetic integration command are now implemented. The remaining live step is to execute the command with a short-lived authenticated user session and verify RLS denial for an unauthenticated caller.
-
-
-## Phase 2 progress
-
-Native PDF text/OCR provider contracts are implemented with Hindi-English fallback semantics. Government/education vocabulary and deterministic context hints are implemented before AI analysis. A concrete OCR backend and structured AI provider remain pending.
-
-
-## Concrete extraction backends
-
-Native PDF text now has a pypdf implementation. OCR fallback now has an OCRmyPDF/Tesseract implementation using Hindi+English sidecar text. Extraction text/version persistence is wired into letter_processing. Runtime verification of OCR binaries/language packs remains pending.
-
-
-## Structured context provider
-
-The provider-neutral context schema and extraction→context→persistence pipeline are implemented. Gemini is the first runtime-configurable structured-output adapter; provider/model changes do not require schema changes and can be handled by reprocessing versions.
-
-
-## Search foundation
-
-The separate archive database now has live full-text + trigram search via `search_letters`, plus covering indexes for reported foreign-key gaps. Search remains RLS-protected. Semantic embeddings/ranking are the next search layer.
-
-
-## Semantic search
-
-The live archive database now has 768-dimensional pgvector storage, HNSW cosine indexing, semantic chunk search, and application-level hybrid ranking that merges text/fuzzy relevance with semantic similarity. Embeddings are version-filtered to support safe future reprocessing.
-
-
-## Private mobile API/PWA
-
-A FastAPI + Hindi-first mobile PWA shell now sits on top of the RLS-protected search layer. Filtered search and safe letter detail are implemented without leaking Drive object IDs. Passwordless login-request flow exists for pre-authorized users, while callback/session exchange and the private original-file resolver remain deployment/runtime tasks. No production deployment has occurred.
+Never commit real letters, Drive IDs/URLs, Supabase project references/keys, OAuth tokens, credentials, SSH keys, or server details. Do not rename existing Drive files without an approved preview mapping. No production deployment without explicit approval.
