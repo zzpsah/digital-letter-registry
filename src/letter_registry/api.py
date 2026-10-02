@@ -62,6 +62,8 @@ class LetterDetailResponse(BaseModel):
     id: str
     smart_filename: str | None = None
     title: str | None = None
+    summary: str | None = None
+    reference_number: str | None = None
     authority: str | None = None
     category: str | None = None
     subcategory: str | None = None
@@ -366,6 +368,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             id=detail.record_id,
             smart_filename=detail.smart_filename,
             title=detail.title,
+            summary=detail.summary,
+            reference_number=detail.reference_number,
             authority=detail.authority,
             category=detail.category,
             subcategory=detail.subcategory,
