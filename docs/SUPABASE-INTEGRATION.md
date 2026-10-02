@@ -64,18 +64,27 @@ The database uniquely constrains:
 
 The synthetic in-memory repository implements the same behavior for tests.
 
-## Current blocker
+## Current verification state
 
-The archive database currently has no authenticated archive owner account. Therefore live RLS-backed writes are intentionally not tested yet.
+The archive-owner Supabase Auth identity exists and is confirmed.
+
+DB-level synthetic RLS verification has passed using simulated request JWT claims:
+- owner-context insert succeeds,
+- owner-context read succeeds,
+- a different synthetic user sees zero rows,
+- cross-owner insert is denied by RLS.
+
+This does **not** replace the pending real short-lived bearer-session/PostgREST test. One synthetic RLS verification row currently remains in `letters`; no real archive-letter row exists.
 
 Before real ingestion:
 
-1. Establish the archive owner through Supabase Auth.
-2. Obtain an authenticated user session at runtime.
-3. Provide the runtime Supabase transport through secret/config management.
-4. Run a synthetic end-to-end insert.
-5. Verify RLS permits the owner and denies another user.
-6. Only then connect real Drive uploads.
+1. Obtain a real authenticated owner session at runtime.
+2. Run the guarded synthetic HTTP/PostgREST insert/read test with that session.
+3. Verify the full synthetic intake → private Drive → queue/worker → search/open-original path.
+4. Verify refreshable Drive OAuth/original streaming.
+5. Verify Gemini only with synthetic content.
+6. Clean up temporary synthetic verification rows through an authorized destructive path.
+7. Only after the synthetic vertical slice is complete should real intake even be considered.
 
 ## Safety
 
