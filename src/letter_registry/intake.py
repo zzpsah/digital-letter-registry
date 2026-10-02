@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from .fingerprints import sha256_file
 from .models import DocumentRecord
 from .orchestration import ingest_original
 from .persistence import LetterRepository
@@ -13,6 +14,10 @@ from .storage import OriginalStorage
 
 
 _ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png"}
+
+
+class DuplicateSourceError(ValueError):
+    """Raised before storage upload when the owner already archived this content."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,6 +69,15 @@ class IntakeService:
     ) -> IntakeResult:
         source = Path(path)
         self.policy.validate(source)
+
+        fingerprint = sha256_file(source)
+        if self.repository.source_exists_by_hash(
+            owner_id=owner_id,
+            sha256=fingerprint,
+        ):
+            raise DuplicateSourceError(
+                "source content already exists for this archive owner"
+            )
 
         record = ingest_original(
             source,
