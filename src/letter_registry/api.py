@@ -6,6 +6,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from urllib.parse import urlsplit
 
 from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile, status
 from fastapi.responses import FileResponse, RedirectResponse, Response
@@ -240,6 +241,50 @@ def _access_token(
     )
 
 
+def _configured_app_origin() -> str:
+    configured = os.environ.get("AUTH_APP_ORIGIN", "").strip()
+    if configured:
+        parsed = urlsplit(configured)
+    else:
+        redirect = _required_env("AUTH_REDIRECT_URL")
+        parsed = urlsplit(redirect)
+
+    if parsed.scheme not in {"https", "http"} or not parsed.netloc:
+        raise RuntimeError("Valid AUTH_APP_ORIGIN or AUTH_REDIRECT_URL is required")
+    if parsed.scheme == "http" and parsed.hostname not in {"localhost", "127.0.0.1"}:
+        raise RuntimeError("HTTP app origin is allowed only for local development")
+    return f"{parsed.scheme}://{parsed.netloc}"
+
+
+def _require_same_origin(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
+) -> None:
+    """Protect cookie-authenticated state changes from cross-site requests.
+
+    Explicit Bearer API clients are not vulnerable to browser CSRF because the
+    credential is supplied deliberately in the Authorization header.
+    """
+
+    if credentials is not None and credentials.scheme.lower() == "bearer":
+        return
+
+    origin = request.headers.get("origin", "").strip()
+    try:
+        expected = _configured_app_origin()
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Application origin is not configured",
+        ) from exc
+
+    if origin != expected:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cross-site mutation request rejected",
+        )
+
+
 def _transport(access_token: str) -> SupabasePostgrestTransport:
     return SupabasePostgrestTransport(
         base_url=_required_env("SUPABASE_URL"),
@@ -304,7 +349,10 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         return {"status": "ok"}
 
     @app.post("/api/v1/auth/magic-link", response_model=MessageResponse)
-    def send_magic_link(payload: MagicLinkRequest) -> MessageResponse:
+    def send_magic_link(
+        payload: MagicLinkRequest,
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
         redirect_to = _required_env("AUTH_REDIRECT_URL")
         auth = SupabasePasswordlessAuth.from_environment()
         auth.send_magic_link(email=payload.email, redirect_to=redirect_to)
@@ -342,7 +390,9 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         return SessionStatusResponse(authenticated=True)
 
     @app.post("/api/v1/auth/logout", response_model=MessageResponse)
-    def logout() -> Response:
+    def logout(
+        _: None = Depends(_require_same_origin),
+    ) -> Response:
         response = Response(
             content='{"message":"Signed out"}',
             media_type="application/json",
@@ -373,6 +423,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     async def intake_upload(
         file: UploadFile = File(...),
         access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
     ) -> IntakeResponse:
         safe_name = Path(file.filename or "").name
         if not safe_name or safe_name in {".", ".."}:
@@ -657,6 +708,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         relationship_id: str,
         payload: RelationshipReviewRequest,
         access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
     ) -> MessageResponse:
         try:
             decision = RelationshipReviewStatus(payload.decision)
