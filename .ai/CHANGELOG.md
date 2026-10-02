@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover HttpOnly cookie auth callback and API session
+- Commit: cac4f53a816cd2a574f08c04bd5d6383e95a1de0
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-02 — test: cover server-side Supabase auth verification and refresh
 - Commit: b4dd915f866522a4c0e7057a184cc9e7c4053d94
 - Author: PRASHANT KUMAR SAH
