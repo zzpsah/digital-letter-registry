@@ -21,7 +21,7 @@ Last verified: 2026-10-02
 
 ## Current gaps
 
-- Live DB-level owner RLS read/insert and cross-user isolation are verified with rollback-only synthetic transactions. A final HTTP/PostgREST test using a short-lived real user bearer session is still pending.
+- DB-level owner RLS insert/read and cross-user isolation are verified with synthetic request-JWT claim simulation. A final HTTP/PostgREST test using a short-lived real user bearer session is still pending. One synthetic verification row currently remains in `letters`; no real archive-letter row exists.
 - Passwordless auth now uses a server-side token-hash callback with Secure HttpOnly access/refresh cookies and refresh rotation. The PWA does not persist auth tokens in browser storage.
 - Google Drive OAuth refresh-token lifecycle is implemented with in-memory access-token caching; live runtime verification is still pending.
 - Live original streaming through the API still needs runtime verification.
@@ -49,7 +49,7 @@ PDF and image paths are both represented: PDF uses native text then OCRmyPDF/Tes
 
 - Applied the pending relationship-review migration to the empty archive database.
 - Live schema now includes processing jobs, search/semantic RPCs, summary/reference metadata, and reviewable relationship lifecycle.
-- Verified RLS owner access and cross-user isolation without retaining test rows.
+- Earlier rollback-only RLS checks were followed by a new synthetic DB-level claim-simulation check: owner insert/read passed, wrong-user read returned zero rows, and cross-owner insert was denied. One synthetic verification row is currently retained; no real archive row exists.
 - PWA uses the server-side token-hash magic-link callback with Secure HttpOnly session cookies and can open streamed original bytes.
 - No real letter ingestion, rename execution, or production deployment occurred.
 
@@ -119,3 +119,16 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Project-level AI scope and task records were reconciled to the implemented source.
 - This reconciliation does not verify external runtime credentials, hosted Supabase Auth settings, live provider behavior, real-letter ingestion, Drive rename execution, or production deployment.
 - The next safe runtime work remains synthetic-only: refreshable Drive OAuth verification, Gemini credential verification, and an authenticated owner-session HTTP/PostgREST vertical slice.
+
+
+## 2026-10-02 — DB-level RLS verification follow-up
+
+- Re-read project RULES, AGENTS, .ai state, root tasks/docs, and brain context before continuing.
+- Inspected the public archive RLS policies and confirmed owner-scoped authenticated access.
+- Synthetic owner-context insert/read passed.
+- Synthetic wrong-user read returned zero visible rows.
+- Synthetic cross-owner insert was rejected by RLS.
+- Test method used simulated database request JWT claims, so the real short-lived authenticated HTTP/PostgREST vertical slice remains pending.
+- Exactly one synthetic RLS verification row remains in `letters`; no real archive-letter row exists.
+- Destructive cleanup was not claimed because the connected cleanup action was blocked.
+- No secrets, private IDs, real letters, deployment, live import, or real rename were added.
