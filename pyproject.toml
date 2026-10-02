@@ -7,6 +7,9 @@ name = "digital-letter-registry"
 version = "0.1.0"
 description = "Domain foundations for a private official letter intelligence archive."
 requires-python = ">=3.12"
+dependencies = [
+  "pypdf>=5.0,<7",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
