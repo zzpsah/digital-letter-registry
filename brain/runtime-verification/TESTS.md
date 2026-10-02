@@ -23,7 +23,7 @@ Passed additionally:
 Not yet passed:
 - Real browser/PostgREST short-lived bearer-session vertical slice after Supabase email-send throttling allows a fresh one-time link.
 - Optional custom-SMTP/token-hash template application in the live project.
-- Runtime Drive write/upload verification (current live grant is read-only).
+- Runtime Drive write/upload verification passed with a disposable synthetic object; stream/content verification and cleanup also passed.
 - Gemini runtime synthetic test.
 
 Data note: the retained synthetic verification row was removed; `letters` now contains zero rows.
