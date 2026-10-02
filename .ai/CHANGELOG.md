@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add explicit relationship review RPC
+- Commit: 9b831b0b67a87722bee287d675cf8cf37966114b
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261002143500_add_relationship_review_rpc.sql`
+
 ## 2026-10-02 — feat: add reviewable relationship lifecycle
 - Commit: 34cd40d70cdaca4885d7e0821942170c3c03bfe8
 - Author: PRASHANT KUMAR SAH

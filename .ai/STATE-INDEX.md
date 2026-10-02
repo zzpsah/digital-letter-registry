@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 34cd40d70cdaca4885d7e0821942170c3c03bfe8
-- Last commit: feat: add reviewable relationship lifecycle
+- HEAD: 9b831b0b67a87722bee287d675cf8cf37966114b
+- Last commit: feat: add explicit relationship review RPC
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
