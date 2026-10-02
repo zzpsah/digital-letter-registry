@@ -194,3 +194,18 @@
 - [ ] Add Vercel origin to Supabase Auth redirect allow-list.
 - [ ] Authorize Vercel GitHub integration so pushes to `main` auto-deploy.
 - [ ] Migrate only the intended Drive/original-access secrets if/when Vercel should serve originals directly.
+
+
+## Simple account creation
+
+- [x] Make `zzpsah@gmail.com` an active DLR admin.
+- [x] Add `Create Account` with email/password/confirm-password.
+- [x] Remove Magic-Link controls from the primary UI.
+- [x] Auto-create new archive memberships as `viewer / disabled`.
+- [x] Add protected admin confirmation Edge Function.
+- [x] Confirm account when admin changes pending member to Active.
+- [x] Keep role/status approval in the DLR admin panel.
+- [x] Deploy final Vercel build and verify canonical UI/health.
+- [x] Run 257/257 tests successfully.
+- [ ] Reconcile the hosted pending-membership trigger into a repository migration file when an allowed migration-source path is available.
+- [ ] Optionally disable legacy Magic-Link backend routes after a deprecation period.
