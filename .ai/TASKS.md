@@ -47,3 +47,17 @@ All deferred actions require explicit user authorization and must preserve the r
 - [x] Add persistent refresh-session cookie.
 - [ ] Configure Google Web OAuth client + Supabase Google provider.
 - [ ] Verify linked owner identity and real authenticated synthetic RLS flow.
+
+
+## Multi-user authorization
+
+- [x] Hosted archive membership/role schema applied.
+- [x] Admin/editor/viewer RLS enforced.
+- [x] Email/password + invite-only account registration implemented.
+- [x] Admin invite/member-management UI and API implemented.
+- [x] Last-admin protection verified live.
+- [x] Invite URL secret handling hardened.
+- [x] Full suite: 249/249.
+- [ ] Enable leaked-password protection.
+- [ ] Add a second dedicated admin when an email is selected.
+- [ ] Run real authenticated multi-role HTTP/RLS verification.
