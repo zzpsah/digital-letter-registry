@@ -24,6 +24,15 @@ from .persistence import (
 class SupabaseTransport(Protocol):
     """Minimal authenticated PostgREST-like transport."""
 
+    def select(
+        self,
+        table: str,
+        *,
+        filters: dict[str, str] | None = None,
+        columns: str = "*",
+    ) -> list[dict[str, object]]:
+        ...
+
     def insert(
         self,
         table: str,
@@ -49,6 +58,17 @@ class SupabaseLetterRepository:
 
     transport: SupabaseTransport
     storage_provider: str = "gdrive"
+
+    def source_exists_by_hash(self, *, owner_id: str, sha256: str) -> bool:
+        rows = self.transport.select(
+            "letters",
+            filters={
+                "owner_id": owner_id,
+                "original_sha256": sha256.lower(),
+            },
+            columns="id",
+        )
+        return bool(rows)
 
     def save_source(self, record: DocumentRecord, *, owner_id: str) -> None:
         row = build_supabase_letter_row(
