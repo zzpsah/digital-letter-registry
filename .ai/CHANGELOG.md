@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: mark cookie CSRF hardening complete
+- Commit: be7e720b0204427f5880c942b5cebffa82487647
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+
 ## 2026-10-02 — security: enforce same-origin cookie mutations
 - Commit: 5b4450801d9e81c3c1a593a3b45f5f8eaee7b04a
 - Author: PRASHANT KUMAR SAH
