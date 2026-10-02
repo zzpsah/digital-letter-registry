@@ -23,10 +23,9 @@ class IntakeChannel(StrEnum):
 
 
 @dataclass(frozen=True, slots=True)
-class InboundAttachment:
+class IntakeProvenance:
     channel: IntakeChannel
     filename: str
-    content: bytes
     received_at: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -37,10 +36,26 @@ class InboundAttachment:
     def __post_init__(self) -> None:
         if Path(self.filename).name != self.filename or not self.filename.strip():
             raise ValueError("filename must be a plain basename")
-        if not self.content:
-            raise ValueError("attachment content cannot be empty")
         if self.received_at.tzinfo is None:
             raise ValueError("received_at must be timezone-aware")
+
+
+@dataclass(frozen=True, slots=True)
+class InboundAttachment:
+    provenance: IntakeProvenance
+    content: bytes
+
+    def __post_init__(self) -> None:
+        if not self.content:
+            raise ValueError("attachment content cannot be empty")
+
+    @property
+    def channel(self) -> IntakeChannel:
+        return self.provenance.channel
+
+    @property
+    def filename(self) -> str:
+        return self.provenance.filename
 
 
 class ProvenanceRepository(Protocol):
@@ -49,7 +64,7 @@ class ProvenanceRepository(Protocol):
         *,
         owner_id: str,
         letter_id: str,
-        attachment: InboundAttachment,
+        provenance: IntakeProvenance,
     ) -> None:
         ...
 
@@ -63,7 +78,7 @@ class SupabaseProvenanceRepository:
         *,
         owner_id: str,
         letter_id: str,
-        attachment: InboundAttachment,
+        provenance: IntakeProvenance,
     ) -> None:
         UUID(owner_id)
         UUID(letter_id)
@@ -72,15 +87,15 @@ class SupabaseProvenanceRepository:
             {
                 "owner_id": owner_id,
                 "letter_id": letter_id,
-                "source_channel": attachment.channel.value,
-                "external_message_id": attachment.external_message_id,
-                "source_label": attachment.source_label,
-                "received_at": attachment.received_at.isoformat(),
-                "metadata": dict(attachment.metadata),
+                "source_channel": provenance.channel.value,
+                "external_message_id": provenance.external_message_id,
+                "source_label": provenance.source_label,
+                "received_at": provenance.received_at.isoformat(),
+                "metadata": dict(provenance.metadata),
             },
             on_conflict=(
                 "owner_id,source_channel,external_message_id"
-                if attachment.external_message_id
+                if provenance.external_message_id
                 else None
             ),
         )
@@ -91,32 +106,26 @@ class ChannelIntakeService:
     intake: IntakeService
     provenance: ProvenanceRepository
 
+    @property
+    def policy(self):
+        return self.intake.policy
+
     def ingest_path(
         self,
         path: str | Path,
         *,
         owner_id: str,
-        channel: IntakeChannel,
-        external_message_id: str | None = None,
-        source_label: str | None = None,
-        metadata: Mapping[str, object] | None = None,
-        received_at: datetime | None = None,
+        provenance: IntakeProvenance,
     ) -> IntakeResult:
         source = Path(path)
+        if source.name != provenance.filename:
+            raise ValueError("provenance filename must match the intake file")
+
         result = self.intake.ingest(source, owner_id=owner_id)
-        attachment = InboundAttachment(
-            channel=channel,
-            filename=source.name,
-            content=b"provenance-only",
-            received_at=received_at or datetime.now(timezone.utc),
-            external_message_id=external_message_id,
-            source_label=source_label,
-            metadata=metadata or {},
-        )
         self.provenance.save_source(
             owner_id=owner_id,
             letter_id=result.record.record_id,
-            attachment=attachment,
+            provenance=provenance,
         )
         return result
 
@@ -134,9 +143,5 @@ class ChannelIntakeService:
             return self.ingest_path(
                 path,
                 owner_id=owner_id,
-                channel=attachment.channel,
-                external_message_id=attachment.external_message_id,
-                source_label=attachment.source_label,
-                metadata=attachment.metadata,
-                received_at=attachment.received_at,
+                provenance=attachment.provenance,
             )
