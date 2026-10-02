@@ -35,8 +35,8 @@
 - [x] Add provider-neutral native PDF text extraction contract and usability heuristic.
 - [x] Add concrete pypdf native-text backend.
 - [x] Add Hindi/English OCR fallback contract with versioned processing result.
-- [x] Add concrete local OCRmyPDF/Tesseract backend contract.
-- [ ] Verify OCRmyPDF + Hindi/English language packs in the eventual runtime environment.
+- [x] Add concrete OCRmyPDF PDF fallback + direct Tesseract image OCR backends.
+- [ ] Verify OCRmyPDF + Tesseract Hindi/English language packs in the eventual runtime environment.
 - [x] Create government/education Hindi vocabulary and deterministic context hints.
 - [x] Implement provider-independent structured AI analysis.
 - [x] Add configurable Gemini structured-output provider as the first adapter.
@@ -44,6 +44,9 @@
 - [x] Generate normalized smart filename.
 - [x] Use `undated` and `no-ref` placeholders.
 - [x] Preserve Hindi/English/Hinglish Unicode text.
+- [x] Extract explicit issue date + reference number into structured context.
+- [x] Smart filename is derived automatically when title + authority are confidently available.
+- [x] Promote summary/reference number into searchable metadata.
 
 ## Phase 3 — Search/UI
 
@@ -62,9 +65,9 @@
 
 ## Phase 3.5 — Intake/runtime
 
-- [ ] Private upload/intake API with synthetic-first safety guard.
-- [ ] Durable processing-job queue contract.
-- [ ] Upload → archive source → enqueue derived processing.
+- [x] Private upload/intake API with synthetic-first safety guard.
+- [x] Durable Supabase processing-job queue with atomic claim/complete/fail RPCs.
+- [x] Upload → duplicate preflight → private archive → enqueue derived processing.
 - [ ] Live authenticated synthetic API vertical slice.
 - [ ] Runtime auth callback/session exchange without exposing tokens.
 - [ ] Refreshable Google Drive credential strategy.
@@ -74,6 +77,7 @@
 - [ ] Related/superseded/extension/correction links.
 - [ ] Processing-version registry.
 - [ ] Preview + recursive reprocessing jobs.
+- [x] One-job processing worker orchestration with durable success/failure state.
 - [ ] Safe rename executor only after explicit approval.
 - [ ] Historical bulk import.
 - [ ] Additional intake channels: Telegram, WhatsApp, email, watched folder.
