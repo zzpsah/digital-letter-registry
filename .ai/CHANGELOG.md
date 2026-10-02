@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: move mobile UI to HttpOnly cookie sessions
+- Commit: a8cdd621a0a8b89090df2035e3c7f7b6eef4da0c
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-02 — feat: add cookie-backed session status endpoint
 - Commit: b77daf9e4251b8e475489544c2b713d081eecfcf
 - Author: PRASHANT KUMAR SAH
