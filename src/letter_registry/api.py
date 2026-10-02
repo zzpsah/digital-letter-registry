@@ -29,6 +29,7 @@ from .session import SupabaseUserSession
 from .storage import GoogleDriveOriginalStorage
 from .supabase_repository import SupabaseLetterRepository
 from .supabase_runtime import SupabasePostgrestTransport
+from .version_registry import ProcessingTargetVersions, SupabaseProcessingVersionRegistry
 
 
 security = HTTPBearer(auto_error=False)
@@ -104,6 +105,27 @@ class ReprocessingPreviewItemResponse(BaseModel):
 class ReprocessingPreviewResponse(BaseModel):
     count: int
     items: list[ReprocessingPreviewItemResponse]
+
+
+class ProcessingProfileRequest(BaseModel):
+    extraction: str
+    context: str
+    dictionary: str
+    filename_rule: str
+    category_schema: str
+    embedding: str
+    status_rule: str
+
+
+class ProcessingProfileResponse(ProcessingProfileRequest):
+    pass
+
+
+class ReprocessingPreviewResponse(BaseModel):
+    letter_id: str
+    title: str | None = None
+    smart_filename: str | None = None
+    differences: list[str] = Field(default_factory=list)
 
 
 class IntakeResponse(BaseModel):
