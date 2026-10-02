@@ -74,8 +74,10 @@
 
 ## Phase 4 — Intelligence lifecycle
 
-- [ ] Related/superseded/extension/correction links.
+- [x] Reviewable related/superseded/extension/correction relationship lifecycle.
 - [ ] Processing-version registry.
+- [x] Conservative explicit-reference relationship suggestion rules.
+- [x] Confirm/reject review API with status recalculation only after confirmation.
 - [ ] Preview + recursive reprocessing jobs.
 - [x] One-job processing worker orchestration with durable success/failure state.
 - [ ] Safe rename executor only after explicit approval.
