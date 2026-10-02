@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: start Vercel hosting enhancement
+- Commit: ff4687a9fb181cfd8d6dfb0539756ff9a4012f27
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/vercel-hosting/HANDOFF.md`
+
 ## 2026-10-03 — fix: allow access-only auth callback fallback
 - Commit: 08643f6ac583ad32944b49aad680f229f1161856
 - Author: PRASHANT KUMAR SAH
