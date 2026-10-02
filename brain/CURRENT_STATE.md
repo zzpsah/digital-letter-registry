@@ -88,3 +88,16 @@ Provider-neutral adapters now normalize Telegram, WhatsApp, email, watched-folde
 - A temporary localhost-only FastAPI smoke run verified `/api/v1/health` = 200, Hindi PWA shell = 200, unauthenticated session = 401, and unauthenticated search = 401; the temporary process was stopped afterward.
 - ARM64 Ubuntu repositories provide Tesseract, Hindi/English language packs, and OCRmyPDF, but package installation is still pending because the `prashant` account requires interactive sudo authorization.
 - Supabase performance advisor no longer reports duplicate processing-profile RLS policies after cleanup. Remaining unused-index notices are informational while the archive is nearly empty.
+
+
+## Runtime readiness + secure browser auth
+
+The browser auth flow is now server-side and token-safe: Supabase token-hash magic links are verified at `/auth/confirm`, access/refresh sessions are stored in HttpOnly SameSite=Lax cookies, access expiry is refreshed server-side, and browser JavaScript never reads auth tokens. Cookie-authenticated mutations are protected by same-origin checks; explicit Bearer API clients remain supported.
+
+The owner PWA now includes authenticated synthetic-first upload and safe runtime readiness panels. Readiness checks report only boolean/status information for Supabase, auth callback, Drive OAuth/folder, Gemini, OCRmyPDF, Tesseract Hindi+English, and the synthetic-only safety flag. No secret values or private folder IDs are returned.
+
+Refresh-token Google Drive credentials now enable both upload and original streaming; a direct short-lived access token remains an optional fallback.
+
+Application CI is green with these changes included. The remaining blocker before a live browser synthetic vertical slice is hosted Supabase Auth configuration: copy `supabase/templates/magic-link.html` into the project Magic Link template and configure the Site URL/redirect for the app's `/auth/confirm` endpoint. The connected Supabase tool cannot mutate hosted Auth templates/settings, so this external dashboard step has not been claimed as complete.
+
+Real intake remains disabled by default. No real archive letter has been ingested or renamed and no production deployment has occurred.
