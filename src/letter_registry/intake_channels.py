@@ -63,6 +63,17 @@ class CanonicalIntake(Protocol):
         ...
 
 
+class ProvenanceRepository(Protocol):
+    def save(
+        self,
+        *,
+        owner_id: str,
+        letter_id: str,
+        provenance: IntakeProvenance,
+    ) -> None:
+        ...
+
+
 @dataclass(frozen=True, slots=True)
 class ChannelIntakeResult:
     intake: IntakeResult
@@ -72,6 +83,7 @@ class ChannelIntakeResult:
 @dataclass(slots=True)
 class IntakeChannelAdapter:
     intake: CanonicalIntake
+    provenance_repository: ProvenanceRepository | None = None
 
     def submit(
         self,
@@ -88,6 +100,12 @@ class IntakeChannelAdapter:
             attachment.path,
             owner_id=owner_id,
         )
+        if self.provenance_repository is not None:
+            self.provenance_repository.save(
+                owner_id=owner_id,
+                letter_id=result.record.record_id,
+                provenance=attachment.provenance,
+            )
         return ChannelIntakeResult(
             intake=result,
             provenance=attachment.provenance,
@@ -160,3 +178,40 @@ def whatsapp_attachment(
             conversation_label=chat_label,
         ),
     )
+
+
+
+class SourceTransport(Protocol):
+    def insert(
+        self,
+        table: str,
+        row: dict[str, object],
+        *,
+        on_conflict: str | None = None,
+    ) -> dict[str, object]:
+        ...
+
+
+@dataclass(slots=True)
+class SupabaseProvenanceRepository:
+    transport: SourceTransport
+
+    def save(
+        self,
+        *,
+        owner_id: str,
+        letter_id: str,
+        provenance: IntakeProvenance,
+    ) -> None:
+        self.transport.insert(
+            "letter_sources",
+            {
+                "owner_id": owner_id,
+                "letter_id": letter_id,
+                "channel": provenance.channel,
+                "source_id": provenance.source_id,
+                "sender_label": provenance.sender_label,
+                "conversation_label": provenance.conversation_label,
+            },
+            on_conflict="owner_id,channel,source_id",
+        )
