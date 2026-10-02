@@ -25,7 +25,7 @@ Last verified: 2026-10-02
 - Passwordless auth now uses a server-side token-hash callback with Secure HttpOnly access/refresh cookies and refresh rotation. The PWA does not persist auth tokens in browser storage.
 - Google Drive OAuth refresh-token lifecycle is implemented with in-memory access-token caching; live runtime verification is still pending.
 - Live original streaming through the API still needs runtime verification.
-- OCRmyPDF/Tesseract Hindi+English packages still need runtime-environment verification.
+- Oracle OCR runtime is verified using a user-local ARM64 Tesseract 5.3.4 install with `eng`, `hin`, and `osd`, plus OCRmyPDF 16.13.0 in the project virtualenv. Synthetic PNG and image-only PDF OCR smoke tests both passed.
 - No real archive letters have been ingested.
 - Approval-locked rename execution code exists, but no rename plan has been approved or executed.
 
@@ -101,3 +101,14 @@ Refresh-token Google Drive credentials now enable both upload and original strea
 Application CI is green with these changes included. The remaining blocker before a live browser synthetic vertical slice is hosted Supabase Auth configuration: copy `supabase/templates/magic-link.html` into the project Magic Link template and configure the Site URL/redirect for the app's `/auth/confirm` endpoint. The connected Supabase tool cannot mutate hosted Auth templates/settings, so this external dashboard step has not been claimed as complete.
 
 Real intake remains disabled by default. No real archive letter has been ingested or renamed and no production deployment has occurred.
+
+
+## 2026-10-02 — Runtime readiness follow-up
+
+- Oracle local runtime now passes the full synthetic suite (200/200 at this checkpoint).
+- Supabase runtime URL/publishable key/owner mapping is configured locally; anonymous Data API read returns an empty RLS-scoped result and anonymous insert is rejected with 401.
+- The private Drive archive folder and its `originals/`, `quarantine/`, and `exports/` children were verified through the connected Drive account; the expected private synthetic integration PDF is present in `originals/`.
+- Oracle local `.env` contains only runtime-only mappings and remains Git-ignored with restrictive permissions.
+- Auth callback is configured for localhost `/auth/confirm`.
+- OCR no longer requires sudo: Tesseract 5.3.4 and Hindi/English language data are installed under the user account; OCRmyPDF 16.13.0 is installed in the project virtualenv.
+- Current readiness blockers are only Google Drive runtime OAuth credentials and a Gemini API key. The authenticated owner-session test also still requires a user-approved/manual one-time login boundary because transferring a one-time email credential directly between connected tools is not permitted.
