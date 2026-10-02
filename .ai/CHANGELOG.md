@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover runtime capabilities and mobile upload shell
+- Commit: bad83b6e78d6e928584951b57084f7a712e3ef49
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-02 — feat: add authenticated synthetic-first upload panel
 - Commit: f637acd9a5d8be941625ae20d0e0cbdcf31c49b2
 - Author: PRASHANT KUMAR SAH
