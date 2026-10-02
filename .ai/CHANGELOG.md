@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: use refreshable Drive token provider for rename
+- Commit: 18f19b0156b01a1f2cacc27a08e31379eed7f17c
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/google_drive_renamer.py`
+
 ## 2026-10-02 — fix: remove duplicate reprocessing response model
 - Commit: 7c196032d45d0d028b4c9f68ec26c036991d5782
 - Author: PRASHANT KUMAR SAH
