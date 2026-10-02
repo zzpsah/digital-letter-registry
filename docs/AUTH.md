@@ -69,3 +69,26 @@ Auth callback/session responses use `Cache-Control: private, no-store`.
 - Do not put Supabase access/refresh tokens in localStorage/sessionStorage.
 - Do not cache responses that contain authentication cookies.
 - Keep `AUTH_COOKIE_SECURE=true` for HTTPS environments.
+
+
+## CSRF protection
+
+Browser sessions use HttpOnly cookies, so every state-changing browser request
+is additionally checked against the configured application origin.
+
+Set:
+
+```bash
+AUTH_APP_ORIGIN=https://archive.example.com
+```
+
+If omitted, the server derives the expected origin from `AUTH_REDIRECT_URL`.
+Plain HTTP origins are accepted only for `localhost` / `127.0.0.1`.
+
+Cookie-authenticated mutations with a missing or different `Origin` header are
+rejected with HTTP 403. Explicit Bearer-token API clients are exempt because
+their credential is deliberately supplied in the `Authorization` header.
+
+The protected mutation surface includes magic-link requests, logout, upload
+intake, and relationship review. New mutation endpoints should reuse the same
+origin guard.
