@@ -13,6 +13,6 @@ Current runtime checkpoint:
 - The existing VPS `phone_drive` rclone credential cannot enumerate archive contents even with direct folder IDs, so it is not suitable for registry Drive runtime access.
 - Gemini runtime key remains unavailable.
 - A dedicated Google OAuth client exists in a private vault from the earlier attempt, but Bitwarden CLI is unavailable locally and on the VPS, so current tooling cannot retrieve it automatically.
-- One synthetic DB verification row remains; no real archive letters exist.
+- The synthetic DB verification row was removed through controlled cleanup; no archive-letter rows exist.
 
 Do not deploy, ingest real documents, activate live connectors, rename real Drive files, configure or expose secrets, or perform destructive live-data actions without the required explicit authorization.
