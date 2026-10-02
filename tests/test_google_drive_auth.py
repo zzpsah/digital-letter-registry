@@ -1,9 +1,12 @@
 import json
 import os
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from letter_registry.google_drive_auth import (
+    GoogleAuthorizedUserFileProvider,
     GoogleRefreshTokenProvider,
     StaticAccessTokenProvider,
     drive_token_provider_from_environment,
@@ -43,6 +46,55 @@ class DriveAuthTests(unittest.TestCase):
         self.assertEqual(second, "refreshed-token")
         self.assertEqual(len(calls), 1)
         self.assertIn("grant_type=refresh_token", calls[0])
+
+    def test_environment_prefers_authorized_user_file(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "credentials.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "client_id": "synthetic-client",
+                        "client_secret": "synthetic-secret",
+                        "refresh_token": "synthetic-refresh",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "GOOGLE_OAUTH_CREDENTIALS_FILE": str(path),
+                    "GOOGLE_DRIVE_ACCESS_TOKEN": "fallback-token",
+                },
+                clear=True,
+            ):
+                provider = drive_token_provider_from_environment()
+
+        self.assertIsInstance(provider, GoogleAuthorizedUserFileProvider)
+
+    def test_authorized_user_file_delegates_refresh(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "credentials.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "client_id": "synthetic-client",
+                        "client_secret": "synthetic-secret",
+                        "refresh_token": "synthetic-refresh",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            provider = GoogleAuthorizedUserFileProvider(str(path))
+            with patch.object(
+                GoogleRefreshTokenProvider,
+                "get_access_token",
+                return_value="synthetic-access",
+            ) as refresh:
+                token = provider.get_access_token()
+
+        self.assertEqual(token, "synthetic-access")
+        refresh.assert_called_once()
 
     def test_environment_prefers_refresh_credentials(self):
         with patch.dict(
