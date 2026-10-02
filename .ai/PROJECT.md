@@ -51,3 +51,8 @@ The application foundation is implemented in the public repository:
 - Tailscale controls private network reachability.
 - Google OAuth controls backend access to the configured Drive archive.
 - Real document mutation remains separately approval-gated even for a successfully authenticated owner.
+
+
+## Preferred user login
+
+Google Sign-In is the preferred browser authentication experience when configured. Magic Link remains fallback/recovery. Both resolve to the same Supabase authenticated user/session and owner-scoped RLS model. Google Sign-In uses a separate Web OAuth client; never reuse backend Drive OAuth credentials.
