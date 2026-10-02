@@ -14,8 +14,10 @@
 - Official filename pattern is `short-title__issuer__date__reference-number.ext`.
 - Naming now preserves Hindi/English/Hinglish Unicode and uses `undated` / `no-ref` placeholders.
 - Rename functionality is preview-only; no Drive rename executor is authorized yet.
+- Persistence ports, Supabase row mapping, an injected-transport Supabase repository adapter, and a synthetic/local ingestion-preparation service are implemented.
+- GitHub CI runs the synthetic unit-test suite on pushes/PRs.
 - No live document ingestion, OCR/AI processing, or production deployment has occurred.
 
 ## Next step
 
-Establish an authenticated archive owner for RLS-backed writes, then implement the private storage/database repository adapter using synthetic fixtures before any live-letter ingestion.
+Establish an authenticated archive owner for RLS-backed writes, then implement the private Google Drive upload adapter and a real authenticated Supabase transport using synthetic fixtures before any live-letter ingestion.
