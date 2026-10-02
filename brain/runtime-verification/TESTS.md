@@ -17,7 +17,7 @@ Not yet passed:
 - Drive OAuth/original streaming runtime test.
 - Gemini runtime synthetic test.
 
-Data note: one synthetic verification row remains; no real archive-letter row exists.
+Data note: the retained synthetic verification row was removed; `letters` now contains zero rows.
 
 ## OCR readiness override verification
 
