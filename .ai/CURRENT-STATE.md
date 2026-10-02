@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 8235d4c3f0716761a433b445fde90f1a06e797ff
-- Change: feat: add authenticated password update helper
+- Commit: d9acc8e7741b3215c765f6b5b1b5e9448db5f8a2
+- Change: feat: add member password change endpoint
 - Date: 2026-10-03
 - Durable context synchronization: completed

@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: add member password change endpoint
+- Commit: d9acc8e7741b3215c765f6b5b1b5e9448db5f8a2
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-03 — feat: add authenticated password update helper
 - Commit: 8235d4c3f0716761a433b445fde90f1a06e797ff
 - Author: PRASHANT KUMAR SAH

@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 8235d4c3f0716761a433b445fde90f1a06e797ff
-- Last commit: feat: add authenticated password update helper
+- HEAD: d9acc8e7741b3215c765f6b5b1b5e9448db5f8a2
+- Last commit: feat: add member password change endpoint
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
