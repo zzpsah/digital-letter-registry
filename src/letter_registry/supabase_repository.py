@@ -81,6 +81,23 @@ class SupabaseLetterRepository:
             storage_object_reference=str(row["storage_object_id"]),
         )
 
+    def storage_reference_exists(
+        self,
+        *,
+        owner_id: str,
+        object_reference: str,
+    ) -> bool:
+        rows = self.transport.select(
+            "letters",
+            filters={
+                "owner_id": owner_id,
+                "storage_provider": self.storage_provider,
+                "storage_object_id": object_reference,
+            },
+            columns="id",
+        )
+        return bool(rows)
+
     def source_exists_by_hash(self, *, owner_id: str, sha256: str) -> bool:
         rows = self.transport.select(
             "letters",
