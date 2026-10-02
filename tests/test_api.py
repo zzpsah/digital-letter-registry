@@ -600,6 +600,35 @@ class ApiTests(unittest.TestCase):
         self.assertIn("dlr_refresh_token=", cookies)
         self.assertIn("httponly", cookies)
 
+    def test_fragment_session_bridge_accepts_provider_token_shape(self):
+        from letter_registry.session import SupabaseUserSession
+
+        owner_id = "11111111-1111-4111-8111-111111111111"
+        with patch(
+            "letter_registry.api.SupabaseUserSession.from_environment"
+        ) as factory:
+            factory.return_value.user_id.return_value = owner_id
+            with patch.dict(
+                os.environ,
+                {
+                    "AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm",
+                    "AUTH_COOKIE_SECURE": "false",
+                },
+                clear=False,
+            ):
+                response = self.client.post(
+                    "/api/v1/auth/session-from-fragment",
+                    headers={"Origin": "https://archive.example.com"},
+                    json={
+                        "access_token": "a" * 40,
+                        "refresh_token": "short-refresh",
+                        "expires_in": 5,
+                    },
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["authenticated"])
+
     def test_fragment_session_bridge_rejects_non_member(self):
         from fastapi import HTTPException
 
