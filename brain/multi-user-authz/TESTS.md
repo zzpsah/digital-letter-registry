@@ -22,3 +22,24 @@
 
 ## Pending
 - Real browser/session editor and viewer vertical-slice verification.
+
+
+## Hosted RLS matrix verification — 2026-10-02
+
+Transaction-safe synthetic claim tests on hosted Supabase verified:
+- viewer can read archive letters;
+- viewer update affects zero rows;
+- editor can insert;
+- editor can update;
+- editor delete affects zero rows;
+- non-member reads zero archive rows;
+- non-member insert is denied;
+- admin delete succeeds.
+
+The first harness incorrectly treated zero-row UPDATE/DELETE denials as failures; the corrected harness measured affected rows. A separate admin check captured the admin identity before role switching and confirmed delete success.
+
+Post-test cleanup verified:
+- zero synthetic test Auth users;
+- zero synthetic test letters;
+- zero synthetic test memberships;
+- zero pending invites.
