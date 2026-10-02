@@ -55,15 +55,23 @@ Include BSEB, UDISE+, PEN, APAAR, eShikshaKosh, Matric, Intermediate, registrati
 
 ## Smart filename
 
-Suggested form:
-`YYYY-MM-DD_CATEGORY_SHORT-SUBJECT[_LETTER-NO].pdf`
+Official derived filename pattern:
+
+`short-title__issuer__date__reference-number.ext`
 
 Rules:
 - keep original filename in metadata,
-- keep generated names short and normalized,
-- omit uncertain fields rather than guessing,
-- avoid collisions with stable record IDs/suffixes,
-- filename is derived/versioned and can be regenerated.
+- preserve the original extension,
+- keep generated title/issuer short and normalized,
+- use `YYYY-MM-DD` for a confident date, otherwise `undated`,
+- use the official memo/reference number when confidently present, otherwise `no-ref`,
+- separate the four fields with double underscores,
+- preserve Hindi/English/Hinglish Unicode,
+- keep the original immutable,
+- treat the smart filename as derived/versioned data that can be regenerated,
+- never bulk-rename existing Drive files without preview + explicit approval.
+
+See `docs/NAMING-SPEC.md` for the canonical filename contract.
 
 ## Search
 
@@ -131,4 +139,4 @@ The broader environment already has an authorized private administration path th
 
 ## Current boundary
 
-No production deployment or live archive import is authorized yet. First implementation should use synthetic/private test fixtures and prove the vertical slice safely.
+No production deployment or live archive import is authorized yet. Synthetic/private test fixtures must prove the vertical slice safely before real archive intake.
