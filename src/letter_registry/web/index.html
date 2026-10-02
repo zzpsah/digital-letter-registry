@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#1f5e46">
+  <link rel="manifest" href="/manifest.webmanifest">
   <title>Official Letter Intelligence Archive</title>
   <style>
     :root{font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:#17202a;background:#f5f7f9}
@@ -29,6 +31,16 @@
   <section class="hero">
     <h1>आधिकारिक पत्र खोज</h1>
     <div class="muted">Official Letter Intelligence Archive · Hindi / English / Hinglish</div>
+  </section>
+
+  <section id="loginBox" class="card">
+    <h2>साइन इन</h2>
+    <div class="muted">Authorized email पर secure sign-in link भेजें.</div>
+    <form id="loginForm" class="row" style="margin-top:10px">
+      <input id="loginEmail" type="email" autocomplete="email" placeholder="email@example.com" style="flex:1;min-width:0">
+      <button type="submit">Link भेजें</button>
+    </form>
+    <div id="loginStatus" class="muted" style="margin-top:8px"></div>
   </section>
 
   <form id="searchForm">
@@ -104,6 +116,29 @@ function render(data){
     if(!res.ok) alert("Original नहीं खुल सका");
   }));
 }
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const email=$("loginEmail").value.trim();
+  if(!email)return;
+  $("loginStatus").textContent="Link भेजा जा रहा है…";
+  const res=await fetch("/api/v1/auth/magic-link",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email})
+  });
+  $("loginStatus").textContent=res.ok
+    ?"अगर email authorized है तो sign-in link भेज दिया गया है."
+    :"Sign-in request failed.";
+});
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+if(token()){
+  $("loginBox").style.display="none";
+  $("status").textContent="Authenticated session active.";
+}
+
 $("searchForm").addEventListener("submit",async e=>{
   e.preventDefault();
   if(!token()){
