@@ -62,6 +62,8 @@ class GeminiEmbeddingProvider:
         )
 
     def embed_document(self, text: str) -> EmbeddingResult:
+        if not text.strip():
+            raise ValueError("embedding text cannot be empty")
         instructed = (
             "Represent this official education/government document passage for retrieval. "
             "Preserve semantic meaning across Hindi, English, and Hinglish.\n\n"
@@ -70,6 +72,8 @@ class GeminiEmbeddingProvider:
         return self._embed(instructed)
 
     def embed_query(self, text: str) -> EmbeddingResult:
+        if not text.strip():
+            raise ValueError("embedding text cannot be empty")
         instructed = (
             "Represent this user search query for retrieving relevant official "
             "education/government letters.\n\n"
