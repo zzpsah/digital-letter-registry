@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover server-side Supabase auth verification and refresh
+- Commit: b4dd915f866522a4c0e7057a184cc9e7c4053d94
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_auth.py`
+
 ## 2026-10-02 — feat: move mobile UI to HttpOnly cookie sessions
 - Commit: a8cdd621a0a8b89090df2035e3c7f7b6eef4da0c
 - Author: PRASHANT KUMAR SAH
