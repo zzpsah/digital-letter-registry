@@ -133,6 +133,20 @@ class SupabasePostgrestTransport:
             return result
         raise SupabaseRuntimeError("unexpected upsert response shape")
 
+    def rpc(
+        self,
+        function: str,
+        params: dict[str, object],
+    ) -> list[dict[str, object]]:
+        result = self._request(
+            method="POST",
+            path=f"rpc/{function}",
+            row=params,
+        )
+        if isinstance(result, list):
+            return [item for item in result if isinstance(item, dict)]
+        raise SupabaseRuntimeError("unexpected RPC response shape")
+
     def select(
         self,
         table: str,
