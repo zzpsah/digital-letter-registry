@@ -25,7 +25,10 @@
     const access_token=hash.get("access_token")||"";
     const refresh_token=hash.get("refresh_token")||"";
     const expires_in=Number(hash.get("expires_in")||3600);
-    if(!access_token||!refresh_token)throw new Error("Missing session tokens");
+    if(!access_token){
+      status.textContent="Sign-in callback में access token नहीं मिला.";
+      return;
+    }
 
     const res=await fetch("/api/v1/auth/session-from-fragment",{
       method:"POST",
@@ -33,12 +36,18 @@
       body:JSON.stringify({access_token,refresh_token,expires_in})
     });
 
+    let body={};
+    try{body=await res.json();}catch{}
     history.replaceState(null,"","/auth/confirm");
-    if(!res.ok)throw new Error("Session validation failed");
+    if(!res.ok){
+      const refreshState=refresh_token?"refresh=yes":"refresh=no";
+      status.textContent="DLR session bridge failed (HTTP "+res.status+", "+refreshState+"): "+(body.detail||"unknown error");
+      return;
+    }
     location.replace("/");
   }catch(error){
     history.replaceState(null,"","/auth/confirm");
-    status.textContent="Sign-in session invalid या expired है. Google sign-in या email fallback दोबारा शुरू करें.";
+    status.textContent="DLR session bridge request failed. Network/session callback error.";
   }
 })();
 </script>
