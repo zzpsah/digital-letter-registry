@@ -1,3 +1,10 @@
+## 2026-10-03 — build: configure Vercel Python function
+- Commit: 5f676a0e8b978ca9430b9f01443df0be8698e600
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `vercel.json`
+
 ## 2026-10-03 — docs: start Vercel hosting enhancement
 - Commit: ff4687a9fb181cfd8d6dfb0539756ff9a4012f27
 - Author: PRASHANT KUMAR SAH
