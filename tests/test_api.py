@@ -52,6 +52,7 @@ class ApiTests(unittest.TestCase):
                 response = self.client.post(
                     "/api/v1/auth/magic-link",
                     json={"email": "owner@example.com"},
+                    headers={"Origin": "https://archive.example.com"},
                 )
 
         self.assertEqual(response.status_code, 200)
@@ -124,7 +125,15 @@ class ApiTests(unittest.TestCase):
             "synthetic-cookie-refresh",
         )
 
-        response = self.client.post("/api/v1/auth/logout")
+        with patch.dict(
+            os.environ,
+            {"AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm"},
+            clear=False,
+        ):
+            response = self.client.post(
+                "/api/v1/auth/logout",
+                headers={"Origin": "https://archive.example.com"},
+            )
 
         self.assertEqual(response.status_code, 200)
         joined = "\n".join(
@@ -133,6 +142,45 @@ class ApiTests(unittest.TestCase):
         self.assertIn("dlr_access_token=", joined)
         self.assertIn("dlr_refresh_token=", joined)
         self.assertIn("max-age=0", joined)
+
+    def test_cross_site_cookie_mutation_is_rejected(self):
+        self.client.cookies.set(
+            "dlr_access_token",
+            "synthetic-cookie-access",
+        )
+        with patch.dict(
+            os.environ,
+            {"AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm"},
+            clear=False,
+        ):
+            response = self.client.post(
+                "/api/v1/auth/logout",
+                headers={"Origin": "https://attacker.example"},
+            )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertIn("Cross-site", response.json()["detail"])
+
+    def test_bearer_mutation_does_not_require_origin_header(self):
+        class RelationshipTransport:
+            def rpc(self, function, params):
+                return [{"success": True}]
+
+            def select(self, table, *, filters=None, columns="*"):
+                return []
+
+        with patch(
+            "letter_registry.api._transport",
+            return_value=RelationshipTransport(),
+        ):
+            response = self.client.post(
+                "/api/v1/relationships/"
+                "44444444-4444-4444-8444-444444444444/review",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+                json={"decision": "confirmed"},
+            )
+
+        self.assertEqual(response.status_code, 200)
 
     def test_pwa_manifest_and_service_worker_are_public(self):
         self.assertEqual(self.client.get("/manifest.webmanifest").status_code, 200)
