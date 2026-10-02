@@ -7,7 +7,7 @@
 - Private archive structure exists with `originals/`, `quarantine/`, and `exports/`; a synthetic integration PDF has been used in `originals/`, but no real archive letters have been ingested.
 - A separate Supabase archive project exists, isolated from the existing UMV database.
 - Core tables exist: `letters`, `letter_processing`, `letter_relationships`, and `letter_chunks`.
-- RLS is enabled on all public archive tables; security advisor is clean.
+- RLS is enabled on all public archive tables. Owner-read and cross-user isolation were live-verified with rollback-only synthetic transactions. Security advisor has no schema/RLS finding; it currently warns only that leaked-password protection is disabled at the Auth project setting.
 - Supabase archive-owner Auth identity exists and is confirmed; no real archive-letter rows have been ingested.
 - The public-safe core schema is captured under `supabase/migrations/`.
 - Domain code includes immutable source identity, SHA-256 fingerprints, processing versions, statuses/relationships, and smart filenames.
@@ -94,9 +94,9 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Search API uses the caller's Supabase bearer session, preserving RLS as the data boundary.
 - Search/detail responses never expose private storage object identifiers.
 - Safe authenticated letter-detail endpoint is implemented.
-- Passwordless email link request is implemented with `create_user=false`; callback/session exchange remains a deployment-time integration.
+- Passwordless email link request is implemented with `create_user=false`. The PWA now completes the existing implicit magic-link flow client-side: it captures the bearer access token from the URL fragment into `sessionStorage`, immediately scrubs the fragment from browser history, and supports explicit sign-out. Refresh tokens are not persisted by this shell.
 - PWA service worker caches only public app-shell assets and never caches `/api/` data.
-- Server-side original streaming is implemented: the API resolves private storage references under RLS and can stream Google Drive bytes without exposing Drive object IDs. Live runtime credential verification remains pending.
+- Server-side original streaming is implemented: the API resolves private storage references under RLS and can stream Google Drive bytes without exposing Drive object IDs. The PWA now opens successful streamed `200` responses as browser blobs. Live runtime credential verification remains pending.
 - Application CI is green after fixing native-PDF, blank-embedding, and Drive-reader source-generation regressions. DevOS context-sync is also green using the vendored local helper.
 
 ## Last automated change
@@ -104,3 +104,14 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Change: feat: complete browser magic-link session handling
 - Date: 2026-10-02
 - Durable context synchronization: completed
+
+
+## 2026-10-02 — Live schema/RLS/auth-shell verification
+
+- Applied the final pending `add_relationship_review` migration to the separate archive Supabase project; live migration history is now aligned with repository migrations by migration name.
+- Verified one confirmed archive-owner Auth identity exists.
+- Verified owner RLS access and unrelated-authenticated-user isolation using rollback-only synthetic transactions; no archive rows were retained.
+- Verified archive data tables remained empty after the RLS checks.
+- Verified the private Drive `originals/` folder contains only the existing synthetic integration PDF and no real archive letter.
+- Added client-side implicit magic-link callback handling and streamed-original blob opening to the PWA.
+- GitHub Actions was triggered for the new web-shell tests; final completion should be checked before treating this exact commit as green.
