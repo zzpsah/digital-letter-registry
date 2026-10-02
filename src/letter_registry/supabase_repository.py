@@ -10,11 +10,14 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from .extraction import ExtractionResult
+from .structured_analysis import ContextAnalysisResult
 from .models import DocumentRecord
 from .persistence import (
     build_supabase_letter_row,
     build_supabase_processing_row,
     build_supabase_extraction_patch,
+    build_supabase_context_processing_patch,
+    build_supabase_letter_context_patch,
 )
 
 
@@ -84,4 +87,34 @@ class SupabaseLetterRepository:
             "letter_processing",
             row,
             on_conflict="letter_id",
+        )
+
+
+    def save_context_result(
+        self,
+        record: DocumentRecord,
+        *,
+        owner_id: str,
+        result: ContextAnalysisResult,
+    ) -> None:
+        processing_row = build_supabase_context_processing_patch(
+            record,
+            owner_id=owner_id,
+            result=result,
+        )
+        letter_row = build_supabase_letter_context_patch(
+            record,
+            owner_id=owner_id,
+            result=result,
+        )
+
+        self.transport.upsert(
+            "letter_processing",
+            processing_row,
+            on_conflict="letter_id",
+        )
+        self.transport.upsert(
+            "letters",
+            letter_row,
+            on_conflict="id",
         )
