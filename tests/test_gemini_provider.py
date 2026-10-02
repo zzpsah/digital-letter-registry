@@ -32,6 +32,8 @@ class GeminiProviderTests(unittest.TestCase):
                 "subcategory": "exam-form",
                 "summary": "Synthetic summary",
                 "action_required": "Complete form before deadline",
+                "issue_date": "2026-10-02",
+                "reference_number": "BSEB/TEST-001",
                 "concepts": ["exam_form", "deadline_extension"],
                 "important_dates": [
                     {
@@ -74,6 +76,8 @@ class GeminiProviderTests(unittest.TestCase):
 
         self.assertEqual(context.authority, "BSEB")
         self.assertEqual(context.deadline, "2026-10-10T23:59:59+05:30")
+        self.assertEqual(context.issue_date, "2026-10-02")
+        self.assertEqual(context.reference_number, "BSEB/TEST-001")
         self.assertEqual(context.related_terms_hi[0], "परीक्षा प्रपत्र")
         self.assertIn("gemini-3.8-flash:generateContent", seen["url"])
         self.assertEqual(seen["api_key"], "synthetic-key")
