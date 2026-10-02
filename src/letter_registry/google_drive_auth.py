@@ -174,17 +174,17 @@ class GoogleRefreshTokenProvider:
 
 
 def drive_token_provider_from_environment() -> DriveAccessTokenProvider:
-    credentials_file = os.environ.get(
-        "GOOGLE_OAUTH_CREDENTIALS_FILE", ""
-    ).strip()
-    if credentials_file:
-        return GoogleAuthorizedUserFileProvider.from_environment()
-
     refresh_token = os.environ.get(
         "GOOGLE_DRIVE_REFRESH_TOKEN", ""
     ).strip()
     if refresh_token:
         return GoogleRefreshTokenProvider.from_environment()
+
+    credentials_file = os.environ.get(
+        "GOOGLE_OAUTH_CREDENTIALS_FILE", ""
+    ).strip()
+    if credentials_file:
+        return GoogleAuthorizedUserFileProvider.from_environment()
 
     static = os.environ.get("GOOGLE_DRIVE_ACCESS_TOKEN", "").strip()
     if static:

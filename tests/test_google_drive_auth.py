@@ -47,7 +47,7 @@ class DriveAuthTests(unittest.TestCase):
         self.assertEqual(len(calls), 1)
         self.assertIn("grant_type=refresh_token", calls[0])
 
-    def test_environment_prefers_authorized_user_file(self):
+    def test_environment_uses_authorized_user_file_when_refresh_env_is_absent(self):
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / "credentials.json"
             path.write_text(
@@ -97,17 +97,30 @@ class DriveAuthTests(unittest.TestCase):
         refresh.assert_called_once()
 
     def test_environment_prefers_refresh_credentials(self):
-        with patch.dict(
-            os.environ,
-            {
-                "GOOGLE_OAUTH_CLIENT_ID": "synthetic-client",
-                "GOOGLE_OAUTH_CLIENT_SECRET": "synthetic-secret",
-                "GOOGLE_DRIVE_REFRESH_TOKEN": "synthetic-refresh",
-                "GOOGLE_DRIVE_ACCESS_TOKEN": "fallback-token",
-            },
-            clear=True,
-        ):
-            provider = drive_token_provider_from_environment()
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "credentials.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "client_id": "file-client",
+                        "client_secret": "file-secret",
+                        "refresh_token": "file-refresh",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "GOOGLE_OAUTH_CREDENTIALS_FILE": str(path),
+                    "GOOGLE_OAUTH_CLIENT_ID": "synthetic-client",
+                    "GOOGLE_OAUTH_CLIENT_SECRET": "synthetic-secret",
+                    "GOOGLE_DRIVE_REFRESH_TOKEN": "synthetic-refresh",
+                    "GOOGLE_DRIVE_ACCESS_TOKEN": "fallback-token",
+                },
+                clear=True,
+            ):
+                provider = drive_token_provider_from_environment()
 
         self.assertIsInstance(provider, GoogleRefreshTokenProvider)
 
