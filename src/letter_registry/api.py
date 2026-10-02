@@ -407,7 +407,18 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         if not token_hash:
             return FileResponse(
                 Path(__file__).with_name("web") / "auth-confirm.html",
-                headers={"Cache-Control": "private, no-store"},
+                headers={
+                    "Cache-Control": "private, no-store",
+                    "Referrer-Policy": "no-referrer",
+                    "X-Content-Type-Options": "nosniff",
+                    "Content-Security-Policy": (
+                        "default-src 'self'; "
+                        "script-src 'self' 'unsafe-inline'; "
+                        "style-src 'self' 'unsafe-inline'; "
+                        "connect-src 'self'; "
+                        "base-uri 'none'; frame-ancestors 'none'"
+                    ),
+                },
             )
         try:
             session = SupabasePasswordlessAuth.from_environment().verify_token_hash(
