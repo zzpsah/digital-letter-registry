@@ -15,14 +15,16 @@
 - [x] Implement FastAPI private API, Hindi-first PWA, secure passwordless session handling, and safe original-streaming path.
 - [x] Implement preview-first historical import, reviewable relationships, recursive-reprocessing preview, and approval-locked rename execution.
 - [x] Add synthetic unit-test coverage and GitHub workflow definitions.
+- [x] Verify DB-level synthetic owner insert/read and wrong-user RLS isolation using simulated JWT request claims.
 
 ## Runtime verification next
 
+- [ ] Complete authenticated synthetic HTTP/PostgREST owner-session vertical-slice verification using a real short-lived session.
 - [ ] Configure and verify refreshable Google Drive OAuth runtime credentials using synthetic data only.
 - [ ] Configure and verify Gemini runtime credentials using synthetic data only.
-- [ ] Complete authenticated synthetic HTTP/PostgREST owner-session vertical-slice verification.
 - [ ] Configure Supabase hosted magic-link template and final Site URL/redirects through the dashboard.
 - [ ] Verify original streaming and synthetic upload from the deployed/private runtime.
+- [ ] Remove the retained synthetic RLS verification row through an authorized cleanup path.
 - [ ] Re-read runtime readiness after each external configuration change.
 
 ## Explicitly deferred
