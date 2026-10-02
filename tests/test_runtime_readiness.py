@@ -109,5 +109,39 @@ class RuntimeReadinessTests(unittest.TestCase):
         )
 
 
+    def test_configured_ocr_overrides_are_used_without_exposing_paths(self):
+        env = {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_PUBLISHABLE_KEY": "key",
+            "AUTH_REDIRECT_URL": "http://localhost:8000/auth/confirm",
+            "GOOGLE_DRIVE_ACCESS_TOKEN": "token",
+            "DRIVE_ORIGINALS_FOLDER_REFERENCE": "folder",
+            "GEMINI_API_KEY": "gemini",
+            "TESSERACT_CMD": "/private/tools/tesseract",
+            "OCRMYPDF_CMD": "/private/tools/ocrmypdf",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            with patch(
+                "letter_registry.runtime_readiness.shutil.which",
+                side_effect=lambda name: name if name.startswith("/private/tools/") else None,
+            ):
+                class Result:
+                    returncode = 0
+                    stdout = "List of available languages\\neng\\nhin\\n"
+                    stderr = ""
+
+                with patch(
+                    "letter_registry.runtime_readiness.subprocess.run",
+                    return_value=Result(),
+                ):
+                    readiness = check_runtime_readiness()
+
+        checks = {item.name: item for item in readiness.checks}
+        self.assertTrue(checks["tesseract"].ready)
+        self.assertTrue(checks["ocrmypdf"].ready)
+        self.assertTrue(checks["ocr_languages_hin_eng"].ready)
+        self.assertNotIn("/private/tools/", str(readiness.as_dict()))
+
+
 if __name__ == "__main__":
     unittest.main()
