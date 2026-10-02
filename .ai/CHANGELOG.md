@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add issue date and reference number to structured context
+- Commit: 81681895269767f51963a072851bcf903fc0877f
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/structured_analysis.py`
+
 ## 2026-10-02 — test: enforce current Gemini embedding REST payload
 - Commit: a384b0eed65b2f6f3cacc24358b56966f753aab2
 - Author: PRASHANT KUMAR SAH

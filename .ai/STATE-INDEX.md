@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: a384b0eed65b2f6f3cacc24358b56966f753aab2
-- Last commit: test: enforce current Gemini embedding REST payload
+- HEAD: 81681895269767f51963a072851bcf903fc0877f
+- Last commit: feat: add issue date and reference number to structured context
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
