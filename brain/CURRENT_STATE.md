@@ -11,17 +11,19 @@ Last verified: 2026-10-02
 - Separate Supabase archive database exists with four core RLS-protected tables.
 - Security advisor is clean.
 - Unicode-safe official naming and preview-only rename mapping are implemented.
+- Persistence ports, Supabase row mapping, injected-transport repository adapter, and synthetic ingestion preparation are implemented.
+- GitHub CI is configured for synthetic unit tests.
 
 ## Current gaps
 
 - Supabase Auth currently has no archive owner user, so normal RLS-backed inserts are not ready.
-- No private storage adapter or Supabase repository adapter is implemented yet.
+- No live Google Drive upload adapter or authenticated Supabase transport is wired yet.
 - No OCR, AI context extraction, embeddings pipeline, search UI, or live ingestion exists.
 - No rename executor is authorized.
 
 ## Next action
 
-Create/establish the archive owner authentication identity, then implement and verify the storage/database repository adapter with synthetic fixtures only.
+Create/establish the archive owner authentication identity, then wire the private Drive upload adapter and authenticated Supabase transport with synthetic fixtures only.
 
 ## Safety
 
