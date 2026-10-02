@@ -28,3 +28,9 @@
 - [x] Add authenticated password set/change flow.
 - [x] Deploy Account password UI and verify unauthenticated denial.
 - [ ] Set bootstrap admin password through a real browser session.
+
+
+- [x] Start second-admin onboarding through the normal admin invite flow.
+- [x] Send invite-validated registration email.
+- [x] Verify confirmation-trigger activation path.
+- [ ] Confirm the invited mailbox and verify the resulting active admin membership.
