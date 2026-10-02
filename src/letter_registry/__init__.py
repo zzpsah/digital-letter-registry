@@ -30,6 +30,7 @@ from .storage import (
     StoredOriginal,
 )
 from .supabase_repository import SupabaseLetterRepository, SupabaseTransport
+from .supabase_runtime import SupabasePostgrestTransport, SupabaseRuntimeError
 
 __all__ = [
     "DocumentRecord",
@@ -50,6 +51,8 @@ __all__ = [
     "persist_prepared_source",
     "SupabaseTransport",
     "SupabaseLetterRepository",
+    "SupabasePostgrestTransport",
+    "SupabaseRuntimeError",
     "build_rename_preview",
     "build_smart_filename",
     "build_supabase_letter_row",
