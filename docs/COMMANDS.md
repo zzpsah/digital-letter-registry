@@ -170,3 +170,17 @@ claim job
 ```
 
 For PDF OCR install OCRmyPDF + Tesseract `hin`/`eng`; image OCR uses Tesseract directly. This command is for synthetic integration verification until real intake is explicitly approved.
+
+
+## Historical import preview
+
+Inventory a local historical folder and create a duplicate-aware report without uploading or changing anything:
+
+```bash
+PYTHONPATH=src python3 scripts/preview_historical_import.py \
+  --folder /private/path/to/archive \
+  --recursive \
+  --output /private/path/historical-preview.csv
+```
+
+Use `.json` as the output extension for a JSON report. The report contains filenames, SHA-256, size, type, and duplicate/new status only. It does **not** upload files, rename files, run OCR/AI, or create archive rows.
