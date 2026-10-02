@@ -15,7 +15,7 @@
 - [x] Define official archive filename convention.
 - [x] Add Unicode-safe Hindi/English/Hinglish filename generation.
 - [x] Add preview-only rename mapping.
-- [ ] Confirm initial AI provider/model and fallback adapter contract.
+- [x] Confirm initial AI provider/model adapter contract: configurable Gemini first, provider-neutral schema retained.
 - [x] Confirm the archive-owner email identity for RLS-backed writes.
 
 ## Phase 1 — Archive foundation
@@ -38,7 +38,8 @@
 - [x] Add concrete local OCRmyPDF/Tesseract backend contract.
 - [ ] Verify OCRmyPDF + Hindi/English language packs in the eventual runtime environment.
 - [x] Create government/education Hindi vocabulary and deterministic context hints.
-- [ ] Implement provider-independent structured AI analysis.
+- [x] Implement provider-independent structured AI analysis.
+- [x] Add configurable Gemini structured-output provider as the first adapter.
 - [x] Persist extracted text and extraction version into letter_processing.
 - [x] Generate normalized smart filename.
 - [x] Use `undated` and `no-ref` placeholders.
