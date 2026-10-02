@@ -1,8 +1,14 @@
 # Multi-user authorization — Decisions
 
-1. Do not make Gmail/Google a requirement.
-2. Do not use Supabase service-role as an application admin identity.
-3. Use stable Supabase user ids for membership.
-4. Keep signup/invitation controlled; no open archive access.
-5. Preserve the existing owner as the bootstrap admin.
-6. Use database/RLS enforcement, not frontend-only role checks.
+1. Gmail is not required.
+2. Google Sign-In is optional convenience, not the authorization model.
+3. Native email/password login is supported.
+4. Registration is invite-only; no open archive membership.
+5. A dedicated DLR admin is a normal Supabase Auth user with an active `admin` archive membership.
+6. Never use Supabase service-role as a human admin login.
+7. Use stable Supabase user ids + archive membership for authorization.
+8. Preserve the bootstrap owner as the initial admin.
+9. Database/RLS enforcement is mandatory; frontend role hiding is only UX.
+10. The database must retain at least one active admin.
+11. Invite codes travel in URL fragments, not query strings, and are removed from the browser URL after prefill.
+12. Real archive mutation approval boundaries remain separate from account role.
