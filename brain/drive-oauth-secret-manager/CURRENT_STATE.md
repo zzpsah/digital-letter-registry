@@ -10,6 +10,6 @@ Verified on the private Oracle runtime:
 - The private API service remained healthy after cutover.
 
 Pending:
-- complete the approved write-capable Google Drive re-consent;
-- rotate the refresh token in the secret manager;
-- run synthetic upload/write/cleanup verification.
+- write-capable Google Drive re-consent completed;
+- refresh token rotation in the secret manager completed;
+- synthetic upload/write/stream/delete cleanup verification passed.
