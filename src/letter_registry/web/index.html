@@ -58,6 +58,10 @@
       </div>
     </form>
     <div id="uploadStatus" class="muted" style="margin-top:8px"></div>
+    <details id="runtimeDetails" style="margin-top:10px">
+      <summary>Runtime readiness</summary>
+      <div id="runtimeStatus" class="muted" style="margin-top:8px"></div>
+    </details>
   </section>
 
   <form id="searchForm">
@@ -127,6 +131,15 @@ async function refreshSessionUi(){
     if(!data.drive_upload_configured){
       $("uploadStatus").textContent="Private Drive upload runtime अभी configure नहीं है.";
     }
+  }
+
+  const readiness=await fetch("/api/v1/readiness",{cache:"no-store"});
+  if(readiness.ok){
+    const data=await readiness.json();
+    const missing=data.checks.filter(item=>!item.ready);
+    $("runtimeStatus").innerHTML=data.ready
+      ?"सभी runtime checks ready हैं."
+      :missing.map(item=>`<div>• ${esc(item.name)} — ${esc(item.detail)}</div>`).join("");
   }
   return true;
 }
