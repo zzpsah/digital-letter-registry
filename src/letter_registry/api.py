@@ -77,6 +77,11 @@ class PasswordChangeRequest(BaseModel):
     password: str = Field(min_length=8, max_length=256)
 
 
+class CreateAccountRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    password: str = Field(min_length=8, max_length=256)
+
+
 class RegistrationRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=8, max_length=256)
@@ -605,6 +610,40 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 detail="Password could not be updated",
             ) from exc
         return MessageResponse(message="Password updated")
+
+    @app.post(
+        "/api/v1/auth/create-account",
+        response_model=RegistrationResponse,
+    )
+    def create_account(
+        payload: CreateAccountRequest,
+        _: None = Depends(_require_same_origin),
+    ) -> Response:
+        auth = SupabasePasswordlessAuth.from_environment()
+        try:
+            result = auth.sign_up_with_password(
+                email=payload.email,
+                password=payload.password,
+            )
+        except (SupabaseAuthError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Account creation failed",
+            ) from exc
+
+        body = RegistrationResponse(
+            authenticated=False,
+            confirmation_required=result.confirmation_required,
+            role=None,
+            message=(
+                "Account created. Admin approval is required before archive access."
+            ),
+        )
+        return Response(
+            content=body.model_dump_json(),
+            media_type="application/json",
+            status_code=status.HTTP_201_CREATED,
+        )
 
     @app.post(
         "/api/v1/auth/register",
