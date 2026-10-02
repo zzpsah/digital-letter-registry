@@ -1,3 +1,12 @@
+## 2026-10-02 — feat: support Google provider in Supabase auth config
+- Commit: 8ba30ee6e42e7fe2dc005a1bc07cd89b218ecb94
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `scripts/configure_supabase_auth.py`
+- `src/letter_registry/supabase_management.py`
+- `tests/test_supabase_management.py`
+
 ## 2026-10-02 — docs: add Google Sign-In brain
 - Commit: 1d52b550a4f971ef79395b79330c2b60d5ade290
 - Author: PRASHANT KUMAR SAH
