@@ -73,13 +73,37 @@
     </details>
   </form>
 
-  <div id="status">Search करने के लिए Supabase access token इस browser session में सेट होना चाहिए.</div>
+  <div id="sessionBar" class="row" style="display:none;margin:8px 0">
+    <span class="muted">Authenticated session active.</span>
+    <button id="logoutButton" type="button">Sign out</button>
+  </div>
+
+  <div id="status">Search करने के लिए secure sign-in आवश्यक है.</div>
   <section id="results"></section>
 </main>
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const token=()=>sessionStorage.getItem("dlr_access_token")||"";
+
+function captureImplicitSession(){
+  if(!location.hash||location.hash.length<2)return false;
+  const fragment=new URLSearchParams(location.hash.slice(1));
+  const accessToken=fragment.get("access_token");
+  const tokenType=(fragment.get("token_type")||"").toLowerCase();
+  if(!accessToken||tokenType!=="bearer")return false;
+
+  sessionStorage.setItem("dlr_access_token",accessToken);
+  history.replaceState(null,"",location.pathname+location.search);
+  return true;
+}
+
+function setSessionUi(){
+  const signedIn=Boolean(token());
+  $("loginBox").style.display=signedIn?"none":"block";
+  $("sessionBar").style.display=signedIn?"flex":"none";
+  if(signedIn)$("status").textContent="Authenticated session active.";
+}
 
 function params(){
   const p=new URLSearchParams();
@@ -114,7 +138,12 @@ function render(data){
     const res=await fetch(a.href,{headers:{Authorization:`Bearer ${token()}`},redirect:"manual"});
     if(res.status===501){alert("Private Drive resolver अभी configure नहीं है.");return}
     if(res.status===307||res.status===302){location.href=res.headers.get("location");return}
-    if(!res.ok) alert("Original नहीं खुल सका");
+    if(!res.ok){alert("Original नहीं खुल सका");return}
+    const blob=await res.blob();
+    const objectUrl=URL.createObjectURL(blob);
+    const opened=window.open(objectUrl,"_blank","noopener");
+    if(!opened)location.href=objectUrl;
+    setTimeout(()=>URL.revokeObjectURL(objectUrl),60000);
   }));
 }
 $("loginForm").addEventListener("submit",async e=>{
@@ -132,12 +161,18 @@ $("loginForm").addEventListener("submit",async e=>{
     :"Sign-in request failed.";
 });
 
+captureImplicitSession();
+setSessionUi();
+
+$("logoutButton").addEventListener("click",()=>{
+  sessionStorage.removeItem("dlr_access_token");
+  $("results").innerHTML="";
+  $("status").textContent="Signed out.";
+  setSessionUi();
+});
+
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/sw.js").catch(()=>{});
-}
-if(token()){
-  $("loginBox").style.display="none";
-  $("status").textContent="Authenticated session active.";
 }
 
 $("searchForm").addEventListener("submit",async e=>{
