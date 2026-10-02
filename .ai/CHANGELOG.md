@@ -1,3 +1,10 @@
+## 2026-10-02 — test: fix OCR runtime mock call order
+- Commit: e4856ad9d824232e018cd982c1014a52740fcb18
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_runtime_dependencies.py`
+
 ## 2026-10-02 — test: cover runtime capabilities and mobile upload shell
 - Commit: bad83b6e78d6e928584951b57084f7a712e3ef49
 - Author: PRASHANT KUMAR SAH
