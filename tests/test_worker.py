@@ -181,6 +181,32 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(queue.failed[0][0], JOB_ID)
         self.assertIn("not found", queue.failed[0][1])
 
+    def test_real_looking_record_is_blocked_by_default(self):
+        real_record = DocumentRecord(
+            record_id=LETTER_ID,
+            original_filename="official-letter.pdf",
+            original_sha256="b" * 64,
+            original_storage_reference="private-reference",
+            received_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
+        )
+        queue = FakeQueue(job())
+        worker = DocumentProcessingWorker(
+            queue=queue,
+            source_loader=FakeSourceLoader(real_record),
+            database=FakeDatabase(),
+            original_access=FakeOriginalAccess(),
+            repository=FakeRepository(),
+            extractor=VersionedTextExtractor(FakePdfBackend()),
+            context_provider=FakeContextProvider(),
+            embeddings=FakeEmbeddings(),
+        )
+
+        result = worker.run_once()
+
+        self.assertEqual(result.status, "failed")
+        self.assertIn("real document processing is disabled", result.error)
+        self.assertEqual(queue.completed, [])
+
     def test_no_pending_job_is_idle(self):
         worker = DocumentProcessingWorker(
             queue=FakeQueue(None),
