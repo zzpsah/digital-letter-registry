@@ -42,6 +42,56 @@ class RelationshipSuggestion:
             raise ValueError("relationship version is required")
 
 
+@dataclass(frozen=True, slots=True)
+class RelationshipCandidate:
+    target_letter_id: str
+    title: str | None
+    authority: str | None
+    category: str | None
+    reference_number: str | None
+    issue_date: str | None
+    concepts: tuple[str, ...]
+    score: float
+
+
+def infer_relationship_type(
+    *,
+    source_concepts: tuple[str, ...],
+    source_text: str,
+) -> DocumentRelationship:
+    """Infer a conservative relationship type from the newer/source letter."""
+
+    concepts = set(source_concepts)
+    text = source_text.casefold()
+
+    if "deadline_extension" in concepts or any(
+        term in text
+        for term in ("तिथि विस्तार", "अवधि विस्तार", "deadline extension", "date extension")
+    ):
+        return DocumentRelationship.EXTENDS
+
+    if "correction" in concepts or any(
+        term in text
+        for term in ("शुद्धिपत्र", "corrigendum", "correction notice")
+    ):
+        return DocumentRelationship.CORRECTS
+
+    if any(
+        term in text
+        for term in (
+            "supersedes",
+            "superseded",
+            "revised order",
+            "पूर्व आदेश निरस्त",
+            "पूर्व पत्र निरस्त",
+            "संशोधित आदेश",
+        )
+    ):
+        return DocumentRelationship.SUPERSEDES
+
+    return DocumentRelationship.RELATED_TO
+
+
 class RelationshipTransport(Protocol):
     def select(
         self,
@@ -72,6 +122,43 @@ class RelationshipTransport(Protocol):
 @dataclass(slots=True)
 class SupabaseRelationshipRepository:
     transport: RelationshipTransport
+
+    def find_candidates(
+        self,
+        source_letter_id: str,
+        *,
+        limit: int = 12,
+    ) -> list[RelationshipCandidate]:
+        UUID(source_letter_id)
+        if limit < 1 or limit > 50:
+            raise ValueError("limit must be between 1 and 50")
+
+        rows = self.transport.rpc(
+            "find_relationship_candidates",
+            {
+                "source_letter_id": source_letter_id,
+                "result_limit": limit,
+            },
+        )
+        return [
+            RelationshipCandidate(
+                target_letter_id=str(row["target_letter_id"]),
+                title=row.get("target_title"),
+                authority=row.get("target_authority"),
+                category=row.get("target_category"),
+                reference_number=row.get("target_reference_number"),
+                issue_date=(
+                    str(row["target_issue_date"])
+                    if row.get("target_issue_date") is not None
+                    else None
+                ),
+                concepts=tuple(
+                    str(x) for x in (row.get("target_concepts") or [])
+                ),
+                score=float(row.get("candidate_score") or 0.0),
+            )
+            for row in rows
+        ]
 
     def save_suggestion(
         self,
@@ -155,3 +242,36 @@ class SupabaseRelationshipRepository:
             int(row.get("updated_superseded") or 0),
             int(row.get("updated_current") or 0),
         )
+
+
+
+def suggest_from_candidate(
+    *,
+    source_letter_id: str,
+    source_concepts: tuple[str, ...],
+    source_text: str,
+    candidate: RelationshipCandidate,
+    version: str = "relationships-v1",
+) -> RelationshipSuggestion:
+    relationship_type = infer_relationship_type(
+        source_concepts=source_concepts,
+        source_text=source_text,
+    )
+
+    confidence = min(1.0, max(0.0, candidate.score))
+    rationale_parts = [f"candidate_score={confidence:.2f}"]
+    if candidate.authority:
+        rationale_parts.append(f"authority={candidate.authority}")
+    if candidate.reference_number:
+        rationale_parts.append(
+            f"reference={candidate.reference_number}"
+        )
+
+    return RelationshipSuggestion(
+        source_letter_id=source_letter_id,
+        target_letter_id=candidate.target_letter_id,
+        relationship_type=relationship_type,
+        confidence=confidence,
+        rationale="; ".join(rationale_parts),
+        version=version,
+    )
