@@ -5,14 +5,16 @@ Passed:
 - DB-level owner read.
 - DB-level wrong-user read returned zero visible rows.
 - DB-level cross-owner insert rejected by RLS.
-- VPS auth/API suite: 28/28 tests passed on 2026-10-02 after adding default hosted Magic Link fragment compatibility.
-- VPS full synthetic unit suite: 208/208 tests passed on 2026-10-02.
+- VPS auth/API suite: 29/29 tests passed on 2026-10-02 after adding default hosted Magic Link fragment compatibility and safe rate-limit handling.
+- VPS full synthetic unit suite: 209/209 tests passed on 2026-10-02.
+- Dedicated tailnet-only HTTPS health check passed from an authorized tailnet client.
+- Supabase Site URL/redirect configuration was moved off the unrelated localhost origin to the dedicated private DLR origin.
 - Supabase Management Auth-config helper focused suite: 4/4 tests passed on 2026-10-02.
 - Repository custom magic-link template artifact uses the server callback pattern: `/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 - Default Supabase hosted Magic Link callback bridge is covered: callback page serves no-store/no-referrer/CSP headers, validates owner identity server-side, sets HttpOnly cookies, and clears fragment tokens.
 
 Not yet passed:
-- Real browser/PostgREST short-lived bearer-session vertical slice.
+- Real browser/PostgREST short-lived bearer-session vertical slice after Supabase email-send throttling allows a fresh one-time link.
 - Optional custom-SMTP/token-hash template application in the live project.
 - Drive OAuth/original streaming runtime test.
 - Gemini runtime synthetic test.
