@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 3e70a1f5c16f69d1baafee7203d16243cb14aac3
-- Last commit: test: cover channel attachment normalizers
+- HEAD: 460fd77490b261ecb617cdb3041e4e9a557d40d4
+- Last commit: test: align web intake API with provenance wrapper
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 

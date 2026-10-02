@@ -1,3 +1,10 @@
+## 2026-10-02 — test: align web intake API with provenance wrapper
+- Commit: 460fd77490b261ecb617cdb3041e4e9a557d40d4
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-02 — test: cover channel attachment normalizers
 - Commit: 3e70a1f5c16f69d1baafee7203d16243cb14aac3
 - Author: PRASHANT KUMAR SAH
