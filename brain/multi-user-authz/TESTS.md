@@ -43,3 +43,14 @@ Post-test cleanup verified:
 - zero synthetic test letters;
 - zero synthetic test memberships;
 - zero pending invites.
+
+
+## Password flow verification
+
+- Supabase authenticated-user password update helper covered by unit tests.
+- Passwords shorter than the DLR minimum are rejected.
+- Member-only API endpoint covered.
+- Signed-in Account UI covered.
+- Live private runtime confirms Account form is present.
+- Live unauthenticated password-change call returns HTTP 401.
+- Full suite: 255/255.
