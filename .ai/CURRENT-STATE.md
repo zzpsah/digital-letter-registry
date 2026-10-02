@@ -14,7 +14,7 @@
 - VPS auth/API suite passes 28/28 tests after the default-flow bridge; the full synthetic unit suite passes 208/208 tests. The Supabase Management Auth-config helper focused suite passes 4/4.
 - VPS project runtime has Supabase runtime/publishable configuration but no Supabase Management API token or CLI login; hosted Auth settings therefore cannot currently be changed from the VPS through the existing credential set. A guarded Management API helper is now implemented and ready once a scoped runtime management token is supplied.
 - The connected remote execution layer correctly blocked forwarding a one-time auth token into a VPS command. No bypass was used and no one-time token was persisted.
-- One synthetic RLS verification row currently remains in `letters`; no real archive-letter row exists.
+- The retained synthetic RLS verification row was removed through a controlled exact-match cleanup; `letters` now contains zero rows.
 - Supabase archive-owner Auth identity exists and is confirmed.
 - The public-safe core schema is captured under `supabase/migrations/`.
 - Domain code includes immutable source identity, SHA-256 fingerprints, processing versions, statuses/relationships, and smart filenames.
@@ -33,7 +33,7 @@
 2. Configure and verify refreshable Google Drive OAuth runtime credentials using synthetic data only.
 3. Verify private original streaming and the synthetic upload path end-to-end.
 4. Configure and verify Gemini runtime credentials using synthetic data only.
-5. Remove the retained synthetic DB verification row when an authorized cleanup path is available.
+5. Retained synthetic DB verification row cleanup is complete; no rows remain in `letters`.
 6. Re-check readiness before considering any real-letter intake.
 7. Optional later: enable custom SMTP and apply the checked-in token-hash email template.
 
@@ -46,7 +46,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Synthetic wrong-user read returned zero rows.
 - Synthetic cross-owner insert was denied by the RLS policy.
 - This is DB-level claim simulation only; it does not replace the pending real user bearer-session/PostgREST test.
-- Exactly one synthetic verification row remains in `letters`; no real archive record exists.
+- The synthetic verification row was removed after the RLS test; `letters` now contains zero rows.
 
 ## 2026-10-02 — Runtime connectivity checkpoint
 
