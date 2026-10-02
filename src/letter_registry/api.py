@@ -13,6 +13,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from .auth import SupabasePasswordlessAuth
+from .detail import SupabaseLetterDetailRepository
 from .gemini_embeddings import GeminiEmbeddingProvider
 from .hybrid_search import HybridSearchRepository
 from .search import SearchFilters, SupabaseSearchRepository
@@ -45,6 +46,22 @@ class MagicLinkRequest(BaseModel):
 
 class MessageResponse(BaseModel):
     message: str
+
+
+class LetterDetailResponse(BaseModel):
+    id: str
+    smart_filename: str | None = None
+    title: str | None = None
+    authority: str | None = None
+    category: str | None = None
+    subcategory: str | None = None
+    issue_date: str | None = None
+    status: str
+    action_required: str | None = None
+    deadline_at: str | None = None
+    concepts: list[str] = Field(default_factory=list)
+    structured_context: dict[str, object] = Field(default_factory=dict)
+    open_original_path: str
 
 
 class SearchResponse(BaseModel):
@@ -215,6 +232,34 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             count=len(cards),
             mode=mode,
             results=cards,
+        )
+
+    @app.get("/api/v1/letters/{record_id}", response_model=LetterDetailResponse)
+    def letter_detail(
+        record_id: str,
+        access_token: str = Depends(_access_token),
+    ) -> LetterDetailResponse:
+        repository = SupabaseLetterDetailRepository(_transport(access_token))
+        detail = repository.get(record_id)
+        if detail is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Letter not found",
+            )
+        return LetterDetailResponse(
+            id=detail.record_id,
+            smart_filename=detail.smart_filename,
+            title=detail.title,
+            authority=detail.authority,
+            category=detail.category,
+            subcategory=detail.subcategory,
+            issue_date=detail.issue_date,
+            status=detail.status,
+            action_required=detail.action_required,
+            deadline_at=detail.deadline_at,
+            concepts=list(detail.concepts),
+            structured_context=detail.structured_context,
+            open_original_path=f"/api/v1/letters/{detail.record_id}/original",
         )
 
     @app.get("/api/v1/letters/{record_id}/original", include_in_schema=True)
