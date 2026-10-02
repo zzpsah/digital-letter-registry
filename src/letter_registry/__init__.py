@@ -9,7 +9,11 @@ from .extraction import (
     is_usable_native_text,
     normalize_extracted_text,
 )
-from .extraction_backends import OcrmypdfTesseractBackend, PypdfTextBackend
+from .extraction_backends import (
+    OcrmypdfTesseractBackend,
+    PypdfTextBackend,
+    TesseractImageBackend,
+)
 from .fingerprints import sha256_file
 from .gemini_embeddings import GeminiEmbeddingProvider, GeminiEmbeddingError
 from .gemini_provider import GeminiDocumentContextProvider, GeminiProviderError
@@ -56,6 +60,7 @@ __all__ = [
     "VersionedTextExtractor",
     "PypdfTextBackend",
     "OcrmypdfTesseractBackend",
+    "TesseractImageBackend",
     "GeminiDocumentContextProvider",
     "GeminiEmbeddingProvider",
     "GeminiEmbeddingError",
