@@ -73,6 +73,10 @@ class PasswordLoginRequest(BaseModel):
     password: str = Field(min_length=6, max_length=256)
 
 
+class PasswordChangeRequest(BaseModel):
+    password: str = Field(min_length=8, max_length=256)
+
+
 class RegistrationRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=8, max_length=256)
@@ -576,6 +580,28 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 "Referrer-Policy": "no-referrer",
             },
         )
+
+    @app.post(
+        "/api/v1/auth/password/change",
+        response_model=MessageResponse,
+    )
+    def change_password(
+        payload: PasswordChangeRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(access_token)
+        try:
+            SupabasePasswordlessAuth.from_environment().update_password(
+                access_token=access_token,
+                password=payload.password,
+            )
+        except (SupabaseAuthError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Password could not be updated",
+            ) from exc
+        return MessageResponse(message="Password updated")
 
     @app.post(
         "/api/v1/auth/register",
