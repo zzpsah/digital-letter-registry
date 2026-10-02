@@ -115,3 +115,12 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Reprocessing preview reports the exact processing stages that differ per letter.
 - Reprocessing enqueue is separate from preview and requires explicit `confirm=true`.
 - Reprocessing jobs are idempotent per target-version profile hash and use the existing durable processing queue.
+
+
+## Reprocessing/version registry
+
+- Canonical current processing-version registry is implemented for native PDF extraction, PDF OCR, image OCR, configured Gemini context model, dictionary, filename rule, category schema, embedding model/dimensions, and relationship status rules.
+- Authenticated `/api/v1/processing/versions` exposes the current version snapshot without secrets.
+- Read-only `/api/v1/reprocessing/preview` compares every stored processing row with either current registry defaults or explicit target overrides.
+- Preview returns exact component mismatches per letter; it performs no mutation and enqueues nothing.
+- Reprocessing execution remains intentionally separate and is not enabled yet.
