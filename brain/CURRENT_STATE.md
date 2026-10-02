@@ -23,11 +23,11 @@ Last verified: 2026-10-02
 
 - Live DB-level owner RLS read/insert and cross-user isolation are verified with rollback-only synthetic transactions. A final HTTP/PostgREST test using a short-lived real user bearer session is still pending.
 - The current passwordless implicit-flow callback is implemented in the PWA: access token is kept in sessionStorage and URL fragments are scrubbed. Refresh/session renewal is intentionally not implemented yet.
-- Google Drive access-token refresh/credential lifecycle is not yet implemented.
+- Google Drive OAuth refresh-token lifecycle is implemented with in-memory access-token caching; live runtime verification is still pending.
 - Live original streaming through the API still needs runtime verification.
 - OCRmyPDF/Tesseract Hindi+English packages still need runtime-environment verification.
 - No real archive letters have been ingested.
-- No rename executor is authorized.
+- Approval-locked rename execution code exists, but no rename plan has been approved or executed.
 
 ## Next action
 
@@ -74,3 +74,8 @@ A dormant Google Drive rename path now exists behind an approval-locked executor
 ## Historical import
 
 Historical import is implemented as preview-first, approval-locked adoption. Local candidate files can be hashed in a non-mutating preview. Existing private Drive files can be listed read-only, classified as eligible/unsupported/already archived/real-document-blocked, and only after explicit confirmation are their bytes read for SHA-256 duplicate verification, source identity persisted against the existing Drive object, and a historical processing job queued. Real historical documents remain blocked by default and no real historical import has been executed.
+
+
+## Intake channels
+
+Provider-neutral adapters now normalize Telegram, WhatsApp, email, watched-folder, and web-style attachments into the canonical IntakeService. Owner-scoped source provenance is persisted in the live `letter_sources` schema without storing attachment bytes in provenance records. No live external connector has been activated yet; runtime connector wiring and synthetic end-to-end verification remain pending.
