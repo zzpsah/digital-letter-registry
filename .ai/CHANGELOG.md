@@ -1,3 +1,10 @@
+## 2026-10-03 — ux: clarify pending account approval without email action
+- Commit: aa13c355059fc0048026372ff555c289066fc039
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-03 — docs: record password self-registration flow
 - Commit: 22f80f3d25ec35fcf0b6960a79c4463c7b199db5
 - Author: PRASHANT KUMAR SAH

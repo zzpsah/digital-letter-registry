@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 22f80f3d25ec35fcf0b6960a79c4463c7b199db5
-- Last commit: docs: record password self-registration flow
+- HEAD: aa13c355059fc0048026372ff555c289066fc039
+- Last commit: ux: clarify pending account approval without email action
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
