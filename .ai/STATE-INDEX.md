@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 8ba5b4ba6fa047dc00fb3e4fb34a73eef2ddd621
-- Last commit: feat: add atomic RLS processing job claim RPC
+- HEAD: beef2aec515654ec0561a2f79c6fd48aec484205
+- Last commit: feat: add RPC-only durable worker queue lifecycle
 - Last commit date: 2026-10-02
 - Last commit author: PRASHANT KUMAR SAH
 

@@ -100,7 +100,7 @@ Establish an authenticated archive owner for RLS-backed writes, then wire the li
 - Application CI is green after fixing native-PDF, blank-embedding, and Drive-reader source-generation regressions. DevOS context-sync is also green using the vendored local helper.
 
 ## Last automated change
-- Commit: 8ba5b4ba6fa047dc00fb3e4fb34a73eef2ddd621
-- Change: feat: add atomic RLS processing job claim RPC
+- Commit: beef2aec515654ec0561a2f79c6fd48aec484205
+- Change: feat: add RPC-only durable worker queue lifecycle
 - Date: 2026-10-02
 - Durable context synchronization: completed

@@ -1,3 +1,10 @@
+## 2026-10-02 — feat: add RPC-only durable worker queue lifecycle
+- Commit: beef2aec515654ec0561a2f79c6fd48aec484205
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/jobs.py`
+
 ## 2026-10-02 — feat: add atomic RLS processing job claim RPC
 - Commit: 8ba5b4ba6fa047dc00fb3e4fb34a73eef2ddd621
 - Author: PRASHANT KUMAR SAH
