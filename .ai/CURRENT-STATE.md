@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: b324abab8c7e9b60b4ecd0a6e613f6e02f9c3d6f
-- Change: db: record enforce_archive_role_model migration
+- Commit: 8aec8bfe8d594ebbbafdf818f9ec74d899c33256
+- Change: db: index processing profile owner foreign key
 - Date: 2026-10-02
 - Durable context synchronization: completed

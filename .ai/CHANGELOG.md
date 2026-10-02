@@ -1,3 +1,10 @@
+## 2026-10-02 — db: index processing profile owner foreign key
+- Commit: 8aec8bfe8d594ebbbafdf818f9ec74d899c33256
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261002171354_index_processing_profiles_owner.sql`
+
 ## 2026-10-02 — db: record enforce_archive_role_model migration
 - Commit: b324abab8c7e9b60b4ecd0a6e613f6e02f9c3d6f
 - Author: PRASHANT KUMAR SAH
