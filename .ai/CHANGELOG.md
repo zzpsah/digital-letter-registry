@@ -1,4 +1,11 @@
 ## 2026-10-03 — docs: record password self-registration flow
+- Commit: 22f80f3d25ec35fcf0b6960a79c4463c7b199db5
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `README.md`
+
+## 2026-10-03 — docs: record password self-registration flow
 - Commit: 2863e132ab10a4587a0b5fef8ceb708a263d4234
 - Author: PRASHANT KUMAR SAH
 - Classification: routine
