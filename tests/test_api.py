@@ -151,6 +151,43 @@ class ApiTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 401)
 
+    def test_processing_versions_endpoint(self):
+        with patch("letter_registry.api._transport", return_value=object()):
+            response = self.client.get(
+                "/api/v1/processing/versions",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        versions = response.json()["versions"]
+        self.assertEqual(versions["filename_rule_version"], "official-v1")
+        self.assertEqual(versions["status_rule_version"], "relationships-v1")
+
+    def test_reprocessing_preview_uses_current_registry_defaults(self):
+        class PreviewTransport:
+            def select(self, table, *, filters=None, columns="*"):
+                return [{
+                    "letter_id": "22222222-2222-4222-8222-222222222222",
+                    "ocr_version": "old-ocr",
+                    "context_version": "old-context",
+                    "dictionary_version": "old-dict",
+                    "filename_rule_version": "old-name",
+                    "category_schema_version": "old-cat",
+                    "embedding_version": "old-embed",
+                    "status_rule_version": "old-status",
+                }]
+
+        with patch("letter_registry.api._transport", return_value=PreviewTransport()):
+            response = self.client.get(
+                "/api/v1/reprocessing/preview",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["count"], 1)
+        target = response.json()["items"][0]["target_versions"]
+        self.assertEqual(target["filename_rule_version"], "official-v1")
+
     def test_reprocessing_preview_is_read_only(self):
         class PreviewTransport:
             def select(self, table, *, filters=None, columns="*"):
