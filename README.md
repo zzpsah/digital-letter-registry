@@ -118,3 +118,12 @@ Magic Link authentication does **not**:
 - grant access to unrelated users merely because they can reach the DLR URL.
 
 In short: **Tailscale protects how the app is reached; Magic Link identifies the user; Supabase RLS controls that user's database access; Google OAuth controls the backend Drive connection.**
+
+
+## Preferred login experience
+
+DLR prefers **Google Sign-In** for the archive user when the Supabase Google provider is configured. Passwordless email/Magic Link remains a fallback and recovery path.
+
+A successful sign-in establishes the same server-managed Supabase session/RLS identity used by the existing application. The refresh session persists for 30 days by default (subject to Supabase revocation/session policy), so normal browser restarts should not require a fresh email link every time.
+
+Google Sign-In credentials are separate from Google Drive OAuth credentials. Browser login requires its own Google **Web application** OAuth client.
