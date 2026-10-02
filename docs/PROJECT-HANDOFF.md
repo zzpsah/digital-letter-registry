@@ -174,3 +174,10 @@ Out of scope:
 - automatic approval of real uploads, renames, deletes, historical imports, or other consequential archive mutations.
 
 Authentication proves identity; it does not itself authorize every action.
+
+
+## Preferred login UX
+
+Primary target: **Sign in with Google** through Supabase Auth. Magic Link remains a fallback. The existing archive-owner email identity should be automatically linked to the verified Google identity with the same email, preserving the existing Supabase user id and RLS ownership. After authentication, DLR uses HttpOnly access/refresh cookies; the refresh cookie persists for 30 days by default.
+
+This user-auth OAuth client is separate from the backend Google Drive OAuth client.
