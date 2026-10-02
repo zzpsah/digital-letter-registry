@@ -1,3 +1,10 @@
+## 2026-10-02 — docs: record secure browser runtime milestone
+- Commit: 20356741003c593bcdbe3fe586f28a00adc3e6ec
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/HISTORY.md`
+
 ## 2026-10-02 — docs: add secret-safe runtime readiness checks
 - Commit: c524d74349db5bfdf589d82dc09d5f50aaf9af29
 - Author: PRASHANT KUMAR SAH
