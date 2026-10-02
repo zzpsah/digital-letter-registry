@@ -19,3 +19,6 @@ dist/
 build/
 .devos-onboarding-result.json
 .devos-lifecycle-result.json
+
+*.egg-info/
+runtime-synthetic/
