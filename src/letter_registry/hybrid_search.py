@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .search import SearchResult, SupabaseSearchRepository
+from .search import SearchFilters, SearchResult, SupabaseSearchRepository
 from .semantic_search import SupabaseEmbeddingRepository
 
 
@@ -22,8 +22,18 @@ class HybridSearchRepository:
     text_weight: float = 0.55
     semantic_weight: float = 0.45
 
-    def search(self, query: str, *, limit: int = 25) -> list[HybridSearchResult]:
-        text_results = self.text_search.search(query, limit=min(100, limit * 3))
+    def search(
+        self,
+        query: str,
+        *,
+        filters: SearchFilters | None = None,
+        limit: int = 25,
+    ) -> list[HybridSearchResult]:
+        text_results = self.text_search.search(
+            query,
+            filters=filters,
+            limit=min(100, limit * 3),
+        )
         semantic_rows = self.semantic_search.semantic_search(
             query,
             limit=min(100, limit * 3),
