@@ -119,3 +119,22 @@
 - [ ] Enable Google provider in Supabase Auth.
 - [ ] Verify same-email Google identity links to the existing archive-owner user id.
 - [ ] Complete the authenticated synthetic owner/RLS vertical slice.
+
+
+## Multi-user DLR accounts
+
+- [x] Add archive membership model with `admin`, `editor`, and `viewer` roles.
+- [x] Preserve the existing archive owner as bootstrap admin.
+- [x] Enforce role-aware RLS across archive data.
+- [x] Add email/password sign-in independent of Gmail.
+- [x] Make new account registration invite-only.
+- [x] Add admin access UI/API for invites, roles, and active/disabled status.
+- [x] Add last-active-admin database protection.
+- [x] Add optional Google Sign-In and Magic Link under the same membership model.
+- [x] Move invite codes from query strings to URL fragments and clear them after browser prefill.
+- [x] Verify hosted database currently has one active admin, zero disabled members, zero pending invites, and zero real archive letters.
+- [x] Verify final-admin disable attempt is rejected by the live database trigger.
+- [x] Full synthetic suite passes 249/249.
+- [ ] Enable Supabase leaked-password protection when Management/Dashboard configuration is available.
+- [ ] Create/invite an additional dedicated admin account once its actual email address is chosen.
+- [ ] Complete the real authenticated HTTP/PostgREST multi-role vertical-slice test with actual sessions.
