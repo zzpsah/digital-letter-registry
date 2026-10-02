@@ -3,6 +3,8 @@ import unittest
 from letter_registry.version_registry import (
     ProcessingTargetVersions,
     SupabaseProcessingVersionRegistry,
+    reprocessing_reason,
+    schedule_reprocessing_preview,
 )
 
 
@@ -92,6 +94,71 @@ class VersionRegistryTests(unittest.TestCase):
         registry = SupabaseProcessingVersionRegistry(FakeTransport())
         with self.assertRaises(ValueError):
             registry.preview(limit=501)
+
+    def test_scheduler_requires_explicit_approval(self):
+        versions = ProcessingTargetVersions(
+            extraction="native-pdf-v2",
+            context="gemini:context-v2",
+            dictionary="gov-hi-v2",
+            filename_rule="official-v2",
+            category_schema="categories-v2",
+            embedding="gemini:embedding-v2",
+            status_rule="relationships-v2",
+        )
+        preview = SupabaseProcessingVersionRegistry(
+            FakeTransport()
+        ).preview()
+
+        class Queue:
+            def __init__(self):
+                self.calls = []
+
+            def enqueue(self, *, letter_id, owner_id, reason="initial_processing"):
+                self.calls.append((letter_id, owner_id, reason))
+
+        queue = Queue()
+        with self.assertRaises(PermissionError):
+            schedule_reprocessing_preview(
+                owner_id=OWNER_ID,
+                versions=versions,
+                preview=preview,
+                queue=queue,
+            )
+        self.assertEqual(queue.calls, [])
+
+    def test_approved_scheduler_uses_deterministic_profile_reason(self):
+        versions = ProcessingTargetVersions(
+            extraction="native-pdf-v2",
+            context="gemini:context-v2",
+            dictionary="gov-hi-v2",
+            filename_rule="official-v2",
+            category_schema="categories-v2",
+            embedding="gemini:embedding-v2",
+            status_rule="relationships-v2",
+        )
+        preview = SupabaseProcessingVersionRegistry(
+            FakeTransport()
+        ).preview()
+
+        class Queue:
+            def __init__(self):
+                self.calls = []
+
+            def enqueue(self, *, letter_id, owner_id, reason="initial_processing"):
+                self.calls.append((letter_id, owner_id, reason))
+
+        queue = Queue()
+        result = schedule_reprocessing_preview(
+            owner_id=OWNER_ID,
+            versions=versions,
+            preview=preview,
+            queue=queue,
+            approved=True,
+        )
+
+        self.assertEqual(result.reason, reprocessing_reason(versions))
+        self.assertEqual(len(queue.calls), 1)
+        self.assertEqual(queue.calls[0][2], result.reason)
 
 
 if __name__ == "__main__":
