@@ -1,3 +1,10 @@
+## 2026-10-02 — test: cover durable Supabase processing queue adapter
+- Commit: 4bdf7fbd000872e6aa1587030220932b91ade58a
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_jobs.py`
+
 ## 2026-10-02 — test: cover synthetic-first archive intake and queueing
 - Commit: 03b914d1049fbb12f891fbbee143bbeaf1dead2e
 - Author: PRASHANT KUMAR SAH
