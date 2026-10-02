@@ -161,3 +161,13 @@
 - [x] Unauthenticated password update fails closed with HTTP 401.
 - [x] Full synthetic suite passes 255/255.
 - [ ] Complete one real owner browser session and set the bootstrap admin password.
+
+
+## Magic Link callback repair
+
+- [x] Confirm real Supabase Magic Link redemption succeeded.
+- [x] Confirm archive-owner Auth user id matches active admin membership.
+- [x] Identify DLR callback failure as HTTP 422 in session-from-fragment.
+- [x] Remove unnecessary fixed token-shape assumptions while preserving Supabase + membership validation.
+- [x] Pass full synthetic suite: 256/256.
+- [ ] Complete browser retry and verify DLR HttpOnly session cookie creation.
