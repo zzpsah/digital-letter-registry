@@ -148,3 +148,17 @@ DLR authorization is archive-membership based, not Gmail/provider based.
 - Invite links keep the invite code in the URL fragment (`#invite=...`) so the code is not sent in normal HTTP request URLs/referrers; the browser clears it after prefill.
 
 Google Drive OAuth remains a separate backend storage authorization system and is not tied to the user's login provider.
+
+
+## Password setup and recovery
+
+Authenticated archive members can set or change their DLR password from the Account section. The password is sent directly to Supabase Auth over the authenticated session; DLR does not persist or log it.
+
+Practical flow:
+1. Sign in using an existing valid method (for the bootstrap admin, Magic Link works now).
+2. Open the Account section.
+3. Set a new password (minimum 8 characters enforced by DLR).
+4. Future logins can use email + password from any computer that can reach the private DLR app.
+5. Magic Link remains available as passwordless recovery.
+
+This does not change archive roles or Google Drive permissions.
