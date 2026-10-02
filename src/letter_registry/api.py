@@ -394,7 +394,18 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     ) -> MessageResponse:
         redirect_to = _required_env("AUTH_REDIRECT_URL")
         auth = SupabasePasswordlessAuth.from_environment()
-        auth.send_magic_link(email=payload.email, redirect_to=redirect_to)
+        try:
+            auth.send_magic_link(email=payload.email, redirect_to=redirect_to)
+        except SupabaseAuthError as exc:
+            if "HTTP 429" in str(exc):
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="Sign-in email rate limit reached. Try again shortly.",
+                ) from exc
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Sign-in email provider is temporarily unavailable.",
+            ) from exc
         return MessageResponse(
             message="If this email is authorized, a sign-in link has been sent."
         )
