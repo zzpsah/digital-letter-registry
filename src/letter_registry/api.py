@@ -13,6 +13,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from .auth import SupabasePasswordlessAuth
+from .channel_intake import ChannelIntakeService, IntakeChannel, IntakeProvenance, SupabaseProvenanceRepository
 from .detail import SupabaseLetterDetailRepository
 from .gemini_embeddings import GeminiEmbeddingProvider
 from .google_drive_reader import GoogleDrivePrivateTransport
@@ -186,7 +187,7 @@ def _truthy_env(name: str) -> bool:
     return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _runtime_intake(access_token: str) -> tuple[str, IntakeService]:
+def _runtime_intake(access_token: str) -> tuple[str, ChannelIntakeService]:
     folder_reference = _required_env("DRIVE_ORIGINALS_FOLDER_REFERENCE")
     owner_id = SupabaseUserSession.from_environment(
         access_token=access_token,
@@ -196,13 +197,16 @@ def _runtime_intake(access_token: str) -> tuple[str, IntakeService]:
         transport=GoogleDrivePrivateWriter.from_environment(),
         originals_folder_reference=folder_reference,
     )
-    service = IntakeService(
-        storage=storage,
-        repository=SupabaseLetterRepository(database),
-        queue=SupabaseProcessingQueue(database),
-        policy=IntakePolicy(
-            synthetic_only=not _truthy_env("ENABLE_REAL_INTAKE"),
+    service = ChannelIntakeService(
+        intake=IntakeService(
+            storage=storage,
+            repository=SupabaseLetterRepository(database),
+            queue=SupabaseProcessingQueue(database),
+            policy=IntakePolicy(
+                synthetic_only=not _truthy_env("ENABLE_REAL_INTAKE"),
+            ),
         ),
+        provenance=SupabaseProvenanceRepository(database),
     )
     return owner_id, service
 
@@ -299,9 +303,16 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     handle.write(chunk)
 
             try:
-                result = service.ingest(
+                result = service.ingest_path(
                     source,
                     owner_id=owner_id,
+                    provenance=IntakeProvenance(
+                        channel=IntakeChannel.WEB,
+                        filename=safe_name,
+                        metadata={
+                            "content_type": file.content_type or "",
+                        },
+                    ),
                 )
             except DuplicateSourceError as exc:
                 raise HTTPException(
