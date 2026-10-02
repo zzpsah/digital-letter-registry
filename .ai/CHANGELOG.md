@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: record password self-registration flow
+- Commit: 2863e132ab10a4587a0b5fef8ceb708a263d4234
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/multi-user-authz/CURRENT_STATE.md`
+
 ## 2026-10-03 — feat: confirm account when admin activates access
 - Commit: 58d28dee74a2e3e00d015fa904ac33256115dbaa
 - Author: PRASHANT KUMAR SAH
