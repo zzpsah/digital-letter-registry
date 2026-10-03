@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: add guarded WhatsApp attachment intake runner
+- Commit: e6b4275e7f842c3027405ba69021a893e958715d
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `scripts/ingest_whatsapp_attachment.py`
+
 ## 2026-10-03 — docs: start WhatsApp DLR intake enhancement
 - Commit: e29ad67127a394f9baab360216c845f2a9e4f125
 - Author: PRASHANT KUMAR SAH
