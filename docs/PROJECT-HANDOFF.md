@@ -281,3 +281,8 @@ The first real official PDF was ingested through the private Oracle pilot and su
 ## 2026-10-03 two-letter pilot completion
 
 The private Oracle real-intake pilot has successfully processed two distinct real official PDFs. Both completed through the dedicated worker, were searchable, and streamed from private original storage. The two files exercised different extraction paths (forced OCR for broken embedded-font text and native PDF extraction). The configured hard cap is now reached with zero remaining real-intake slots, so no further real upload should be accepted until the next phase is explicitly chosen. Real content/identifiers remain excluded from Git/docs.
+
+
+## 2026-10-03 WhatsApp EDU- Letters connector
+
+A private dedicated WhatsApp archive group is live on the existing Hermes session and is bound to the DLR connector. Only supported document/image attachments from that exact group are staged; ordinary text is silently skipped and other groups are ignored. A protected local queue and one-minute systemd consumer feed the canonical DLR WhatsApp intake using the dedicated worker identity and Bitwarden-backed credentials. WhatsApp message provenance is retained for deduplication. The connector has a separate real-intake cap of 20 documents; the completed manual two-letter pilot cap remains unchanged. Synthetic E2E verification passed and disposable test data was cleaned. Exact group/member identifiers remain private runtime state.
