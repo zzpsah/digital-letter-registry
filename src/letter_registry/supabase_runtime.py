@@ -169,6 +169,28 @@ class SupabasePostgrestTransport:
             return result
         raise SupabaseRuntimeError("unexpected upsert response shape")
 
+    def update(
+        self,
+        table: str,
+        row: dict[str, object],
+        *,
+        filters: dict[str, str],
+    ) -> dict[str, object]:
+        if not filters:
+            raise ValueError("update filters are required")
+        params = [(key, f"eq.{value}") for key, value in filters.items()]
+        result = self._request(
+            method="PATCH",
+            path=f"{table}?{parse.urlencode(params)}",
+            row=row,
+            prefer="return=representation",
+        )
+        if isinstance(result, list):
+            return result[0] if result else {}
+        if isinstance(result, dict):
+            return result
+        raise SupabaseRuntimeError("unexpected update response shape")
+
     def rpc(
         self,
         function: str,
@@ -293,6 +315,19 @@ class ArchiveScopedSupabaseTransport:
             table,
             self._row(table, row),
             on_conflict=self._conflict(table, on_conflict) or on_conflict,
+        )
+
+    def update(
+        self,
+        table: str,
+        row: dict[str, object],
+        *,
+        filters: dict[str, str],
+    ) -> dict[str, object]:
+        return self.transport.update(
+            table,
+            self._row(table, row),
+            filters=self._filters(table, filters) or {},
         )
 
     def select(
