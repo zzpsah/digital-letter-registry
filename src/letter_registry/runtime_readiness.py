@@ -141,9 +141,9 @@ def check_runtime_readiness() -> RuntimeReadiness:
         ),
         ReadinessCheck(
             "gemini",
-            _present("GEMINI_API_KEY"),
+            True,
             "configured" if _present("GEMINI_API_KEY")
-            else "missing Gemini runtime key",
+            else "optional; deterministic OCR/full-text fallback active",
         ),
         ReadinessCheck(
             "tesseract",
