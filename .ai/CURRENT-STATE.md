@@ -88,3 +88,13 @@ This preserves normal Supabase RLS rather than using service-role credentials in
 Oracle has the Bitwarden-scoped worker wrapper and systemd service/timer files installed, but the timer is deliberately disabled/inactive until the dedicated worker account and Bitwarden secret pair are provisioned.
 
 Latest synthetic suite: 264/264 PASS.
+
+## 2026-10-03 — Dedicated worker signup checkpoint
+
+- The intended worker email/password secrets already exist in Bitwarden Secrets Manager and are injected successfully by the installed Oracle worker wrapper.
+- Before signup, the one-shot wrapper reached Supabase Auth but failed with `invalid_credentials`.
+- A dedicated worker Auth signup was then created using the existing Bitwarden-backed credentials without exposing the password in chat or Git.
+- The worker account now exists as the normal self-signup state `viewer / disabled` and requires email confirmation.
+- A fresh one-shot worker attempt now fails with `email_not_confirmed`, proving the stored credential pair matches the newly created Auth user.
+- The confirmation email was delivered to the school Gmail alias. Its one-time token was not forwarded into Oracle commands.
+- Do not enable the worker timer yet. After confirmation, promote/activate the worker with minimum `editor` access, run one-shot idle verification, then proceed to the synthetic end-to-end vertical slice.
