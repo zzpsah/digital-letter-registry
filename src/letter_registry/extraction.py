@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
+import unicodedata
 
 
 _IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
@@ -47,16 +48,31 @@ def is_usable_native_text(
     *,
     minimum_characters: int = 80,
     minimum_alphanumeric_ratio: float = 0.35,
+    maximum_private_use_ratio: float = 0.01,
+    maximum_replacement_ratio: float = 0.005,
 ) -> bool:
-    """Heuristic: enough meaningful native text to skip OCR."""
+    """Heuristic: enough meaningful, correctly encoded native text to skip OCR."""
 
     normalized = normalize_extracted_text(text)
     if len(normalized) < minimum_characters:
         return False
 
+    length = max(len(normalized), 1)
     meaningful = sum(1 for char in normalized if char.isalnum())
-    ratio = meaningful / max(len(normalized), 1)
-    return ratio >= minimum_alphanumeric_ratio
+    if meaningful / length < minimum_alphanumeric_ratio:
+        return False
+
+    private_use = sum(
+        1 for char in normalized if unicodedata.category(char) == "Co"
+    )
+    if private_use / length > maximum_private_use_ratio:
+        return False
+
+    replacement = normalized.count("�")
+    if replacement / length > maximum_replacement_ratio:
+        return False
+
+    return True
 
 
 @dataclass(slots=True)
