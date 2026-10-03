@@ -132,7 +132,7 @@
 - [x] Add last-active-admin database protection.
 - [x] Add optional Google Sign-In and Magic Link under the same membership model.
 - [x] Move invite codes from query strings to URL fragments and clear them after browser prefill.
-- [x] Verify hosted database currently has one active admin, zero disabled members, zero pending invites, and zero real archive letters.
+- [x] Verify hosted database state; latest live check on 2026-10-03 shows two active admins, one active viewer, one accepted invite, and zero real archive letters.
 - [x] Verify final-admin disable attempt is rejected by the live database trigger.
 - [x] Full synthetic suite passes 249/249.
 - [ ] Enable Supabase leaked-password protection when Management/Dashboard configuration is available.
@@ -179,7 +179,7 @@
 - [x] Send invite-validated registration email.
 - [x] Confirm the Auth user was created with invite metadata but remains unconfirmed.
 - [x] Confirm database trigger activates membership only after email confirmation.
-- [ ] Complete email confirmation; expected result is accepted invite + active admin membership.
+- [x] Complete email confirmation; accepted invite + active admin membership verified live.
 
 
 ## Vercel hosting
