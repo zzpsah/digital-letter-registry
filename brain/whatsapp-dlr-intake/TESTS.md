@@ -33,3 +33,17 @@ Passed:
 
 Not yet claimed:
 - a genuine inbound attachment posted by another group member has not yet been observed after the final live bridge hook.
+
+
+## Live E2E — 2026-10-03
+
+- Source group binding present and live metadata name matched `EDU- Letters`.
+- Gateway active; DLR WhatsApp intake timer active; bridge staging hook present.
+- Fresh unique synthetic PDF sent into the group via the live bridge.
+- Automatic connector intake created a DLR record with WhatsApp provenance and message-id dedup key.
+- Worker completed processing.
+- Authenticated search returned the record.
+- Authenticated original stream returned the archived bytes.
+- Synthetic Drive object deleted after verification.
+- Synthetic letter/job/processing/source rows cleaned to zero.
+- Group currently reports three participants. Allowlist also has three configured entries, but identity-alias differences mean this count is not treated as proof that every allowlisted identity is already a participant.
