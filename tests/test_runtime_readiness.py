@@ -66,6 +66,36 @@ class RuntimeReadinessTests(unittest.TestCase):
         self.assertTrue(checks["drive_credentials"].ready)
         self.assertNotIn(str(credentials), str(readiness.as_dict()))
 
+    def test_missing_gemini_uses_deterministic_fallback(self):
+        env = {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_PUBLISHABLE_KEY": "key",
+            "AUTH_REDIRECT_URL": "https://archive.example.com/auth/confirm",
+            "GOOGLE_DRIVE_ACCESS_TOKEN": "token",
+            "DRIVE_ORIGINALS_FOLDER_REFERENCE": "folder",
+            "ENABLE_REAL_INTAKE": "false",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            with patch(
+                "letter_registry.runtime_readiness.shutil.which",
+                side_effect=lambda name: f"/usr/bin/{name}",
+            ):
+                class Result:
+                    returncode = 0
+                    stdout = "List of available languages\neng\nhin\n"
+                    stderr = ""
+
+                with patch(
+                    "letter_registry.runtime_readiness.subprocess.run",
+                    return_value=Result(),
+                ):
+                    readiness = check_runtime_readiness()
+
+        checks = {item.name: item for item in readiness.checks}
+        self.assertTrue(checks["gemini"].ready)
+        self.assertIn("deterministic", checks["gemini"].detail)
+        self.assertTrue(readiness.ready)
+
     def test_missing_ocr_languages_fail_readiness(self):
         env = {
             "SUPABASE_URL": "https://example.supabase.co",
