@@ -87,7 +87,7 @@ class DocumentProcessingWorker:
     repository: WorkerRepository
     extractor: VersionedTextExtractor
     context_provider: DocumentContextProvider
-    embeddings: EmbeddingRepository
+    embeddings: EmbeddingRepository | None
     relationship_repository: RelationshipSuggestionRepository | None = None
     allow_real_documents: bool = False
 
@@ -132,11 +132,13 @@ class DocumentProcessingWorker:
                     repository=self.repository,
                 )
 
-                chunks = self.embeddings.embed_document_chunks(
-                    owner_id=job.owner_id,
-                    letter_id=job.letter_id,
-                    extracted_text=outcome.extraction.text,
-                )
+                chunks = 0
+                if self.embeddings is not None:
+                    chunks = self.embeddings.embed_document_chunks(
+                        owner_id=job.owner_id,
+                        letter_id=job.letter_id,
+                        extracted_text=outcome.extraction.text,
+                    )
 
             if self.relationship_repository is not None:
                 candidate_rows = self.database.select(
@@ -191,12 +193,13 @@ class DocumentProcessingWorker:
                         owner_id=job.owner_id,
                     )
 
-            version = str(getattr(self.embeddings.provider, "version"))
-            self.repository.save_embedding_version(
-                record,
-                owner_id=job.owner_id,
-                embedding_version=version,
-            )
+            if self.embeddings is not None:
+                version = str(getattr(self.embeddings.provider, "version"))
+                self.repository.save_embedding_version(
+                    record,
+                    owner_id=job.owner_id,
+                    embedding_version=version,
+                )
             self.queue.complete(job)
             return WorkerRunResult(
                 status="completed",
