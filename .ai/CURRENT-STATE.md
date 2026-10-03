@@ -69,3 +69,8 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Change: fix: parse English dated issue date
 - Date: 2026-10-03
 - Durable context synchronization: completed
+
+
+## 2026-10-03 — genuine official WhatsApp document proof
+
+A public official CBSE circular was sent into the privately bound WhatsApp source group and entered DLR with WhatsApp provenance/message-id dedup. Live quality review exposed a deterministic classification precedence bug: the circular contained generic UDISE terms and was initially labeled as UDISE. The analyzer now prioritizes explicit CBSE authority/affiliation evidence and parses CBSE notification references plus English `Dated:` issue dates. Reprocessing produced CBSE authority, affiliation category, explicit reference/date and a corrected smart filename. Authenticated search and private original streaming passed. Full suite: 281/281.
