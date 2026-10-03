@@ -76,7 +76,7 @@ The main interface is one search box plus optional filters such as date/year, au
 
 ## Status
 
-The private archive folder structure and a separate Supabase archive database are established. The database and Drive archive are currently empty of real archive records. Refreshable Google Drive OAuth is verified on the private Oracle worker runtime with secret-manager injection, including live originals listing, server-side streaming, and a disposable synthetic upload/stream/delete write test. The public Vercel control plane is live at the canonical DLR URL, while real document intake/migration remains disabled until explicitly approved.
+The DLR baseline is complete and live. The database and Drive archive contain no real archive records. Password-first multi-user auth, role-aware RLS, private Drive storage, OCR/context processing, search, original streaming, and the dedicated Oracle worker have all been verified with disposable synthetic data. A real short-lived Supabase bearer session passed insert/read + RLS-denial verification, and the live HTTP intake → Drive → queue → worker → search → original-stream path passed end-to-end. All disposable artifacts were removed afterward. Real document intake/migration remains disabled until explicitly approved.
 
 See:
 - `PRD.md`
@@ -158,18 +158,18 @@ This does not change archive roles or Google Drive permissions.
 
 The DLR web/auth/search control plane is now deployed on Vercel:
 
-`https://digital-letter-registry.vercel.app`
+`https://umv-dlr.vercel.app`
 
 Verified production behavior:
 - home page returns HTTP 200;
 - `/api/v1/health` returns HTTP 200;
-- auth provider discovery returns password + Magic Link with invite-only registration;
+- password-first sign-in and self-service account creation are available; new memberships start disabled until admin approval;
 - Vercel Authentication protection is disabled so DLR's own Supabase authentication is the user-facing gate;
 - real intake remains disabled on the Vercel deployment.
 
 The current Vercel deployment does not receive the private Google Drive OAuth credentials. Original-file streaming, Drive writes, OCR/system-binary processing, and other private-worker responsibilities remain on the Oracle deployment until explicitly migrated.
 
-Supabase's Auth redirect allow-list still needs the Vercel origin before Magic Link callbacks should be treated as fully portable to the public Vercel URL.
+Password-first login does not depend on the Supabase redirect allow-list. Adding the Vercel origin remains a future hardening/portability task only for optional Magic Link or Google Sign-In flows.
 
 
 ## Account creation
@@ -183,3 +183,18 @@ DLR uses a password-first account workflow:
 5. The user signs in directly with email + password.
 
 The normal UI does not require a Magic Link. New accounts do not receive archive access until an admin explicitly activates them.
+
+
+## Baseline verification
+
+Verified 2026-10-03:
+- canonical Vercel home and health endpoints return HTTP 200;
+- dedicated Bitwarden-backed Oracle worker identity is active as editor and the systemd timer is active;
+- real short-lived authenticated bearer insert/read and RLS denial passed;
+- authenticated HTTP synthetic intake → Drive → queue → worker → search → original streaming passed;
+- private original bytes matched the uploaded source exactly;
+- cleanup returned the live archive to zero letters, zero processing jobs, and zero processing rows;
+- full Oracle synthetic suite passes 266/266;
+- real intake remains disabled.
+
+Optional future enhancements include Google Sign-In, Gemini semantic enrichment, live messaging/watched-folder connectors, leaked-password protection, and Vercel auto-deploy/redirect portability.
