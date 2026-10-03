@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: sync real-intake pilot state index
+- Commit: 4d1519776cdea6b4fa027e11e76d312216039a09
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-03 — test: fix pilot UI fixture
 - Commit: f8b4afe1c97e261d2ea6064877485acc9d070244
 - Author: PRASHANT KUMAR SAH
