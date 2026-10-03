@@ -10,3 +10,5 @@
 - [x] Enable real group intake after synthetic verification passed.
 
 - [ ] Verify the first real attachment posted by an allowed member in `EDU- Letters` is archived and processed automatically.
+
+- [ ] Observe the first real inbound PDF/image posted by a group member and confirm automatic staging without manual intervention.
