@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: record post-processing delivery E2E
+- Commit: fcee1db7849c37edf9d4667ef29f3659c11aa46f
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+
 ## 2026-10-03 — feat: retain private WhatsApp reply metadata
 - Commit: 76bbde1c51494b8e8e5b82f3788a2bce8f576f28
 - Author: PRASHANT KUMAR SAH
