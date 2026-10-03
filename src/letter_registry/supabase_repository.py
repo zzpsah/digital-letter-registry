@@ -52,6 +52,15 @@ class SupabaseTransport(Protocol):
     ) -> dict[str, object]:
         ...
 
+    def update(
+        self,
+        table: str,
+        row: dict[str, object],
+        *,
+        filters: dict[str, str],
+    ) -> dict[str, object]:
+        ...
+
 
 @dataclass(slots=True)
 class SupabaseLetterRepository:
@@ -170,10 +179,10 @@ class SupabaseLetterRepository:
             processing_row,
             on_conflict="letter_id",
         )
-        self.transport.upsert(
+        self.transport.update(
             "letters",
             letter_row,
-            on_conflict="id",
+            filters={"id": record.record_id},
         )
 
 
