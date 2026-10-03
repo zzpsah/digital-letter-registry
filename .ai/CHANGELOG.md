@@ -1,3 +1,10 @@
+## 2026-10-03 — ux: show pilot review lock
+- Commit: 034b56bb59aa19bf6a6234e66f360f81aae1b452
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-03 — docs: sync real-intake pilot state index
 - Commit: 4d1519776cdea6b4fa027e11e76d312216039a09
 - Author: PRASHANT KUMAR SAH

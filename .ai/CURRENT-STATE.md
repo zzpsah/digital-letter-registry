@@ -65,18 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 6da238592134f60880d015a6f26a43f33ad0c6ba
-- Change: ux: show bounded real-intake pilot mode
+- Commit: 034b56bb59aa19bf6a6234e66f360f81aae1b452
+- Change: ux: show pilot review lock
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## 2026-10-03 — controlled real-letter pilot enabled
-
-- Private Oracle runtime now has `ENABLE_REAL_INTAKE=true` with `DLR_REAL_INTAKE_PILOT_LIMIT=2`.
-- Runtime capability check reports `pilot_mode=true`, limit 2, remaining 2.
-- Public Vercel remains synthetic-only for intake and reports no Drive upload capability.
-- The pilot guard blocks additional real-looking filenames once the configured real-letter count reaches the limit; synthetic/test fixtures do not consume real pilot slots.
-- Worker one-shot remains healthy (`status=idle`) and timer is active.
-- Live archive counts remain zero before the first real pilot upload.
-- Full test suite after pilot-mode changes: 273/273.
