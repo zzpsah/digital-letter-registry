@@ -79,4 +79,9 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Disposable Drive and database artifacts were removed; live counts returned to zero letters/jobs/processing rows.
 - The hosted self-signup pending-membership trigger was reconciled into checked-in migration `20261003061500_add_pending_membership_signup.sql`.
 - Supabase advisors were reviewed. SECURITY DEFINER warnings correspond to intentional narrowly-scoped RPCs with explicit authorization checks; leaked-password protection remains external hardening because no Management token is provisioned. Unused-index notices are expected on the empty archive.
-- Full Oracle synthetic suite passes 266/266 and the worker timer is active.
+- Full Oracle synthetic suite passes 269/269 and the worker timer is active.
+
+
+## 2026-10-03 — delete regression hardening
+
+PostgREST DELETE semantics are now encoded in the runtime transport and tests. A successful HTTP response with an empty representation is treated as zero affected rows, which prevents future RLS tests from mistaking a filtered no-op for an authorized delete. Filterless deletes fail closed. Full suite: 269/269.
