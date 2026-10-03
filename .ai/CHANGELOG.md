@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: align README with password-first Vercel architecture
+- Commit: 01e43d82f3dc8f12516224211eec3418b3a1d6f3
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `README.md`
+
 ## 2026-10-03 — test: Gemini is optional when deterministic fallback is active
 - Commit: 54fee01aa563cc1b0a0a955512fc573762fc2c0c
 - Author: PRASHANT KUMAR SAH
