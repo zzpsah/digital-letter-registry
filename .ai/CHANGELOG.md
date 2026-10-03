@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: align handoff with live Vercel and deterministic processing
+- Commit: d68fb8f88fe1c652d3ef9a76f27e521ac289e15a
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-03 — docs: update deployment auth and fallback processing tasks
 - Commit: 99626bdf3e89be0d05ffcbf354f4ce332c005b35
 - Author: PRASHANT KUMAR SAH
