@@ -292,3 +292,16 @@ No baseline DLR work is blocked by these items.
 - [x] Verify live archive remains empty before first pilot upload.
 - [ ] Manually upload the first real official letter through the private Oracle DLR UI.
 - [ ] Review OCR/search/metadata/original access for that letter before using the second slot.
+
+
+## Pilot staged-review hardening — 2026-10-03
+
+- [x] Add explicit second-slot unlock flag.
+- [x] Block a second real-letter upload after the first pilot letter until review is complete.
+- [x] Keep synthetic/test fixtures exempt from the review gate.
+- [x] Expose review-lock state through authenticated capabilities/UI.
+- [x] Set private Oracle second-slot unlock to false.
+- [x] Verify zero-letter state reports pilot mode active, 2 slots remaining, review lock false.
+- [x] Focused API/web tests pass 60/60; full suite passes 275/275.
+- [ ] Upload and review the first real pilot letter.
+- [ ] Explicitly unlock slot two only after that review passes.
