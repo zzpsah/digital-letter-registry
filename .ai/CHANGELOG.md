@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: sync live WhatsApp connector state index
+- Commit: d42ce29e3c21729851dac1b1da617fde9582ba72
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-03 — docs: sync live WhatsApp intake state
 - Commit: 554ea6120e56bb3fd3c8e2c10ba3884849026561
 - Author: PRASHANT KUMAR SAH
