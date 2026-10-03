@@ -14,3 +14,6 @@ Verified 2026-10-03:
 - Real archive letters were untouched.
 
 Next observation: first genuine PDF/JPG/PNG posted by another member in `EDU- Letters`.
+
+- Genuine public official CBSE circular proof also passed: WhatsApp intake, worker processing, corrected explicit CBSE metadata, search and original streaming.
+- Real-document review exposed and fixed CBSE-vs-UDISE classification precedence.
