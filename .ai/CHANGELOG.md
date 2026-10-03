@@ -1,3 +1,10 @@
+## 2026-10-03 — test: cover deterministic transfer-order metadata
+- Commit: 370ac2d4042752a10e29d20be488445541f6400e
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_deterministic_context.py`
+
 ## 2026-10-03 — test: pass configured tesseract path to OCRmyPDF
 - Commit: 3e0598cea6f076d2ea569f7a35c660fdd4be4675
 - Author: PRASHANT KUMAR SAH
