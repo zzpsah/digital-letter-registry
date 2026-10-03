@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: record first real-letter pilot pass
+- Commit: aabdf625c19e808d2cb170300e7ff7e904e27219
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-03 — test: cover deterministic transfer-order metadata
 - Commit: 370ac2d4042752a10e29d20be488445541f6400e
 - Author: PRASHANT KUMAR SAH
