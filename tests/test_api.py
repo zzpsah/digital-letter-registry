@@ -820,6 +820,72 @@ class ApiTests(unittest.TestCase):
         self.assertNotIn("token", response.text.lower())
         self.assertNotIn("folder-id", response.text.lower())
 
+    def test_real_intake_pilot_limit_parser(self):
+        from letter_registry.api import _pilot_real_intake_limit
+
+        with patch.dict(
+            os.environ,
+            {"DLR_REAL_INTAKE_PILOT_LIMIT": "2"},
+            clear=False,
+        ):
+            self.assertEqual(_pilot_real_intake_limit(), 2)
+
+        with patch.dict(
+            os.environ,
+            {"DLR_REAL_INTAKE_PILOT_LIMIT": "0"},
+            clear=False,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "between 1 and 100"):
+                _pilot_real_intake_limit()
+
+    def test_real_intake_pilot_blocks_after_limit(self):
+        from fastapi import HTTPException
+        from letter_registry.api import _enforce_real_intake_pilot_limit
+
+        class FakeDatabase:
+            def select(self, table, *, filters=None, columns="*"):
+                return [
+                    {"original_filename": "letter-one.pdf"},
+                    {"original_filename": "letter-two.jpg"},
+                ]
+
+        with patch.dict(
+            os.environ,
+            {
+                "ENABLE_REAL_INTAKE": "true",
+                "DLR_REAL_INTAKE_PILOT_LIMIT": "2",
+            },
+            clear=False,
+        ):
+            with patch(
+                "letter_registry.api._transport",
+                return_value=FakeDatabase(),
+            ):
+                with self.assertRaises(HTTPException) as ctx:
+                    _enforce_real_intake_pilot_limit(
+                        "synthetic-access",
+                        filename="third-letter.pdf",
+                    )
+        self.assertEqual(ctx.exception.status_code, 409)
+
+    def test_synthetic_file_does_not_consume_real_intake_pilot_limit(self):
+        from letter_registry.api import _enforce_real_intake_pilot_limit
+
+        with patch.dict(
+            os.environ,
+            {
+                "ENABLE_REAL_INTAKE": "true",
+                "DLR_REAL_INTAKE_PILOT_LIMIT": "2",
+            },
+            clear=False,
+        ):
+            with patch("letter_registry.api._transport") as transport:
+                _enforce_real_intake_pilot_limit(
+                    "synthetic-access",
+                    filename="synthetic-health-test.pdf",
+                )
+        transport.assert_not_called()
+
     def test_capabilities_report_synthetic_mode_and_refresh_drive_config(self):
         env = {
             "ENABLE_REAL_INTAKE": "false",
