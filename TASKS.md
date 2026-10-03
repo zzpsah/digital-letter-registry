@@ -100,11 +100,11 @@
 
 ## Current safety boundary
 
-- Drive archive folders remain private; only synthetic integration data has been used.
-- Supabase synthetic RLS-verification row was removed; `letters` currently contains zero rows and no real archive-letter rows.
+- Drive archive folders remain private. Two real pilot letters are retained; disposable synthetic connector data was cleaned after verification.
+- Supabase contains the two retained real pilot letters; disposable synthetic verification rows are cleaned after tests.
 - Rename behavior is preview/approval locked; no real rename has been approved or executed.
-- No real archive-letter has been ingested yet.
-- Controlled manual real-letter pilot is enabled only on the private Oracle runtime with a hard limit of 2 real letters.
+- Real intake has completed a two-letter manual pilot; the manual pilot cap is reached.
+- Manual web intake remains bounded at the completed two-letter pilot cap. WhatsApp `EDU- Letters` intake is separately enabled with a guarded cap of 20 documents.
 - Public Vercel control-plane deployment remains synthetic-only for intake and has no private Drive upload credentials.
 - No Drive IDs/URLs, Supabase credentials, SSH keys, tokens, or server details belong in public Git.
 
@@ -333,3 +333,18 @@ No baseline DLR work is blocked by these items.
 - [x] Pilot hard cap reached with 0 real slots remaining; further real uploads are blocked by the API.
 - [x] Full suite passes 280/280 after live fixes.
 - [ ] Decide next production phase before raising/removing the pilot cap.
+
+
+## WhatsApp EDU- Letters live connector — 2026-10-03
+
+- [x] Create private `EDU- Letters` WhatsApp group on the existing Hermes session.
+- [x] Verify current finite WhatsApp allowlist membership is present in the group.
+- [x] Bind Hermes group policy only to the private target group.
+- [x] Stage only PDF/JPG/JPEG/PNG attachments; suppress normal Hermes replies in the archive group.
+- [x] Add protected local queue + one-minute systemd consumer.
+- [x] Use Bitwarden-backed DLR worker identity for connector intake.
+- [x] Add connector-specific cap of 20 real WhatsApp documents without changing the manual web pilot cap.
+- [x] Preserve WhatsApp message-id/source provenance and retry idempotency.
+- [x] Complete synthetic queue→DLR→provenance verification and cleanup.
+- [x] Full DLR suite passes 280/280.
+- [ ] Observe the first real attachment posted by an allowed member in `EDU- Letters`.
