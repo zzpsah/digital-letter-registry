@@ -15,6 +15,56 @@ class SupabaseRuntimeTransportTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "SUPABASE_URL"):
                 SupabasePostgrestTransport.from_environment()
 
+    def test_worker_environment_prefers_direct_access_token(self) -> None:
+        env = {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_PUBLISHABLE_KEY": "synthetic-key",
+            "SUPABASE_ACCESS_TOKEN": "synthetic-access",
+            "SUPABASE_WORKER_EMAIL": "worker@example.com",
+            "SUPABASE_WORKER_PASSWORD": "synthetic-password",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            transport = SupabasePostgrestTransport.from_worker_environment()
+
+        self.assertEqual(transport.access_token, "synthetic-access")
+
+    def test_worker_environment_signs_in_dedicated_account(self) -> None:
+        from letter_registry.auth import SupabaseAuthSession
+
+        env = {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_PUBLISHABLE_KEY": "synthetic-key",
+            "SUPABASE_WORKER_EMAIL": "worker@example.com",
+            "SUPABASE_WORKER_PASSWORD": "synthetic-password",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            with patch(
+                "letter_registry.auth.SupabasePasswordlessAuth.from_environment"
+            ) as factory:
+                factory.return_value.sign_in_with_password.return_value = (
+                    SupabaseAuthSession(
+                        access_token="fresh-worker-access",
+                        refresh_token="rotating-refresh",
+                        expires_in=3600,
+                    )
+                )
+                transport = SupabasePostgrestTransport.from_worker_environment()
+
+        self.assertEqual(transport.access_token, "fresh-worker-access")
+        factory.return_value.sign_in_with_password.assert_called_once_with(
+            email="worker@example.com",
+            password="synthetic-password",
+        )
+
+    def test_worker_environment_requires_dedicated_credentials(self) -> None:
+        env = {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_PUBLISHABLE_KEY": "synthetic-key",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            with self.assertRaisesRegex(ValueError, "missing worker auth"):
+                SupabasePostgrestTransport.from_worker_environment()
+
     def test_insert_sends_bearer_token_and_publishable_key(self) -> None:
         seen = {}
 
