@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: start controlled real-intake pilot
+- Commit: be4cdc826dbec5176bc6c7b8260e2dd9e3943c83
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/real-intake-pilot/HANDOFF.md`
+
 ## 2026-10-03 — docs: sync hardened DLR state index
 - Commit: ffa3b5ce30ab558d495fb874f4212ee2416f2229
 - Author: PRASHANT KUMAR SAH
