@@ -145,6 +145,55 @@ class SupabaseRuntimeTransportTests(unittest.TestCase):
         self.assertEqual(seen["prefer"], "return=representation")
         self.assertEqual(result["title"], "Updated")
 
+    def test_delete_returns_affected_rows(self) -> None:
+        seen = {}
+
+        def executor(req):
+            seen["method"] = req.method
+            seen["url"] = req.full_url
+            seen["prefer"] = req.headers["Prefer"]
+            return 200, '[{"id":"synthetic"}]'
+
+        transport = SupabasePostgrestTransport(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            access_token="synthetic-token",
+            http_executor=executor,
+        )
+
+        rows = transport.delete("letters", filters={"id": "synthetic"})
+
+        self.assertEqual(seen["method"], "DELETE")
+        self.assertIn("id=eq.synthetic", seen["url"])
+        self.assertEqual(seen["prefer"], "return=representation")
+        self.assertEqual(rows, [{"id": "synthetic"}])
+
+    def test_delete_empty_representation_means_no_rows_affected(self) -> None:
+        def executor(req):
+            return 200, "[]"
+
+        transport = SupabasePostgrestTransport(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            access_token="synthetic-token",
+            http_executor=executor,
+        )
+
+        self.assertEqual(
+            transport.delete("letters", filters={"id": "rls-hidden"}),
+            [],
+        )
+
+    def test_delete_requires_filters(self) -> None:
+        transport = SupabasePostgrestTransport(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            access_token="synthetic-token",
+            http_executor=lambda req: (200, "[]"),
+        )
+        with self.assertRaisesRegex(ValueError, "delete filters are required"):
+            transport.delete("letters", filters={})
+
     def test_select_builds_eq_filters(self) -> None:
         seen = {}
 
