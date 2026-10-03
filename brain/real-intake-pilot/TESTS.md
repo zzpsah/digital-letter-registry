@@ -15,3 +15,16 @@ Passed 2026-10-03:
 - Second-slot review gate: one existing real letter + locked flag rejects the second real upload with HTTP 409.
 - Explicit slot-two unlock allows the second real upload while the hard cap remains enforced.
 - Zero-letter live capability state: pilot mode true, remaining 2, review lock false.
+
+
+## First real-letter pilot live verification
+
+Passed 2026-10-03:
+- Human-owned job claimed/completed by dedicated worker while preserving document owner.
+- Broken embedded-font Hindi triggered forced OCR fallback.
+- OCR processing completed with the configured Hindi+English runtime.
+- Deterministic explicit metadata and smart filename were generated.
+- Authenticated search returned the real record.
+- Authenticated original streaming returned the private original successfully.
+- Pilot state: one slot remaining; second slot review-locked.
+- Full suite: 280/280.
