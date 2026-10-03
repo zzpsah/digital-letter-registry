@@ -1,15 +1,12 @@
 # Current State
 
 Observed 2026-10-03:
-- First real official PDF has been ingested through the private Oracle DLR UI.
-- Dedicated worker processing now separates human document ownership from worker claim identity through `claimed_by`.
-- Hosted worker-claim migration is applied and verified.
-- Garbled embedded-font native Hindi is detected as unusable; PDF fallback uses forced Hindi+English OCR.
-- OCRmyPDF receives the configured user-local Tesseract directory in child PATH.
-- First real letter reprocessing completed successfully.
-- Explicit deterministic metadata and smart filename generation succeeded.
-- Authenticated search finds the record and private original streaming succeeds.
-- Pilot reports 1 remaining slot and `pilot_review_locked=true`.
+- The bounded real-intake pilot has completed with two distinct real official PDFs.
+- Both documents were processed by the dedicated worker while preserving human ownership.
+- One document required forced Hindi+English OCR because embedded native text was garbled; OCR fallback and metadata extraction passed.
+- The second document processed successfully with native PDF extraction and structured metadata generation.
+- Authenticated search and private original streaming passed for both real documents.
+- Pilot hard cap is reached: 0 real slots remaining. Further real uploads are blocked.
 - Full suite passes 280/280.
 
-No real document text or private identifiers are stored in this public brain. Next operational action is an explicit decision whether to unlock the second pilot slot.
+Next action: choose the next production phase before changing `DLR_REAL_INTAKE_PILOT_LIMIT`. Do not raise/remove the cap implicitly.
