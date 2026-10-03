@@ -57,6 +57,16 @@ class OcrmypdfTesseractBackend:
                 str(output_pdf),
             ]
 
+            child_env = os.environ.copy()
+            tesseract_cmd = child_env.get("TESSERACT_CMD", "").strip()
+            if tesseract_cmd:
+                tesseract_dir = str(Path(tesseract_cmd).expanduser().parent)
+                child_env["PATH"] = (
+                    tesseract_dir
+                    + os.pathsep
+                    + child_env.get("PATH", "")
+                )
+
             try:
                 completed = subprocess.run(
                     command,
@@ -64,6 +74,7 @@ class OcrmypdfTesseractBackend:
                     text=True,
                     timeout=self.timeout_seconds,
                     check=False,
+                    env=child_env,
                 )
             except FileNotFoundError as exc:
                 raise RuntimeError(
