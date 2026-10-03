@@ -216,10 +216,14 @@ async function refreshSessionUi(){
   const capabilities=await fetch("/api/v1/capabilities",{cache:"no-store"});
   if(capabilities.ok){
     const data=await capabilities.json();
-    $("intakeBadge").textContent=data.synthetic_only?"TEST MODE":"LIVE INTAKE";
+    $("intakeBadge").textContent=data.synthetic_only
+      ?"TEST MODE"
+      :(data.pilot_mode?"PILOT MODE":"LIVE INTAKE");
     $("intakeMode").textContent=data.synthetic_only
       ?"अभी केवल synthetic/test filename वाले दस्तावेज स्वीकार होंगे."
-      :"Private archive intake enabled.";
+      :(data.pilot_mode
+        ?"Controlled real-letter pilot enabled · "+data.pilot_remaining+" of "+data.pilot_limit+" slots remaining."
+        :"Private archive intake enabled.");
     if(!data.drive_upload_configured){
       $("uploadStatus").textContent="Private Drive upload runtime अभी configure नहीं है.";
     }
