@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: treat Gemini as optional with deterministic fallback
+- Commit: 59bf8840952237ba060be4210f295c2e319f14f6
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/runtime_readiness.py`
+
 ## 2026-10-03 — feat: run worker with deterministic fallback when Gemini is absent
 - Commit: 8e8c27625a640494746cdb4d0f99f2c56f066bff
 - Author: PRASHANT KUMAR SAH
