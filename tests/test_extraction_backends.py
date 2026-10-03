@@ -37,6 +37,45 @@ class OcrmypdfBackendTests(unittest.TestCase):
 
             self.assertIn("शिक्षा विभाग", text)
 
+    def test_ocrmypdf_child_path_includes_configured_tesseract(self) -> None:
+        with TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.pdf"
+            source.write_bytes(b"%PDF-synthetic")
+            seen = {}
+
+            def fake_run(command, **kwargs):
+                seen["env"] = kwargs["env"]
+                sidecar_index = command.index("--sidecar") + 1
+                Path(command[sidecar_index]).write_text(
+                    "synthetic OCR",
+                    encoding="utf-8",
+                )
+
+                class Result:
+                    returncode = 0
+                    stderr = ""
+                    stdout = ""
+
+                return Result()
+
+            with patch.dict(
+                "os.environ",
+                {
+                    "TESSERACT_CMD": "/opt/dlr-ocr/bin/tesseract",
+                    "PATH": "/usr/bin",
+                },
+                clear=False,
+            ):
+                with patch("subprocess.run", side_effect=fake_run):
+                    OcrmypdfTesseractBackend().extract_text(
+                        source,
+                        languages=("hin", "eng"),
+                    )
+
+            self.assertTrue(
+                seen["env"]["PATH"].startswith("/opt/dlr-ocr/bin")
+            )
+
     def test_missing_executable_is_reported_cleanly(self) -> None:
         with TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.pdf"
