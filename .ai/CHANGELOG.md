@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: sync live WhatsApp intake state
+- Commit: 554ea6120e56bb3fd3c8e2c10ba3884849026561
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-03 — docs: record live WhatsApp DLR connector
 - Commit: 3f4723b2499e37a9b9a0abed1f51ae305673be92
 - Author: PRASHANT KUMAR SAH
