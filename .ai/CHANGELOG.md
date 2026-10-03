@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: authenticate worker with dedicated Supabase account
+- Commit: 7325bd26ca2f98f553a1d1c2996b576ba59072d1
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `scripts/run_worker_once.py`
+
 ## 2026-10-03 — feat: support dedicated password-authenticated worker transport
 - Commit: cd40cfcb5269e5e7d788f405938f3be9cf72d533
 - Author: PRASHANT KUMAR SAH
