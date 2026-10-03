@@ -48,7 +48,7 @@ class OcrmypdfTesseractBackend:
 
             command = [
                 self.executable,
-                "--skip-text",
+                "--force-ocr",
                 "--sidecar",
                 str(sidecar),
                 "-l",
