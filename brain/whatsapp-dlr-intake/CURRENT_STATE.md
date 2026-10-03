@@ -1,17 +1,18 @@
 # Current State
 
-Verified 2026-10-03:
+Observed 2026-10-03:
+- Existing Oracle Hermes WhatsApp bridge/session is reused; no second WhatsApp login was created.
+- One configured private source group is allowlisted and bound to DLR through a private runtime group-id file.
+- Bridge stages only inbound PDF/JPG/JPEG/PNG attachments from that exact group into a protected local pending inbox.
+- A 60-second systemd timer consumes pending attachments through the existing Bitwarden-backed DLR WhatsApp intake wrapper.
+- Connector real intake is explicitly enabled with a bounded connector limit of 100 source messages.
+- WhatsApp message ID is persisted as provenance and duplicate message IDs are ignored.
+- Synthetic downstream E2E passed: staged attachment -> DLR queue -> dedicated worker -> search -> original stream -> duplicate-message guard.
+- Synthetic Drive/database artifact was cleaned after verification.
+- A live synthetic test PDF and success message were delivered to the configured WhatsApp group.
+- One allowlisted WhatsApp member was not directly addable by the bridge; a private group invite fallback was sent successfully.
+- Full DLR suite remains 280/280 from the latest code regression run.
 
-- A private WhatsApp group named `EDU- Letters` exists on the already-connected Hermes WhatsApp session.
-- The group contains the current finite WhatsApp allowlist membership; raw phone/JID values remain private runtime state.
-- Hermes group policy is allowlist-only and the DLR connector is bound only to this group.
-- Target-group PDF/JPG/JPEG/PNG attachments are staged by the private Hermes hook; target-group text/unsupported media are skipped without an agent reply.
-- A protected one-minute systemd timer consumes the staging queue through a Bitwarden-backed DLR worker identity.
-- WhatsApp provenance preserves channel, source label and external message id for deduplication.
-- Connector-specific real intake is enabled with a cap of 20 WhatsApp documents. The separate manual web pilot cap remains reached and unchanged.
-- Synthetic queue→DLR verification passed, including WhatsApp provenance persistence and retry repair after a partial-ingest failure; the synthetic Drive/DB test record was cleaned up.
-- Real archive remains at the two previously validated pilot letters after synthetic cleanup.
-- Full DLR suite passes 280/280.
-- Gateway, WhatsApp intake timer and DLR worker timer are active.
+Privacy boundary: no group IDs, phone numbers, session data, message bodies, Drive IDs or credential values are stored in public Git.
 
-Next live proof is simply the first real PDF/image posted by an allowed member into `EDU- Letters`; no further setup is required.
+Remaining live observation: the next real attachment posted by another group member will be the first true inbound bridge-hook proof.
