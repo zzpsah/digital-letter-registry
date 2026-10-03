@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: record official WhatsApp connector proof
+- Commit: 20de76bd71fe5bc005b43bbfff67467697a1dfe9
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+
 ## 2026-10-03 — docs: record genuine WhatsApp official-document proof
 - Commit: a76a7916283f845deb3e4e358e47ee6c71d7192c
 - Author: PRASHANT KUMAR SAH
