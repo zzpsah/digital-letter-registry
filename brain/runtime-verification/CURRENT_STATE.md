@@ -23,7 +23,7 @@ Observed on 2026-10-02:
 - Supabase email-send throttling is currently preventing issuance of another fresh test link; the API now reports this safely as HTTP 429 instead of 500.
 - The dedicated Google OAuth client is successfully in use through secret-manager-injected refresh credentials; legacy persistent authorized-user runtime files were retired after verified cutover.
 
-Pending: real short-lived owner-session HTTP/PostgREST test through the dedicated tailnet-only default hosted Magic Link flow once email throttling permits a fresh link, and Gemini synthetic verification. Write-capable Drive authorization is complete and disposable synthetic upload/stream/delete cleanup passed. Custom SMTP/template application is optional.
+Baseline runtime verification is complete: real short-lived bearer/PostgREST insert/read + RLS denial and authenticated HTTP intake/search/original streaming passed. Gemini remains optional enrichment; custom SMTP/template application is optional.
 
 ## OCR readiness correction
 
