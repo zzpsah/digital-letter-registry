@@ -59,3 +59,8 @@ Observed on 2026-10-02:
 - Retried job completed successfully; search found the synthetic record and private original streaming matched the source bytes exactly.
 - Disposable Drive object and all synthetic DB rows were cleaned up; `letters=0`, `processing_jobs=0`, `letter_processing=0` afterward.
 - `ENABLE_REAL_INTAKE=false` remains in force.
+
+
+## 2026-10-03 — actual-session role matrix
+
+A real Supabase Auth bearer was tested against live RLS while the same non-human account was temporarily assigned viewer, editor and admin membership roles. Viewer read-only behavior, editor insert/update with delete denial, and admin delete all passed. The account was restored to `editor / active`, the worker timer was resumed, and no synthetic rows remain.
