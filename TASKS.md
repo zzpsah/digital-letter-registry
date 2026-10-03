@@ -220,3 +220,16 @@
 - [x] Verify Oracle scoped readiness reports fully ready in synthetic-only mode.
 - [x] Full synthetic suite passes 261/261.
 - [ ] Add Gemini later for richer structured context + semantic embeddings; historical records can be reprocessed then.
+
+
+## Dedicated Oracle worker identity
+
+- [x] Add worker transport that can sign in a dedicated non-human Supabase account with email/password.
+- [x] Keep direct `SUPABASE_ACCESS_TOKEN` only as a one-shot/manual integration fallback.
+- [x] Add tests for direct-token preference, dedicated worker sign-in, and missing worker credentials.
+- [x] Full synthetic suite passes 264/264.
+- [ ] Provision dedicated worker Auth identity.
+- [ ] Store `DLR_SUPABASE_WORKER_EMAIL` and `DLR_SUPABASE_WORKER_PASSWORD` in Bitwarden.
+- [ ] Run one-shot worker login/idle verification.
+- [ ] Enable Oracle worker timer only after the one-shot verification passes.
+- [ ] Complete synthetic upload → Drive → queue → worker → search/open-original vertical slice.
