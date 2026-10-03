@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: run worker with deterministic fallback when Gemini is absent
+- Commit: 8e8c27625a640494746cdb4d0f99f2c56f066bff
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `scripts/run_worker_once.py`
+
 ## 2026-10-03 — feat: allow processing without semantic embeddings
 - Commit: aec08dc3361bf72546530d613232241c8df6c3ff
 - Author: PRASHANT KUMAR SAH

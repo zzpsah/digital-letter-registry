@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: aec08dc3361bf72546530d613232241c8df6c3ff
-- Last commit: feat: allow processing without semantic embeddings
+- HEAD: 8e8c27625a640494746cdb4d0f99f2c56f066bff
+- Last commit: feat: run worker with deterministic fallback when Gemini is absent
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
