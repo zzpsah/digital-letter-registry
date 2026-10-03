@@ -10,6 +10,7 @@ Current state:
 - last-active-admin protection is enforced by the database;
 - Magic Link remains recovery/legacy compatibility and Google Sign-In remains optional;
 - the live bootstrap admin successfully updated the DLR password through the Account flow on 2026-10-03;
+- live Supabase membership verification shows two active admins and one active viewer; the earlier admin invite is accepted;
 - no password value is stored or logged by DLR project documentation;
 - no real archive letters have been ingested.
 
