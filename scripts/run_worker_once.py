@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 
 from letter_registry.extraction import VersionedTextExtractor
+from letter_registry.deterministic_context import DeterministicDocumentContextProvider
 from letter_registry.extraction_backends import (
     OcrmypdfTesseractBackend,
     PypdfTextBackend,
@@ -45,7 +46,20 @@ def main() -> int:
         archive_id=os.environ["DLR_ARCHIVE_ID"],
     )
     repository = SupabaseLetterRepository(transport)
-    embedding_provider = GeminiEmbeddingProvider.from_environment()
+    gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    context_provider = (
+        GeminiDocumentContextProvider.from_environment()
+        if gemini_key
+        else DeterministicDocumentContextProvider()
+    )
+    embeddings = (
+        SupabaseEmbeddingRepository(
+            transport=transport,
+            provider=GeminiEmbeddingProvider.from_environment(),
+        )
+        if gemini_key
+        else None
+    )
 
     worker = DocumentProcessingWorker(
         queue=SupabaseProcessingQueue(transport),
@@ -60,11 +74,8 @@ def main() -> int:
             ocr_backend=OcrmypdfTesseractBackend(),
             image_ocr_backend=TesseractImageBackend(),
         ),
-        context_provider=GeminiDocumentContextProvider.from_environment(),
-        embeddings=SupabaseEmbeddingRepository(
-            transport=transport,
-            provider=embedding_provider,
-        ),
+        context_provider=context_provider,
+        embeddings=embeddings,
         relationship_repository=SupabaseRelationshipRepository(transport),
         allow_real_documents=_truthy("ENABLE_REAL_INTAKE"),
     )
