@@ -17,3 +17,14 @@ Next observation: first genuine PDF/JPG/PNG posted by another member in `EDU- Le
 
 - Genuine public official CBSE circular proof also passed: WhatsApp intake, worker processing, corrected explicit CBSE metadata, search and original streaming.
 - Real-document review exposed and fixed CBSE-vs-UDISE classification precedence.
+
+
+## Official public PDF connector proof — 2026-10-03
+
+- A public official education PDF was sent through the live `EDU- Letters` WhatsApp group path using a test-marked filename so the outbound safety guard could exercise the connector.
+- Connector staging succeeded; WhatsApp provenance and external message-id dedup were stored.
+- Worker processing completed.
+- Authenticated search found the record and private original streaming returned the archived PDF successfully.
+- A transient Bitwarden lookup failure was observed on the first consumer attempt; the private Oracle consumer was hardened with bounded retry/backoff for that exact transient condition.
+- After retry hardening, the consumer service reports success and both connector and worker timers are active.
+- The test archive copy and all derived DB/provenance/job rows were cleaned after verification. Real archive letters were untouched.
