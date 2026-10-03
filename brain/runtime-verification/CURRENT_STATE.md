@@ -39,9 +39,9 @@ Observed on 2026-10-02:
 - Oracle's `dlr-worker-run-with-bitwarden` wrapper successfully injects the configured worker email/password secrets.
 - Initial login failed with `invalid_credentials`, confirming the wrapper path was live but the Auth identity was not yet provisioned.
 - A dedicated Supabase Auth signup was created using the existing Bitwarden-backed credentials.
-- The new account is currently unconfirmed and in the expected self-signup membership state: viewer / disabled.
-- Re-running the worker now reaches Supabase Auth and fails specifically with `email_not_confirmed`.
+- The dedicated worker account is now email-confirmed.
+- Live membership was promoted to the minimum processing role and verified as `editor / active`.
 - Confirmation email delivery to the school Gmail alias is verified.
-- Rechecked live on 2026-10-03: worker remains `email_confirmed = false`, `viewer / disabled`; archive letters and processing jobs remain untouched.
+- Rechecked live on 2026-10-03: worker is `email_confirmed = true`, `editor / active`; archive letters and processing jobs remain untouched.
 - The one-time confirmation token was not forwarded to the Oracle runtime.
-- Next: complete email confirmation, assign minimum editor access, run one-shot worker login/idle verification, then keep the timer disabled until the synthetic vertical slice passes.
+- Next: run one-shot worker login/idle verification. Keep the timer disabled until that passes, then continue to the synthetic vertical slice.
