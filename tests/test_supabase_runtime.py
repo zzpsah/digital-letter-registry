@@ -117,6 +117,34 @@ class SupabaseRuntimeTransportTests(unittest.TestCase):
 
         self.assertIn("resolution=merge-duplicates", seen["prefer"])
 
+    def test_update_uses_patch_and_filters(self) -> None:
+        seen = {}
+
+        def executor(req):
+            seen["method"] = req.method
+            seen["url"] = req.full_url
+            seen["prefer"] = req.headers["Prefer"]
+            seen["body"] = json.loads(req.data.decode("utf-8"))
+            return 200, '[{"id":"synthetic","title":"Updated"}]'
+
+        transport = SupabasePostgrestTransport(
+            base_url="https://example.supabase.co",
+            publishable_key="synthetic-key",
+            access_token="synthetic-token",
+            http_executor=executor,
+        )
+
+        result = transport.update(
+            "letters",
+            {"title": "Updated"},
+            filters={"id": "synthetic"},
+        )
+
+        self.assertEqual(seen["method"], "PATCH")
+        self.assertIn("id=eq.synthetic", seen["url"])
+        self.assertEqual(seen["prefer"], "return=representation")
+        self.assertEqual(result["title"], "Updated")
+
     def test_select_builds_eq_filters(self) -> None:
         seen = {}
 
