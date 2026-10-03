@@ -194,7 +194,7 @@ Verified 2026-10-03:
 - authenticated HTTP synthetic intake → Drive → queue → worker → search → original streaming passed;
 - private original bytes matched the uploaded source exactly;
 - cleanup returned the live archive to zero letters, zero processing jobs, and zero processing rows;
-- full Oracle synthetic suite passes 273/273;
+- full Oracle synthetic suite passes 275/275;
 - real intake remains disabled.
 
 Optional future enhancements include Google Sign-In, Gemini semantic enrichment, live messaging/watched-folder connectors, leaked-password protection, and Vercel auto-deploy/redirect portability.
@@ -202,4 +202,4 @@ Optional future enhancements include Google Sign-In, Gemini semantic enrichment,
 
 ## Controlled real-letter pilot
 
-As of 2026-10-03, the private Oracle DLR runtime is in a bounded manual pilot: real intake is enabled there with a hard cap of 2 real letters. The public Vercel deployment remains synthetic-only for intake and does not hold private Drive upload credentials. The UI reports `PILOT MODE` and remaining slots to authenticated editors/admins. No real letter has been ingested yet at this checkpoint. Live connectors, bulk import, rename execution, and automated delete remain outside the pilot.
+As of 2026-10-03, the private Oracle DLR runtime is in a bounded manual pilot: real intake is enabled there with a hard cap of 2 real letters. The public Vercel deployment remains synthetic-only for intake and does not hold private Drive upload credentials. The UI reports `PILOT MODE` and remaining slots to authenticated editors/admins. After the first real letter is ingested, the second real-letter slot is automatically blocked until the first letter is reviewed and slot two is explicitly unlocked. No real letter has been ingested yet at this checkpoint. Live connectors, bulk import, rename execution, and automated delete remain outside the pilot.
