@@ -271,6 +271,28 @@ class WorkerTests(unittest.TestCase):
         self.assertIn("real document processing is disabled", result.error)
         self.assertEqual(queue.completed, [])
 
+    def test_worker_completes_without_embeddings(self):
+        queue = FakeQueue(job())
+        repository = FakeRepository()
+        worker = DocumentProcessingWorker(
+            queue=queue,
+            source_loader=FakeSourceLoader(record()),
+            database=FakeDatabase(),
+            original_access=FakeOriginalAccess(),
+            repository=repository,
+            extractor=VersionedTextExtractor(FakePdfBackend()),
+            context_provider=FakeContextProvider(),
+            embeddings=None,
+        )
+
+        result = worker.run_once()
+
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(result.chunks, 0)
+        self.assertEqual(queue.completed, [JOB_ID])
+        self.assertEqual(queue.failed, [])
+        self.assertIsNone(repository.embedding_version)
+
     def test_no_pending_job_is_idle(self):
         worker = DocumentProcessingWorker(
             queue=FakeQueue(None),
