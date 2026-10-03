@@ -1,3 +1,10 @@
+## 2026-10-03 — test: worker completes when semantic provider is unavailable
+- Commit: b955372655aa2b3662bc845ecf33928898185ee6
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_worker.py`
+
 ## 2026-10-03 — feat: treat Gemini as optional with deterministic fallback
 - Commit: 59bf8840952237ba060be4210f295c2e319f14f6
 - Author: PRASHANT KUMAR SAH
