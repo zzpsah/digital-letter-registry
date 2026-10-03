@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 004d020d5e202791e3453e05b6da2be6629a1c22
-- Last commit: test: cover dedicated worker authentication
+- HEAD: 326087bed23ec2ae53ce385ef2e71717cdb0c7ec
+- Last commit: docs: align current state with worker-auth readiness
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
