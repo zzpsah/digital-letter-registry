@@ -232,6 +232,6 @@
 - [x] Store `DLR_SUPABASE_WORKER_EMAIL` and `DLR_SUPABASE_WORKER_PASSWORD` in Bitwarden and verify wrapper injection reaches Supabase Auth.
 - [x] Confirm the dedicated worker email address.
 - [x] Assign/verify minimum `editor` archive membership for the worker.
-- [ ] Run one-shot worker login/idle verification.
-- [ ] Enable Oracle worker timer only after the one-shot verification passes.
+- [x] Run one-shot worker login/idle verification.
+- [x] Enable Oracle worker timer after successful one-shot verification.
 - [ ] Complete synthetic upload → Drive → queue → worker → search/open-original vertical slice.
