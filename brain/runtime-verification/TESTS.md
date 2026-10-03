@@ -40,7 +40,7 @@ Passed on 2026-10-03:
 - Private original byte content matched the uploaded synthetic source.
 - Initial live run exposed and then verified the fix for partial-letter UPSERT failure; context writes now PATCH the existing letter row.
 - Focused PostgREST/repository tests: 15/15.
-- Full Oracle synthetic suite after the fix: 266/266.
+- Full Oracle synthetic suite after the fix: 269/269.
 - Cleanup verified: zero synthetic letters, jobs, and processing rows remain; disposable Drive object removed.
 
 
@@ -52,3 +52,12 @@ Using the dedicated worker's genuine short-lived Supabase Auth session, archive 
 - admin: DELETE returned the target row and removed it.
 
 The worker membership was restored to `editor / active`, the timer was restarted and verified active, and live archive counts returned to zero letters/jobs. Note: PostgREST may return an HTTP-success response with an empty representation when RLS filters out a DELETE; tests must inspect affected rows rather than status code alone.
+
+
+## PostgREST delete regression hardening — 2026-10-03
+
+- Added a filtered DELETE helper to the authenticated runtime transport with archive scoping preserved.
+- DELETE always requests `return=representation`; callers can distinguish an actually deleted row from an RLS-filtered no-op even when HTTP status is successful.
+- Empty DELETE representation is explicitly covered as zero affected rows.
+- DELETE without filters fails closed.
+- Focused runtime transport suite passes 13/13; full Oracle DLR suite passes 269/269.
