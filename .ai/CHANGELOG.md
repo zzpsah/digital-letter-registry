@@ -1,3 +1,10 @@
+## 2026-10-03 — test: fix pilot UI fixture
+- Commit: f8b4afe1c97e261d2ea6064877485acc9d070244
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_web_shell.py`
+
 ## 2026-10-03 — test: cover pilot-mode UI
 - Commit: 34ac3d209c71e7c178d364e98e8742057be9ac86
 - Author: PRASHANT KUMAR SAH
