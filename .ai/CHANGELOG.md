@@ -1,3 +1,10 @@
+## 2026-10-03 — fix: qualify derived write ownership policies
+- Commit: 0ad9c4cbbf11f5a208278b96bdc069374c0b6268
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261003085000_separate_job_owner_from_worker_claim.sql`
+
 ## 2026-10-03 — db: separate job ownership from worker claim
 - Commit: f75887aa8983a53b2dd5d3b690a871e204197fd8
 - Author: PRASHANT KUMAR SAH

@@ -65,7 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: f75887aa8983a53b2dd5d3b690a871e204197fd8
-- Change: db: separate job ownership from worker claim
+- Commit: 0ad9c4cbbf11f5a208278b96bdc069374c0b6268
+- Change: fix: qualify derived write ownership policies
 - Date: 2026-10-03
 - Durable context synchronization: completed
