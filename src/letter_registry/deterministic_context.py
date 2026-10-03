@@ -52,8 +52,9 @@ def _explicit_reference_number(text: str) -> str | None:
 
 def _explicit_issue_date(text: str) -> str | None:
     match = re.search(
-        r"दिनांक\s*[:：]?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{4})",
+        r"(?:दिनांक|dated)\s*[:：]?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{4})",
         text,
+        flags=re.IGNORECASE,
     )
     if not match:
         return None
