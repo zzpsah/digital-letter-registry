@@ -103,8 +103,9 @@
 - Drive archive folders remain private; only synthetic integration data has been used.
 - Supabase synthetic RLS-verification row was removed; `letters` currently contains zero rows and no real archive-letter rows.
 - Rename behavior is preview/approval locked; no real rename has been approved or executed.
-- No real archive-letter ingestion has occurred.
-- Public Vercel control-plane deployment is live; real archive-letter intake remains disabled.
+- No real archive-letter has been ingested yet.
+- Controlled manual real-letter pilot is enabled only on the private Oracle runtime with a hard limit of 2 real letters.
+- Public Vercel control-plane deployment remains synthetic-only for intake and has no private Drive upload credentials.
 - No Drive IDs/URLs, Supabase credentials, SSH keys, tokens, or server details belong in public Git.
 
 
@@ -275,3 +276,19 @@ These items are intentionally outside baseline completion and require a new exte
 - **Gemini semantic enrichment** — optional; deterministic OCR/full-text processing is already operational and historical rows can be reprocessed later.
 
 No baseline DLR work is blocked by these items.
+
+
+## Controlled real-letter pilot — 2026-10-03
+
+- [x] Create dedicated real-intake-pilot brain and security boundary.
+- [x] Add runtime pilot limit guard and authenticated capability reporting.
+- [x] Add UI `PILOT MODE` indicator with remaining slots.
+- [x] Add regression tests for pilot limit parsing, blocking and synthetic-test exemption.
+- [x] Enable real intake only on private Oracle runtime.
+- [x] Set hard pilot limit to 2 real letters.
+- [x] Verify private capabilities: pilot mode active, 2/2 slots remaining.
+- [x] Verify public Vercel remains synthetic-only and has no Drive upload capability.
+- [x] Verify worker one-shot idle and timer active.
+- [x] Verify live archive remains empty before first pilot upload.
+- [ ] Manually upload the first real official letter through the private Oracle DLR UI.
+- [ ] Review OCR/search/metadata/original access for that letter before using the second slot.
