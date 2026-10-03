@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: sync WhatsApp connector state index
+- Commit: 8c70157ac033eb8a4bb2538314b7aa91ad11ec55
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-03 — docs: sync WhatsApp DLR connector state index
 - Commit: 8dc630b77a76d5406d96a24976947515ea42a11f
 - Author: PRASHANT KUMAR SAH
