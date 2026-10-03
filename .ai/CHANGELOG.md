@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: stage first-letter review gate
+- Commit: 9d91c809952cd0d14cec71d5c86cebaaffd5ee54
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/SECURITY.md`
+
 ## 2026-10-03 — test: enforce staged pilot review lock
 - Commit: ca92856cb99ee28021735e66ae147eae4cd610d6
 - Author: PRASHANT KUMAR SAH
