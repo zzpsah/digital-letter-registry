@@ -82,6 +82,18 @@ class SupabaseProvenanceRepository:
     ) -> None:
         UUID(owner_id)
         UUID(letter_id)
+        if provenance.external_message_id:
+            existing = self.transport.select(
+                "letter_sources",
+                filters={
+                    "source_channel": provenance.channel.value,
+                    "external_message_id": provenance.external_message_id,
+                },
+                columns="id",
+            )
+            if existing:
+                return
+
         self.transport.insert(
             "letter_sources",
             {
@@ -93,11 +105,6 @@ class SupabaseProvenanceRepository:
                 "received_at": provenance.received_at.isoformat(),
                 "metadata": dict(provenance.metadata),
             },
-            on_conflict=(
-                "archive_id,source_channel,external_message_id"
-                if provenance.external_message_id
-                else None
-            ),
         )
 
 
