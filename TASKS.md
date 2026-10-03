@@ -228,8 +228,10 @@
 - [x] Keep direct `SUPABASE_ACCESS_TOKEN` only as a one-shot/manual integration fallback.
 - [x] Add tests for direct-token preference, dedicated worker sign-in, and missing worker credentials.
 - [x] Full synthetic suite passes 264/264.
-- [ ] Provision dedicated worker Auth identity. (Signup created on 2026-10-03 with the intended Bitwarden-backed credentials; email confirmation is still required before password login works.)
-- [ ] Store `DLR_SUPABASE_WORKER_EMAIL` and `DLR_SUPABASE_WORKER_PASSWORD` in Bitwarden.
+- [x] Provision dedicated worker Auth identity. (Signup created on 2026-10-03 with the intended Bitwarden-backed credentials; email confirmation is still required before password login works.)
+- [x] Store `DLR_SUPABASE_WORKER_EMAIL` and `DLR_SUPABASE_WORKER_PASSWORD` in Bitwarden and verify wrapper injection reaches Supabase Auth.
+- [ ] Confirm the dedicated worker email address.
+- [ ] Assign/verify minimum `editor` archive membership for the worker.
 - [ ] Run one-shot worker login/idle verification.
 - [ ] Enable Oracle worker timer only after the one-shot verification passes.
 - [ ] Complete synthetic upload → Drive → queue → worker → search/open-original vertical slice.
