@@ -203,15 +203,27 @@ class SupabaseProvenanceRepository:
         letter_id: str,
         provenance: IntakeProvenance,
     ) -> None:
+        source_channel = (
+            "web" if provenance.channel == "web_upload"
+            else provenance.channel
+        )
+        existing = self.transport.select(
+            "letter_sources",
+            filters={
+                "source_channel": source_channel,
+                "external_message_id": provenance.source_id,
+            },
+            columns="id",
+        )
+        if existing:
+            return
+
         self.transport.insert(
             "letter_sources",
             {
                 "owner_id": owner_id,
                 "letter_id": letter_id,
-                "source_channel": (
-                    "web" if provenance.channel == "web_upload"
-                    else provenance.channel
-                ),
+                "source_channel": source_channel,
                 "external_message_id": provenance.source_id,
                 "source_label": (
                     provenance.conversation_label
@@ -222,5 +234,4 @@ class SupabaseProvenanceRepository:
                     "conversation_label": provenance.conversation_label,
                 },
             },
-            on_conflict="owner_id,source_channel,external_message_id",
         )
