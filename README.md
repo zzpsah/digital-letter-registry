@@ -76,7 +76,7 @@ The main interface is one search box plus optional filters such as date/year, au
 
 ## Status
 
-The private archive folder structure and a separate Supabase archive database are established. The database and Drive archive are currently empty of real archive records. Refreshable Google Drive OAuth is verified with runtime secret-manager injection, including live originals listing, server-side streaming, and a disposable synthetic upload/stream/delete write test; a protected file credential remains supported only as a local/migration fallback. No public production deployment or live document migration is authorized yet.
+The private archive folder structure and a separate Supabase archive database are established. The database and Drive archive are currently empty of real archive records. Refreshable Google Drive OAuth is verified on the private Oracle worker runtime with secret-manager injection, including live originals listing, server-side streaming, and a disposable synthetic upload/stream/delete write test. The public Vercel control plane is live at the canonical DLR URL, while real document intake/migration remains disabled until explicitly approved.
 
 See:
 - `PRD.md`
@@ -102,31 +102,21 @@ See:
 
 ## Authentication scope
 
-DLR uses passwordless email login (commonly called a Magic Link) to establish the identity of the person using the private application.
+DLR uses Supabase Auth for identity and archive membership for authorization.
 
-Its scope is deliberately narrow:
+- **Primary login:** email + password.
+- **Account creation:** self-service email/password registration creates a disabled viewer membership.
+- **Approval:** an active DLR admin chooses the role and activates the account.
+- **Recovery/legacy:** Magic Link backend compatibility remains, but it is not part of the primary UI.
+- **Database authorization:** Supabase RLS and archive membership decide what the signed-in user may read or modify.
+- **Google Drive authorization:** separate server-side OAuth; never derived from the user's DLR login.
 
-- **Identity/session:** prove which authorized user is using DLR and create the authenticated browser session.
-- **Database authorization:** Supabase RLS uses that authenticated user identity to decide which archive rows the user may read or write.
-- **Future multi-user isolation:** different authorized users/schools can share the same application while remaining separated by database ownership/policies.
-
-Magic Link authentication does **not**:
-
-- provide Google Drive access — that is handled separately by server-side Google OAuth;
-- replace Tailscale/private-network protection;
-- authorize real letter ingestion, rename, delete, historical adoption, or bulk mutation;
-- grant access to unrelated users merely because they can reach the DLR URL.
-
-In short: **Tailscale protects how the app is reached; Magic Link identifies the user; Supabase RLS controls that user's database access; Google OAuth controls the backend Drive connection.**
+Authentication proves identity; archive membership grants access; Google Drive OAuth controls storage access. These are separate boundaries.
 
 
 ## Preferred login experience
 
-DLR prefers **Google Sign-In** for the archive user when the Supabase Google provider is configured. Passwordless email/Magic Link remains a fallback and recovery path.
-
-A successful sign-in establishes the same server-managed Supabase session/RLS identity used by the existing application. The refresh session persists for 30 days by default (subject to Supabase revocation/session policy), so normal browser restarts should not require a fresh email link every time.
-
-Google Sign-In credentials are separate from Google Drive OAuth credentials. Browser login requires its own Google **Web application** OAuth client.
+The normal experience is **email + password**. New users create an account in DLR, remain disabled until an admin approves them, and then sign in directly with the password they chose. Google Sign-In may be added later as an optional provider. Magic Link is retained only as legacy/recovery backend compatibility and is not shown in the primary UI.
 
 
 ## DLR accounts and roles
@@ -137,7 +127,7 @@ DLR authorization is archive-membership based, not Gmail/provider based.
 - Primary native login is email + password.
 - Magic Link remains a passwordless/recovery option.
 - Google Sign-In is optional and maps into the same Supabase user/membership model when enabled.
-- Registration is **invite-only**. Creating a Supabase Auth user does not by itself grant archive access.
+- Registration is self-service, but a new account starts with archive role `viewer` and status `disabled`; creating a Supabase Auth user does not grant usable archive access until an admin activates it.
 - Roles are:
   - `admin`: manage members/invites and administrative archive operations;
   - `editor`: read/search and add/update archive content;
@@ -155,11 +145,11 @@ Google Drive OAuth remains a separate backend storage authorization system and i
 Authenticated archive members can set or change their DLR password from the Account section. The password is sent directly to Supabase Auth over the authenticated session; DLR does not persist or log it.
 
 Practical flow:
-1. Sign in using an existing valid method (for the bootstrap admin, Magic Link works now).
-2. Open the Account section.
-3. Set a new password (minimum 8 characters enforced by DLR).
-4. Future logins can use email + password from any computer that can reach the private DLR app.
-5. Magic Link remains available as passwordless recovery.
+1. Create an account or sign in with an existing approved email/password account.
+2. New accounts wait for admin approval.
+3. Once active, sign in directly with email + password.
+4. An authenticated member can change the password from the Account section.
+5. DLR does not persist or log the password.
 
 This does not change archive roles or Google Drive permissions.
 
