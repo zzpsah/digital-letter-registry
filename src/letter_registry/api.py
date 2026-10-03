@@ -172,6 +172,7 @@ class RuntimeCapabilitiesResponse(BaseModel):
     pilot_mode: bool = False
     pilot_limit: int | None = None
     pilot_remaining: int | None = None
+    pilot_review_locked: bool = False
     drive_upload_configured: bool
     original_streaming_configured: bool
     semantic_search_configured: bool
@@ -495,6 +496,10 @@ def _pilot_real_intake_limit() -> int | None:
     return limit
 
 
+def _pilot_second_slot_unlocked() -> bool:
+    return _truthy_env("DLR_REAL_INTAKE_PILOT_SECOND_SLOT_UNLOCKED")
+
+
 def _looks_synthetic_filename(filename: str) -> bool:
     normalized = filename.casefold()
     return "synthetic" in normalized or "test" in normalized
@@ -531,6 +536,14 @@ def _enforce_real_intake_pilot_limit(
             detail=(
                 f"Real-intake pilot limit reached ({limit}). "
                 "Review the pilot before adding more real letters."
+            ),
+        )
+    if used >= 1 and not _pilot_second_slot_unlocked():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "Second real-letter pilot slot is locked. "
+                "Review the first letter before explicitly unlocking slot two."
             ),
         )
 
@@ -1153,13 +1166,21 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         pilot_limit = _pilot_real_intake_limit()
         pilot_mode = not synthetic_only and pilot_limit is not None
         pilot_remaining = None
+        pilot_review_locked = False
         if pilot_mode:
-            pilot_remaining = max(0, pilot_limit - _count_real_letters(database))
+            used = _count_real_letters(database)
+            pilot_remaining = max(0, pilot_limit - used)
+            pilot_review_locked = (
+                used >= 1
+                and pilot_remaining > 0
+                and not _pilot_second_slot_unlocked()
+            )
         return RuntimeCapabilitiesResponse(
             synthetic_only=synthetic_only,
             pilot_mode=pilot_mode,
             pilot_limit=pilot_limit if pilot_mode else None,
             pilot_remaining=pilot_remaining,
+            pilot_review_locked=pilot_review_locked,
             drive_upload_configured=(
                 drive_credentials
                 and bool(
