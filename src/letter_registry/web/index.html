@@ -222,7 +222,9 @@ async function refreshSessionUi(){
     $("intakeMode").textContent=data.synthetic_only
       ?"अभी केवल synthetic/test filename वाले दस्तावेज स्वीकार होंगे."
       :(data.pilot_mode
-        ?"Controlled real-letter pilot enabled · "+data.pilot_remaining+" of "+data.pilot_limit+" slots remaining."
+        ?(data.pilot_review_locked
+          ?"Pilot paused after first real letter · review required before slot two."
+          :"Controlled real-letter pilot enabled · "+data.pilot_remaining+" of "+data.pilot_limit+" slots remaining.")
         :"Private archive intake enabled.");
     if(!data.drive_upload_configured){
       $("uploadStatus").textContent="Private Drive upload runtime अभी configure नहीं है.";
