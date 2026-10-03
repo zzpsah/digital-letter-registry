@@ -30,6 +30,7 @@
 - The canonical user-facing control plane is now the public Vercel URL with password-first auth. The private Oracle HTTPS origin remains an operational/private-worker endpoint rather than the normal user entrypoint.
 - Magic-link email throttling is now surfaced safely as HTTP 429 instead of an internal 500.
 - Public Vercel control-plane deployment is live; no real archive-letter ingestion has occurred and real intake remains disabled.
+- On 2026-10-03, the bootstrap admin successfully updated the DLR password through the live Account flow. This completes the real password-setup milestone; no password value is stored or logged in repository state.
 
 ## Next step
 
