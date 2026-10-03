@@ -1,3 +1,10 @@
+## 2026-10-03 — test: expect forced OCR fallback
+- Commit: 0d992cfa5cba50523afc4d7b94aec67891a71df0
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- (no application files detected)
+
 ## 2026-10-03 — fix: qualify derived write ownership policies
 - Commit: 0ad9c4cbbf11f5a208278b96bdc069374c0b6268
 - Author: PRASHANT KUMAR SAH
