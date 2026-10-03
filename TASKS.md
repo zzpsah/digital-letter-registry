@@ -234,4 +234,4 @@
 - [x] Assign/verify minimum `editor` archive membership for the worker.
 - [x] Run one-shot worker login/idle verification.
 - [x] Enable Oracle worker timer after successful one-shot verification.
-- [ ] Complete synthetic upload → Drive → queue → worker → search/open-original vertical slice.
+- [x] Complete synthetic upload → Drive → queue → worker → search/open-original vertical slice.
