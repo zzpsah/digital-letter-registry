@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: track dedicated worker identity rollout
+- Commit: f52e746402cbdc5e4474df385db56d8a03f8322a
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+
 ## 2026-10-03 — docs: align current state with worker-auth readiness
 - Commit: 326087bed23ec2ae53ce385ef2e71717cdb0c7ec
 - Author: PRASHANT KUMAR SAH
