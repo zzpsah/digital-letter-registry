@@ -1,3 +1,10 @@
+## 2026-10-03 — test: cover CBSE affiliation precedence
+- Commit: 46991323c7c617991faf0148517ecfaf89b4620b
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_deterministic_context.py`
+
 ## 2026-10-03 — docs: sync WhatsApp connector state index
 - Commit: 8c70157ac033eb8a4bb2538314b7aa91ad11ec55
 - Author: PRASHANT KUMAR SAH
