@@ -139,7 +139,7 @@ The broader environment already has an authorized private administration path th
 
 ## Current boundary
 
-No production deployment or live archive import is authorized yet. Synthetic/private test fixtures must prove the vertical slice safely before real archive intake.
+The public Vercel control plane is deployed and reachable. Real archive import/intake remains disabled. Synthetic/private test fixtures are still required before enabling real archive ingestion.
 
 
 ## 2026-10-02 runtime verification checkpoint
@@ -160,7 +160,7 @@ The codebase is Google-account portable. A deployment uses the Google account th
 
 ## Authentication scope
 
-DLR's passwordless email login (Magic Link / Email OTP login) exists to establish an authenticated archive-user session and supply Supabase RLS with the user's identity.
+DLR uses Supabase Auth to establish an authenticated archive-user session and supply RLS with the user's identity. Primary login is email + password; self-registration creates a disabled viewer membership until an active DLR admin approves the account. Magic Link remains legacy/recovery backend compatibility rather than the primary user flow.
 
 Scope:
 - authenticate the browser user;
@@ -242,3 +242,17 @@ Remaining portability tasks:
 1. add the Vercel production origin to the Supabase Auth redirect allow-list;
 2. grant Vercel GitHub integration access if automatic `main` deployments are desired;
 3. explicitly decide which Drive/original-access operations, if any, should migrate from Oracle to Vercel.
+
+
+## Deterministic processing fallback
+
+Oracle processing no longer depends on Gemini availability for baseline functionality.
+
+When `GEMINI_API_KEY` is absent:
+- OCR/native text extraction still runs;
+- checked-in vocabulary produces conservative structured hints;
+- full-text/metadata search remains available;
+- semantic embeddings are skipped and remain eligible for later reprocessing;
+- exact dates, reference numbers, deadlines and actions are never invented by the fallback.
+
+The scoped Oracle runtime currently reports ready with Supabase, auth callback, Drive OAuth, originals folder, Tesseract, OCRmyPDF, Hindi/English OCR languages, and synthetic-only safety all available. Gemini is optional. Full tests: 261/261.
