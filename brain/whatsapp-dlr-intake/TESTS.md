@@ -52,3 +52,14 @@ Not yet claimed:
 ## Genuine official circular proof
 
 Passed 2026-10-03: public official CBSE PDF sent into the bound group, ingested with WhatsApp provenance, processed by the dedicated worker, reprocessed after fixing CBSE authority precedence, found by authenticated search, and streamed from private original storage. Corrected metadata includes CBSE authority, affiliation category, explicit notification reference/date and smart filename. Full suite: 281/281.
+
+
+## Official public PDF connector proof — 2026-10-03
+
+- A public official education PDF was sent through the live `EDU- Letters` WhatsApp group path using a test-marked filename so the outbound safety guard could exercise the connector.
+- Connector staging succeeded; WhatsApp provenance and external message-id dedup were stored.
+- Worker processing completed.
+- Authenticated search found the record and private original streaming returned the archived PDF successfully.
+- A transient Bitwarden lookup failure was observed on the first consumer attempt; the private Oracle consumer was hardened with bounded retry/backoff for that exact transient condition.
+- After retry hardening, the consumer service reports success and both connector and worker timers are active.
+- The test archive copy and all derived DB/provenance/job rows were cleaned after verification. Real archive letters were untouched.
