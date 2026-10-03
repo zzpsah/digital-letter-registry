@@ -1,3 +1,10 @@
+## 2026-10-03 — db: capture pending membership signup trigger
+- Commit: 3bbb67ad3caa31d42502bd09ede26c582fbeb5ac
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261003061500_add_pending_membership_signup.sql`
+
 ## 2026-10-03 — docs: close runtime worker slice task
 - Commit: a606815b66352c7f42003e8dbd2658456d4c8239
 - Author: PRASHANT KUMAR SAH

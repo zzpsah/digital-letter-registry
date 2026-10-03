@@ -67,42 +67,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: cd40cfcb5269e5e7d788f405938f3be9cf72d533
-- Change: feat: support dedicated password-authenticated worker transport
+- Commit: 3bbb67ad3caa31d42502bd09ede26c582fbeb5ac
+- Change: db: capture pending membership signup trigger
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## Dedicated worker authentication readiness
-
-The worker no longer requires a manually copied human `SUPABASE_ACCESS_TOKEN` as its only option. `SupabasePostgrestTransport.from_worker_environment()` now supports:
-
-- direct `SUPABASE_ACCESS_TOKEN` only for one-shot/manual integration tests;
-- preferred background mode: `SUPABASE_WORKER_EMAIL` + `SUPABASE_WORKER_PASSWORD`, which signs in a dedicated non-human account and obtains a fresh short-lived user access token each run.
-
-This preserves normal Supabase RLS rather than using service-role credentials in the Oracle worker.
-
-Oracle has the Bitwarden-scoped worker wrapper and systemd service/timer files installed. The dedicated worker Auth account is now email-confirmed and live verification on 2026-10-03 shows `editor / active` membership. One-shot worker verification passed with `status=idle`; `ENABLE_REAL_INTAKE=false` was re-verified, and the Oracle worker timer is now enabled and active.
-
-Latest synthetic suite: 264/264 PASS.
-
-## 2026-10-03 — Dedicated worker signup checkpoint
-
-- The intended worker email/password secrets already exist in Bitwarden Secrets Manager and are injected successfully by the installed Oracle worker wrapper.
-- Before signup, the one-shot wrapper reached Supabase Auth but failed with `invalid_credentials`.
-- A dedicated worker Auth signup was then created using the existing Bitwarden-backed credentials without exposing the password in chat or Git.
-- The worker account now exists as the normal self-signup state `viewer / disabled` and requires email confirmation.
-- A fresh one-shot worker attempt now fails with `email_not_confirmed`, proving the stored credential pair matches the newly created Auth user.
-- The confirmation email was delivered to the school Gmail alias. Its one-time token was not forwarded into Oracle commands.
-- Do not enable the worker timer yet. After confirmation, promote/activate the worker with minimum `editor` access, run one-shot idle verification, then proceed to the synthetic end-to-end vertical slice.
-
-
-## 2026-10-03 — Synthetic worker vertical slice
-
-- Disposable synthetic intake passed through private Drive, Supabase queue, Oracle worker, OCR/context persistence, search, and private original streaming.
-- The first worker attempt exposed a persistence defect: context metadata used a partial UPSERT into `letters`, violating required source fields.
-- Fix committed: filtered PostgREST PATCH support was added and existing letter context is now updated instead of partially upserted.
-- Focused tests passed 15/15; full Oracle synthetic suite passes 266/266.
-- Retried job completed successfully. Search found the synthetic record and original-stream bytes matched the uploaded source.
-- Synthetic Drive object and related database rows were removed; live counts returned to zero letters, zero jobs, and zero processing rows.
-- Real intake remains disabled.
