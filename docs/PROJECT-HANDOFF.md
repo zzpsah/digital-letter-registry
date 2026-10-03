@@ -291,3 +291,6 @@ A private dedicated WhatsApp archive group is live on the existing Hermes sessio
 ## 2026-10-03 WhatsApp → DLR connector
 
 A private Oracle WhatsApp-to-DLR connector is active using the existing Hermes WhatsApp session. One exact private source group is bound at runtime; only PDF/JPG/JPEG/PNG attachments are staged. The bridge writes a protected message-ID keyed inbox, and an active 60-second systemd timer invokes the existing Bitwarden-backed WhatsApp intake wrapper. Provenance/deduplication are retained in DLR. A synthetic end-to-end connector test passed queue, worker, search, original streaming, duplicate-message rejection and cleanup. Connector real intake is bounded to 100 WhatsApp source messages. Public Git intentionally omits group IDs, phone numbers and session details. First genuine inbound member-post remains to be observed.
+
+
+The WhatsApp connector has now also passed a genuine WhatsApp-source official circular proof using a public CBSE PDF. The document processed successfully, and a real classification-quality issue discovered during review was fixed: explicit CBSE affiliation evidence now outranks generic UDISE mentions. Search and private original streaming passed after reprocessing. Full suite: 281/281.
