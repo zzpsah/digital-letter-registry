@@ -1,9 +1,12 @@
 # Tasks
 
 - [x] Define reply/email transcript behavior.
-- [ ] Preserve source reply destination and user query/caption in private provenance.
-- [ ] Add idempotent post-processing delivery dispatcher.
-- [ ] Send same-chat WhatsApp reply after completed processing.
-- [ ] Prepare queued email transcript + attachment package.
+- [x] Preserve source reply destination and user query/caption in private provenance.
+- [x] Add idempotent post-processing delivery dispatcher.
+- [x] Send same-chat WhatsApp reply after completed processing.
+- [x] Prepare queued email transcript + attachment package.
 - [ ] Add Gmail sender authorization and live email send.
 - [ ] Add Telegram reply parity.
+
+- [x] Gmail sender implementation + dry-run MIME validation.
+- [ ] One-time Gmail `gmail.send` OAuth authorization and live email send verification.
