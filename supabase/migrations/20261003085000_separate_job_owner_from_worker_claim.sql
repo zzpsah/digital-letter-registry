@@ -109,9 +109,9 @@ with check (
   (select private.archive_member_role(archive_id)) in ('admin','editor')
   and exists (
     select 1 from public.letters l
-    where l.id = letter_id
-      and l.archive_id = archive_id
-      and l.owner_id = owner_id
+    where l.id = public.letter_processing.letter_id
+      and l.archive_id = public.letter_processing.archive_id
+      and l.owner_id = public.letter_processing.owner_id
   )
 );
 
@@ -123,9 +123,9 @@ with check (
   (select private.archive_member_role(archive_id)) in ('admin','editor')
   and exists (
     select 1 from public.letters l
-    where l.id = letter_id
-      and l.archive_id = archive_id
-      and l.owner_id = owner_id
+    where l.id = public.letter_chunks.letter_id
+      and l.archive_id = public.letter_chunks.archive_id
+      and l.owner_id = public.letter_chunks.owner_id
   )
 );
 
@@ -137,8 +137,8 @@ with check (
   (select private.archive_member_role(archive_id)) in ('admin','editor')
   and exists (
     select 1 from public.letters l
-    where l.id = source_letter_id
-      and l.archive_id = archive_id
-      and l.owner_id = owner_id
+    where l.id = public.letter_relationships.source_letter_id
+      and l.archive_id = public.letter_relationships.archive_id
+      and l.owner_id = public.letter_relationships.owner_id
   )
 );
