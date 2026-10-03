@@ -35,8 +35,8 @@
 
 ## Next step
 
-1. Complete the synthetic upload → Drive → queue → Oracle worker → Vercel search/open-original vertical slice.
-2. Keep `ENABLE_REAL_INTAKE=false` throughout synthetic verification.
+1. Keep `ENABLE_REAL_INTAKE=false`; the synthetic upload → Drive → queue → Oracle worker → search/open-original slice is now verified end-to-end and cleaned up.
+2. Complete the remaining real authenticated owner/PostgREST browser-session verification separately from worker processing.
 3. Gemini remains optional; add it later for richer structured context and semantic embeddings, then reprocess historical items.
 
 Public Vercel hosting is authorized and live. Real-letter ingestion, historical adoption, Drive rename/delete operations, and real connector intake remain disabled unless explicitly enabled later.
@@ -95,3 +95,14 @@ Latest synthetic suite: 264/264 PASS.
 - A fresh one-shot worker attempt now fails with `email_not_confirmed`, proving the stored credential pair matches the newly created Auth user.
 - The confirmation email was delivered to the school Gmail alias. Its one-time token was not forwarded into Oracle commands.
 - Do not enable the worker timer yet. After confirmation, promote/activate the worker with minimum `editor` access, run one-shot idle verification, then proceed to the synthetic end-to-end vertical slice.
+
+
+## 2026-10-03 — Synthetic worker vertical slice
+
+- Disposable synthetic intake passed through private Drive, Supabase queue, Oracle worker, OCR/context persistence, search, and private original streaming.
+- The first worker attempt exposed a persistence defect: context metadata used a partial UPSERT into `letters`, violating required source fields.
+- Fix committed: filtered PostgREST PATCH support was added and existing letter context is now updated instead of partially upserted.
+- Focused tests passed 15/15; full Oracle synthetic suite passes 266/266.
+- Retried job completed successfully. Search found the synthetic record and original-stream bytes matched the uploaded source.
+- Synthetic Drive object and related database rows were removed; live counts returned to zero letters, zero jobs, and zero processing rows.
+- Real intake remains disabled.
