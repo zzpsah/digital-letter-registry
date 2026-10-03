@@ -1,18 +1,16 @@
 # Current State
 
-Observed 2026-10-03:
-- Existing Oracle Hermes WhatsApp bridge/session is reused; no second WhatsApp login was created.
-- One configured private source group is allowlisted and bound to DLR through a private runtime group-id file.
-- Bridge stages only inbound PDF/JPG/JPEG/PNG attachments from that exact group into a protected local pending inbox.
-- A 60-second systemd timer consumes pending attachments through the existing Bitwarden-backed DLR WhatsApp intake wrapper.
-- Connector real intake is explicitly enabled with a bounded connector limit of 100 source messages.
-- WhatsApp message ID is persisted as provenance and duplicate message IDs are ignored.
-- Synthetic downstream E2E passed: staged attachment -> DLR queue -> dedicated worker -> search -> original stream -> duplicate-message guard.
-- Synthetic Drive/database artifact was cleaned after verification.
-- A live synthetic test PDF and success message were delivered to the configured WhatsApp group.
-- One allowlisted WhatsApp member was not directly addable by the bridge; a private group invite fallback was sent successfully.
-- Full DLR suite remains 280/280 from the latest code regression run.
+Verified 2026-10-03:
+- Existing Hermes WhatsApp bridge/session is reused; no second WhatsApp login exists.
+- Live source group is bound privately as `EDU- Letters`; exact group identity stays outside public Git.
+- Group metadata query returned the expected group name and three current participants.
+- WhatsApp→DLR intake timer and bridge hook are active.
+- Fresh unique synthetic PDF sent through the live WhatsApp bridge was automatically staged and ingested into DLR.
+- Provenance recorded `source_channel=whatsapp` with a non-empty external message-id dedup key.
+- Dedicated DLR worker completed processing.
+- Authenticated DLR search found the synthetic record and private original streaming succeeded.
+- Synthetic Drive object and all synthetic database/provenance/job rows were deleted after verification.
+- Outbound bridge-sent synthetic/test media now also passes the same DLR staging helper, enabling reproducible E2E connector tests.
+- Real archive letters were untouched.
 
-Privacy boundary: no group IDs, phone numbers, session data, message bodies, Drive IDs or credential values are stored in public Git.
-
-Remaining live observation: the next real attachment posted by another group member will be the first true inbound bridge-hook proof.
+Next observation: first genuine PDF/JPG/PNG posted by another member in `EDU- Letters`.
