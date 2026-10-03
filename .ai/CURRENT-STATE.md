@@ -8,7 +8,7 @@
 - A separate Supabase archive project exists, isolated from the existing UMV database.
 - Public archive tables use owner-scoped RLS with `auth.uid() = owner_id`.
 - DB-level synthetic verification on 2026-10-02 confirmed: owner-context insert succeeds, owner-context read succeeds, a different synthetic user sees zero rows, and cross-owner insert is rejected by RLS.
-- That verification used simulated request JWT claims inside the database, not a real browser/PostgREST bearer session, so the real short-lived owner-session HTTP/PostgREST vertical slice remains pending.
+- In addition to the earlier DB-level claim simulation, a real short-lived Supabase Auth bearer session now passed live PostgREST insert/read verification and anonymous RLS denial using disposable synthetic data.
 - Repository auth/template implementation is ready: `supabase/templates/magic-link.html` already targets the server-side `/auth/confirm?token_hash=...` callback.
 - Archive-owner magic-link delivery is working. The hosted project uses Supabase's default direct-confirmation email because the Dashboard requires custom SMTP before editing template subject/body. The application now supports that default flow with a hardened fragment bridge at `/auth/confirm`: browser fragment tokens are posted same-origin, the server validates the authenticated owner, stores only HttpOnly cookies, and clears the URL. The checked-in token-hash template remains an optional future path if custom SMTP is enabled.
 - VPS auth/API suite passes 29/29 tests after default-flow and rate-limit handling; the full synthetic unit suite passes 212/212 tests after adding file-based Drive OAuth support. The Supabase Management Auth-config helper focused suite passes 4/4.
@@ -33,11 +33,9 @@
 - On 2026-10-03, the bootstrap admin successfully updated the DLR password through the live Account flow. This completes the real password-setup milestone; no password value is stored or logged in repository state.
 - Live Supabase membership verification on 2026-10-03 shows two active admins and one active viewer. The earlier second-admin invite is accepted. Archive letters and processing jobs remain at zero.
 
-## Next step
+## Baseline completion
 
-1. Keep `ENABLE_REAL_INTAKE=false`; the synthetic upload → Drive → queue → Oracle worker → search/open-original slice is now verified end-to-end and cleaned up.
-2. Complete the remaining real authenticated owner/PostgREST browser-session verification separately from worker processing.
-3. Gemini remains optional; add it later for richer structured context and semantic embeddings, then reprocess historical items.
+The core DLR baseline is complete. Keep `ENABLE_REAL_INTAKE=false` until real archive ingestion is explicitly authorized. Remaining work is optional/external hardening: Google Sign-In, leaked-password protection, Vercel redirect/auto-deploy portability, Gemini semantic enrichment, and live messaging/watched-folder connectors.
 
 Public Vercel hosting is authorized and live. Real-letter ingestion, historical adoption, Drive rename/delete operations, and real connector intake remain disabled unless explicitly enabled later.
 
@@ -47,7 +45,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Synthetic owner insert/read succeeded.
 - Synthetic wrong-user read returned zero rows.
 - Synthetic cross-owner insert was denied by the RLS policy.
-- This is DB-level claim simulation only; it does not replace the pending real user bearer-session/PostgREST test.
+- The DB-level claim simulation is now complemented by a real short-lived bearer/PostgREST insert/read + RLS-denial test.
 - The synthetic verification row was removed after the RLS test; `letters` now contains zero rows.
 
 ## 2026-10-02 — Runtime connectivity checkpoint
@@ -71,3 +69,14 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Change: db: capture pending membership signup trigger
 - Date: 2026-10-03
 - Durable context synchronization: completed
+
+
+## 2026-10-03 — Baseline completion checkpoint
+
+- Canonical Vercel home and health returned HTTP 200.
+- Real authenticated HTTP session and authenticated search passed on the Oracle API using the dedicated worker bearer.
+- A disposable HTTP multipart upload reached Drive, queued a durable job, completed through the Oracle worker, appeared in search, and streamed back byte-for-byte through the authenticated original endpoint.
+- Disposable Drive and database artifacts were removed; live counts returned to zero letters/jobs/processing rows.
+- The hosted self-signup pending-membership trigger was reconciled into checked-in migration `20261003061500_add_pending_membership_signup.sql`.
+- Supabase advisors were reviewed. SECURITY DEFINER warnings correspond to intentional narrowly-scoped RPCs with explicit authorization checks; leaked-password protection remains external hardening because no Management token is provisioned. Unused-index notices are expected on the empty archive.
+- Full Oracle synthetic suite passes 266/266 and the worker timer is active.
