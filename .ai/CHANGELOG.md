@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: retain private WhatsApp reply metadata
+- Commit: 76bbde1c51494b8e8e5b82f3788a2bce8f576f28
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `scripts/ingest_whatsapp_attachment.py`
+
 ## 2026-10-03 — docs: start post-processing delivery enhancement
 - Commit: 11a544900f8191e45acf6b0b4ff6487a6ab59f11
 - Author: PRASHANT KUMAR SAH
