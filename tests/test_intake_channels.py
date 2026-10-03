@@ -80,6 +80,9 @@ class IntakeChannelTests(unittest.TestCase):
             def __init__(self):
                 self.calls = []
 
+            def select(self, table, *, filters=None, columns="*"):
+                return []
+
             def insert(self, table, row, *, on_conflict=None):
                 self.calls.append((table, row, on_conflict))
                 return row
@@ -115,10 +118,7 @@ class IntakeChannelTests(unittest.TestCase):
         self.assertEqual(table, "letter_sources")
         self.assertEqual(row["source_channel"], "whatsapp")
         self.assertEqual(row["external_message_id"], "synthetic-wa-message")
-        self.assertEqual(
-            conflict,
-            "owner_id,source_channel,external_message_id",
-        )
+        self.assertIsNone(conflict)
 
     def test_filename_normalization_rejects_path_traversal(self):
         self.assertEqual(
