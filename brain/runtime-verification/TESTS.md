@@ -33,3 +33,12 @@ Data note: the retained synthetic verification row was removed; `letters` now co
 Passed:
 - Focused runtime-readiness unit suite: 5/5.
 - The configured-command test confirms explicit OCR paths are resolved without exposing them in readiness output.
+
+
+Passed on 2026-10-03:
+- Live synthetic worker vertical slice: Drive upload → durable queue → Oracle worker → OCR/context persistence → text search → private original stream.
+- Private original byte content matched the uploaded synthetic source.
+- Initial live run exposed and then verified the fix for partial-letter UPSERT failure; context writes now PATCH the existing letter row.
+- Focused PostgREST/repository tests: 15/15.
+- Full Oracle synthetic suite after the fix: 266/266.
+- Cleanup verified: zero synthetic letters, jobs, and processing rows remain; disposable Drive object removed.
