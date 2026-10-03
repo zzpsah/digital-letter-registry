@@ -169,6 +169,9 @@ class FragmentSessionRequest(BaseModel):
 
 class RuntimeCapabilitiesResponse(BaseModel):
     synthetic_only: bool
+    pilot_mode: bool = False
+    pilot_limit: int | None = None
+    pilot_remaining: int | None = None
     drive_upload_configured: bool
     original_streaming_configured: bool
     semantic_search_configured: bool
@@ -477,6 +480,59 @@ def _transport(
 
 def _truthy_env(name: str) -> bool:
     return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _pilot_real_intake_limit() -> int | None:
+    raw = os.environ.get("DLR_REAL_INTAKE_PILOT_LIMIT", "").strip()
+    if not raw:
+        return None
+    try:
+        limit = int(raw)
+    except ValueError as exc:
+        raise RuntimeError("DLR_REAL_INTAKE_PILOT_LIMIT must be an integer") from exc
+    if limit < 1 or limit > 100:
+        raise RuntimeError("DLR_REAL_INTAKE_PILOT_LIMIT must be between 1 and 100")
+    return limit
+
+
+def _looks_synthetic_filename(filename: str) -> bool:
+    normalized = filename.casefold()
+    return "synthetic" in normalized or "test" in normalized
+
+
+def _count_real_letters(database: ArchiveScopedSupabaseTransport) -> int:
+    rows = database.select("letters", columns="original_filename")
+    return sum(
+        1
+        for row in rows
+        if not _looks_synthetic_filename(str(row.get("original_filename") or ""))
+    )
+
+
+def _enforce_real_intake_pilot_limit(
+    access_token: str,
+    *,
+    filename: str,
+) -> None:
+    limit = _pilot_real_intake_limit()
+    if limit is None or not _truthy_env("ENABLE_REAL_INTAKE"):
+        return
+    if _looks_synthetic_filename(filename):
+        return
+
+    database = _transport(
+        access_token,
+        roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR},
+    )
+    used = _count_real_letters(database)
+    if used >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                f"Real-intake pilot limit reached ({limit}). "
+                "Review the pilot before adding more real letters."
+            ),
+        )
 
 
 def _runtime_intake(access_token: str) -> tuple[str, ChannelIntakeService]:
@@ -1091,10 +1147,19 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     def capabilities(
         access_token: str = Depends(_access_token),
     ) -> RuntimeCapabilitiesResponse:
-        _transport(access_token)
+        database = _transport(access_token)
         drive_credentials = _drive_credentials_configured()
+        synthetic_only = not _truthy_env("ENABLE_REAL_INTAKE")
+        pilot_limit = _pilot_real_intake_limit()
+        pilot_mode = not synthetic_only and pilot_limit is not None
+        pilot_remaining = None
+        if pilot_mode:
+            pilot_remaining = max(0, pilot_limit - _count_real_letters(database))
         return RuntimeCapabilitiesResponse(
-            synthetic_only=not _truthy_env("ENABLE_REAL_INTAKE"),
+            synthetic_only=synthetic_only,
+            pilot_mode=pilot_mode,
+            pilot_limit=pilot_limit if pilot_mode else None,
+            pilot_remaining=pilot_remaining,
             drive_upload_configured=(
                 drive_credentials
                 and bool(
@@ -1163,6 +1228,11 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Valid upload filename is required",
             )
+
+        _enforce_real_intake_pilot_limit(
+            access_token,
+            filename=safe_name,
+        )
 
         try:
             owner_id, service = _runtime_intake(access_token)
