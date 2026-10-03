@@ -194,7 +194,7 @@ Verified 2026-10-03:
 - authenticated HTTP synthetic intake → Drive → queue → worker → search → original streaming passed;
 - private original bytes matched the uploaded source exactly;
 - cleanup returned the live archive to zero letters, zero processing jobs, and zero processing rows;
-- full Oracle synthetic suite passes 266/266;
+- full Oracle synthetic suite passes 269/269;
 - real intake remains disabled.
 
 Optional future enhancements include Google Sign-In, Gemini semantic enrichment, live messaging/watched-folder connectors, leaked-password protection, and Vercel auto-deploy/redirect portability.
