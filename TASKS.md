@@ -348,3 +348,17 @@ No baseline DLR work is blocked by these items.
 - [x] Complete synthetic queue→DLR→provenance verification and cleanup.
 - [x] Full DLR suite passes 280/280.
 - [ ] Observe the first real attachment posted by an allowed member in `EDU- Letters`.
+
+
+## WhatsApp → DLR automation — 2026-10-03
+
+- [x] Reuse existing Hermes WhatsApp bridge/session; no duplicate login.
+- [x] Bind one exact allowlisted source group privately.
+- [x] Stage only PDF/JPG/JPEG/PNG attachments.
+- [x] Add protected pending inbox + active 60-second consumer timer.
+- [x] Enable bounded connector real intake (100 WhatsApp source messages).
+- [x] Persist WhatsApp provenance and message-ID deduplication.
+- [x] Verify synthetic connector path through queue/worker/search/original.
+- [x] Verify duplicate message replay does not duplicate archive content.
+- [x] Clean synthetic Drive/database test artifact.
+- [ ] Observe first genuine inbound group-member attachment after final hook activation.
