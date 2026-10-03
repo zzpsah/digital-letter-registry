@@ -321,4 +321,15 @@ No baseline DLR work is blocked by these items.
 - [x] Original streams successfully from private storage.
 - [x] Pilot capability reports 1 slot remaining and review lock active.
 - [x] Full test suite passes 280/280.
-- [ ] Explicitly unlock the second real-letter slot only after operator approval.
+- [x] Explicitly unlock and consume the second real-letter pilot slot; hard cap now reached.
+
+
+## Two-letter pilot completed — 2026-10-03
+
+- [x] Two distinct real official PDFs processed through the private Oracle DLR path.
+- [x] Dedicated worker successfully processed human-owned jobs while preserving human ownership.
+- [x] First document validated forced OCR fallback, structured metadata, smart filename, search and private original streaming.
+- [x] Second document validated native-PDF extraction, structured metadata/reference/smart filename, search and private original streaming.
+- [x] Pilot hard cap reached with 0 real slots remaining; further real uploads are blocked by the API.
+- [x] Full suite passes 280/280 after live fixes.
+- [ ] Decide next production phase before raising/removing the pilot cap.
