@@ -42,3 +42,13 @@ Passed on 2026-10-03:
 - Focused PostgREST/repository tests: 15/15.
 - Full Oracle synthetic suite after the fix: 266/266.
 - Cleanup verified: zero synthetic letters, jobs, and processing rows remain; disposable Drive object removed.
+
+
+## Actual-session multi-role RLS verification — 2026-10-03
+
+Using the dedicated worker's genuine short-lived Supabase Auth session, archive membership was temporarily exercised through all three live roles while the worker timer was paused:
+- viewer: SELECT allowed; INSERT denied;
+- editor: INSERT and UPDATE allowed; DELETE affected zero rows and the row remained present;
+- admin: DELETE returned the target row and removed it.
+
+The worker membership was restored to `editor / active`, the timer was restarted and verified active, and live archive counts returned to zero letters/jobs. Note: PostgREST may return an HTTP-success response with an empty representation when RLS filters out a DELETE; tests must inspect affected rows rather than status code alone.
