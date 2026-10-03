@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: update deployment auth and fallback processing tasks
+- Commit: 99626bdf3e89be0d05ffcbf354f4ce332c005b35
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+
 ## 2026-10-03 — docs: align README with password-first Vercel architecture
 - Commit: 01e43d82f3dc8f12516224211eec3418b3a1d6f3
 - Author: PRASHANT KUMAR SAH
