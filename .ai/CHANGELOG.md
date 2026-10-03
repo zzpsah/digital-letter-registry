@@ -1,3 +1,10 @@
+## 2026-10-03 — test: enforce staged pilot review lock
+- Commit: ca92856cb99ee28021735e66ae147eae4cd610d6
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-03 — ux: show pilot review lock
 - Commit: 034b56bb59aa19bf6a6234e66f360f81aae1b452
 - Author: PRASHANT KUMAR SAH
