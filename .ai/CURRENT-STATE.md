@@ -85,3 +85,8 @@ A public official CBSE circular was sent into the privately bound WhatsApp sourc
 - A transient Bitwarden lookup failure was observed on the first consumer attempt; the private Oracle consumer was hardened with bounded retry/backoff for that exact transient condition.
 - After retry hardening, the consumer service reports success and both connector and worker timers are active.
 - The test archive copy and all derived DB/provenance/job rows were cleaned after verification. Real archive letters were untouched.
+
+
+## 2026-10-03 — post-processing reply/email delivery
+
+WhatsApp-origin documents can now retain private reply-destination and query/caption provenance. A private Oracle dispatcher waits for worker completion and sends a concise document explanation back to the exact source WhatsApp chat with logical archive path and portal pointer. It also creates an idempotent private email-outbox package containing the interaction transcript and archived original attachment. Live synthetic E2E passed, duplicate-reply protection passed, Gmail MIME dry-run passed, and test artifacts were cleaned. Current DLR Google OAuth scopes are Drive-only, so actual Gmail sending remains pending a separate one-time `gmail.send` authorization.
