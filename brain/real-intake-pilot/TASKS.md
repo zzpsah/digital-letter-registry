@@ -10,4 +10,8 @@
 - [x] Ingest first real official letter manually.
 - [x] Verify OCR/search/original access for first real letter.
 - [x] Review derived metadata before expanding beyond pilot.
-- [ ] Explicitly unlock second slot only after first-letter review.
+- [x] Explicitly unlock second slot only after first-letter review.
+
+- [x] Complete second real-letter verification: processing, search and original streaming.
+- [x] Verify pilot hard cap reached with zero slots remaining.
+- [ ] Decide whether next phase is controlled manual production or automated connectors.
