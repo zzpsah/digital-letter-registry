@@ -203,3 +203,8 @@ Optional future enhancements include Google Sign-In, Gemini semantic enrichment,
 ## Controlled real-letter pilot
 
 As of 2026-10-03, the private Oracle DLR runtime is in a bounded manual pilot: real intake is enabled there with a hard cap of 2 real letters. The public Vercel deployment remains synthetic-only for intake and does not hold private Drive upload credentials. The UI reports `PILOT MODE` and remaining slots to authenticated editors/admins. After the first real letter is ingested, the second real-letter slot is automatically blocked until the first letter is reviewed and slot two is explicitly unlocked. No real letter has been ingested yet at this checkpoint. Live connectors, bulk import, rename execution, and automated delete remain outside the pilot.
+
+
+## WhatsApp intake
+
+The private Oracle runtime can ingest official PDF/JPG/JPEG/PNG attachments from a dedicated WhatsApp archive group through the existing Hermes session. The connector is group-allowlisted, stages media into a protected local queue, preserves WhatsApp message provenance for deduplication, and processes it through the same immutable Drive + Supabase + worker pipeline as manual intake. The initial WhatsApp rollout is separately capped at 20 documents. Runtime group/member identifiers and credentials are never stored in this public repository.
