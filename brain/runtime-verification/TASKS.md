@@ -16,4 +16,5 @@
 - [x] Create dedicated worker signup using the existing Bitwarden-backed credentials.
 - [x] Complete worker email confirmation.
 - [x] Assign/verify minimum editor membership for the worker.
-- [ ] Run one-shot worker login/idle verification before enabling the timer.
+- [x] Run one-shot worker login/idle verification before enabling the timer.
+- [x] Enable and verify `dlr-worker.timer` with real intake still disabled.
