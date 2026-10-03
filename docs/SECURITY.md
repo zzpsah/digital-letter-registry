@@ -35,3 +35,5 @@ No production deployment, live archive import, public endpoint, or secret config
 ## Real-intake pilot boundary
 
 The first real-letter phase is intentionally private and bounded. Real intake is enabled only on the private Oracle runtime and is capped at two real letters through `DLR_REAL_INTAKE_PILOT_LIMIT`. Public Vercel intake remains synthetic-only and does not hold Drive upload credentials. Pilot intake is manual web upload by an authenticated editor/admin; connectors, bulk imports, rename execution and automated delete remain disabled/approval-gated. Never copy real OCR text or extracted private metadata into public Git documentation.
+
+The second real-letter slot is additionally review-gated: once the first real pilot letter exists, subsequent real-looking uploads return a conflict until an operator explicitly unlocks slot two after reviewing the first document. This prevents accidental progression through the pilot cap without inspection.
