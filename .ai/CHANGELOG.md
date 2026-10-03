@@ -1,3 +1,10 @@
+## 2026-10-03 — test: update provenance persistence semantics
+- Commit: 21e7b88d9f6e574ef68541c06c8604ce6748f9c7
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_channel_intake.py`
+
 ## 2026-10-03 — feat: add guarded WhatsApp attachment intake runner
 - Commit: e6b4275e7f842c3027405ba69021a893e958715d
 - Author: PRASHANT KUMAR SAH
