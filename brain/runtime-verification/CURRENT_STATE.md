@@ -48,3 +48,14 @@ Observed on 2026-10-02:
 - `ENABLE_REAL_INTAKE=false` was re-verified before activation.
 - `dlr-worker.timer` is enabled and active; the one-shot service completes successfully and returns to inactive/dead between timer runs as expected.
 - Next: complete the synthetic upload → Drive → queue → worker → search/open-original vertical slice.
+
+
+## 2026-10-03 — End-to-end worker slice
+
+- Live disposable synthetic intake reached private Google Drive and created a durable Supabase processing job under the dedicated worker identity.
+- First worker attempt failed on a partial `letters` upsert; this revealed a live persistence defect.
+- Fix committed: existing letter context is now updated through filtered PostgREST PATCH while processing state continues to use upsert.
+- Focused tests passed 15/15 and full synthetic suite passed 266/266 on Oracle.
+- Retried job completed successfully; search found the synthetic record and private original streaming matched the source bytes exactly.
+- Disposable Drive object and all synthetic DB rows were cleaned up; `letters=0`, `processing_jobs=0`, `letter_processing=0` afterward.
+- `ENABLE_REAL_INTAKE=false` remains in force.
