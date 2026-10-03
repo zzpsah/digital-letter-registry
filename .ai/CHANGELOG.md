@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: start post-processing delivery enhancement
+- Commit: 11a544900f8191e45acf6b0b4ff6487a6ab59f11
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/post-processing-delivery/HANDOFF.md`
+
 ## 2026-10-03 — docs: record official WhatsApp connector proof
 - Commit: 20de76bd71fe5bc005b43bbfff67467697a1dfe9
 - Author: PRASHANT KUMAR SAH
