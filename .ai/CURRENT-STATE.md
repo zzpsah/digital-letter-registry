@@ -27,21 +27,20 @@
 - Gemini runtime remains unconfigured; an apparent Hermes reference was only example/commented configuration and no live key was available to reuse.
 - The dedicated Google OAuth client has been used successfully; temporary OAuth handoff files are removed after secret-manager rotation and the runtime no longer depends on a persistent authorized-user credentials file.
 - DLR runtime is isolated on its own tailnet-only HTTPS endpoint; it no longer shares the localhost/shared origin previously used during testing. The exact private endpoint is runtime-only and is not recorded in public Git.
-- Supabase Site URL and redirect allow-list are aligned to that dedicated private HTTPS origin. A device opening a magic link must be connected to the authorized tailnet; no public-internet exposure is enabled.
+- The canonical user-facing control plane is now the public Vercel URL with password-first auth. The private Oracle HTTPS origin remains an operational/private-worker endpoint rather than the normal user entrypoint.
 - Magic-link email throttling is now surfaced safely as HTTP 429 instead of an internal 500.
-- No real archive-letter ingestion or production deployment has occurred.
+- Public Vercel control-plane deployment is live; no real archive-letter ingestion has occurred and real intake remains disabled.
 
 ## Next step
 
-1. Complete the authenticated owner-session HTTP/PostgREST synthetic vertical slice with a real short-lived session using the dedicated tailnet-only HTTPS callback. Current blocker is Supabase email-send throttling, not routing or application health.
-2. Refreshable Google Drive OAuth is complete with secret-manager-backed write-capable access; read/list/stream plus disposable synthetic upload/delete verification passed.
-3. Synthetic upload/write verification is complete; real archive mutations remain separately disabled/approval-gated.
-4. Configure and verify Gemini runtime credentials using synthetic data only.
-5. Retained synthetic DB verification row cleanup is complete; no rows remain in `letters`.
-6. Re-check readiness before considering any real-letter intake.
-7. Optional later: enable custom SMTP and apply the checked-in token-hash email template.
+1. Provision a dedicated non-human Supabase worker account with the minimum archive role required for processing.
+2. Store only that worker email/password in Bitwarden as `DLR_SUPABASE_WORKER_EMAIL` and `DLR_SUPABASE_WORKER_PASSWORD`; never reuse a human admin password/session.
+3. Enable the already-installed Oracle `dlr-worker.timer` only after those secrets exist and a one-shot worker login/idle test passes.
+4. Complete the synthetic upload → Drive → queue → Oracle worker → Vercel search/open-original vertical slice.
+5. Keep `ENABLE_REAL_INTAKE=false` throughout synthetic verification.
+6. Gemini remains optional; add it later for richer structured context and semantic embeddings, then reprocess historical items.
 
-No real-letter ingestion, historical adoption, Drive rename, connector activation, or production deployment is authorized by this state record.
+Public Vercel hosting is authorized and live. Real-letter ingestion, historical adoption, Drive rename/delete operations, and real connector intake remain disabled unless explicitly enabled later.
 
 ## 2026-10-02 — RLS verification checkpoint
 
@@ -64,12 +63,26 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Existing Supabase runtime credentials are sufficient for application access but not for Management API Auth-template changes.
 - Secret-manager-backed Google Drive OAuth runtime is configured and verified with a write-capable grant; refresh/list/stream and disposable synthetic upload/stream/delete cleanup all passed.
 - The older `phone_drive` rclone path remains separate and unused by DLR.
-- Runtime readiness now reports Drive credentials configured; Gemini is the only failing readiness check.
-- Gemini runtime key remains unavailable.
-- Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
+- Scoped Oracle runtime readiness now passes fully in synthetic-only mode.
+- Gemini runtime key remains unavailable, but this is no longer a baseline blocker because deterministic OCR/full-text context fallback is active.
+- Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
 - Commit: cd40cfcb5269e5e7d788f405938f3be9cf72d533
 - Change: feat: support dedicated password-authenticated worker transport
 - Date: 2026-10-03
 - Durable context synchronization: completed
+
+
+## Dedicated worker authentication readiness
+
+The worker no longer requires a manually copied human `SUPABASE_ACCESS_TOKEN` as its only option. `SupabasePostgrestTransport.from_worker_environment()` now supports:
+
+- direct `SUPABASE_ACCESS_TOKEN` only for one-shot/manual integration tests;
+- preferred background mode: `SUPABASE_WORKER_EMAIL` + `SUPABASE_WORKER_PASSWORD`, which signs in a dedicated non-human account and obtains a fresh short-lived user access token each run.
+
+This preserves normal Supabase RLS rather than using service-role credentials in the Oracle worker.
+
+Oracle has the Bitwarden-scoped worker wrapper and systemd service/timer files installed, but the timer is deliberately disabled/inactive until the dedicated worker account and Bitwarden secret pair are provisioned.
+
+Latest synthetic suite: 264/264 PASS.
