@@ -7,7 +7,7 @@
 - [x] Enable real intake only on Oracle private runtime.
 - [x] Restart/verify private API and worker readiness.
 - [x] Verify public Vercel remains synthetic/real-intake disabled.
-- [ ] Ingest first real official letter manually.
-- [ ] Verify OCR/search/original access for first real letter.
-- [ ] Review derived metadata before expanding beyond pilot.
+- [x] Ingest first real official letter manually.
+- [x] Verify OCR/search/original access for first real letter.
+- [x] Review derived metadata before expanding beyond pilot.
 - [ ] Explicitly unlock second slot only after first-letter review.
