@@ -43,6 +43,42 @@ class SupabasePostgrestTransport:
     http_executor: HttpExecutor = _default_http_executor
 
     @classmethod
+    def from_worker_environment(cls) -> "SupabasePostgrestTransport":
+        """Build a worker transport from a dedicated non-human Auth account.
+
+        A directly supplied SUPABASE_ACCESS_TOKEN remains supported for
+        one-shot/manual integration tests. Normal background workers should use
+        SUPABASE_WORKER_EMAIL + SUPABASE_WORKER_PASSWORD so each run obtains a
+        fresh short-lived user session and continues to respect RLS.
+        """
+
+        access_token = os.environ.get("SUPABASE_ACCESS_TOKEN", "").strip()
+        if access_token:
+            return cls.from_environment()
+
+        worker_email = os.environ.get("SUPABASE_WORKER_EMAIL", "").strip()
+        worker_password = os.environ.get("SUPABASE_WORKER_PASSWORD", "")
+        if not worker_email or not worker_password:
+            raise ValueError(
+                "missing worker auth: set SUPABASE_ACCESS_TOKEN or "
+                "SUPABASE_WORKER_EMAIL and SUPABASE_WORKER_PASSWORD"
+            )
+
+        from .auth import SupabasePasswordlessAuth
+
+        session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
+            email=worker_email,
+            password=worker_password,
+        )
+        return cls(
+            base_url=os.environ.get("SUPABASE_URL", "").strip(),
+            publishable_key=os.environ.get(
+                "SUPABASE_PUBLISHABLE_KEY", ""
+            ).strip(),
+            access_token=session.access_token,
+        )
+
+    @classmethod
     def from_environment(cls) -> "SupabasePostgrestTransport":
         values = {
             "base_url": os.environ.get("SUPABASE_URL", "").strip(),
