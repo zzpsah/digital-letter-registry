@@ -42,7 +42,7 @@ def _truthy(name: str) -> bool:
 
 def main() -> int:
     transport = ArchiveScopedSupabaseTransport(
-        transport=SupabasePostgrestTransport.from_environment(),
+        transport=SupabasePostgrestTransport.from_worker_environment(),
         archive_id=os.environ["DLR_ARCHIVE_ID"],
     )
     repository = SupabaseLetterRepository(transport)
