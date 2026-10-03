@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: mark DLR baseline complete
+- Commit: 2ec4f6b718594b63ec9eeaaddbe338f0e626a86b
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+
 ## 2026-10-03 — db: capture pending membership signup trigger
 - Commit: 3bbb67ad3caa31d42502bd09ede26c582fbeb5ac
 - Author: PRASHANT KUMAR SAH
