@@ -223,7 +223,8 @@ This allows the bootstrap admin to use one Magic Link once, set a password, and 
 Live verification:
 - Account UI deployed;
 - unauthenticated password-change request returns 401;
-- full synthetic suite 255/255.
+- full synthetic suite 255/255;
+- on 2026-10-03, the bootstrap admin successfully updated the password through the live DLR Account flow. The password itself is not stored in project documentation.
 
 
 ## Vercel hosting checkpoint
