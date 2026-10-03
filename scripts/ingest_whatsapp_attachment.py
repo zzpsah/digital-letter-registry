@@ -17,6 +17,7 @@ from letter_registry.channel_intake import (
     SupabaseProvenanceRepository,
 )
 from letter_registry.google_drive_writer import GoogleDrivePrivateWriter
+from letter_registry.fingerprints import sha256_file
 from letter_registry.intake import DuplicateSourceError, IntakePolicy, IntakeService
 from letter_registry.jobs import SupabaseProcessingQueue
 from letter_registry.session import SupabaseUserSession
@@ -73,6 +74,27 @@ def main() -> int:
     if len(existing) >= limit:
         raise SystemExit(f"WhatsApp intake limit reached ({limit})")
 
+    provenance = IntakeProvenance(
+        channel=IntakeChannel.WHATSAPP,
+        filename=path.name,
+        external_message_id=args.message_id,
+        source_label=args.source_label,
+        metadata={"connector": "hermes-whatsapp"},
+    )
+    source_repo = SupabaseProvenanceRepository(transport)
+    existing_message = transport.select(
+        "letter_sources",
+        filters={
+            "source_channel": "whatsapp",
+            "external_message_id": args.message_id,
+        },
+        columns="id,letter_id",
+    )
+    if existing_message:
+        print("status=duplicate-message")
+        return 0
+
+    letter_repo = SupabaseLetterRepository(transport)
     service = ChannelIntakeService(
         intake=IntakeService(
             storage=GoogleDriveOriginalStorage(
@@ -81,27 +103,33 @@ def main() -> int:
                     "DRIVE_ORIGINALS_FOLDER_REFERENCE"
                 ],
             ),
-            repository=SupabaseLetterRepository(transport),
+            repository=letter_repo,
             queue=SupabaseProcessingQueue(transport),
             policy=IntakePolicy(synthetic_only=False),
         ),
-        provenance=SupabaseProvenanceRepository(transport),
+        provenance=source_repo,
     )
 
     try:
         result = service.ingest_path(
             path,
             owner_id=owner_id,
-            provenance=IntakeProvenance(
-                channel=IntakeChannel.WHATSAPP,
-                filename=path.name,
-                external_message_id=args.message_id,
-                source_label=args.source_label,
-                metadata={"connector": "hermes-whatsapp"},
-            ),
+            provenance=provenance,
         )
     except DuplicateSourceError:
-        print("status=duplicate")
+        rows = transport.select(
+            "letters",
+            filters={"original_sha256": sha256_file(path)},
+            columns="id",
+        )
+        if not rows:
+            raise
+        source_repo.save_source(
+            owner_id=owner_id,
+            letter_id=str(rows[0]["id"]),
+            provenance=provenance,
+        )
+        print("status=duplicate-provenance-linked")
         return 0
 
     print("status=queued")
