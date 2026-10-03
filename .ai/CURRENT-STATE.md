@@ -74,3 +74,14 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 ## 2026-10-03 — genuine official WhatsApp document proof
 
 A public official CBSE circular was sent into the privately bound WhatsApp source group and entered DLR with WhatsApp provenance/message-id dedup. Live quality review exposed a deterministic classification precedence bug: the circular contained generic UDISE terms and was initially labeled as UDISE. The analyzer now prioritizes explicit CBSE authority/affiliation evidence and parses CBSE notification references plus English `Dated:` issue dates. Reprocessing produced CBSE authority, affiliation category, explicit reference/date and a corrected smart filename. Authenticated search and private original streaming passed. Full suite: 281/281.
+
+
+## Official public PDF connector proof — 2026-10-03
+
+- A public official education PDF was sent through the live `EDU- Letters` WhatsApp group path using a test-marked filename so the outbound safety guard could exercise the connector.
+- Connector staging succeeded; WhatsApp provenance and external message-id dedup were stored.
+- Worker processing completed.
+- Authenticated search found the record and private original streaming returned the archived PDF successfully.
+- A transient Bitwarden lookup failure was observed on the first consumer attempt; the private Oracle consumer was hardened with bounded retry/backoff for that exact transient condition.
+- After retry hardening, the consumer service reports success and both connector and worker timers are active.
+- The test archive copy and all derived DB/provenance/job rows were cleaned after verification. Real archive letters were untouched.
