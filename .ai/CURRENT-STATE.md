@@ -90,3 +90,12 @@ A public official CBSE circular was sent into the privately bound WhatsApp sourc
 ## 2026-10-03 — post-processing reply/email delivery
 
 WhatsApp-origin documents can now retain private reply-destination and query/caption provenance. A private Oracle dispatcher waits for worker completion and sends a concise document explanation back to the exact source WhatsApp chat with logical archive path and portal pointer. It also creates an idempotent private email-outbox package containing the interaction transcript and archived original attachment. Live synthetic E2E passed, duplicate-reply protection passed, Gmail MIME dry-run passed, and test artifacts were cleaned. Current DLR Google OAuth scopes are Drive-only, so actual Gmail sending remains pending a separate one-time `gmail.send` authorization.
+
+
+## Sender account verification — 2026-10-03
+
+- Connected Gmail sender account: `umvstudent@gmail.com` (profile label: Sender).
+- Recipient mailbox remains `umvtetahali@gmail.com`.
+- A live test message sent from the Sender connection was received in the school inbox with From: UMV Student <umvstudent@gmail.com>.
+- DLR runtime sender configuration now targets `umvstudent@gmail.com`.
+- Important boundary: the ChatGPT Gmail linked account proves and enables interactive sends from ChatGPT, but the private Oracle background process still requires its own Gmail-capable server-side OAuth refresh credential before autonomous email-outbox draining can be enabled.
