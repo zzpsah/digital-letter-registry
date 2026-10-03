@@ -160,7 +160,7 @@
 - [x] Require active archive membership before password update.
 - [x] Unauthenticated password update fails closed with HTTP 401.
 - [x] Full synthetic suite passes 255/255.
-- [ ] Complete one real owner browser session and set the bootstrap admin password.
+- [x] Complete one real owner browser session and set the bootstrap admin password.
 
 
 ## Magic Link callback repair
