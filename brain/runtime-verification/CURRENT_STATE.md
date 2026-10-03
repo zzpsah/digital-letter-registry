@@ -32,3 +32,15 @@ Observed on 2026-10-02:
 - Runtime readiness honors explicit `TESSERACT_CMD` and `OCRMYPDF_CMD` mappings instead of relying only on `PATH`.
 - With the private environment loaded, Supabase runtime, auth callback, originals folder, Tesseract, OCRmyPDF, Hindi/English language checks, and synthetic-only safety are ready.
 - Drive OAuth is configured with the verified write-capable grant; live refresh/list/stream plus disposable synthetic upload/stream/delete cleanup passed. Gemini remains unconfigured; no live Gemini synthetic operation has been completed yet.
+
+
+## 2026-10-03 — Dedicated worker identity checkpoint
+
+- Oracle's `dlr-worker-run-with-bitwarden` wrapper successfully injects the configured worker email/password secrets.
+- Initial login failed with `invalid_credentials`, confirming the wrapper path was live but the Auth identity was not yet provisioned.
+- A dedicated Supabase Auth signup was created using the existing Bitwarden-backed credentials.
+- The new account is currently unconfirmed and in the expected self-signup membership state: viewer / disabled.
+- Re-running the worker now reaches Supabase Auth and fails specifically with `email_not_confirmed`.
+- Confirmation email delivery to the school Gmail alias is verified.
+- The one-time confirmation token was not forwarded to the Oracle runtime.
+- Next: complete email confirmation, assign minimum editor access, run one-shot worker login/idle verification, then keep the timer disabled until the synthetic vertical slice passes.
