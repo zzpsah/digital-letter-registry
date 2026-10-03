@@ -258,3 +258,20 @@
 - Gemini semantic enrichment; deterministic OCR/full-text fallback is already operational.
 - Live Telegram/WhatsApp/email/watched-folder connectors.
 - Optional Vercel-side Drive/original-access secret migration; Oracle remains the private original/worker plane.
+
+
+## External / optional backlog classification — 2026-10-03
+
+These items are intentionally outside baseline completion and require a new external credential, provider setup, or an explicit future product decision:
+
+- **Custom SMTP / token-hash Magic Link template** — optional recovery-path polish; primary password login is live.
+- **Telegram/WhatsApp/email/watched-folder live connectors** — provider-neutral code exists; each connector needs separate runtime credentials and activation approval.
+- **Google Sign-In** — requires a separate Google Web OAuth client; the existing Drive OAuth client must not be reused.
+- **Supabase leaked-password protection** — requires Dashboard/Management configuration; no management access token is provisioned in the current runtime.
+- **Vercel Auth redirect allow-list** — relevant only to optional Magic Link/Google callbacks; password-first login does not depend on it.
+- **Vercel GitHub auto-deploy** — requires Vercel/GitHub integration authorization outside the current connected project access.
+- **Vercel-side Drive/original access** — optional architecture decision; Oracle is already the verified private storage/worker plane.
+- **Legacy Magic Link route removal** — deliberately deferred until a later deprecation window.
+- **Gemini semantic enrichment** — optional; deterministic OCR/full-text processing is already operational and historical rows can be reprocessed later.
+
+No baseline DLR work is blocked by these items.
