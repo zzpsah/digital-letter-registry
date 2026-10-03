@@ -1,3 +1,10 @@
+## 2026-10-03 — test: cover service-worker refresh registration
+- Commit: 0504afb6831bbd119e7933e8cf249c4efa87ef10
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_web_shell.py`
+
 ## 2026-10-03 — docs: sync staged pilot state index
 - Commit: 0087ef9a4d3dbfbd7b852e94c1831cc67e2eb93f
 - Author: PRASHANT KUMAR SAH
