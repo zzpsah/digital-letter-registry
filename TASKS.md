@@ -362,3 +362,13 @@ No baseline DLR work is blocked by these items.
 - [x] Verify duplicate message replay does not duplicate archive content.
 - [x] Clean synthetic Drive/database test artifact.
 - [ ] Observe first genuine inbound group-member attachment after final hook activation.
+
+
+## WhatsApp connector live verification — 2026-10-03
+
+- [x] Existing private WhatsApp bridge reused for DLR intake.
+- [x] Private source-group binding active; no group identifier stored in public Git.
+- [x] PDF/JPG/JPEG/PNG staging and WhatsApp provenance/message dedup verified.
+- [x] Fresh synthetic PDF completed WhatsApp send → DLR intake → worker → search → original stream.
+- [x] Synthetic Drive/database artifacts cleaned after verification.
+- [ ] Observe first genuine document posted by another group member.
