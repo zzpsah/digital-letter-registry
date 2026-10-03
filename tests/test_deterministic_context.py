@@ -26,6 +26,31 @@ class DeterministicContextTests(unittest.TestCase):
         self.assertIsNone(result.reference_number)
         self.assertIsNone(result.deadline)
 
+    def test_transfer_order_extracts_explicit_structured_facts(self):
+        text = (
+            "कार्यालय जिला शिक्षा पदाधिकारी, SIWAN\n"
+            "स्थानांतरण / पदस्थापन आदेश\n"
+            "पत्रांक: SIWA/Transfer2.0/RT/2026/00736 दिनांक : 26/09/2026\n"
+            "शिक्षक का नाम : SYNTHETIC PERSON\n"
+            "जिला के अंदर स्थानांतरण हेतु आदेश निर्गत किया जाता है।"
+        )
+        hints = detect_context_hints(text)
+
+        result = DeterministicDocumentContextProvider().analyze(
+            extracted_text=text,
+            hints=hints,
+        )
+
+        self.assertEqual(result.title, "स्थानांतरण / पदस्थापन आदेश")
+        self.assertEqual(result.authority, "कार्यालय जिला शिक्षा पदाधिकारी, SIWAN")
+        self.assertEqual(result.category, "transfer-posting")
+        self.assertEqual(
+            result.reference_number,
+            "SIWA/Transfer2.0/RT/2026/00736",
+        )
+        self.assertEqual(result.issue_date, "2026-09-26")
+        self.assertGreater(result.confidence or 0, 0.5)
+
     def test_unknown_text_does_not_invent_structured_facts(self):
         text = "यह एक सामान्य सिंथेटिक परीक्षण दस्तावेज है।"
         hints = detect_context_hints(text)
