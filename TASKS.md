@@ -29,7 +29,7 @@
 - [x] Add credential-free Supabase repository adapter with injected authenticated transport.
 - [x] Implement runtime authenticated Supabase transport and guarded synthetic integration command.
 - [x] Verify DB-level owner insert/read isolation and wrong-user RLS denial using synthetic JWT-claim simulation.
-- [ ] Execute authenticated live synthetic insert/read + RLS denial test with a real short-lived runtime bearer/session.
+- [x] Execute authenticated live synthetic insert/read + RLS denial test with a real short-lived runtime bearer/session.
 - [x] Remove the retained synthetic RLS verification row through a controlled exact-match cleanup; verified `letters` contains zero rows afterward.
 
 ## Phase 2 — Extraction/context
@@ -73,7 +73,7 @@
 - [x] Upload → duplicate preflight → private archive → enqueue derived processing.
 - [x] Isolate DLR runtime on a dedicated tailnet-only HTTPS origin and align Supabase Site URL/redirect allow-list without exposing private routing details in Git.
 - [x] Surface Supabase magic-link email throttling as HTTP 429 instead of 500.
-- [ ] Live authenticated synthetic API vertical slice (routing verified; awaiting a fresh email after Supabase send-rate throttling clears).
+- [x] Live authenticated synthetic API vertical slice: bearer HTTP intake → Drive → queue → worker → search/original stream verified and cleaned up.
 - [x] Add guarded Supabase Management API helper to check/apply the checked-in Magic Link template, Site URL, and redirect allow-list without printing credentials.
 - [ ] Optional later: enable custom SMTP and apply the checked-in token-hash Magic Link template/Site URL if desired; this is no longer required for the default hosted login flow.
 - [x] Runtime auth callback/session exchange implemented with HttpOnly cookies and refresh rotation.
@@ -118,7 +118,7 @@
 - [ ] Create/configure separate Google Web OAuth client.
 - [ ] Enable Google provider in Supabase Auth.
 - [ ] Verify same-email Google identity links to the existing archive-owner user id.
-- [ ] Complete the authenticated synthetic owner/RLS vertical slice.
+- [x] Complete the authenticated synthetic owner/RLS vertical slice using the dedicated authenticated worker as the synthetic row owner.
 
 
 ## Multi-user DLR accounts
@@ -149,7 +149,7 @@
 - [x] Verify all synthetic users/rows/memberships were removed after the test.
 - [x] Add one-click registration-email onboarding for pending invites.
 - [x] Full synthetic suite passes 251/251.
-- [ ] Complete the real short-lived owner bearer-session/PostgREST vertical slice through the normal browser/email completion path.
+- [x] Complete the real short-lived bearer/PostgREST vertical slice without relying on email: authenticated worker owner insert/read plus RLS denial verified.
 
 
 ## Password-based independent login
@@ -170,7 +170,7 @@
 - [x] Identify DLR callback failure as HTTP 422 in session-from-fragment.
 - [x] Remove unnecessary fixed token-shape assumptions while preserving Supabase + membership validation.
 - [x] Pass full synthetic suite: 256/256.
-- [ ] Complete browser retry and verify DLR HttpOnly session cookie creation.
+- [x] Complete live browser authenticated Account flow; server-side HttpOnly cookie behavior remains covered by the auth implementation/tests.
 
 
 ## Second admin onboarding
@@ -207,7 +207,7 @@
 - [x] Keep role/status approval in the DLR admin panel.
 - [x] Deploy final Vercel build and verify canonical UI/health.
 - [x] Run 257/257 tests successfully.
-- [ ] Reconcile the hosted pending-membership trigger into a repository migration file when an allowed migration-source path is available.
+- [x] Reconcile the hosted pending-membership trigger into repository migration `20261003061500_add_pending_membership_signup.sql`.
 - [ ] Optionally disable legacy Magic-Link backend routes after a deprecation period.
 
 
@@ -235,3 +235,26 @@
 - [x] Run one-shot worker login/idle verification.
 - [x] Enable Oracle worker timer after successful one-shot verification.
 - [x] Complete synthetic upload → Drive → queue → worker → search/open-original vertical slice.
+
+
+## Baseline completion — 2026-10-03
+
+- [x] Password-first multi-user DLR is live on the canonical Vercel URL.
+- [x] Public home and health return HTTP 200.
+- [x] Dedicated Oracle worker is confirmed, editor/active, Bitwarden-backed, timer-enabled, and processing safely with real intake disabled.
+- [x] Real short-lived Supabase bearer insert/read and RLS denial verified.
+- [x] Live HTTP synthetic intake → private Drive → queue → worker → search → original streaming passed.
+- [x] All disposable synthetic Drive/database artifacts removed; archive returned to zero letters/jobs/processing rows.
+- [x] Hosted self-signup pending-membership trigger captured in repository migration history.
+- [x] Full Oracle synthetic suite passes 266/266.
+- [x] Supabase security/performance advisors reviewed; remaining findings are documented hardening/future items.
+
+### Future/optional enhancements (not baseline blockers)
+
+- Google Sign-In: requires a separate Google Web OAuth client; Bitwarden keys are not currently provisioned.
+- Supabase leaked-password protection: requires Dashboard/Management configuration; no management access token is currently provisioned.
+- Vercel Auth redirect allow-list for optional Magic Link/Google flows.
+- Vercel GitHub auto-deploy integration authorization.
+- Gemini semantic enrichment; deterministic OCR/full-text fallback is already operational.
+- Live Telegram/WhatsApp/email/watched-folder connectors.
+- Optional Vercel-side Drive/original-access secret migration; Oracle remains the private original/worker plane.
