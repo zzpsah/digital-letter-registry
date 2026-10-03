@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: sync delete regression hardening
+- Commit: b6c8df41e87c60a0fd72f11462d0f52d2dbcdc5f
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-03 — test: capture PostgREST delete semantics
 - Commit: 4187a91a5ebc00d160069dac927fa3f31949218f
 - Author: PRASHANT KUMAR SAH
