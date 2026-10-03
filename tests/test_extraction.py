@@ -105,6 +105,18 @@ class ExtractionTests(unittest.TestCase):
     def test_usability_rejects_symbol_noise(self) -> None:
         self.assertFalse(is_usable_native_text("### --- ... " * 20))
 
+    def test_usability_rejects_private_use_glyph_noise(self) -> None:
+        garbled = (
+            "काया\ue7e2लय िजला िश\ue88aा पदािधकारी SIWAN "
+            "स्थानांतरण आदेश " * 20
+        )
+        self.assertFalse(is_usable_native_text(garbled))
+
+    def test_usability_rejects_replacement_character_noise(self) -> None:
+        garbled = ("Education Department �� transfer order " * 30)
+        self.assertFalse(is_usable_native_text(garbled))
+
+
 
 if __name__ == "__main__":
     unittest.main()
