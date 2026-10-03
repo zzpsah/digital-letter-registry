@@ -384,3 +384,14 @@ No baseline DLR work is blocked by these items.
 - [x] Reprocessed successfully with corrected CBSE metadata and smart filename.
 - [x] Authenticated search and private original streaming passed.
 - [x] Full synthetic suite passes 281/281.
+
+
+## Official public PDF connector proof — 2026-10-03
+
+- A public official education PDF was sent through the live `EDU- Letters` WhatsApp group path using a test-marked filename so the outbound safety guard could exercise the connector.
+- Connector staging succeeded; WhatsApp provenance and external message-id dedup were stored.
+- Worker processing completed.
+- Authenticated search found the record and private original streaming returned the archived PDF successfully.
+- A transient Bitwarden lookup failure was observed on the first consumer attempt; the private Oracle consumer was hardened with bounded retry/backoff for that exact transient condition.
+- After retry hardening, the consumer service reports success and both connector and worker timers are active.
+- The test archive copy and all derived DB/provenance/job rows were cleaned after verification. Real archive letters were untouched.
