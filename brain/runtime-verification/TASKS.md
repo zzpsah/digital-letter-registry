@@ -14,6 +14,6 @@
 
 - [x] Verify Bitwarden worker secret injection path reaches Supabase Auth.
 - [x] Create dedicated worker signup using the existing Bitwarden-backed credentials.
-- [ ] Complete worker email confirmation.
-- [ ] Assign/verify minimum editor membership for the worker.
+- [x] Complete worker email confirmation.
+- [x] Assign/verify minimum editor membership for the worker.
 - [ ] Run one-shot worker login/idle verification before enabling the timer.
