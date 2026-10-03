@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: classify external optional DLR backlog
+- Commit: 83b012ead96947f02b8368770295975417c967c7
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+
 ## 2026-10-03 — docs: sync live multi-role authz state
 - Commit: eac4caf26d58389a074a9262e2e8b02c4a0b20f7
 - Author: PRASHANT KUMAR SAH
