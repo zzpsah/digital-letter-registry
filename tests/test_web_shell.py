@@ -56,5 +56,11 @@ class WebShellTests(unittest.TestCase):
         self.assertNotIn('sessionStorage.removeItem("dlr_access_token")', self.html)
 
 
+    def test_web_shell_exposes_real_intake_pilot_indicator(self):
+        html = self.web.read_text(encoding="utf-8")
+        self.assertIn("PILOT MODE", html)
+        self.assertIn("pilot_remaining", html)
+        self.assertIn("pilot_limit", html)
+
 if __name__ == "__main__":
     unittest.main()
