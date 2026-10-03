@@ -31,6 +31,7 @@
 - Magic-link email throttling is now surfaced safely as HTTP 429 instead of an internal 500.
 - Public Vercel control-plane deployment is live; no real archive-letter ingestion has occurred and real intake remains disabled.
 - On 2026-10-03, the bootstrap admin successfully updated the DLR password through the live Account flow. This completes the real password-setup milestone; no password value is stored or logged in repository state.
+- Live Supabase membership verification on 2026-10-03 shows two active admins and one active viewer. The earlier second-admin invite is accepted. Archive letters and processing jobs remain at zero.
 
 ## Next step
 
