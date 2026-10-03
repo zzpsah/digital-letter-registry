@@ -37,3 +37,26 @@ The canonical Vercel UI now uses password-first authentication:
 - latest test suite is 257/257 PASS.
 
 The Supabase `dlr-confirm-account` Edge Function is part of account approval and runs outside Vercel. It confirms the target Auth identity only after verifying an active archive-admin caller.
+
+
+## Current split after auth stabilization
+
+Canonical public URL: `https://umv-dlr.vercel.app`.
+
+Vercel currently owns:
+- UI;
+- password auth/session;
+- self-registration/admin approval;
+- Supabase-backed search/admin control plane.
+
+Oracle currently owns:
+- private Google Drive OAuth;
+- original-file access;
+- OCR binaries and Hindi/English OCR language packs;
+- document worker responsibilities.
+
+The attempt to automatically copy private Drive OAuth secrets from Oracle into Vercel was blocked by the execution safety boundary and was not bypassed. Therefore Vercel still has no Drive secrets and real intake remains off.
+
+Public security verification passed: unauthenticated search, admin, session, readiness, capabilities and valid multipart upload requests are rejected with 401. Health remains public.
+
+Oracle now supports deterministic OCR/full-text processing without Gemini. Full tests: 261/261.
