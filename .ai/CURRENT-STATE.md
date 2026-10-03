@@ -74,3 +74,8 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 ## 2026-10-03 — first real-letter pilot passed
 
 The first real official PDF has been archived and processed successfully on the private Oracle pilot path. Live processing exposed and resolved three production-only issues: dedicated worker claims were tied to document ownership, garbled embedded-font Hindi was incorrectly accepted as usable native text, and OCRmyPDF could not see the configured user-local Tesseract path. These are now fixed. The real letter was reprocessed with forced Hindi+English OCR, structured metadata/smart filename were generated deterministically from explicit text, authenticated search found the record, and original streaming succeeded. The second pilot slot remains review-locked with one slot remaining. Full suite: 280/280. No real OCR content or private identifiers are recorded in Git.
+
+
+## 2026-10-03 — two-letter real pilot complete
+
+The bounded private Oracle real-intake pilot has completed successfully with two distinct real official PDFs. One exercised forced OCR for broken embedded-font Hindi; the other exercised native-PDF extraction. Both completed through the dedicated worker, produced structured metadata/smart filenames, were found by authenticated search, and streamed their private originals successfully. The configured hard cap is now reached with zero remaining slots, so further real intake is blocked until an explicit next-phase decision is made. Real document content and identifiers are intentionally omitted from public Git.
