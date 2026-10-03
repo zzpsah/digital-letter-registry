@@ -868,6 +868,60 @@ class ApiTests(unittest.TestCase):
                     )
         self.assertEqual(ctx.exception.status_code, 409)
 
+    def test_second_real_pilot_slot_requires_explicit_unlock(self):
+        from fastapi import HTTPException
+        from letter_registry.api import _enforce_real_intake_pilot_limit
+
+        class FakeDatabase:
+            def select(self, table, *, filters=None, columns="*"):
+                return [{"original_filename": "first-real-letter.pdf"}]
+
+        with patch.dict(
+            os.environ,
+            {
+                "ENABLE_REAL_INTAKE": "true",
+                "DLR_REAL_INTAKE_PILOT_LIMIT": "2",
+                "DLR_REAL_INTAKE_PILOT_SECOND_SLOT_UNLOCKED": "false",
+            },
+            clear=False,
+        ):
+            with patch(
+                "letter_registry.api._transport",
+                return_value=FakeDatabase(),
+            ):
+                with self.assertRaises(HTTPException) as ctx:
+                    _enforce_real_intake_pilot_limit(
+                        "synthetic-access",
+                        filename="second-real-letter.pdf",
+                    )
+        self.assertEqual(ctx.exception.status_code, 409)
+        self.assertIn("slot is locked", ctx.exception.detail)
+
+    def test_second_real_pilot_slot_can_be_explicitly_unlocked(self):
+        from letter_registry.api import _enforce_real_intake_pilot_limit
+
+        class FakeDatabase:
+            def select(self, table, *, filters=None, columns="*"):
+                return [{"original_filename": "first-real-letter.pdf"}]
+
+        with patch.dict(
+            os.environ,
+            {
+                "ENABLE_REAL_INTAKE": "true",
+                "DLR_REAL_INTAKE_PILOT_LIMIT": "2",
+                "DLR_REAL_INTAKE_PILOT_SECOND_SLOT_UNLOCKED": "true",
+            },
+            clear=False,
+        ):
+            with patch(
+                "letter_registry.api._transport",
+                return_value=FakeDatabase(),
+            ):
+                _enforce_real_intake_pilot_limit(
+                    "synthetic-access",
+                    filename="second-real-letter.pdf",
+                )
+
     def test_synthetic_file_does_not_consume_real_intake_pilot_limit(self):
         from letter_registry.api import _enforce_real_intake_pilot_limit
 
