@@ -2,7 +2,7 @@
 
 Read project AGENTS/RULES, .ai state, root TASKS, brain root state, and this enhancement folder before continuing.
 
-Next safe action is completing the real short-lived authenticated HTTP/PostgREST synthetic vertical slice using the supported default hosted Magic Link flow. Keep all credentials runtime-only. Do not confuse DB-level simulated JWT-claim verification with the pending real user-session test.
+The real short-lived bearer/PostgREST and authenticated HTTP synthetic vertical slices are complete. Keep credentials runtime-only and preserve `ENABLE_REAL_INTAKE=false` until real archive ingestion is explicitly authorized.
 
 2026-10-02 runtime findings:
 - Repository custom-template artifact is correct: `supabase/templates/magic-link.html` sends `token_hash` to `/auth/confirm`.
@@ -11,7 +11,7 @@ Next safe action is completing the real short-lived authenticated HTTP/PostgREST
 - Archive-owner magic-link delivery works.
 - Connected remote execution blocked forwarding a one-time auth token to the VPS. Do not bypass this; use the proper server callback or another credential-safe path.
 - Auth/API suite passes 29/29; full VPS synthetic suite passes 212/212; Management Auth-config helper focused tests pass 4/4.
-- DLR runtime is isolated behind its own tailnet-only HTTPS origin; Supabase Site URL and redirect allow-list match that origin. Keep exact hostname/port out of public Git. Current owner-session retry is blocked only by Supabase email-send throttling.
+- DLR runtime is isolated behind its own tailnet-only HTTPS origin. Password-first bearer verification no longer depends on email/Magic-Link throttling.
 - Dedicated DLR Google OAuth is configured with secret-manager-injected refresh credentials; refresh exchange, originals listing, and synthetic-original streaming all passed. The write-capable grant is now verified with synthetic upload/stream/delete cleanup.
 - Existing VPS `phone_drive` rclone remains separate and must not be reused for DLR.
 - Runtime write/upload is verified with the write-capable grant using a disposable synthetic object; upload, stream/content verification, delete cleanup, and catalog restoration all passed.
@@ -32,3 +32,8 @@ Passwordless email/Magic Link login should prove that:
 5. an unauthorized/wrong-user session is denied by RLS.
 
 This test is not a Google Drive authorization test and does not authorize real archive mutation. Drive OAuth, network access, and mutation approvals remain separate controls.
+
+
+## 2026-10-03 completion note
+
+Live bearer insert/read + RLS denial passed. Authenticated HTTP session/search passed. Disposable HTTP upload → Drive → queue → worker → search → original stream passed, byte comparison passed, and all synthetic artifacts were removed. Full suite passes 266/266. Baseline runtime verification is complete.
