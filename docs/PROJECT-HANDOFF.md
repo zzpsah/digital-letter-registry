@@ -286,3 +286,8 @@ The private Oracle real-intake pilot has successfully processed two distinct rea
 ## 2026-10-03 WhatsApp EDU- Letters connector
 
 A private dedicated WhatsApp archive group is live on the existing Hermes session and is bound to the DLR connector. Only supported document/image attachments from that exact group are staged; ordinary text is silently skipped and other groups are ignored. A protected local queue and one-minute systemd consumer feed the canonical DLR WhatsApp intake using the dedicated worker identity and Bitwarden-backed credentials. WhatsApp message provenance is retained for deduplication. The connector has a separate real-intake cap of 20 documents; the completed manual two-letter pilot cap remains unchanged. Synthetic E2E verification passed and disposable test data was cleaned. Exact group/member identifiers remain private runtime state.
+
+
+## 2026-10-03 WhatsApp → DLR connector
+
+A private Oracle WhatsApp-to-DLR connector is active using the existing Hermes WhatsApp session. One exact private source group is bound at runtime; only PDF/JPG/JPEG/PNG attachments are staged. The bridge writes a protected message-ID keyed inbox, and an active 60-second systemd timer invokes the existing Bitwarden-backed WhatsApp intake wrapper. Provenance/deduplication are retained in DLR. A synthetic end-to-end connector test passed queue, worker, search, original streaming, duplicate-message rejection and cleanup. Connector real intake is bounded to 100 WhatsApp source messages. Public Git intentionally omits group IDs, phone numbers and session details. First genuine inbound member-post remains to be observed.
