@@ -29,6 +29,9 @@ class FakeTransport:
     def __init__(self):
         self.calls = []
 
+    def select(self, table, *, filters=None, columns="*"):
+        return []
+
     def insert(self, table, row, *, on_conflict=None):
         self.calls.append((table, row, on_conflict))
         return row
