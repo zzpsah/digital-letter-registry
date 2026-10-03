@@ -69,24 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 59bf8840952237ba060be4210f295c2e319f14f6
-- Change: feat: treat Gemini as optional with deterministic fallback
+- Commit: cd40cfcb5269e5e7d788f405938f3be9cf72d533
+- Change: feat: support dedicated password-authenticated worker transport
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## 2026-10-03 — Current operational baseline
-
-- Public Vercel control plane is live at the canonical short alias `https://umv-dlr.vercel.app`.
-- Primary authentication is email + password.
-- Self-registration creates a disabled viewer membership; an active DLR admin chooses role/status and activates the account.
-- Current confirmed active memberships include the bootstrap admin, `zzpsah@gmail.com` as admin, and `zzpscode@gmail.com` as active viewer.
-- Primary UI no longer shows Magic Link controls.
-- Public unauthenticated checks: health 200; session/search/admin/readiness/capabilities 401; valid multipart intake 401.
-- Real archive-letter rows remain zero and pending invites are zero.
-- Vercel currently has Supabase/auth configuration only; private Drive OAuth/original access has not been migrated there.
-- Oracle remains the private Drive/OCR worker runtime.
-- Oracle scoped readiness now reports fully ready in synthetic-only mode. Gemini is optional because the deterministic OCR/full-text fallback is active.
-- Processing can complete OCR/native text + conservative vocabulary context without Gemini; semantic embeddings remain pending for later reprocessing.
-- Full synthetic suite passes 261/261.
-- Real intake remains disabled.

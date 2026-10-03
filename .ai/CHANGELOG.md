@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: support dedicated password-authenticated worker transport
+- Commit: cd40cfcb5269e5e7d788f405938f3be9cf72d533
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/supabase_runtime.py`
+
 ## 2026-10-03 — docs: record stabilized auth and worker fallback baseline
 - Commit: 107c9fb46181a162651c1f1ab91fe2d03c7a7912
 - Author: PRASHANT KUMAR SAH
