@@ -395,3 +395,15 @@ No baseline DLR work is blocked by these items.
 - A transient Bitwarden lookup failure was observed on the first consumer attempt; the private Oracle consumer was hardened with bounded retry/backoff for that exact transient condition.
 - After retry hardening, the consumer service reports success and both connector and worker timers are active.
 - The test archive copy and all derived DB/provenance/job rows were cleaned after verification. Real archive letters were untouched.
+
+
+## Post-processing reply and email transcript — 2026-10-03
+
+- [x] Capture source WhatsApp reply destination privately.
+- [x] Capture document caption/query for transcript use.
+- [x] Reply to exact source WhatsApp chat after processing completes.
+- [x] Include short description, authority/reference/date when available, logical Drive path and portal pointer.
+- [x] Prevent duplicate WhatsApp replies on dispatcher reruns.
+- [x] Prepare private email outbox with full query/reply transcript + original attachment.
+- [x] Implement Gmail API sender and validate MIME assembly in dry-run.
+- [ ] Authorize separate Gmail `gmail.send` OAuth scope and verify first live email to the configured school mailbox.
