@@ -394,7 +394,7 @@ $("logoutButton").addEventListener("click",async()=>{
 });
 
 if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("/sw.js").catch(()=>{});
+  navigator.serviceWorker.register("/sw.js?v=2",{updateViaCache:"none"}).catch(()=>{});
 }
 
 $("uploadForm").addEventListener("submit",async e=>{
