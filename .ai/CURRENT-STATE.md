@@ -65,23 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 3bbb67ad3caa31d42502bd09ede26c582fbeb5ac
-- Change: db: capture pending membership signup trigger
+- Commit: 6da238592134f60880d015a6f26a43f33ad0c6ba
+- Change: ux: show bounded real-intake pilot mode
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## 2026-10-03 — Baseline completion checkpoint
-
-- Canonical Vercel home and health returned HTTP 200.
-- Real authenticated HTTP session and authenticated search passed on the Oracle API using the dedicated worker bearer.
-- A disposable HTTP multipart upload reached Drive, queued a durable job, completed through the Oracle worker, appeared in search, and streamed back byte-for-byte through the authenticated original endpoint.
-- Disposable Drive and database artifacts were removed; live counts returned to zero letters/jobs/processing rows.
-- The hosted self-signup pending-membership trigger was reconciled into checked-in migration `20261003061500_add_pending_membership_signup.sql`.
-- Supabase advisors were reviewed. SECURITY DEFINER warnings correspond to intentional narrowly-scoped RPCs with explicit authorization checks; leaked-password protection remains external hardening because no Management token is provisioned. Unused-index notices are expected on the empty archive.
-- Full Oracle synthetic suite passes 269/269 and the worker timer is active.
-
-
-## 2026-10-03 — delete regression hardening
-
-PostgREST DELETE semantics are now encoded in the runtime transport and tests. A successful HTTP response with an empty representation is treated as zero affected rows, which prevents future RLS tests from mistaking a filtered no-op for an authorized delete. Filterless deletes fail closed. Full suite: 269/269.

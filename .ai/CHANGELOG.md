@@ -1,3 +1,10 @@
+## 2026-10-03 — ux: show bounded real-intake pilot mode
+- Commit: 6da238592134f60880d015a6f26a43f33ad0c6ba
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-03 — docs: start controlled real-intake pilot
 - Commit: be4cdc826dbec5176bc6c7b8260e2dd9e3943c83
 - Author: PRASHANT KUMAR SAH
