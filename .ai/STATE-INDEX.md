@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: ea9af0444acb03fbe9024dbdfb61e6c59937365b
-- Last commit: test: update legacy provenance fixture
+- HEAD: a64aa90a9081194566db78920880bf0da995c79c
+- Last commit: fix: make WhatsApp connector retries idempotent
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 

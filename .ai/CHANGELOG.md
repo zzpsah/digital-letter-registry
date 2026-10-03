@@ -1,3 +1,10 @@
+## 2026-10-03 — fix: make WhatsApp connector retries idempotent
+- Commit: a64aa90a9081194566db78920880bf0da995c79c
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `scripts/ingest_whatsapp_attachment.py`
+
 ## 2026-10-03 — test: update legacy provenance fixture
 - Commit: ea9af0444acb03fbe9024dbdfb61e6c59937365b
 - Author: PRASHANT KUMAR SAH
