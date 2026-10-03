@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: start WhatsApp DLR intake enhancement
+- Commit: e29ad67127a394f9baab360216c845f2a9e4f125
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/whatsapp-dlr-intake/HANDOFF.md`
+
 ## 2026-10-03 — docs: sync completed real pilot state index
 - Commit: 68bc31af1c6f4beda784b6fdb377f4befd4204f8
 - Author: PRASHANT KUMAR SAH
