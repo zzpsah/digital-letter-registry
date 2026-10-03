@@ -290,8 +290,8 @@ No baseline DLR work is blocked by these items.
 - [x] Verify public Vercel remains synthetic-only and has no Drive upload capability.
 - [x] Verify worker one-shot idle and timer active.
 - [x] Verify live archive remains empty before first pilot upload.
-- [ ] Manually upload the first real official letter through the private Oracle DLR UI.
-- [ ] Review OCR/search/metadata/original access for that letter before using the second slot.
+- [x] Manually upload the first real official letter through the private Oracle DLR UI.
+- [x] Review OCR/search/metadata/original access for the first real letter; review passed and second slot remains locked.
 
 
 ## Pilot staged-review hardening — 2026-10-03
@@ -305,3 +305,20 @@ No baseline DLR work is blocked by these items.
 - [x] Focused API/web tests pass 60/60; full suite passes 275/275.
 - [ ] Upload and review the first real pilot letter.
 - [ ] Explicitly unlock slot two only after that review passes.
+
+
+## First real-letter pilot result — 2026-10-03
+
+- [x] First real official PDF archived through private Oracle UI.
+- [x] Fixed dedicated-worker claim semantics without changing the human document owner; processing jobs now separate `owner_id` from `claimed_by`.
+- [x] Applied hosted migration for archive-scoped dedicated worker claims.
+- [x] Detected broken embedded-font native Hindi text and hardened native-text usability checks.
+- [x] Switched unusable-native PDF fallback to forced OCR and fixed OCRmyPDF child PATH for configured Tesseract.
+- [x] Reprocessed first real letter successfully through OCR.
+- [x] Added deterministic extraction of explicit transfer/posting title, issuing office, reference number and issue date.
+- [x] First real letter now has structured metadata and a smart filename.
+- [x] Authenticated search finds the first real letter.
+- [x] Original streams successfully from private storage.
+- [x] Pilot capability reports 1 slot remaining and review lock active.
+- [x] Full test suite passes 280/280.
+- [ ] Explicitly unlock the second real-letter slot only after operator approval.
