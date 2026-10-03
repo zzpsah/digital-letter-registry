@@ -57,10 +57,9 @@ class WebShellTests(unittest.TestCase):
 
 
     def test_web_shell_exposes_real_intake_pilot_indicator(self):
-        html = self.web.read_text(encoding="utf-8")
-        self.assertIn("PILOT MODE", html)
-        self.assertIn("pilot_remaining", html)
-        self.assertIn("pilot_limit", html)
+        self.assertIn("PILOT MODE", self.html)
+        self.assertIn("pilot_remaining", self.html)
+        self.assertIn("pilot_limit", self.html)
 
 if __name__ == "__main__":
     unittest.main()
