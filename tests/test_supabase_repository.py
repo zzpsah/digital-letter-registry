@@ -33,6 +33,16 @@ class FakeTransport:
         self.calls.append(("upsert", table, row, on_conflict))
         return row
 
+    def update(
+        self,
+        table: str,
+        row: dict[str, object],
+        *,
+        filters: dict[str, str],
+    ) -> dict[str, object]:
+        self.calls.append(("update", table, row, str(filters)))
+        return row
+
 
 def record() -> DocumentRecord:
     return DocumentRecord(
@@ -90,6 +100,31 @@ class SupabaseRepositoryTests(unittest.TestCase):
         self.assertEqual(table, "letter_processing")
         self.assertEqual(conflict, "letter_id")
         self.assertEqual(row["letter_id"], LETTER_ID)
+
+    def test_context_save_updates_existing_letter_row(self) -> None:
+        from unittest.mock import patch
+
+        transport = FakeTransport()
+        repository = SupabaseLetterRepository(transport)
+
+        with patch(
+            "letter_registry.supabase_repository.build_supabase_context_processing_patch",
+            return_value={"letter_id": LETTER_ID, "owner_id": OWNER_ID},
+        ), patch(
+            "letter_registry.supabase_repository.build_supabase_letter_context_patch",
+            return_value={"id": LETTER_ID, "owner_id": OWNER_ID, "title": "Synthetic"},
+        ):
+            repository.save_context_result(
+                record(),
+                owner_id=OWNER_ID,
+                result=object(),
+            )
+
+        self.assertEqual(transport.calls[0][0], "upsert")
+        self.assertEqual(transport.calls[0][1], "letter_processing")
+        self.assertEqual(transport.calls[1][0], "update")
+        self.assertEqual(transport.calls[1][1], "letters")
+        self.assertIn(LETTER_ID, transport.calls[1][3])
 
     def test_adapter_contains_no_runtime_credentials(self) -> None:
         transport = FakeTransport()
