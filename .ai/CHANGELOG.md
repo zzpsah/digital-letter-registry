@@ -1,3 +1,10 @@
+## 2026-10-03 — test: cover pilot-mode UI
+- Commit: 34ac3d209c71e7c178d364e98e8742057be9ac86
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_web_shell.py`
+
 ## 2026-10-03 — ux: show bounded real-intake pilot mode
 - Commit: 6da238592134f60880d015a6f26a43f33ad0c6ba
 - Author: PRASHANT KUMAR SAH
