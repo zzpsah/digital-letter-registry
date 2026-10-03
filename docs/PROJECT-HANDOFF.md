@@ -276,3 +276,8 @@ Pilot safety update: the second slot is locked by default. After the first real 
 ## 2026-10-03 first real-letter pilot verification
 
 The first real official PDF was ingested through the private Oracle pilot and successfully processed after live fixes to dedicated-worker job claiming and OCR fallback. Human document ownership is preserved while the dedicated worker is recorded separately as the claimant. PDFs with garbled private-use embedded-font text now fall back to forced OCR; the configured user-local Tesseract path is propagated to OCRmyPDF. The first real document now has deterministic structured metadata/smart filename, is searchable, and its private original streams successfully. The second pilot slot is review-locked with one slot remaining. Full suite: 280/280. Do not copy real OCR text or private identifiers into Git/docs.
+
+
+## 2026-10-03 two-letter pilot completion
+
+The private Oracle real-intake pilot has successfully processed two distinct real official PDFs. Both completed through the dedicated worker, were searchable, and streamed from private original storage. The two files exercised different extraction paths (forced OCR for broken embedded-font text and native PDF extraction). The configured hard cap is now reached with zero remaining real-intake slots, so no further real upload should be accepted until the next phase is explicitly chosen. Real content/identifiers remain excluded from Git/docs.
