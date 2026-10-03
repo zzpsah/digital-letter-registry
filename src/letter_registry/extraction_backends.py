@@ -49,6 +49,10 @@ class OcrmypdfTesseractBackend:
             command = [
                 self.executable,
                 "--force-ocr",
+                "--rotate-pages",
+                "--deskew",
+                "--clean",
+                "--optimize", "1",
                 "--sidecar",
                 str(sidecar),
                 "-l",
@@ -113,6 +117,8 @@ class TesseractImageBackend:
             "stdout",
             "-l",
             "+".join(languages),
+            "--psm",
+            "6",
         ]
         try:
             completed = subprocess.run(

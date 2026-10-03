@@ -162,7 +162,7 @@ class GeminiDocumentContextProvider:
         return (
             "Analyze this official Indian/Bihar education letter. "
             "Do not invent dates, memo numbers, authority, deadlines, or actions. "
-            "Use null when uncertain. Keep summaries concise and preserve Hindi meaning.\n\n"
+            "Use null when uncertain. The input may contain noisy OCR; silently correct obvious OCR spelling, spacing, character-confusion and line-break errors when the intended text is clear. Do not copy unreadable OCR garbage into title, authority, summary or action fields. Write clean natural Hindi when the source is primarily Hindi, while preserving clear official names, UDISE codes, reference numbers and dates exactly. Keep summaries concise and suitable for WhatsApp/email delivery.\n\n"
             f"Deterministic concept hints: {concepts}\n"
             f"Government structure hints: {structure}\n\n"
             "Extract: title, authority, category, subcategory, summary, action_required, "
