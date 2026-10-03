@@ -191,6 +191,26 @@ class SupabasePostgrestTransport:
             return result
         raise SupabaseRuntimeError("unexpected update response shape")
 
+    def delete(
+        self,
+        table: str,
+        *,
+        filters: dict[str, str],
+    ) -> list[dict[str, object]]:
+        if not filters:
+            raise ValueError("delete filters are required")
+        params = [(key, f"eq.{value}") for key, value in filters.items()]
+        result = self._request(
+            method="DELETE",
+            path=f"{table}?{parse.urlencode(params)}",
+            prefer="return=representation",
+        )
+        if isinstance(result, list):
+            return [item for item in result if isinstance(item, dict)]
+        if isinstance(result, dict) and not result:
+            return []
+        raise SupabaseRuntimeError("unexpected delete response shape")
+
     def rpc(
         self,
         function: str,
@@ -327,6 +347,17 @@ class ArchiveScopedSupabaseTransport:
         return self.transport.update(
             table,
             self._row(table, row),
+            filters=self._filters(table, filters) or {},
+        )
+
+    def delete(
+        self,
+        table: str,
+        *,
+        filters: dict[str, str],
+    ) -> list[dict[str, object]]:
+        return self.transport.delete(
+            table,
             filters=self._filters(table, filters) or {},
         )
 
