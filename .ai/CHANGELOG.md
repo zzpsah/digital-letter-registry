@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: record live WhatsApp DLR connector
+- Commit: 3f4723b2499e37a9b9a0abed1f51ae305673be92
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/whatsapp-dlr-intake/HANDOFF.md`
+
 ## 2026-10-03 — fix: make WhatsApp connector retries idempotent
 - Commit: a64aa90a9081194566db78920880bf0da995c79c
 - Author: PRASHANT KUMAR SAH
