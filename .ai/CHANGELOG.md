@@ -1,3 +1,10 @@
+## 2026-10-03 — test: Gemini is optional when deterministic fallback is active
+- Commit: 54fee01aa563cc1b0a0a955512fc573762fc2c0c
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_runtime_readiness.py`
+
 ## 2026-10-03 — test: cover deterministic context fallback
 - Commit: 4fae26fbe4773fb61f4d05f1ef83c6cb8db1c97e
 - Author: PRASHANT KUMAR SAH
