@@ -257,3 +257,10 @@ When `GEMINI_API_KEY` is absent:
 - exact dates, reference numbers, deadlines and actions are never invented by the fallback.
 
 The scoped Oracle runtime currently reports ready with Supabase, auth callback, Drive OAuth, originals folder, Tesseract, OCRmyPDF, Hindi/English OCR languages, and synthetic-only safety all available. Gemini is optional. Full tests: 261/261.
+
+
+## 2026-10-03 baseline completion
+
+Core DLR baseline is verified live. Password-first multi-user auth is live on the canonical Vercel control plane; the dedicated Bitwarden-backed Oracle worker is active; real short-lived bearer/PostgREST insert/read + RLS denial passed; authenticated HTTP synthetic intake → private Drive → durable queue → worker → search → original streaming passed; original bytes matched; and cleanup returned the archive to zero letters/jobs/processing rows. The pending-membership signup trigger is now captured in a repository migration. Full Oracle synthetic suite: 266/266. Real archive intake remains disabled.
+
+Remaining items are future enhancements or external hardening, not baseline blockers: Google Sign-In, Supabase leaked-password protection, optional Vercel Auth redirect/auto-deploy portability, Gemini semantic enrichment, and live messaging/watched-folder connectors.
