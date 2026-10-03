@@ -69,7 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 995f87df9685e1e9ddb5bde8889581c337968bc1
-- Change: feat: add deterministic context fallback
+- Commit: aec08dc3361bf72546530d613232241c8df6c3ff
+- Change: feat: allow processing without semantic embeddings
 - Date: 2026-10-03
 - Durable context synchronization: completed

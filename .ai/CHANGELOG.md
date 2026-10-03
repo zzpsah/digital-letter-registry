@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: allow processing without semantic embeddings
+- Commit: aec08dc3361bf72546530d613232241c8df6c3ff
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/worker.py`
+
 ## 2026-10-03 — feat: add deterministic context fallback
 - Commit: 995f87df9685e1e9ddb5bde8889581c337968bc1
 - Author: PRASHANT KUMAR SAH

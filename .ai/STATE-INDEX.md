@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 995f87df9685e1e9ddb5bde8889581c337968bc1
-- Last commit: feat: add deterministic context fallback
+- HEAD: aec08dc3361bf72546530d613232241c8df6c3ff
+- Last commit: feat: allow processing without semantic embeddings
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
