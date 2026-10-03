@@ -44,4 +44,7 @@ Observed on 2026-10-02:
 - Confirmation email delivery to the school Gmail alias is verified.
 - Rechecked live on 2026-10-03: worker is `email_confirmed = true`, `editor / active`; archive letters and processing jobs remain untouched.
 - The one-time confirmation token was not forwarded to the Oracle runtime.
-- Next: run one-shot worker login/idle verification. Keep the timer disabled until that passes, then continue to the synthetic vertical slice.
+- One-shot worker verification passed with `status=idle`; systemd recorded exit status 0/SUCCESS.
+- `ENABLE_REAL_INTAKE=false` was re-verified before activation.
+- `dlr-worker.timer` is enabled and active; the one-shot service completes successfully and returns to inactive/dead between timer runs as expected.
+- Next: complete the synthetic upload → Drive → queue → worker → search/open-original vertical slice.
