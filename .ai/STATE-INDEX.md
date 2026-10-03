@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 0d992cfa5cba50523afc4d7b94aec67891a71df0
-- Last commit: test: expect forced OCR fallback
+- HEAD: 3e0598cea6f076d2ea569f7a35c660fdd4be4675
+- Last commit: test: pass configured tesseract path to OCRmyPDF
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 

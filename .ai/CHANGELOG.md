@@ -1,3 +1,10 @@
+## 2026-10-03 — test: pass configured tesseract path to OCRmyPDF
+- Commit: 3e0598cea6f076d2ea569f7a35c660fdd4be4675
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_extraction_backends.py`
+
 ## 2026-10-03 — test: expect forced OCR fallback
 - Commit: 0d992cfa5cba50523afc4d7b94aec67891a71df0
 - Author: PRASHANT KUMAR SAH
