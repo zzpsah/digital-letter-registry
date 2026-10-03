@@ -1,5 +1,5 @@
-const CACHE="dlr-shell-v1";
-const SHELL=["/","/manifest.webmanifest"];
+const CACHE="dlr-shell-v2";
+const SHELL=["/manifest.webmanifest"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)));
@@ -21,7 +21,23 @@ self.addEventListener("fetch",event=>{
   if(url.origin!==self.location.origin){
     return;
   }
+
+  // Always prefer the network for the app shell so deployed UI changes appear
+  // immediately. Cache only as an offline fallback.
+  if(url.pathname==="/"){
+    event.respondWith(
+      fetch(event.request)
+        .then(response=>{
+          const copy=response.clone();
+          caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+          return response;
+        })
+        .catch(()=>caches.match(event.request))
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then(hit=>hit||fetch(event.request))
+    fetch(event.request).catch(()=>caches.match(event.request))
   );
 });
