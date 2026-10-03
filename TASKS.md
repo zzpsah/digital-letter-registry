@@ -372,3 +372,15 @@ No baseline DLR work is blocked by these items.
 - [x] Fresh synthetic PDF completed WhatsApp send → DLR intake → worker → search → original stream.
 - [x] Synthetic Drive/database artifacts cleaned after verification.
 - [ ] Observe first genuine document posted by another group member.
+
+
+## Genuine official WhatsApp proof — 2026-10-03
+
+- [x] Sent a public official CBSE circular into the bound WhatsApp source group.
+- [x] Verified WhatsApp provenance/message-id intake through the connector.
+- [x] Dedicated worker completed processing.
+- [x] Fixed deterministic CBSE-vs-UDISE precedence exposed by the real circular.
+- [x] Added explicit CBSE affiliation title/category/reference/date extraction.
+- [x] Reprocessed successfully with corrected CBSE metadata and smart filename.
+- [x] Authenticated search and private original streaming passed.
+- [x] Full synthetic suite passes 281/281.
