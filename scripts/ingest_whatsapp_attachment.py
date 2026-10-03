@@ -48,6 +48,8 @@ def main() -> int:
     parser.add_argument("--path", required=True)
     parser.add_argument("--message-id", required=True)
     parser.add_argument("--source-label", default="WhatsApp")
+    parser.add_argument("--reply-chat-id", default="")
+    parser.add_argument("--query-text", default="")
     args = parser.parse_args()
 
     path = Path(args.path)
@@ -79,7 +81,11 @@ def main() -> int:
         filename=path.name,
         external_message_id=args.message_id,
         source_label=args.source_label,
-        metadata={"connector": "hermes-whatsapp"},
+        metadata={
+            "connector": "hermes-whatsapp",
+            "reply_chat_id": args.reply_chat_id.strip() or None,
+            "query_text": args.query_text.strip() or None,
+        },
     )
     source_repo = SupabaseProvenanceRepository(transport)
     existing_message = transport.select(
