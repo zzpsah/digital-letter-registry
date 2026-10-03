@@ -69,27 +69,7 @@ No real-letter ingestion, historical adoption, Drive rename, connector activatio
 - Live Gemini verification and the real owner bearer-session vertical slice remain pending; Drive write verification is complete with synthetic data.
 
 ## Last automated change
-- Commit: 58d28dee74a2e3e00d015fa904ac33256115dbaa
-- Change: feat: confirm account when admin activates access
+- Commit: 995f87df9685e1e9ddb5bde8889581c337968bc1
+- Change: feat: add deterministic context fallback
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## Password self-registration — 2026-10-03
-
-DLR now exposes a simple password-based **Create Account** flow on the Vercel UI. The primary login UI no longer shows Magic Link controls.
-
-Hosted Supabase state:
-- new Auth users without an invite automatically receive archive membership role `viewer` with status `disabled`;
-- admin activation confirms the Auth email through the protected `dlr-confirm-account` Edge Function, then activates the chosen archive role;
-- this allows the intended flow: Create Account -> pending -> admin approves -> direct email/password login, without requiring the user to complete a Magic Link sign-in flow;
-- `zzpsah@gmail.com` is an active archive admin.
-
-Verification:
-- full test suite: 257/257 PASS;
-- hosted pending-membership trigger present;
-- Vercel home 200, health 200;
-- `Create Account` present on canonical UI;
-- Magic-Link button absent from primary UI.
-
-Schema note: the hosted pending-membership trigger migration is applied in Supabase. The exact SQL migration source could not be added through the current GitHub tool path, so future schema-replay work must reconcile that hosted migration into repository migration history before rebuilding a fresh environment.

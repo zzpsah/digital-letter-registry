@@ -1,3 +1,10 @@
+## 2026-10-03 — feat: add deterministic context fallback
+- Commit: 995f87df9685e1e9ddb5bde8889581c337968bc1
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/deterministic_context.py`
+
 ## 2026-10-03 — ux: clarify pending account approval without email action
 - Commit: aa13c355059fc0048026372ff555c289066fc039
 - Author: PRASHANT KUMAR SAH
