@@ -108,10 +108,7 @@ class ChannelIntakeTests(unittest.TestCase):
         self.assertEqual(table, "letter_sources")
         self.assertEqual(row["source_channel"], "whatsapp")
         self.assertEqual(row["metadata"], {"forwarded": True})
-        self.assertEqual(
-            conflict,
-            "archive_id,source_channel,external_message_id",
-        )
+        self.assertIsNone(conflict)
 
     def test_empty_attachment_is_rejected(self):
         with self.assertRaises(ValueError):
