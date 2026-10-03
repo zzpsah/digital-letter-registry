@@ -47,3 +47,8 @@ Not yet claimed:
 - Synthetic Drive object deleted after verification.
 - Synthetic letter/job/processing/source rows cleaned to zero.
 - Group currently reports three participants. Allowlist also has three configured entries, but identity-alias differences mean this count is not treated as proof that every allowlisted identity is already a participant.
+
+
+## Genuine official circular proof
+
+Passed 2026-10-03: public official CBSE PDF sent into the bound group, ingested with WhatsApp provenance, processed by the dedicated worker, reprocessed after fixing CBSE authority precedence, found by authenticated search, and streamed from private original storage. Corrected metadata includes CBSE authority, affiliation category, explicit notification reference/date and smart filename. Full suite: 281/281.
