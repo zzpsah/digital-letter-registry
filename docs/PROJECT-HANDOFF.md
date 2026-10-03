@@ -268,4 +268,6 @@ Remaining items are future enhancements or external hardening, not baseline bloc
 
 ## 2026-10-03 controlled real-letter pilot
 
-Private Oracle DLR is now pilot-enabled for manual real official-letter intake with a hard two-letter cap. Public Vercel remains synthetic-only for intake and holds no Drive upload credentials. Authenticated capability checks verified 2/2 private pilot slots remaining; worker is healthy and timer active; archive is empty before first real upload. Full suite passes 273/273. Next action is user-side manual upload of the first selected real official letter through the private Oracle UI, followed by review before the second slot is used.
+Private Oracle DLR is now pilot-enabled for manual real official-letter intake with a hard two-letter cap. Public Vercel remains synthetic-only for intake and holds no Drive upload credentials. Authenticated capability checks verified 2/2 private pilot slots remaining; worker is healthy and timer active; archive is empty before first real upload. Full suite passes 275/275. Next action is user-side manual upload of the first selected real official letter through the private Oracle UI, followed by review before the second slot is used.
+
+Pilot safety update: the second slot is locked by default. After the first real letter is ingested, the API rejects another real-looking upload until review is complete and the runtime slot-two unlock is explicitly enabled. Current zero-letter capability state: pilot active, 2 remaining, not review-locked yet.
