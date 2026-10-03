@@ -79,3 +79,8 @@ The first real official PDF has been archived and processed successfully on the 
 ## 2026-10-03 — two-letter real pilot complete
 
 The bounded private Oracle real-intake pilot has completed successfully with two distinct real official PDFs. One exercised forced OCR for broken embedded-font Hindi; the other exercised native-PDF extraction. Both completed through the dedicated worker, produced structured metadata/smart filenames, were found by authenticated search, and streamed their private originals successfully. The configured hard cap is now reached with zero remaining slots, so further real intake is blocked until an explicit next-phase decision is made. Real document content and identifiers are intentionally omitted from public Git.
+
+
+## 2026-10-03 — WhatsApp EDU- Letters connector live
+
+A private WhatsApp group named `EDU- Letters` now feeds the DLR through the existing Hermes WhatsApp session. Current finite allowed-member count matches the live group participant count. The group is allowlist-only. PDF/JPG/JPEG/PNG attachments are staged by a private hook and normal Hermes agent dispatch is skipped for that archive-only group. A protected one-minute systemd consumer invokes the Bitwarden-backed DLR worker identity and canonical WhatsApp provenance intake. Connector real intake is capped at 20 documents; the completed two-letter manual web pilot cap remains unchanged. Synthetic queue→DLR verification passed, including repair of a partial-ingest provenance failure, and all disposable Drive/DB test data was cleaned. The archive remains at the two retained real pilot letters. Full suite: 280/280.
