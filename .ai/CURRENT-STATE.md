@@ -65,32 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 0ad9c4cbbf11f5a208278b96bdc069374c0b6268
-- Change: fix: qualify derived write ownership policies
+- Commit: be33ff0b7a3f813a4c01c11bede5504c1b2887f7
+- Change: fix: parse English dated issue date
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## 2026-10-03 — first real-letter pilot passed
-
-The first real official PDF has been archived and processed successfully on the private Oracle pilot path. Live processing exposed and resolved three production-only issues: dedicated worker claims were tied to document ownership, garbled embedded-font Hindi was incorrectly accepted as usable native text, and OCRmyPDF could not see the configured user-local Tesseract path. These are now fixed. The real letter was reprocessed with forced Hindi+English OCR, structured metadata/smart filename were generated deterministically from explicit text, authenticated search found the record, and original streaming succeeded. The second pilot slot remains review-locked with one slot remaining. Full suite: 280/280. No real OCR content or private identifiers are recorded in Git.
-
-
-## 2026-10-03 — two-letter real pilot complete
-
-The bounded private Oracle real-intake pilot has completed successfully with two distinct real official PDFs. One exercised forced OCR for broken embedded-font Hindi; the other exercised native-PDF extraction. Both completed through the dedicated worker, produced structured metadata/smart filenames, were found by authenticated search, and streamed their private originals successfully. The configured hard cap is now reached with zero remaining slots, so further real intake is blocked until an explicit next-phase decision is made. Real document content and identifiers are intentionally omitted from public Git.
-
-
-## 2026-10-03 — WhatsApp EDU- Letters connector live
-
-A private WhatsApp group named `EDU- Letters` now feeds the DLR through the existing Hermes WhatsApp session. Current finite allowed-member count matches the live group participant count. The group is allowlist-only. PDF/JPG/JPEG/PNG attachments are staged by a private hook and normal Hermes agent dispatch is skipped for that archive-only group. A protected one-minute systemd consumer invokes the Bitwarden-backed DLR worker identity and canonical WhatsApp provenance intake. Connector real intake is capped at 20 documents; the completed two-letter manual web pilot cap remains unchanged. Synthetic queue→DLR verification passed, including repair of a partial-ingest provenance failure, and all disposable Drive/DB test data was cleaned. The archive remains at the two retained real pilot letters. Full suite: 280/280.
-
-
-## 2026-10-03 — WhatsApp DLR connector enabled
-
-The existing private Oracle Hermes WhatsApp session is now connected to DLR for one exact allowlisted source group. Only PDF/JPG/JPEG/PNG attachments from that source are staged. A protected local inbox and 60-second consumer timer invoke the Bitwarden-backed canonical WhatsApp intake script; WhatsApp message IDs provide provenance/deduplication. Connector real intake is explicitly enabled with a bounded limit of 100 source messages. Synthetic staging/queue/worker/search/original/duplicate verification passed and the synthetic Drive/database artifact was cleaned. A group test PDF and success message were delivered. No group IDs, phone numbers or session secrets are stored in this public repository. The first genuine inbound member-post remains an observational check.
-
-
-## 2026-10-03 — WhatsApp EDU- Letters E2E
-
-The existing private Hermes WhatsApp bridge is now verified as a live DLR intake source for the privately bound `EDU- Letters` group. A fresh unique synthetic PDF sent through the live bridge was automatically staged, ingested with WhatsApp provenance/message-id dedup, processed by the dedicated DLR worker, found by authenticated search, and streamed from private original storage. The synthetic Drive object and DB/provenance/job rows were removed after verification. No real archive data was changed. Public Git contains no group JID, phone number, message ID, or session material.

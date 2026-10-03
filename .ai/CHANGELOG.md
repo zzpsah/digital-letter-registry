@@ -1,3 +1,10 @@
+## 2026-10-03 — fix: parse English dated issue date
+- Commit: be33ff0b7a3f813a4c01c11bede5504c1b2887f7
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/deterministic_context.py`
+
 ## 2026-10-03 — test: cover CBSE affiliation precedence
 - Commit: 46991323c7c617991faf0148517ecfaf89b4620b
 - Author: PRASHANT KUMAR SAH
