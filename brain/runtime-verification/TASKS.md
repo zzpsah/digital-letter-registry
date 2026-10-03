@@ -11,3 +11,9 @@
 - [ ] Configure hosted magic-link template/Site URL.
 - [ ] Remove retained synthetic RLS verification row through an authorized cleanup path.
 - [ ] Re-run readiness and sync all affected docs/context.
+
+- [x] Verify Bitwarden worker secret injection path reaches Supabase Auth.
+- [x] Create dedicated worker signup using the existing Bitwarden-backed credentials.
+- [ ] Complete worker email confirmation.
+- [ ] Assign/verify minimum editor membership for the worker.
+- [ ] Run one-shot worker login/idle verification before enabling the timer.
