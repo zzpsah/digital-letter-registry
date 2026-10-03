@@ -137,7 +137,7 @@
 - [x] Full synthetic suite passes 249/249.
 - [ ] Enable Supabase leaked-password protection when Management/Dashboard configuration is available.
 - [x] Create and activate an additional dedicated admin account.
-- [ ] Complete the real authenticated HTTP/PostgREST multi-role vertical-slice test with actual sessions.
+- [x] Complete the real authenticated HTTP/PostgREST multi-role vertical-slice using a genuine short-lived worker Auth session while temporarily exercising viewer → editor → admin membership roles, then restoring editor.
 
 
 ## Multi-user runtime verification update
