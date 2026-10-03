@@ -89,3 +89,8 @@ A private WhatsApp group named `EDU- Letters` now feeds the DLR through the exis
 ## 2026-10-03 — WhatsApp DLR connector enabled
 
 The existing private Oracle Hermes WhatsApp session is now connected to DLR for one exact allowlisted source group. Only PDF/JPG/JPEG/PNG attachments from that source are staged. A protected local inbox and 60-second consumer timer invoke the Bitwarden-backed canonical WhatsApp intake script; WhatsApp message IDs provide provenance/deduplication. Connector real intake is explicitly enabled with a bounded limit of 100 source messages. Synthetic staging/queue/worker/search/original/duplicate verification passed and the synthetic Drive/database artifact was cleaned. A group test PDF and success message were delivered. No group IDs, phone numbers or session secrets are stored in this public repository. The first genuine inbound member-post remains an observational check.
+
+
+## 2026-10-03 — WhatsApp EDU- Letters E2E
+
+The existing private Hermes WhatsApp bridge is now verified as a live DLR intake source for the privately bound `EDU- Letters` group. A fresh unique synthetic PDF sent through the live bridge was automatically staged, ingested with WhatsApp provenance/message-id dedup, processed by the dedicated DLR worker, found by authenticated search, and streamed from private original storage. The synthetic Drive object and DB/provenance/job rows were removed after verification. No real archive data was changed. Public Git contains no group JID, phone number, message ID, or session material.
