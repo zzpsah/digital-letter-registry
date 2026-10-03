@@ -1,3 +1,10 @@
+## 2026-10-03 — test: capture PostgREST delete semantics
+- Commit: 4187a91a5ebc00d160069dac927fa3f31949218f
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_supabase_runtime.py`
+
 ## 2026-10-03 — docs: sync final DLR state index
 - Commit: a1aab99c0697bc863ade8aa19e52dd35c55cd89b
 - Author: PRASHANT KUMAR SAH
