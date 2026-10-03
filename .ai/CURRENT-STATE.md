@@ -35,11 +35,9 @@
 
 ## Next step
 
-1. Run the one-shot Oracle worker login/idle verification using the already-provisioned dedicated `editor / active` worker identity.
-2. Enable the already-installed Oracle `dlr-worker.timer` only after that one-shot worker test passes.
-3. Complete the synthetic upload → Drive → queue → Oracle worker → Vercel search/open-original vertical slice.
-4. Keep `ENABLE_REAL_INTAKE=false` throughout synthetic verification.
-5. Gemini remains optional; add it later for richer structured context and semantic embeddings, then reprocess historical items.
+1. Complete the synthetic upload → Drive → queue → Oracle worker → Vercel search/open-original vertical slice.
+2. Keep `ENABLE_REAL_INTAKE=false` throughout synthetic verification.
+3. Gemini remains optional; add it later for richer structured context and semantic embeddings, then reprocess historical items.
 
 Public Vercel hosting is authorized and live. Real-letter ingestion, historical adoption, Drive rename/delete operations, and real connector intake remain disabled unless explicitly enabled later.
 
@@ -84,7 +82,7 @@ The worker no longer requires a manually copied human `SUPABASE_ACCESS_TOKEN` as
 
 This preserves normal Supabase RLS rather than using service-role credentials in the Oracle worker.
 
-Oracle has the Bitwarden-scoped worker wrapper and systemd service/timer files installed. The dedicated worker Auth account is now email-confirmed and live verification on 2026-10-03 shows `editor / active` membership. The timer remains deliberately disabled only until the one-shot worker login/idle verification passes.
+Oracle has the Bitwarden-scoped worker wrapper and systemd service/timer files installed. The dedicated worker Auth account is now email-confirmed and live verification on 2026-10-03 shows `editor / active` membership. One-shot worker verification passed with `status=idle`; `ENABLE_REAL_INTAKE=false` was re-verified, and the Oracle worker timer is now enabled and active.
 
 Latest synthetic suite: 264/264 PASS.
 
