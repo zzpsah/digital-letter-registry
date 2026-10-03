@@ -1,3 +1,11 @@
+## 2026-10-03 — Improve Hindi OCR preprocessing and Gemini cleanup guidance
+- Commit: d20deef35257b2194785081bc663f245b4190047
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/extraction_backends.py`
+- `src/letter_registry/gemini_provider.py`
+
 ## 2026-10-03 — docs: record live background Gmail delivery
 - Commit: 3832fd32b6705d51c159dac8c7af18dddc6042ec
 - Author: PRASHANT KUMAR SAH
