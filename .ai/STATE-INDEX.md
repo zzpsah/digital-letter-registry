@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: c8a64daa879f8b06bd4d574c143e06d5dad6326c
-- Last commit: docs: record live worker auth state
+- HEAD: 75fdc845eeba5c13ad07372e26d81ac0c35ac2f7
+- Last commit: docs: close worker account tasks
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 

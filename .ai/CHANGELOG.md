@@ -1,3 +1,10 @@
+## 2026-10-03 — docs: close worker account tasks
+- Commit: 75fdc845eeba5c13ad07372e26d81ac0c35ac2f7
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/runtime-verification/TASKS.md`
+
 ## 2026-10-03 — docs: record live worker auth state
 - Commit: c8a64daa879f8b06bd4d574c143e06d5dad6326c
 - Author: PRASHANT KUMAR SAH
