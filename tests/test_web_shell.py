@@ -61,5 +61,8 @@ class WebShellTests(unittest.TestCase):
         self.assertIn("pilot_remaining", self.html)
         self.assertIn("pilot_limit", self.html)
 
+    def test_service_worker_registration_bypasses_http_cache(self):
+        self.assertIn('register("/sw.js?v=2",{updateViaCache:"none"})', self.html)
+
 if __name__ == "__main__":
     unittest.main()
