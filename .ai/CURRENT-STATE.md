@@ -85,7 +85,7 @@ The worker no longer requires a manually copied human `SUPABASE_ACCESS_TOKEN` as
 
 This preserves normal Supabase RLS rather than using service-role credentials in the Oracle worker.
 
-Oracle has the Bitwarden-scoped worker wrapper and systemd service/timer files installed, but the timer is deliberately disabled/inactive until the dedicated worker account and Bitwarden secret pair are provisioned.
+Oracle has the Bitwarden-scoped worker wrapper and systemd service/timer files installed. The dedicated worker Auth signup now exists and the wrapper reaches Supabase Auth using Bitwarden-backed credentials. Live verification on 2026-10-03 shows the worker account is still email-unconfirmed with `viewer / disabled` membership, so the timer remains deliberately disabled until confirmation, minimum `editor` activation, and one-shot login/idle verification pass.
 
 Latest synthetic suite: 264/264 PASS.
 
