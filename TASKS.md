@@ -104,7 +104,7 @@
 - Supabase synthetic RLS-verification row was removed; `letters` currently contains zero rows and no real archive-letter rows.
 - Rename behavior is preview/approval locked; no real rename has been approved or executed.
 - No real archive-letter ingestion has occurred.
-- No production deployment is claimed.
+- Public Vercel control-plane deployment is live; real archive-letter intake remains disabled.
 - No Drive IDs/URLs, Supabase credentials, SSH keys, tokens, or server details belong in public Git.
 
 
@@ -127,7 +127,7 @@
 - [x] Preserve the existing archive owner as bootstrap admin.
 - [x] Enforce role-aware RLS across archive data.
 - [x] Add email/password sign-in independent of Gmail.
-- [x] Make new account registration invite-only.
+- [x] Replace invite-only registration with self-service password registration plus disabled-by-default membership.
 - [x] Add admin access UI/API for invites, roles, and active/disabled status.
 - [x] Add last-active-admin database protection.
 - [x] Add optional Google Sign-In and Magic Link under the same membership model.
@@ -136,7 +136,7 @@
 - [x] Verify final-admin disable attempt is rejected by the live database trigger.
 - [x] Full synthetic suite passes 249/249.
 - [ ] Enable Supabase leaked-password protection when Management/Dashboard configuration is available.
-- [ ] Create/invite an additional dedicated admin account once its actual email address is chosen.
+- [x] Create and activate an additional dedicated admin account.
 - [ ] Complete the real authenticated HTTP/PostgREST multi-role vertical-slice test with actual sessions.
 
 
@@ -209,3 +209,14 @@
 - [x] Run 257/257 tests successfully.
 - [ ] Reconcile the hosted pending-membership trigger into a repository migration file when an allowed migration-source path is available.
 - [ ] Optionally disable legacy Magic-Link backend routes after a deprecation period.
+
+
+## Gemini-independent processing fallback
+
+- [x] Add conservative deterministic context provider using checked-in Hindi/English vocabulary.
+- [x] Allow worker completion when semantic embeddings are unavailable.
+- [x] Use deterministic context + OCR/full-text indexing when `GEMINI_API_KEY` is absent.
+- [x] Treat Gemini as optional in Oracle runtime readiness.
+- [x] Verify Oracle scoped readiness reports fully ready in synthetic-only mode.
+- [x] Full synthetic suite passes 261/261.
+- [ ] Add Gemini later for richer structured context + semantic embeddings; historical records can be reprocessed then.
