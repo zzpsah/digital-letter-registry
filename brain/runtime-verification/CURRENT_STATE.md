@@ -42,5 +42,6 @@ Observed on 2026-10-02:
 - The new account is currently unconfirmed and in the expected self-signup membership state: viewer / disabled.
 - Re-running the worker now reaches Supabase Auth and fails specifically with `email_not_confirmed`.
 - Confirmation email delivery to the school Gmail alias is verified.
+- Rechecked live on 2026-10-03: worker remains `email_confirmed = false`, `viewer / disabled`; archive letters and processing jobs remain untouched.
 - The one-time confirmation token was not forwarded to the Oracle runtime.
 - Next: complete email confirmation, assign minimum editor access, run one-shot worker login/idle verification, then keep the timer disabled until the synthetic vertical slice passes.
