@@ -28,3 +28,14 @@ Passed 2026-10-03:
 - Authenticated original streaming returned the private original successfully.
 - Pilot state: one slot remaining; second slot review-locked.
 - Full suite: 280/280.
+
+
+## Two-letter pilot completion
+
+Passed 2026-10-03:
+- Two distinct real official PDFs archived and processed.
+- First real document: forced OCR path + deterministic metadata + smart filename + search + original stream.
+- Second real document: native PDF path + deterministic metadata/reference/smart filename + search + original stream.
+- Pilot capability state after second document: 0 slots remaining.
+- Additional real uploads are blocked by the hard pilot cap.
+- Full suite remains 280/280.
