@@ -17,6 +17,14 @@ from .structured_analysis import StructuredDocumentContext
 
 
 def _explicit_authority(text: str) -> str | None:
+    folded_all = text.casefold()
+    if (
+        "central board of secondary education" in folded_all
+        or "केन्द्रीय माध्यमिक शिक्षा बोर्ड" in folded_all
+        or "केंद्रीय माध्यमिक शिक्षा बोर्ड" in folded_all
+    ):
+        return "CBSE"
+
     for line in text.splitlines():
         stripped = line.strip()
         folded = stripped.casefold()
@@ -26,6 +34,14 @@ def _explicit_authority(text: str) -> str | None:
 
 
 def _explicit_reference_number(text: str) -> str | None:
+    cbse_match = re.search(
+        r"\bCBSE/[A-Za-z0-9.]+/[A-Za-z0-9.]+/\d{4}\b",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if cbse_match:
+        return cbse_match.group(0)
+
     match = re.search(
         r"\b[A-Z]{2,}[A-Za-z0-9.]*"
         r"(?:/[A-Za-z0-9.]+){2,}/\d{4}/\d+\b",
@@ -71,6 +87,12 @@ def _authority(text: str) -> str | None:
 
 def _explicit_title(text: str) -> str | None:
     folded = text.casefold()
+    if (
+        "central board of secondary education" in folded
+        and "affiliation" in folded
+        and "notification" in folded
+    ):
+        return "CBSE Affiliation Notification"
     if "स्थानांतरण" in folded and "पदस्थापन" in folded and "आदेश" in folded:
         return "स्थानांतरण / पदस्थापन आदेश"
     return None
@@ -78,6 +100,11 @@ def _explicit_title(text: str) -> str | None:
 
 def _explicit_category(text: str) -> str | None:
     folded = text.casefold()
+    if (
+        "central board of secondary education" in folded
+        and ("affiliation" in folded or "saras" in folded)
+    ):
+        return "affiliation"
     if "स्थानांतरण" in folded and "पदस्थापन" in folded:
         return "transfer-posting"
     return None
@@ -124,7 +151,7 @@ def _title(concepts: tuple[str, ...]) -> str | None:
 class DeterministicDocumentContextProvider:
     """Vocabulary-only fallback suitable for OCR/full-text indexing."""
 
-    version: str = "deterministic:hints-v2"
+    version: str = "deterministic:hints-v3"
     summary_characters: int = 280
 
     def analyze(
