@@ -1,3 +1,10 @@
+## 2026-10-03 — test: update legacy provenance fixture
+- Commit: ea9af0444acb03fbe9024dbdfb61e6c59937365b
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_intake_channels.py`
+
 ## 2026-10-03 — test: update provenance persistence semantics
 - Commit: 21e7b88d9f6e574ef68541c06c8604ce6748f9c7
 - Author: PRASHANT KUMAR SAH

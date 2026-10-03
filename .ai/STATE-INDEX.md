@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 21e7b88d9f6e574ef68541c06c8604ce6748f9c7
-- Last commit: test: update provenance persistence semantics
+- HEAD: ea9af0444acb03fbe9024dbdfb61e6c59937365b
+- Last commit: test: update legacy provenance fixture
 - Last commit date: 2026-10-03
 - Last commit author: PRASHANT KUMAR SAH
 
