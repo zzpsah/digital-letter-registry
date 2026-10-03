@@ -65,12 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 034b56bb59aa19bf6a6234e66f360f81aae1b452
-- Change: ux: show pilot review lock
+- Commit: f75887aa8983a53b2dd5d3b690a871e204197fd8
+- Change: db: separate job ownership from worker claim
 - Date: 2026-10-03
 - Durable context synchronization: completed
-
-
-## 2026-10-03 — staged pilot review lock
-
-The real-intake pilot now pauses after the first real letter. `DLR_REAL_INTAKE_PILOT_SECOND_SLOT_UNLOCKED=false` is set on the private Oracle runtime. With zero real letters, capabilities report pilot mode active, 2 remaining, and review lock false. Once one real letter exists, any second real-looking upload is rejected until the slot-two flag is explicitly enabled after review. Full suite: 275/275.

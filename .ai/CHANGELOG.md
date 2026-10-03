@@ -1,3 +1,10 @@
+## 2026-10-03 — db: separate job ownership from worker claim
+- Commit: f75887aa8983a53b2dd5d3b690a871e204197fd8
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261003085000_separate_job_owner_from_worker_claim.sql`
+
 ## 2026-10-03 — test: cover service-worker refresh registration
 - Commit: 0504afb6831bbd119e7933e8cf249c4efa87ef10
 - Author: PRASHANT KUMAR SAH
