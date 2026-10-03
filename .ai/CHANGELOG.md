@@ -1,3 +1,12 @@
+# Changelog
+
+## 2026-10-03 — Live bootstrap password setup
+
+- Bootstrap admin successfully updated the DLR password through the live Account flow.
+- Marked the real password-setup milestone complete.
+- No password value, credential, private URL, or token was recorded in Git.
+- Next runtime focus remains the dedicated Oracle worker identity and synthetic end-to-end vertical slice.
+
 ## 2026-10-03 — docs: track dedicated worker identity rollout
 - Commit: f52e746402cbdc5e4474df385db56d8a03f8322a
 - Author: PRASHANT KUMAR SAH
