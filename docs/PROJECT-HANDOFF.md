@@ -264,3 +264,8 @@ The scoped Oracle runtime currently reports ready with Supabase, auth callback, 
 Core DLR baseline is verified live. Password-first multi-user auth is live on the canonical Vercel control plane; the dedicated Bitwarden-backed Oracle worker is active; real short-lived bearer/PostgREST insert/read + RLS denial passed; authenticated HTTP synthetic intake → private Drive → durable queue → worker → search → original streaming passed; original bytes matched; and cleanup returned the archive to zero letters/jobs/processing rows. The pending-membership signup trigger is now captured in a repository migration. Full Oracle synthetic suite: 269/269. Real archive intake remains disabled.
 
 Remaining items are future enhancements or external hardening, not baseline blockers: Google Sign-In, Supabase leaked-password protection, optional Vercel Auth redirect/auto-deploy portability, Gemini semantic enrichment, and live messaging/watched-folder connectors.
+
+
+## 2026-10-03 controlled real-letter pilot
+
+Private Oracle DLR is now pilot-enabled for manual real official-letter intake with a hard two-letter cap. Public Vercel remains synthetic-only for intake and holds no Drive upload credentials. Authenticated capability checks verified 2/2 private pilot slots remaining; worker is healthy and timer active; archive is empty before first real upload. Full suite passes 273/273. Next action is user-side manual upload of the first selected real official letter through the private Oracle UI, followed by review before the second slot is used.
