@@ -447,3 +447,35 @@ A feature is production-grade only when:
 - Numbers, dates, amounts, codes and reference-number tokens are excluded from automatic correction learning.
 - Promoted corrections are applied only to derived analysis text. Raw OCR and immutable originals are never rewritten.
 - The memory is reversible and versioned by an internal revision counter; deleting/resetting the runtime memory restores baseline behavior.
+
+### Autonomous learning operational contract
+
+Implementation: `src/letter_registry/autonomous_learning.py`, class `AutonomousCorrectionMemory`.
+
+The learning loop is:
+
+`raw OCR -> promoted correction application -> document analysis -> high-confidence clean text -> correction observation -> candidate accumulation -> automatic promotion`
+
+Promotion policy:
+- minimum context confidence: 0.90;
+- known vocabulary target: 3 independent documents;
+- other target: 5 independent documents;
+- one document can contribute at most once to one candidate;
+- token similarity must be sufficiently close to represent an OCR-style correction rather than semantic rewriting;
+- any source or target token containing digits is rejected from autonomous learning.
+
+Persistence:
+- default file: `/home/prashant/.hermes/state/dlr-learning/ocr-corrections.json`;
+- override: `DLR_OCR_LEARNING_FILE`;
+- permissions: private runtime directory/file;
+- data: schema version, internal revision, candidates, promoted rules, document evidence and average confidence;
+- this file is intentionally excluded from Git.
+
+Application boundary:
+- promoted corrections are applied to analysis text before context extraction;
+- original file bytes remain authoritative;
+- stored raw OCR remains untouched;
+- learned corrections must not silently alter dates, money, percentages, IDs, codes or reference numbers;
+- deleting/resetting the correction-memory file is a complete rollback of learned behavior.
+
+Dictionary/version registry uses `gov-education-hi-en-auto-v2` so historical documents can later be selected for controlled reprocessing when dictionary behavior changes.

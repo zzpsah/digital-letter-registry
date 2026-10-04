@@ -297,3 +297,23 @@ The WhatsApp connector has now also passed a genuine WhatsApp-source official ci
 ## Canonical architecture reference
 
 For all future DLR development, schema changes, AI integration, reprocessing, delivery, duplicate handling, and retention decisions, treat docs/PRODUCTION_ARCHITECTURE.md as the canonical long-term design contract. Do not introduce a new persistent field/table/workflow that conflicts with that document without updating the architecture decision first.
+
+## 2026-10-04 autonomous OCR correction learning
+
+DLR now has an autonomous, reversible OCR correction-memory layer. It does not ask the user to approve individual spelling corrections. The engine compares raw OCR with high-confidence AI-cleaned document text and learns repeated token-level OCR corrections across independent documents.
+
+Operational rules:
+- learning requires structured-context confidence >= 0.90;
+- a correction targeting known Bihar/education/government vocabulary auto-promotes after 3 independent documents;
+- an unknown/general correction auto-promotes after 5 independent documents;
+- repeated observations from the same document do not count as independent evidence;
+- tokens containing digits are excluded, so dates, amounts, codes and reference-number values are not learned/replaced automatically;
+- learned corrections affect only derived analysis input; raw OCR and immutable Drive originals are never rewritten;
+- learning memory is private runtime state, not Git content;
+- default runtime state file: /home/prashant/.hermes/state/dlr-learning/ocr-corrections.json;
+- the state keeps candidate corrections, promoted corrections, independent-document evidence, average confidence, and an internal revision counter;
+- removing/resetting the runtime learning file restores baseline behavior without touching archived originals.
+
+Current dictionary version: gov-education-hi-en-auto-v2.
+
+The worker is wired with AutonomousCorrectionMemory.from_environment(). The path may be overridden with DLR_OCR_LEARNING_FILE. The feature is active for subsequent worker jobs in the current trial/staging flow. Learned document-specific values must never be committed to Git.

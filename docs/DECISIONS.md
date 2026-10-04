@@ -35,3 +35,6 @@
 - final embedding model/provider
 - long-term backup/export cadence
 - normalized historical processing/delivery/audit migration schedule
+
+16. **Autonomous OCR learning:** DLR may automatically learn recurring OCR spelling/token corrections from high-confidence AI-cleaned text without asking the user for per-correction verification. Promotion must require repeated independent evidence, must exclude numeric/code/reference-value mutations, must remain reversible, and must never modify raw OCR or immutable originals.
+17. **Learning state stays private:** learned correction candidates/promotions are runtime state outside Git. Source code and learning policy are version-controlled; document-specific learned mappings are not.
