@@ -1,3 +1,12 @@
+## 2026-10-04 — Document autonomous OCR learning policy
+- Commit: 08714aeaa07eb8331e41ac4cce170b77eccddcba
+- Author: Prashant
+- Classification: routine
+- Changed files:
+- `docs/DECISIONS.md`
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-04 — Add autonomous OCR correction learning
 - Commit: b94b6c0a19bf0a5c0a376932cc849bc41d0e5f94
 - Author: Prashant

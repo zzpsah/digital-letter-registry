@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: b94b6c0a19bf0a5c0a376932cc849bc41d0e5f94
-- Last commit: Add autonomous OCR correction learning
+- HEAD: 08714aeaa07eb8331e41ac4cce170b77eccddcba
+- Last commit: Document autonomous OCR learning policy
 - Last commit date: 2026-10-04
 - Last commit author: Prashant
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
