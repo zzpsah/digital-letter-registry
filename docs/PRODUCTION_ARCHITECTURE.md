@@ -479,3 +479,11 @@ Application boundary:
 - deleting/resetting the correction-memory file is a complete rollback of learned behavior.
 
 Dictionary/version registry uses `gov-education-hi-en-auto-v2` so historical documents can later be selected for controlled reprocessing when dictionary behavior changes.
+
+## Automatic document quality scoring
+
+- Every processed document receives a non-blocking quality score from OCR readability, context confidence, core metadata completeness, reference/date presence and availability of cleaned text.
+- Scores below 0.72 set needs_reprocessing=true with quality flags; delivery still proceeds.
+- Quality metadata is stored inside structured_context to avoid a schema migration during trial.
+- Current quality engine version: document-quality-v1.
+- Low-quality results are eligible for later better-provider reprocessing; originals/raw OCR remain unchanged.

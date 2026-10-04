@@ -38,6 +38,10 @@ class StructuredDocumentContext:
     confidence: float | None = None
     key_points: tuple[str, ...] = ()
     clean_document_text: str | None = None
+    quality_score: float | None = None
+    quality_flags: tuple[str, ...] = ()
+    needs_reprocessing: bool = False
+    quality_version: str | None = None
 
     def to_json_dict(self) -> dict[str, object]:
         data = asdict(self)
@@ -45,6 +49,7 @@ class StructuredDocumentContext:
         data["important_dates"] = [asdict(item) for item in self.important_dates]
         data["related_terms_hi"] = list(self.related_terms_hi)
         data["related_terms_en"] = list(self.related_terms_en)
+        data["quality_flags"] = list(self.quality_flags)
         return data
 
 
@@ -115,6 +120,10 @@ def analyze_document_context(
             confidence=context.confidence,
             key_points=context.key_points,
             clean_document_text=context.clean_document_text,
+            quality_score=context.quality_score,
+            quality_flags=context.quality_flags,
+            needs_reprocessing=context.needs_reprocessing,
+            quality_version=context.quality_version,
         )
 
     return ContextAnalysisResult(

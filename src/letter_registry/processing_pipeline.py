@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .extraction import ExtractionResult, VersionedTextExtractor
 from .models import DocumentRecord
+from .quality_assessment import assess_document_quality
 from .autonomous_learning import AutonomousCorrectionMemory
 from .structured_analysis import (
     ContextAnalysisResult,
@@ -119,6 +120,30 @@ def process_archived_document(
             analysis_text,
             provider=fallback_context_provider,
         )
+    from dataclasses import replace
+
+    quality = assess_document_quality(
+        extracted_text=extraction.text,
+        context_confidence=context.context.confidence,
+        title=context.context.title,
+        authority=context.context.authority,
+        category=context.context.category,
+        reference_number=context.context.reference_number,
+        issue_date=context.context.issue_date,
+        clean_document_text=context.context.clean_document_text,
+    )
+    context = ContextAnalysisResult(
+        context=replace(
+            context.context,
+            quality_score=quality.score,
+            quality_flags=quality.flags,
+            needs_reprocessing=quality.needs_reprocessing,
+            quality_version=quality.version,
+        ),
+        hints=context.hints,
+        version=context.version,
+    )
+
     repository.save_context_result(
         record,
         owner_id=owner_id,
