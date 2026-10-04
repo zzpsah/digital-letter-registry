@@ -427,3 +427,13 @@ A feature is production-grade only when:
 - logs are useful but do not expose sensitive values
 - tests cover normal, duplicate, retry, provider-failure and reprocessing cases
 - documentation states how it can evolve without breaking old records
+
+## Near-duplicate and revised-document detection
+
+- Exact SHA-256 matches remain the only automatic duplicate identity rule.
+- Processed documents are also compared conservatively using reference number, authority, category, title and summary similarity.
+- Same reference + very high similarity creates a reviewable `duplicate_of` suggestion.
+- Same reference + meaningful content differences creates a reviewable `related_to` suggestion labelled as a possible revised/versioned document.
+- Without a reference number, a duplicate suggestion requires the same authority/category plus very high title and summary similarity.
+- Explicit corrigendum/extension/superseding language continues to take priority over fuzzy similarity rules.
+- Near-duplicate/version suggestions never delete, merge, supersede, or alter originals automatically. Human review is required.

@@ -74,5 +74,59 @@ class RelationshipInferenceTests(unittest.TestCase):
         )
 
 
+    def test_same_reference_high_similarity_suggests_duplicate(self):
+        rows = infer_relationship_suggestions(
+            source_letter_id="11111111-1111-4111-8111-111111111111",
+            source_reference_number="BSEB/123/2026",
+            source_authority="BSEB",
+            source_category="exam",
+            source_text="सामान्य सूचना",
+            source_title="Exam Form Notice",
+            source_summary="Original notice",
+            candidates=[self.candidate],
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].relationship_type, DocumentRelationship.DUPLICATE_OF)
+        self.assertGreater(rows[0].confidence, 0.9)
+
+    def test_same_reference_material_difference_suggests_related_version(self):
+        rows = infer_relationship_suggestions(
+            source_letter_id="11111111-1111-4111-8111-111111111111",
+            source_reference_number="BSEB/123/2026",
+            source_authority="BSEB",
+            source_category="exam",
+            source_text="सामान्य सूचना",
+            source_title="Completely Changed Fee Direction",
+            source_summary="Different operational instructions and changed conditions",
+            candidates=[self.candidate],
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].relationship_type, DocumentRelationship.RELATED_TO)
+        self.assertIn("Possible revised/versioned document", rows[0].rationale)
+
+    def test_no_reference_requires_very_high_metadata_similarity(self):
+        candidate = RelationshipCandidate(
+            record_id="33333333-3333-4333-8333-333333333333",
+            reference_number=None,
+            authority="District Education Officer Siwan",
+            category="attendance",
+            title="eShikshaKosh Attendance Notice for Schools",
+            summary="Schools must ensure eShikshaKosh attendance compliance and review records daily.",
+        )
+        rows = infer_relationship_suggestions(
+            source_letter_id="11111111-1111-4111-8111-111111111111",
+            source_reference_number=None,
+            source_authority="District Education Officer Siwan",
+            source_category="attendance",
+            source_text="notice",
+            source_title="eShikshaKosh Attendance Notice for Schools",
+            source_summary="Schools must ensure eShikshaKosh attendance compliance and review records daily.",
+            candidates=[candidate],
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].relationship_type, DocumentRelationship.DUPLICATE_OF)
+
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -205,6 +205,8 @@ class DocumentProcessingWorker:
                     source_authority=outcome.context.context.authority,
                     source_category=outcome.context.context.category,
                     source_text=outcome.extraction.text,
+                    source_title=outcome.context.context.title,
+                    source_summary=outcome.context.context.summary,
                     candidates=candidates,
                 )
                 for suggestion in suggestions:
