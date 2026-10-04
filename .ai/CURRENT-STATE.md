@@ -65,7 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: a207bb9228445e0eee5a5bdcd74cfd1fceae5852
-- Change: Add resilient AI context fallback and Gemini file analysis
+- Commit: 6b0772a2eeab11d4b847fa0b158d63a81fa07b3b
+- Change: Use WhatsApp sender context in document analysis
 - Date: 2026-10-04
 - Durable context synchronization: completed

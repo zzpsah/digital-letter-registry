@@ -1,3 +1,13 @@
+## 2026-10-04 — Use WhatsApp sender context in document analysis
+- Commit: 6b0772a2eeab11d4b847fa0b158d63a81fa07b3b
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/hermes_context_provider.py`
+- `src/letter_registry/processing_pipeline.py`
+- `src/letter_registry/supabase_gemini_gateway.py`
+- `src/letter_registry/worker.py`
+
 ## 2026-10-04 — Add resilient AI context fallback and Gemini file analysis
 - Commit: a207bb9228445e0eee5a5bdcd74cfd1fceae5852
 - Author: Prashant
