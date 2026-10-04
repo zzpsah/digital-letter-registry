@@ -1,3 +1,13 @@
+## 2026-10-04 — Harden provider confidence parsing
+- Commit: 937e18a9b6d57065570275b590d0559d27af4d62
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/autonomous_learning.py`
+- `src/letter_registry/quality_assessment.py`
+- `tests/test_autonomous_learning.py`
+- `tests/test_quality_assessment.py`
+
 ## 2026-10-04 — Document automatic low-quality recovery
 - Commit: bad26c2a76f1ce00c1090a86b49e70027779137b
 - Author: PRASHANT KUMAR SAH

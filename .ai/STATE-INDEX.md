@@ -6,10 +6,10 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: bad26c2a76f1ce00c1090a86b49e70027779137b
-- Last commit: Document automatic low-quality recovery
+- HEAD: 937e18a9b6d57065570275b590d0559d27af4d62
+- Last commit: Harden provider confidence parsing
 - Last commit date: 2026-10-04
-- Last commit author: PRASHANT KUMAR SAH
+- Last commit author: Prashant
 
 ## Context health
 - Overall: healthy
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
