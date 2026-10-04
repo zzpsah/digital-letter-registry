@@ -1,3 +1,21 @@
+## 2026-10-04 — Add resilient AI context fallback and Gemini file analysis
+- Commit: a207bb9228445e0eee5a5bdcd74cfd1fceae5852
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `docs/ARCHITECTURE.md`
+- `docs/DECISIONS.md`
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `docs/PROJECT-HANDOFF.md`
+- `scripts/run_worker_once.py`
+- `src/letter_registry/gemini_provider.py`
+- `src/letter_registry/hermes_context_provider.py`
+- `src/letter_registry/processing_pipeline.py`
+- `src/letter_registry/structured_analysis.py`
+- `src/letter_registry/supabase_gemini_gateway.py`
+- `src/letter_registry/worker.py`
+- `supabase/migrations/20261004120000_add_processing_lineage.sql`
+
 ## 2026-10-03 — Improve Hindi OCR preprocessing and Gemini cleanup guidance
 - Commit: d20deef35257b2194785081bc663f245b4190047
 - Author: Prashant
