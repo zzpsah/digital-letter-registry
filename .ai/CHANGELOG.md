@@ -1,3 +1,10 @@
+## 2026-10-04 — Document automatic low-quality recovery
+- Commit: bad26c2a76f1ce00c1090a86b49e70027779137b
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PRODUCTION_ARCHITECTURE.md`
+
 ## 2026-10-04 — Wire automatic quality recovery into worker
 - Commit: 50d4bf390724452eaa59c583da2c544efcb45ec9
 - Author: PRASHANT KUMAR SAH
