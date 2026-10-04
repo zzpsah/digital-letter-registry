@@ -1,3 +1,16 @@
+## 2026-10-04 — Add autonomous OCR correction learning
+- Commit: b94b6c0a19bf0a5c0a376932cc849bc41d0e5f94
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `scripts/run_worker_once.py`
+- `src/letter_registry/autonomous_learning.py`
+- `src/letter_registry/processing_pipeline.py`
+- `src/letter_registry/versions.py`
+- `src/letter_registry/worker.py`
+- `tests/test_autonomous_learning.py`
+
 ## 2026-10-04 — Add reviewable near-duplicate and revision detection
 - Commit: c3e8e76892764074b4c97b47bbd77f16745cef74
 - Author: Prashant
