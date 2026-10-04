@@ -25,6 +25,8 @@ from letter_registry.jobs import SupabaseProcessingQueue
 from letter_registry.original_access import SupabaseOriginalAccessService
 from letter_registry.relationships import SupabaseRelationshipRepository
 from letter_registry.semantic_search import SupabaseEmbeddingRepository
+from letter_registry.self_healing import SelfHealingReprocessor
+from letter_registry.versions import DICTIONARY_VERSION
 from letter_registry.source_loader import SupabaseSourceLoader
 from letter_registry.supabase_repository import SupabaseLetterRepository
 from letter_registry.supabase_runtime import (
@@ -49,6 +51,7 @@ def main() -> int:
         archive_id=os.environ["DLR_ARCHIVE_ID"],
     )
     repository = SupabaseLetterRepository(transport)
+    queue = SupabaseProcessingQueue(transport)
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
     gateway_configured = bool(
         os.environ.get("SUPABASE_GEMINI_GATEWAY_URL", "").strip()
@@ -69,8 +72,18 @@ def main() -> int:
         else None
     )
 
+    healing = SelfHealingReprocessor(
+        transport=transport,
+        queue=queue,
+    ).scan(
+        target_context_version=str(getattr(context_provider, "version")),
+        target_dictionary_version=DICTIONARY_VERSION,
+    )
+    if healing.enqueued:
+        print(f"self_healing_enqueued={healing.enqueued}")
+
     worker = DocumentProcessingWorker(
-        queue=SupabaseProcessingQueue(transport),
+        queue=queue,
         source_loader=SupabaseSourceLoader(transport),
         database=transport,
         original_access=SupabaseOriginalAccessService(
