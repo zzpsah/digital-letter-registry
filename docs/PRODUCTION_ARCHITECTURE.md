@@ -487,3 +487,29 @@ Dictionary/version registry uses `gov-education-hi-en-auto-v2` so historical doc
 - Quality metadata is stored inside structured_context to avoid a schema migration during trial.
 - Current quality engine version: document-quality-v1.
 - Low-quality results are eligible for later better-provider reprocessing; originals/raw OCR remain unchanged.
+
+## Automatic quality recovery
+
+Low-quality processing results are eligible for automatic reprocessing without user intervention.
+
+Implementation:
+- scanner: `src/letter_registry/self_healing.py`;
+- worker hook: `scripts/run_worker_once.py`;
+- source flag: `structured_context.needs_reprocessing=true`;
+- quality engine: `document-quality-v1`.
+
+Scheduling policy:
+- if the currently configured context provider is higher-tier than the provider that produced the stored result, the document is eligible for recovery;
+- provider order is Gemini > Hermes > deterministic/unknown;
+- a real context-model version change, dictionary-version change, or quality-engine version change creates a stable one-time upgrade job;
+- when a higher-tier provider is configured but temporarily unavailable and processing falls back to a lower tier, the same low-quality document receives at most one recovery attempt per UTC day;
+- job reasons are deterministic and use target-version hashes so repeated worker ticks remain idempotent;
+- the normal durable processing queue is reused; originals are never duplicated.
+
+Delivery behavior:
+- low-quality results are still archived and delivered;
+- a later successful reprocessing pass updates only derived projections/artifacts;
+- if delivery content materially improves, the existing same-thread revision mechanism handles the follow-up;
+- unchanged derived content does not generate another email.
+
+This is trial/staging behavior. It is designed to recover automatically from temporary model quota/outage conditions without creating a reprocessing storm.
