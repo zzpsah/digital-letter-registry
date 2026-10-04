@@ -56,6 +56,8 @@ _CONTEXT_SCHEMA = {
                     "label": {"type": "string"},
                     "value": {"type": "string"},
                     "confidence": {"type": ["number", "null"]},
+        "key_points": {"type": "array", "items": {"type": "string"}},
+        "clean_document_text": {"type": ["string", "null"]},
                 },
                 "required": ["label", "value", "confidence"],
             },
@@ -64,6 +66,8 @@ _CONTEXT_SCHEMA = {
         "related_terms_hi": {"type": "array", "items": {"type": "string"}},
         "related_terms_en": {"type": "array", "items": {"type": "string"}},
         "confidence": {"type": ["number", "null"]},
+        "key_points": {"type": "array", "items": {"type": "string"}},
+        "clean_document_text": {"type": ["string", "null"]},
     },
     "required": [
         "title",
@@ -80,6 +84,8 @@ _CONTEXT_SCHEMA = {
         "related_terms_hi",
         "related_terms_en",
         "confidence",
+        "key_points",
+        "clean_document_text",
     ],
 }
 
@@ -167,7 +173,7 @@ class GeminiDocumentContextProvider:
             f"Government structure hints: {structure}\n\n"
             "Extract: title, authority, category, subcategory, summary, action_required, "
             "issue_date (YYYY-MM-DD only when confidently present), reference_number, "
-            "concepts, important_dates, deadline, related_terms_hi, related_terms_en, confidence.\n\n"
+            "concepts, important_dates, deadline, related_terms_hi, related_terms_en, confidence, key_points, clean_document_text.\n\n"
             "LETTER TEXT:\n"
             f"{extracted_text}"
         )
@@ -214,6 +220,12 @@ class GeminiDocumentContextProvider:
             confidence=(
                 float(data["confidence"])
                 if data.get("confidence") is not None
+                else None
+            ),
+            key_points=tuple(str(x) for x in data.get("key_points", [])),
+            clean_document_text=(
+                str(data.get("clean_document_text")).strip()
+                if data.get("clean_document_text") is not None
                 else None
             ),
         )

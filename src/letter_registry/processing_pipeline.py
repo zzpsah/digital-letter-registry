@@ -14,6 +14,16 @@ from .structured_analysis import (
 )
 
 
+def _mime_type_for_path(path: Path) -> str:
+    return {
+        ".pdf": "application/pdf",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".webp": "image/webp",
+    }.get(path.suffix.lower(), "application/octet-stream")
+
+
 class ProcessingRepository:
     """Narrow repository shape needed by derived processing."""
 
@@ -50,6 +60,7 @@ def process_archived_document(
     extractor: VersionedTextExtractor,
     context_provider: DocumentContextProvider,
     repository: ProcessingRepository,
+    fallback_context_provider: DocumentContextProvider | None = None,
 ) -> ProcessingOutcome:
     """Process one already-archived source without mutating the original."""
 
@@ -63,10 +74,40 @@ def process_archived_document(
     if not extraction.text.strip():
         raise RuntimeError("cannot analyze document context without extracted text")
 
-    context = analyze_document_context(
-        extraction.text,
-        provider=context_provider,
-    )
+    try:
+        analyze_file = getattr(context_provider, "analyze_file", None)
+        if callable(analyze_file):
+            from dataclasses import replace
+            from .context_hints import detect_context_hints
+
+            hints = detect_context_hints(extraction.text)
+            direct_context = analyze_file(
+                file_bytes=Path(path).read_bytes(),
+                mime_type=_mime_type_for_path(Path(path)),
+                filename=Path(path).name,
+                extracted_text=extraction.text,
+                hints=hints,
+            )
+            merged_concepts = tuple(dict.fromkeys((*hints.concepts, *direct_context.concepts)))
+            if merged_concepts != direct_context.concepts:
+                direct_context = replace(direct_context, concepts=merged_concepts)
+            context = ContextAnalysisResult(
+                context=direct_context,
+                hints=hints,
+                version=str(getattr(context_provider, "version")),
+            )
+        else:
+            context = analyze_document_context(
+                extraction.text,
+                provider=context_provider,
+            )
+    except Exception:
+        if fallback_context_provider is None:
+            raise
+        context = analyze_document_context(
+            extraction.text,
+            provider=fallback_context_provider,
+        )
     repository.save_context_result(
         record,
         owner_id=owner_id,

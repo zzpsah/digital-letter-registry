@@ -17,6 +17,8 @@ from letter_registry.extraction_backends import (
 )
 from letter_registry.gemini_embeddings import GeminiEmbeddingProvider
 from letter_registry.gemini_provider import GeminiDocumentContextProvider
+from letter_registry.hermes_context_provider import HermesDefaultModelContextProvider
+from letter_registry.supabase_gemini_gateway import SupabaseGeminiFileContextProvider
 from letter_registry.google_drive_reader import GoogleDrivePrivateTransport
 from letter_registry.jobs import SupabaseProcessingQueue
 from letter_registry.original_access import SupabaseOriginalAccessService
@@ -47,11 +49,16 @@ def main() -> int:
     )
     repository = SupabaseLetterRepository(transport)
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    context_provider = (
-        GeminiDocumentContextProvider.from_environment()
-        if gemini_key
-        else DeterministicDocumentContextProvider()
+    gateway_configured = bool(
+        os.environ.get("SUPABASE_GEMINI_GATEWAY_URL", "").strip()
+        or os.environ.get("SUPABASE_GEMINI_PROJECT_URL", "").strip()
     )
+    if gateway_configured:
+        context_provider = SupabaseGeminiFileContextProvider.from_environment()
+    elif gemini_key:
+        context_provider = GeminiDocumentContextProvider.from_environment()
+    else:
+        context_provider = DeterministicDocumentContextProvider()
     embeddings = (
         SupabaseEmbeddingRepository(
             transport=transport,
@@ -75,6 +82,7 @@ def main() -> int:
             image_ocr_backend=TesseractImageBackend(),
         ),
         context_provider=context_provider,
+        fallback_context_provider=HermesDefaultModelContextProvider(),
         embeddings=embeddings,
         relationship_repository=SupabaseRelationshipRepository(transport),
         allow_real_documents=_truthy("ENABLE_REAL_INTAKE"),

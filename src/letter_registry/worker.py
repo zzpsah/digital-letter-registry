@@ -88,6 +88,7 @@ class DocumentProcessingWorker:
     extractor: VersionedTextExtractor
     context_provider: DocumentContextProvider
     embeddings: EmbeddingRepository | None
+    fallback_context_provider: DocumentContextProvider | None = None
     relationship_repository: RelationshipSuggestionRepository | None = None
     allow_real_documents: bool = False
 
@@ -130,6 +131,7 @@ class DocumentProcessingWorker:
                     extractor=self.extractor,
                     context_provider=self.context_provider,
                     repository=self.repository,
+                    fallback_context_provider=self.fallback_context_provider,
                 )
 
                 chunks = 0

@@ -294,3 +294,6 @@ A private Oracle WhatsApp-to-DLR connector is active using the existing Hermes W
 
 
 The WhatsApp connector has now also passed a genuine WhatsApp-source official circular proof using a public CBSE PDF. The document processed successfully, and a real classification-quality issue discovered during review was fixed: explicit CBSE affiliation evidence now outranks generic UDISE mentions. Search and private original streaming passed after reprocessing. Full suite: 281/281.
+## Canonical architecture reference
+
+For all future DLR development, schema changes, AI integration, reprocessing, delivery, duplicate handling, and retention decisions, treat docs/PRODUCTION_ARCHITECTURE.md as the canonical long-term design contract. Do not introduce a new persistent field/table/workflow that conflicts with that document without updating the architecture decision first.

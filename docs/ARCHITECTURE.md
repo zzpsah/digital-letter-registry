@@ -1,3 +1,5 @@
+> **Canonical production design:** See [PRODUCTION_ARCHITECTURE.md](PRODUCTION_ARCHITECTURE.md). This file is a concise architectural overview; the production document defines the long-term data lifecycle, versioning, delivery, audit, provider, and migration contracts.
+
 # Architecture
 
 ## Core rule

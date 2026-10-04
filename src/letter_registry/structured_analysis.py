@@ -36,6 +36,8 @@ class StructuredDocumentContext:
     related_terms_hi: tuple[str, ...] = ()
     related_terms_en: tuple[str, ...] = ()
     confidence: float | None = None
+    key_points: tuple[str, ...] = ()
+    clean_document_text: str | None = None
 
     def to_json_dict(self) -> dict[str, object]:
         data = asdict(self)
@@ -44,6 +46,23 @@ class StructuredDocumentContext:
         data["related_terms_hi"] = list(self.related_terms_hi)
         data["related_terms_en"] = list(self.related_terms_en)
         return data
+
+
+class DocumentFileContextProvider(Protocol):
+    """Optional provider capability for direct PDF/image understanding."""
+
+    version: str
+
+    def analyze_file(
+        self,
+        *,
+        file_bytes: bytes,
+        mime_type: str,
+        filename: str,
+        extracted_text: str,
+        hints: ContextHints,
+    ) -> StructuredDocumentContext:
+        ...
 
 
 class DocumentContextProvider(Protocol):
@@ -94,6 +113,8 @@ def analyze_document_context(
             related_terms_hi=context.related_terms_hi,
             related_terms_en=context.related_terms_en,
             confidence=context.confidence,
+            key_points=context.key_points,
+            clean_document_text=context.clean_document_text,
         )
 
     return ContextAnalysisResult(
