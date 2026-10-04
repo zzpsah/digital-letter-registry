@@ -1,3 +1,12 @@
+## 2026-10-04 — Support safe Google Drive smart rename
+- Commit: 1a4cde77a7adab124591465042db0c53029f27d3
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `src/letter_registry/google_drive_reader.py`
+- `tests/test_google_drive_reader.py`
+
 ## 2026-10-04 — Harden provider confidence parsing
 - Commit: 937e18a9b6d57065570275b590d0559d27af4d62
 - Author: Prashant
