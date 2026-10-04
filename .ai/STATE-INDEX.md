@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 08714aeaa07eb8331e41ac4cce170b77eccddcba
-- Last commit: Document autonomous OCR learning policy
+- HEAD: 3db223b2eea7dacc24e6947195cbc75febc96afc
+- Last commit: Add automatic document quality scoring
 - Last commit date: 2026-10-04
 - Last commit author: Prashant
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

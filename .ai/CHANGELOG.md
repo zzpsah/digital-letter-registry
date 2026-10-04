@@ -1,3 +1,14 @@
+## 2026-10-04 — Add automatic document quality scoring
+- Commit: 3db223b2eea7dacc24e6947195cbc75febc96afc
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `src/letter_registry/processing_pipeline.py`
+- `src/letter_registry/quality_assessment.py`
+- `src/letter_registry/structured_analysis.py`
+- `tests/test_quality_assessment.py`
+
 ## 2026-10-04 — Document autonomous OCR learning policy
 - Commit: 08714aeaa07eb8331e41ac4cce170b77eccddcba
 - Author: Prashant
