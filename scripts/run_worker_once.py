@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 
 from letter_registry.extraction import VersionedTextExtractor
+from letter_registry.autonomous_learning import AutonomousCorrectionMemory
 from letter_registry.deterministic_context import DeterministicDocumentContextProvider
 from letter_registry.extraction_backends import (
     OcrmypdfTesseractBackend,
@@ -83,6 +84,7 @@ def main() -> int:
         ),
         context_provider=context_provider,
         fallback_context_provider=HermesDefaultModelContextProvider(),
+        correction_memory=AutonomousCorrectionMemory.from_environment(),
         embeddings=embeddings,
         relationship_repository=SupabaseRelationshipRepository(transport),
         allow_real_documents=_truthy("ENABLE_REAL_INTAKE"),

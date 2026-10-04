@@ -437,3 +437,13 @@ A feature is production-grade only when:
 - Without a reference number, a duplicate suggestion requires the same authority/category plus very high title and summary similarity.
 - Explicit corrigendum/extension/superseding language continues to take priority over fuzzy similarity rules.
 - Near-duplicate/version suggestions never delete, merge, supersede, or alter originals automatically. Human review is required.
+
+## Autonomous OCR correction learning
+
+- The OCR layer maintains a private runtime correction memory outside Git.
+- High-confidence AI-cleaned text can create correction candidates automatically; users are not prompted for verification.
+- Known education/government vocabulary corrections auto-promote after 3 independent documents; unknown general terms require 5 independent documents.
+- Learning requires context confidence >= 0.90.
+- Numbers, dates, amounts, codes and reference-number tokens are excluded from automatic correction learning.
+- Promoted corrections are applied only to derived analysis text. Raw OCR and immutable originals are never rewritten.
+- The memory is reversible and versioned by an internal revision counter; deleting/resetting the runtime memory restores baseline behavior.

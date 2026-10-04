@@ -12,6 +12,7 @@ from .jobs import ProcessingJob
 from .models import DocumentRecord
 from .original_access import SupabaseOriginalAccessService
 from .processing_pipeline import ProcessingOutcome, process_archived_document
+from .autonomous_learning import AutonomousCorrectionMemory
 from .relationship_inference import RelationshipCandidate, infer_relationship_suggestions
 from .structured_analysis import DocumentContextProvider
 
@@ -89,6 +90,7 @@ class DocumentProcessingWorker:
     context_provider: DocumentContextProvider
     embeddings: EmbeddingRepository | None
     fallback_context_provider: DocumentContextProvider | None = None
+    correction_memory: AutonomousCorrectionMemory | None = None
     relationship_repository: RelationshipSuggestionRepository | None = None
     allow_real_documents: bool = False
 
@@ -150,6 +152,7 @@ class DocumentProcessingWorker:
                     repository=self.repository,
                     fallback_context_provider=self.fallback_context_provider,
                     intake_context=intake_context,
+                    correction_memory=self.correction_memory,
                 )
 
                 chunks = 0

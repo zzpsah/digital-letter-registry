@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .extraction import ExtractionResult, VersionedTextExtractor
 from .models import DocumentRecord
+from .autonomous_learning import AutonomousCorrectionMemory
 from .structured_analysis import (
     ContextAnalysisResult,
     DocumentContextProvider,
@@ -62,6 +63,7 @@ def process_archived_document(
     repository: ProcessingRepository,
     fallback_context_provider: DocumentContextProvider | None = None,
     intake_context: str = "",
+    correction_memory: AutonomousCorrectionMemory | None = None,
 ) -> ProcessingOutcome:
     """Process one already-archived source without mutating the original."""
 
@@ -75,7 +77,7 @@ def process_archived_document(
     if not extraction.text.strip():
         raise RuntimeError("cannot analyze document context without extracted text")
 
-    analysis_text = extraction.text
+    analysis_text = correction_memory.apply(extraction.text) if correction_memory is not None else extraction.text
     intake_context = " ".join(str(intake_context or "").split()).strip()
     if intake_context:
         analysis_text += (
@@ -122,6 +124,16 @@ def process_archived_document(
         owner_id=owner_id,
         result=context,
     )
+
+    if correction_memory is not None:
+        cleaned_text = str(context.context.clean_document_text or "").strip()
+        if cleaned_text:
+            correction_memory.observe(
+                raw_text=extraction.text,
+                cleaned_text=cleaned_text,
+                document_id=record.record_id,
+                confidence=context.context.confidence,
+            )
 
     return ProcessingOutcome(
         extraction=extraction,

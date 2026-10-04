@@ -11,7 +11,7 @@ from .reprocessing import ReprocessingTargets
 
 PDF_OCR_VERSION = "ocr-pdf-hi-en-v1"
 IMAGE_OCR_VERSION = "ocr-image-hi-en-v1"
-DICTIONARY_VERSION = "gov-education-hi-en-v1"
+DICTIONARY_VERSION = "gov-education-hi-en-auto-v2"
 CATEGORY_SCHEMA_VERSION = "education-letter-category-v1"
 STATUS_RULE_VERSION = "relationships-v1"
 
