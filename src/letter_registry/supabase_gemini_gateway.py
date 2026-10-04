@@ -68,7 +68,9 @@ class SupabaseGeminiFileContextProvider:
         prompt = (
             "Return ONLY one valid JSON object, no markdown and no commentary.\n"
             "Read the attached official Indian/Bihar education document directly. "
-            "The original file is authoritative; OCR below is supporting evidence and may be corrupted.\n"
+            "The original file is authoritative; OCR below is supporting evidence and may be corrupted. "
+            "If the supporting text contains an [INTAKE MESSAGE / SENDER INSTRUCTION] section, use it for "
+            "routing, urgency, priority and requested handling, but NEVER treat it as evidence for document facts.\n"
             "Do not invent facts. Read visible headings, tables, memo/reference numbers, dates, amounts and codes. "
             "For Hindi documents write clean professional Hindi. If uncertain, use null. Do not copy OCR garbage. "
             "Summary must explain what the document actually does. key_points must contain useful operational points. "

@@ -29,7 +29,9 @@ class HermesDefaultModelContextProvider:
     def analyze(self, *, extracted_text: str, hints: ContextHints) -> StructuredDocumentContext:
         prompt = (
             "You are the document-understanding fallback for a school Digital Letter Registry.\n"
-            "Analyze the OCR text below. OCR may contain errors. Do not invent unreadable facts.\n"
+            "Analyze the OCR text below. OCR may contain errors. Do not invent unreadable facts. "
+            "If an [INTAKE MESSAGE / SENDER INSTRUCTION] section is present, use it for routing, urgency, "
+            "priority and requested handling, but never as evidence for document facts.\n"
             "Return ONLY valid JSON with keys: title, authority, category, subcategory, summary, "
             "action_required, issue_date, reference_number, concepts, important_dates, deadline, "
             "related_terms_hi, related_terms_en, confidence, key_points, clean_document_text.\n"

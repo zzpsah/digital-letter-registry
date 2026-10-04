@@ -61,6 +61,7 @@ def process_archived_document(
     context_provider: DocumentContextProvider,
     repository: ProcessingRepository,
     fallback_context_provider: DocumentContextProvider | None = None,
+    intake_context: str = "",
 ) -> ProcessingOutcome:
     """Process one already-archived source without mutating the original."""
 
@@ -74,18 +75,26 @@ def process_archived_document(
     if not extraction.text.strip():
         raise RuntimeError("cannot analyze document context without extracted text")
 
+    analysis_text = extraction.text
+    intake_context = " ".join(str(intake_context or "").split()).strip()
+    if intake_context:
+        analysis_text += (
+            "\n\n[INTAKE MESSAGE / SENDER INSTRUCTION — not document evidence]\n"
+            + intake_context
+        )
+
     try:
         analyze_file = getattr(context_provider, "analyze_file", None)
         if callable(analyze_file):
             from dataclasses import replace
             from .context_hints import detect_context_hints
 
-            hints = detect_context_hints(extraction.text)
+            hints = detect_context_hints(analysis_text)
             direct_context = analyze_file(
                 file_bytes=Path(path).read_bytes(),
                 mime_type=_mime_type_for_path(Path(path)),
                 filename=Path(path).name,
-                extracted_text=extraction.text,
+                extracted_text=analysis_text,
                 hints=hints,
             )
             merged_concepts = tuple(dict.fromkeys((*hints.concepts, *direct_context.concepts)))
@@ -98,14 +107,14 @@ def process_archived_document(
             )
         else:
             context = analyze_document_context(
-                extraction.text,
+                analysis_text,
                 provider=context_provider,
             )
     except Exception:
         if fallback_context_provider is None:
             raise
         context = analyze_document_context(
-            extraction.text,
+            analysis_text,
             provider=fallback_context_provider,
         )
     repository.save_context_result(

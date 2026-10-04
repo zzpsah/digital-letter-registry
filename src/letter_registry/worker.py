@@ -120,6 +120,23 @@ class DocumentProcessingWorker:
             if not safe_name:
                 raise RuntimeError("private original has no valid filename")
 
+            intake_context = ""
+            try:
+                source_rows = self.database.select(
+                    "letter_sources",
+                    filters={"letter_id": record.record_id},
+                    columns="metadata,received_at",
+                )
+                for source_row in source_rows:
+                    metadata = source_row.get("metadata")
+                    if isinstance(metadata, dict):
+                        text = str(metadata.get("query_text") or "").strip()
+                        if text:
+                            intake_context = text
+                            break
+            except Exception:
+                intake_context = ""
+
             with TemporaryDirectory() as directory:
                 path = Path(directory) / safe_name
                 path.write_bytes(original.content)
@@ -132,6 +149,7 @@ class DocumentProcessingWorker:
                     context_provider=self.context_provider,
                     repository=self.repository,
                     fallback_context_provider=self.fallback_context_provider,
+                    intake_context=intake_context,
                 )
 
                 chunks = 0
