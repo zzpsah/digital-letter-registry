@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 6b0772a2eeab11d4b847fa0b158d63a81fa07b3b
-- Last commit: Use WhatsApp sender context in document analysis
+- HEAD: c3e8e76892764074b4c97b47bbd77f16745cef74
+- Last commit: Add reviewable near-duplicate and revision detection
 - Last commit date: 2026-10-04
 - Last commit author: Prashant
 

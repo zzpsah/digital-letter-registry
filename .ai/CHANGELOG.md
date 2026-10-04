@@ -1,3 +1,13 @@
+## 2026-10-04 — Add reviewable near-duplicate and revision detection
+- Commit: c3e8e76892764074b4c97b47bbd77f16745cef74
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `src/letter_registry/relationship_inference.py`
+- `src/letter_registry/worker.py`
+- `tests/test_relationship_inference.py`
+
 ## 2026-10-04 — Use WhatsApp sender context in document analysis
 - Commit: 6b0772a2eeab11d4b847fa0b158d63a81fa07b3b
 - Author: Prashant
