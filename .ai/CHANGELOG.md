@@ -1,3 +1,10 @@
+## 2026-10-04 — Wire automatic quality recovery into worker
+- Commit: 50d4bf390724452eaa59c583da2c544efcb45ec9
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `scripts/run_worker_once.py`
+
 ## 2026-10-04 — Add low-quality document recovery scheduler
 - Commit: 8a99dd227053b3dc76f5deeec221d6cd990cde28
 - Author: PRASHANT KUMAR SAH

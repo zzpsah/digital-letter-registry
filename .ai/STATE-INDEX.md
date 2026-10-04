@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 8a99dd227053b3dc76f5deeec221d6cd990cde28
-- Last commit: Add low-quality document recovery scheduler
+- HEAD: 50d4bf390724452eaa59c583da2c544efcb45ec9
+- Last commit: Wire automatic quality recovery into worker
 - Last commit date: 2026-10-04
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
