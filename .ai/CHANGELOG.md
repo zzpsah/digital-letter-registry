@@ -1,3 +1,10 @@
+## 2026-10-04 — Add low-quality document recovery scheduler
+- Commit: 8a99dd227053b3dc76f5deeec221d6cd990cde28
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/self_healing.py`
+
 ## 2026-10-04 — Add automatic document quality scoring
 - Commit: 3db223b2eea7dacc24e6947195cbc75febc96afc
 - Author: Prashant
