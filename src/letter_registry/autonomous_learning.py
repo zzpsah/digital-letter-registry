@@ -9,6 +9,7 @@ import re
 from tempfile import NamedTemporaryFile
 
 from .vocabulary import CONCEPT_RULES, STRUCTURE_TERMS
+from .quality_assessment import normalize_confidence
 
 
 _WORD_RE = re.compile(r"[A-Za-z\u0900-\u097f][A-Za-z\u0900-\u097f._+-]*", re.UNICODE)
@@ -116,9 +117,10 @@ class AutonomousCorrectionMemory:
         raw_text: str,
         cleaned_text: str,
         document_id: str,
-        confidence: float | None,
+        confidence: float | str | None,
     ) -> int:
-        if confidence is None or confidence < self.minimum_confidence:
+        normalized_confidence = normalize_confidence(confidence)
+        if normalized_confidence is None or normalized_confidence < self.minimum_confidence:
             return 0
         if not raw_text.strip() or not cleaned_text.strip() or not document_id.strip():
             return 0
@@ -187,7 +189,7 @@ class AutonomousCorrectionMemory:
             item["documents"] = documents[-20:]
             item["observations"] = new_n
             item["average_confidence"] = round(
-                ((old_avg * old_n) + float(confidence)) / new_n,
+                ((old_avg * old_n) + normalized_confidence) / new_n,
                 4,
             )
 

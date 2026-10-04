@@ -50,5 +50,33 @@ class DocumentQualityAssessmentTests(unittest.TestCase):
         self.assertIn("missing_reference_and_date", result.flags)
 
 
+    def test_qualitative_confidence_is_normalized(self):
+        result = assess_document_quality(
+            extracted_text=("विद्यालय उपस्थिति संबंधी स्पष्ट निर्देश " * 20),
+            context_confidence="high",
+            title="Attendance notice",
+            authority="Education Department",
+            category="attendance",
+            reference_number="123/2026",
+            issue_date="2026-10-04",
+            clean_document_text="स्पष्ट हिंदी पाठ उपलब्ध है।",
+        )
+        self.assertFalse(result.needs_reprocessing)
+        self.assertNotIn("missing_or_invalid_context_confidence", result.flags)
+
+    def test_invalid_confidence_never_crashes(self):
+        result = assess_document_quality(
+            extracted_text="विद्यालय सूचना " * 10,
+            context_confidence="unexpected-value",
+            title="Notice",
+            authority="Education Department",
+            category="notice",
+            reference_number=None,
+            issue_date=None,
+            clean_document_text=None,
+        )
+        self.assertIn("missing_or_invalid_context_confidence", result.flags)
+
+
 if __name__ == "__main__":
     unittest.main()

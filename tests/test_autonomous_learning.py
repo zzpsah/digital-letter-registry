@@ -57,5 +57,20 @@ class AutonomousCorrectionMemoryTests(unittest.TestCase):
             self.assertEqual(memory.stats()["promoted"], 0)
 
 
+    def test_qualitative_high_confidence_can_learn(self):
+        with tempfile.TemporaryDirectory() as td:
+            memory = AutonomousCorrectionMemory(
+                path=Path(td) / "memory.json",
+                known_term_threshold=1,
+            )
+            memory.observe(
+                raw_text="उपसथिति",
+                cleaned_text="उपस्थिति",
+                document_id="doc-high",
+                confidence="high",
+            )
+            self.assertEqual(memory.stats()["promoted"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()
