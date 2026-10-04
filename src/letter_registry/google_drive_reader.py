@@ -6,6 +6,7 @@ must never be committed or returned to the browser.
 
 from __future__ import annotations
 
+import json
 import mimetypes
 from dataclasses import dataclass
 from typing import Callable
@@ -59,6 +60,47 @@ class GoogleDrivePrivateTransport:
         if self.access_token is not None:
             return StaticAccessTokenProvider(self.access_token).get_access_token()
         raise ValueError("Google Drive token provider is not configured")
+
+    def rename(
+        self,
+        *,
+        provider: str,
+        object_reference: str,
+        new_filename: str,
+    ) -> None:
+        """Rename the visible Drive object without changing file bytes or object ID."""
+        if provider != "gdrive":
+            raise ValueError(f"unsupported storage provider: {provider}")
+
+        object_id = object_reference.strip()
+        if not object_id or "/" in object_id or "\\" in object_id:
+            raise ValueError("invalid Google Drive object reference")
+
+        filename = str(new_filename or "").strip()
+        if not filename:
+            raise ValueError("new_filename is required")
+        if "/" in filename or "\\" in filename:
+            raise ValueError("new_filename must be a basename")
+
+        encoded_id = parse.quote(object_id, safe="")
+        url = (
+            "https://www.googleapis.com/drive/v3/files/"
+            f"{encoded_id}?supportsAllDrives=true&fields=id,name"
+        )
+        req = request.Request(
+            url,
+            data=json.dumps({"name": filename}, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {self._token()}",
+                "Content-Type": "application/json; charset=utf-8",
+            },
+            method="PATCH",
+        )
+        status, _, _ = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise GoogleDriveReadError(
+                f"unexpected Google Drive rename HTTP status: {status}"
+            )
 
     def download(
         self,

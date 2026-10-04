@@ -513,3 +513,10 @@ Delivery behavior:
 - unchanged derived content does not generate another email.
 
 This is trial/staging behavior. It is designed to recover automatically from temporary model quota/outage conditions without creating a reprocessing storm.
+
+## Google Drive visible smart filenames
+
+- Archived Drive objects may have their visible filename updated to the contextual smart filename after successful processing.
+- The Drive file ID and file bytes remain unchanged.
+- `letters.original_filename` remains immutable provenance and is never replaced by the Drive display name.
+- Rename is idempotent and uses the existing private Drive OAuth transport.
