@@ -1,3 +1,15 @@
+## 2026-10-05 — Build professional DLR web operations portal
+- Commit: 4e1c1a4f6b86d12dad8db4f323363969d186e9eb
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `app.py`
+- `src/letter_registry/api.py`
+- `src/letter_registry/google_drive_writer.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261005160000_allow_editor_letter_delete.sql`
+- `tests/test_google_drive_writer.py`
+
 ## 2026-10-05 — Improve WhatsApp letter intelligence and delivery metadata
 - Commit: 489352d107d64e1da07ea457a6882d6fcf24c255
 - Author: Prashant
