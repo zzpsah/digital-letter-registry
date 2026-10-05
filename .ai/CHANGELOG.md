@@ -1,3 +1,11 @@
+## 2026-10-05 — Use compact corner star and upload date on letter cards
+- Commit: c0cadfcdf7a9689ed1413c6c1ca18245b9b00ac9
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Add latest sorting and important document highlights
 - Commit: eb3ca2123906be3fb69103dc2083bc2d9ef193ee
 - Author: Prashant
