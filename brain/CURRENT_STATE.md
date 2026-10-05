@@ -166,3 +166,15 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Categories use Active/Removed sections with Restore; permanent delete is separate.
 - Soft remove/restore operations are audit logged.
 - 310 automated tests pass and recipient-registry soft-delete round-trip verification passes.
+
+## 2026-10-05 — Backup/restore + bulk controls
+
+- Admin Backup tab exports configuration as JSON without passwords/tokens/API keys/cookies.
+- Restore requires preview and same-archive validation.
+- A timestamped private pre-restore snapshot is created before applying any restore.
+- Member restore is safe/merge-based: existing user IDs are updated; missing historical users are skipped.
+- Category restore updates/creates backed-up categories without deleting newer unrelated categories.
+- Recipient registry and WhatsApp allowlist restore to backed-up state; group description is re-applied when possible.
+- Users, recipients and categories have checkbox-based bulk reversible actions.
+- Backup export/restore is audit logged.
+- 311 automated tests pass; isolated recipient backup/restore validation passes.

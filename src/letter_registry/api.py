@@ -968,6 +968,102 @@ def _audit_admin_action(
         pass
 
 
+def _admin_backup_dir() -> Path:
+    return Path("/home/prashant/.hermes/state/dlr-admin/backups")
+
+
+def _build_admin_backup(access_token: str) -> dict[str, object]:
+    database = _transport(access_token, roles={ArchiveRole.ADMIN})
+    account_admin = SupabaseArchiveAccountAdmin(
+        transport=_raw_transport(access_token),
+        archive_id=_archive_id(),
+    )
+    members = [
+        {
+            "user_id": item.user_id,
+            "email": item.email,
+            "role": item.role.value,
+            "status": item.status,
+        }
+        for item in account_admin.list_access()
+        if item.kind == "member" and item.user_id
+    ]
+    categories = database.select(
+        "document_categories",
+        filters={"archive_id": _archive_id()},
+        columns="code,name_en,name_hi,icon,keywords,sort_order,is_active",
+    )
+    module = _oracle_recipient_registry()
+    if module is None:
+        raise RuntimeError("recipient registry unavailable")
+    registry = module.load_registry()
+    allowed = _read_whatsapp_allowed_users()
+    group_state = _load_whatsapp_group_state()
+    description = str(group_state.get("group_description") or "")
+    chat_id = _whatsapp_group_jid()
+    if chat_id:
+        try:
+            meta = _bridge_json("/chat/" + quote(chat_id, safe=""))
+            description = str(meta.get("description") or description)
+        except RuntimeError:
+            pass
+    return {
+        "format": "dlr-admin-backup",
+        "version": 1,
+        "archive_id": _archive_id(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "members": members,
+        "categories": categories,
+        "recipients": {
+            "default_recipient_id": registry.get("default_recipient_id"),
+            "recipients": [
+                {
+                    key: row.get(key)
+                    for key in (
+                        "id","name","email","mobile","email_enabled",
+                        "whatsapp_enabled","is_active","removed_at",
+                        "created_at",
+                    )
+                }
+                for row in registry.get("recipients", [])
+                if isinstance(row, dict)
+            ],
+        },
+        "whatsapp_allowed": allowed,
+        "whatsapp_group": {
+            "name": "EDU- Letters",
+            "description": description,
+            "portal_url": "https://eletters.vercel.app",
+            "index_url": str(group_state.get("drive_url") or ""),
+        },
+    }
+
+
+def _validate_admin_backup(payload: dict[str, object]) -> None:
+    if payload.get("format") != "dlr-admin-backup" or payload.get("version") != 1:
+        raise ValueError("Unsupported backup format")
+    if str(payload.get("archive_id") or "") != _archive_id():
+        raise ValueError("Backup belongs to a different archive")
+    for key in ("members", "categories", "whatsapp_allowed"):
+        if not isinstance(payload.get(key), list):
+            raise ValueError(f"Backup field {key} is invalid")
+    if not isinstance(payload.get("recipients"), dict):
+        raise ValueError("Backup recipients are invalid")
+    if not isinstance(payload.get("whatsapp_group"), dict):
+        raise ValueError("Backup WhatsApp group metadata is invalid")
+
+
+def _save_admin_snapshot(access_token: str, *, prefix: str) -> str:
+    backup = _build_admin_backup(access_token)
+    directory = _admin_backup_dir()
+    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    path = directory / f"{prefix}-{stamp}.json"
+    path.write_text(json.dumps(backup, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    os.chmod(path, 0o600)
+    return str(path)
+
+
 def _restart_whatsapp_gateway() -> None:
     uid = os.getuid()
     env = os.environ.copy()
@@ -2150,6 +2246,164 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             target_id=normalized_id,
         )
         return row
+
+    @app.get("/api/v1/admin/backup/export")
+    def export_admin_backup(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if _oracle_recipient_registry() is None or not _whatsapp_env_path().is_file():
+            result = _proxy_admin_json(
+                path="/api/v1/admin/backup/export",
+                access_token=access_token,
+            )
+            return dict(result) if isinstance(result, dict) else {}
+        try:
+            backup = _build_admin_backup(access_token)
+        except (RuntimeError, ValueError) as exc:
+            raise HTTPException(status_code=502, detail="Backup could not be created") from exc
+        _audit_admin_action(access_token, action="admin_backup_exported", target_type="admin_config")
+        return backup
+
+    @app.post("/api/v1/admin/backup/preview")
+    def preview_admin_backup(
+        payload: dict[str, object],
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if _oracle_recipient_registry() is None or not _whatsapp_env_path().is_file():
+            result = _proxy_admin_json(
+                path="/api/v1/admin/backup/preview",
+                access_token=access_token,
+                method="POST",
+                payload=payload,
+            )
+            return dict(result) if isinstance(result, dict) else {}
+        try:
+            _validate_admin_backup(payload)
+            current = _build_admin_backup(access_token)
+        except (RuntimeError, ValueError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        current_members={str(x.get("user_id")):x for x in current["members"]}
+        incoming_members={str(x.get("user_id")):x for x in payload["members"] if isinstance(x,dict)}
+        current_categories={str(x.get("code")):x for x in current["categories"]}
+        incoming_categories={str(x.get("code")):x for x in payload["categories"] if isinstance(x,dict)}
+        return {
+            "member_updates": sum(1 for k,v in incoming_members.items() if k in current_members and v != current_members[k]),
+            "member_missing": sum(1 for k in incoming_members if k not in current_members),
+            "category_updates": sum(1 for k,v in incoming_categories.items() if k in current_categories and v != current_categories[k]),
+            "category_creates": sum(1 for k in incoming_categories if k not in current_categories),
+            "recipient_count": len(payload["recipients"].get("recipients", [])),
+            "recipient_replace": payload["recipients"] != current["recipients"],
+            "whatsapp_allowlist_change": payload["whatsapp_allowed"] != current["whatsapp_allowed"],
+            "group_description_change": str(payload["whatsapp_group"].get("description") or "") != str(current["whatsapp_group"].get("description") or ""),
+        }
+
+    @app.post("/api/v1/admin/backup/restore")
+    def restore_admin_backup(
+        payload: dict[str, object],
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if _oracle_recipient_registry() is None or not _whatsapp_env_path().is_file():
+            result = _proxy_admin_json(
+                path="/api/v1/admin/backup/restore",
+                access_token=access_token,
+                method="POST",
+                payload=payload,
+            )
+            return dict(result) if isinstance(result, dict) else {}
+        try:
+            _validate_admin_backup(payload)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        snapshot_path = _save_admin_snapshot(access_token, prefix="pre-restore")
+        account_admin = SupabaseArchiveAccountAdmin(
+            transport=_raw_transport(access_token),
+            archive_id=_archive_id(),
+        )
+        existing_members={x.user_id:x for x in account_admin.list_access() if x.kind=="member" and x.user_id}
+        member_updates=0
+        member_skipped=0
+        for row in payload["members"]:
+            if not isinstance(row,dict):
+                continue
+            user_id=str(row.get("user_id") or "")
+            if user_id not in existing_members:
+                member_skipped += 1
+                continue
+            try:
+                account_admin.update_member(
+                    user_id=user_id,
+                    role=ArchiveRole(str(row.get("role") or "viewer")),
+                    status=str(row.get("status") or "disabled"),
+                )
+                member_updates += 1
+            except (ValueError, SupabaseRuntimeError):
+                member_skipped += 1
+        database=_transport(access_token, roles={ArchiveRole.ADMIN})
+        existing_categories={
+            str(x.get("code") or ""):x
+            for x in database.select(
+                "document_categories",
+                filters={"archive_id":_archive_id()},
+                columns="id,code",
+            )
+        }
+        category_updates=0
+        category_creates=0
+        for row in payload["categories"]:
+            if not isinstance(row,dict):
+                continue
+            code=str(row.get("code") or "")
+            values={
+                "name_en":str(row.get("name_en") or "").strip(),
+                "name_hi":str(row.get("name_hi") or "").strip(),
+                "icon":str(row.get("icon") or "📁").strip(),
+                "keywords":[str(x).strip() for x in row.get("keywords",[]) if str(x).strip()],
+                "sort_order":int(row.get("sort_order") or 100),
+                "is_active":bool(row.get("is_active",True)),
+            }
+            if code in existing_categories:
+                database.update("document_categories", values, filters={"id":str(existing_categories[code]["id"]), "archive_id":_archive_id()})
+                category_updates += 1
+            elif re.fullmatch(r"[a-z0-9_]{2,80}", code):
+                database.insert("document_categories", {"archive_id":_archive_id(),"code":code,**values})
+                category_creates += 1
+        module=_oracle_recipient_registry()
+        module.restore_registry(payload["recipients"])
+        allowed=[]
+        for value in payload["whatsapp_allowed"]:
+            raw=str(value).strip()
+            allowed.append("*" if raw=="*" else _normalize_admin_mobile(raw))
+        _write_whatsapp_allowed_users(list(dict.fromkeys(allowed)))
+        _restart_whatsapp_gateway()
+        description=str(payload["whatsapp_group"].get("description") or "").strip()
+        chat_id=_whatsapp_group_jid()
+        if description and chat_id:
+            try:
+                _bridge_json("/groups/update-description", method="POST", payload={"chatId":chat_id,"description":description})
+                state=_load_whatsapp_group_state()
+                state["group_description"]=description
+                _save_whatsapp_group_state(state)
+            except RuntimeError:
+                pass
+        _audit_admin_action(
+            access_token,
+            action="admin_backup_restored",
+            target_type="admin_config",
+            detail={"snapshot_path":snapshot_path,"member_updates":member_updates,"category_updates":category_updates,"category_creates":category_creates},
+        )
+        return {
+            "success": True,
+            "rollback_snapshot": snapshot_path,
+            "member_updates": member_updates,
+            "member_skipped": member_skipped,
+            "category_updates": category_updates,
+            "category_creates": category_creates,
+        }
 
     @app.get("/api/v1/admin/dashboard")
     def admin_dashboard(

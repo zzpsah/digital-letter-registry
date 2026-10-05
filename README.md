@@ -226,3 +226,9 @@ Admin Console includes an Operations tab listing failed document-processing jobs
 ## Reversible admin removal — 2026-10-05
 
 Admin removal is now reversible by default. Users use Active/Disabled status, recipients move to Removed and can be restored, and categories move to Removed by setting them inactive. Recipient removal automatically disables delivery channels and clears it as the default recipient. Permanent recipient/category deletion is a separate explicit action with confirmation.
+
+## Admin backup/restore and bulk actions — 2026-10-05
+
+Admin Console now exports a JSON configuration backup containing member role/status, document categories, private delivery-recipient configuration, WhatsApp allowlist, and EDU-Letters group metadata. Auth passwords, API keys, access/refresh tokens, cookies, invite tokens, and approval tokens are intentionally excluded. Restore requires a preview and creates a timestamped private rollback snapshot before applying changes.
+
+Bulk controls are available for account users, recipients, and categories. Bulk Disable/Remove remains reversible by default; Restore uses the existing safe active-state mechanisms.

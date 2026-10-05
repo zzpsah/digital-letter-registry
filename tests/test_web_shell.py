@@ -58,6 +58,17 @@ class WebShellTests(unittest.TestCase):
         self.assertIn("data-restore-category", self.html)
         self.assertIn("data-toggle-member", self.html)
 
+    def test_admin_backup_restore_and_bulk_controls_are_exposed(self) -> None:
+        self.assertIn('data-admin-pane="backup"', self.html)
+        self.assertIn('id="exportAdminBackup"', self.html)
+        self.assertIn('id="restoreBackupFile"', self.html)
+        self.assertIn('id="restoreAdminBackup"', self.html)
+        self.assertIn('data-select-member', self.html)
+        self.assertIn('data-select-recipient', self.html)
+        self.assertIn('data-select-category', self.html)
+        self.assertIn('fetch("/api/v1/admin/backup/preview"', self.html)
+        self.assertIn('fetch("/api/v1/admin/backup/restore"', self.html)
+
     def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
         self.assertNotIn('id="loginForm"', self.html)
         self.assertNotIn('id="registerMagicLink"', self.html)

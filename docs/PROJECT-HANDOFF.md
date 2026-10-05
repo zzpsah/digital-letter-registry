@@ -333,3 +333,11 @@ The Admin Operations pane is the supported manual recovery path for failed proce
 ## Soft delete and restore — 2026-10-05
 
 Normal Admin removal must remain reversible. Members are disabled/restored through membership status. Recipients carry an is_active state in the private Oracle registry; soft removal disables Email/WhatsApp delivery, clears default-recipient selection when applicable, and keeps the record for restore. Categories use is_active=false for removal and true for restore. Permanent recipient/category deletion remains an explicit secondary action with a stronger confirmation.
+
+## Backup/restore and bulk administration — 2026-10-05
+
+Admin > Backup is the supported configuration portability/recovery path. Export is admin-only and contains no authentication secrets. Restore validates backup format and archive identity, previews intended differences, and writes a private pre-restore snapshot under the Oracle Hermes state backup directory before mutation.
+
+Restore behavior is deliberately conservative for Supabase-managed state: existing members found by user_id have role/status restored; missing historical users are skipped rather than recreated; categories present in the backup are updated or created, while unrelated newer categories are left untouched. The private recipient registry is restored exactly from the backup after validation, the WhatsApp allowlist is replaced with the backed-up allowlist, and the backed-up group description is re-applied when the bridge is available.
+
+Bulk account, recipient, and category actions use the existing guarded per-item APIs so last-admin protection, reversible removal semantics, and audit logging continue to apply.

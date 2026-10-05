@@ -68,3 +68,7 @@ Use Admin > Operations for manual failed-job recovery. Do not turn this into aut
 ## Reversible admin-state handoff — 2026-10-05
 
 Do not make normal Remove buttons destructive. User removal means disabled membership; recipient removal means is_active=false with delivery disabled; category removal means is_active=false. Restore must be available from the same Admin area. Permanent delete should remain secondary, explicit, and confirmed.
+
+## Backup/bulk handoff — 2026-10-05
+
+Preserve the no-secrets backup contract. Never add passwords, Supabase keys, access/refresh tokens, cookies, invite codes or approval tokens to admin backups. Always run restore preview and create a private pre-restore snapshot first. Keep Supabase member/category restore conservative and local recipient/allowlist restore explicit. Bulk UI must continue to call guarded normal APIs rather than bypassing role/last-admin protections.
