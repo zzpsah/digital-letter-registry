@@ -1,3 +1,10 @@
+## 2026-10-05 — Document controlled self-healing reprocessing
+- Commit: 97e6127a26f798fed43732aaa9dcd15b09720346
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PRODUCTION_ARCHITECTURE.md`
+
 ## 2026-10-05 — Test automatic self-healing reprocessing
 - Commit: 115cdc75549d94803e58597f1eedacc64e09fae3
 - Author: PRASHANT KUMAR SAH
