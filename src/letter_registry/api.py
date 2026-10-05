@@ -6,7 +6,8 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from urllib.parse import urlsplit
+from urllib import error as urlerror, request as urlrequest
+from urllib.parse import quote, urlsplit
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile, status
@@ -588,6 +589,145 @@ def _drive_credentials_configured() -> bool:
             "GOOGLE_DRIVE_REFRESH_TOKEN",
         )
     )
+
+
+def _file_ops_proxy_origin() -> str:
+    return os.environ.get("DLR_FILE_OPS_PROXY_ORIGIN", "").strip().rstrip("/")
+
+
+def _proxy_json_request(
+    *,
+    path: str,
+    access_token: str,
+    method: str,
+    body: bytes | None = None,
+    content_type: str | None = None,
+    timeout: int = 90,
+) -> tuple[int, bytes, str]:
+    origin = _file_ops_proxy_origin()
+    if not origin:
+        raise RuntimeError("DLR file-operations proxy is not configured")
+    headers = {"Authorization": f"Bearer {access_token}"}
+    if content_type:
+        headers["Content-Type"] = content_type
+    req = urlrequest.Request(
+        origin + path,
+        data=body,
+        headers=headers,
+        method=method,
+    )
+    try:
+        with urlrequest.urlopen(req, timeout=timeout) as resp:
+            return (
+                int(resp.status),
+                resp.read(),
+                str(resp.headers.get("Content-Type") or ""),
+            )
+    except urlerror.HTTPError as exc:
+        return (
+            int(exc.code),
+            exc.read(),
+            str(exc.headers.get("Content-Type") or ""),
+        )
+    except urlerror.URLError as exc:
+        raise RuntimeError(f"DLR file-operations proxy unavailable: {exc.reason}") from exc
+
+
+def _proxy_error_detail(raw: bytes, fallback: str) -> str:
+    try:
+        payload = __import__("json").loads(raw.decode("utf-8"))
+        if isinstance(payload, dict) and payload.get("detail"):
+            return str(payload["detail"])
+    except Exception:
+        pass
+    return fallback
+
+
+def _letter_storage_row(
+    access_token: str,
+    record_id: str,
+) -> dict[str, object]:
+    database = _transport(access_token)
+    rows = database.select(
+        "letters",
+        filters={"id": record_id},
+        columns=(
+            "id,title,original_filename,smart_filename,"
+            "storage_provider,storage_object_id"
+        ),
+    )
+    if not rows:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Letter not found",
+        )
+    return rows[0]
+
+
+def _drive_public_url(
+    row: dict[str, object],
+    *,
+    download: bool,
+) -> str:
+    if str(row.get("storage_provider") or "").casefold() != "gdrive":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Original is not stored in Google Drive",
+        )
+    object_id = str(row.get("storage_object_id") or "").strip()
+    if not object_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Original Drive object is missing",
+        )
+    quoted = quote(object_id, safe="")
+    if download:
+        return f"https://drive.google.com/uc?export=download&id={quoted}"
+    return f"https://drive.google.com/file/d/{quoted}/view"
+
+
+def _proxy_intake_upload(
+    *,
+    filename: str,
+    content_type: str,
+    content: bytes,
+    access_token: str,
+) -> IntakeResponse:
+    boundary = "dlr-proxy-boundary"
+    body = b"".join(
+        [
+            f"--{boundary}\r\n".encode(),
+            (
+                "Content-Disposition: form-data; name=\"file\"; "
+                f"filename=\"{filename.replace(chr(34), '')}\"\r\n"
+            ).encode(),
+            f"Content-Type: {content_type or 'application/octet-stream'}\r\n\r\n".encode(),
+            content,
+            b"\r\n",
+            f"--{boundary}--\r\n".encode(),
+        ]
+    )
+    code, raw, _ctype = _proxy_json_request(
+        path="/api/v1/intake",
+        access_token=access_token,
+        method="POST",
+        body=body,
+        content_type=f"multipart/form-data; boundary={boundary}",
+        timeout=120,
+    )
+    if code < 200 or code >= 300:
+        raise HTTPException(
+            status_code=code,
+            detail=_proxy_error_detail(raw, "Remote intake failed"),
+        )
+    try:
+        payload = __import__("json").loads(raw.decode("utf-8"))
+        return IntakeResponse.model_validate(payload)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Remote intake returned an invalid response",
+        ) from exc
 
 
 def _runtime_dependencies() -> ApiDependencies:
@@ -1250,6 +1390,24 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 detail="Valid upload filename is required",
             )
 
+        if not _drive_credentials_configured() and _file_ops_proxy_origin():
+            _archive_membership(
+                access_token,
+                roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR},
+            )
+            content = await file.read()
+            if len(content) > 20 * 1024 * 1024:
+                raise HTTPException(
+                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    detail="Upload exceeds 20 MB web intake limit",
+                )
+            return _proxy_intake_upload(
+                filename=safe_name,
+                content_type=file.content_type or "application/octet-stream",
+                content=content,
+                access_token=access_token,
+            )
+
         _enforce_real_intake_pilot_limit(
             access_token,
             filename=safe_name,
@@ -1576,9 +1734,15 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         access_token: str = Depends(_access_token),
     ) -> Response:
         if deps.original_access is None:
-            raise HTTPException(
-                status_code=status.HTTP_501_NOT_IMPLEMENTED,
-                detail="Private original-file resolver is not configured yet",
+            if not _truthy_env("DLR_PUBLIC_DRIVE_REDIRECT"):
+                raise HTTPException(
+                    status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                    detail="Private original-file resolver is not configured yet",
+                )
+            row = _letter_storage_row(access_token, record_id)
+            return RedirectResponse(
+                _drive_public_url(row, download=False),
+                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
             )
 
         original = deps.original_access.fetch(
@@ -1599,6 +1763,117 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 "Content-Disposition": f'inline; filename="{safe_name}"',
                 "Cache-Control": "private, no-store",
             },
+        )
+
+    @app.get("/api/v1/letters/{record_id}/download", include_in_schema=True)
+    def download_original(
+        record_id: str,
+        access_token: str = Depends(_access_token),
+    ) -> Response:
+        if deps.original_access is None:
+            if not _truthy_env("DLR_PUBLIC_DRIVE_REDIRECT"):
+                raise HTTPException(
+                    status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                    detail="Private original-file resolver is not configured yet",
+                )
+            row = _letter_storage_row(access_token, record_id)
+            return RedirectResponse(
+                _drive_public_url(row, download=True),
+                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+            )
+
+        original = deps.original_access.fetch(
+            record_id=record_id,
+            database=_transport(access_token),
+        )
+        if original is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Letter not found",
+            )
+        safe_name = original.filename.replace('"', "")
+        return Response(
+            content=original.content,
+            media_type=original.content_type,
+            headers={
+                "Content-Disposition": f'attachment; filename="{safe_name}"',
+                "Cache-Control": "private, no-store",
+            },
+        )
+
+    @app.delete(
+        "/api/v1/letters/{record_id}",
+        response_model=MessageResponse,
+    )
+    def delete_letter(
+        record_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(
+            access_token,
+            roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR},
+        )
+
+        if not _drive_credentials_configured() and _file_ops_proxy_origin():
+            code, raw, _ctype = _proxy_json_request(
+                path=f"/api/v1/letters/{quote(record_id, safe='')}",
+                access_token=access_token,
+                method="DELETE",
+                timeout=60,
+            )
+            if code < 200 or code >= 300:
+                raise HTTPException(
+                    status_code=code,
+                    detail=_proxy_error_detail(raw, "Remote delete failed"),
+                )
+            try:
+                payload = __import__("json").loads(raw.decode("utf-8"))
+                return MessageResponse(
+                    message=str(payload.get("message") or "Document moved to Trash.")
+                )
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail="Remote delete returned an invalid response",
+                ) from exc
+
+        database = _transport(
+            access_token,
+            roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR},
+        )
+        rows = database.select(
+            "letters",
+            filters={"id": record_id},
+            columns="id,title,storage_provider,storage_object_id",
+        )
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Letter not found",
+            )
+        row = rows[0]
+        provider = str(row.get("storage_provider") or "").casefold()
+        object_id = str(row.get("storage_object_id") or "").strip()
+        if provider == "gdrive" and object_id:
+            try:
+                GoogleDrivePrivateWriter.from_environment().trash_file(
+                    object_reference=object_id,
+                )
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail="Could not move original file to Drive Trash",
+                ) from exc
+
+        deleted = database.delete("letters", filters={"id": record_id})
+        if not deleted:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Document could not be removed from the registry",
+            )
+        return MessageResponse(
+            message="Document moved to Drive Trash and removed from the registry."
         )
 
     return app

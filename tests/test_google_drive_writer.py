@@ -68,6 +68,33 @@ class GoogleDrivePrivateWriterTests(unittest.TestCase):
         self.assertEqual(seen["authorization"], "Bearer synthetic-token")
         self.assertEqual(seen["body"], b"%PDF-replacement")
 
+    def test_trash_moves_existing_drive_object_to_recoverable_trash(self):
+        seen = {}
+
+        def executor(req):
+            seen["method"] = req.method
+            seen["url"] = req.full_url
+            seen["authorization"] = req.headers["Authorization"]
+            seen["content_type"] = req.headers["Content-type"]
+            seen["body"] = req.data
+            return 200, json.dumps(
+                {"id": "existing-drive-object", "trashed": True}
+            )
+
+        writer = GoogleDrivePrivateWriter(
+            access_token="synthetic-token",
+            http_executor=executor,
+        )
+        object_id = writer.trash_file(
+            object_reference="existing-drive-object",
+        )
+
+        self.assertEqual(object_id, "existing-drive-object")
+        self.assertEqual(seen["method"], "PATCH")
+        self.assertIn("/files/existing-drive-object", seen["url"])
+        self.assertEqual(seen["authorization"], "Bearer synthetic-token")
+        self.assertIn(b'"trashed": true', seen["body"])
+
     def test_path_like_folder_reference_is_rejected(self):
         with TemporaryDirectory() as directory:
             path = Path(directory) / "synthetic.pdf"

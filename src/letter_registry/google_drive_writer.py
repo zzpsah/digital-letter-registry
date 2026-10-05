@@ -96,6 +96,43 @@ class GoogleDrivePrivateWriter:
             raise GoogleDriveWriteError("Google Drive replace returned an unexpected object ID")
         return returned_id
 
+    def trash_file(
+        self,
+        *,
+        object_reference: str,
+    ) -> str:
+        """Move an existing Drive object to recoverable Trash."""
+        object_id = object_reference.strip()
+        if not object_id or "/" in object_id or "\\" in object_id:
+            raise ValueError("invalid Google Drive object reference")
+
+        req = request.Request(
+            f"https://www.googleapis.com/drive/v3/files/{object_id}?fields=id,trashed",
+            data=json.dumps({"trashed": True}).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {self._token()}",
+                "Content-Type": "application/json; charset=UTF-8",
+            },
+            method="PATCH",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise GoogleDriveWriteError(
+                f"unexpected Google Drive trash HTTP status: {status}"
+            )
+        try:
+            payload = json.loads(raw)
+            returned_id = str(payload["id"]).strip()
+        except (KeyError, TypeError, json.JSONDecodeError) as exc:
+            raise GoogleDriveWriteError(
+                "Google Drive returned an invalid trash response"
+            ) from exc
+        if returned_id != object_id:
+            raise GoogleDriveWriteError(
+                "Google Drive trash returned an unexpected object ID"
+            )
+        return returned_id
+
     def upload_file(
         self,
         *,

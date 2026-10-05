@@ -24,5 +24,10 @@ if vercel_host:
     os.environ.setdefault("AUTH_APP_ORIGIN", origin)
     os.environ.setdefault("AUTH_REDIRECT_URL", f"{origin.rstrip('/')}/auth/confirm")
     os.environ.setdefault("AUTH_COOKIE_SECURE", "true")
+    os.environ.setdefault(
+        "DLR_FILE_OPS_PROXY_ORIGIN",
+        "https://oracle-server.tail2b7fe2.ts.net:10001",
+    )
+    os.environ.setdefault("DLR_PUBLIC_DRIVE_REDIRECT", "true")
 
 from letter_registry.api import app  # noqa: E402
