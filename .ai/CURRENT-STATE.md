@@ -65,23 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 9975d303b35d70751aa49cdfa7f3a49975885992
-- Change: Add admin failure recovery operations
+- Commit: df5beaa5dea4cd45410a7008a98e1612cb240ac3
+- Change: Add reversible admin remove and restore
 - Date: 2026-10-05
 - Durable context synchronization: completed
-
-## 2026-10-05 — eLetters mobile/admin baseline
-
-The eLetters responsive shell is now explicitly optimized for phones. Admin users can view/manage recipients and WhatsApp allowed users, in addition to account approvals, roles and dynamic categories. The post-change automated suite passed 308 tests. Preserve this as the current web baseline.
-
-## 2026-10-05 — Admin operations control center
-
-eLetters Admin now has Overview summary cards, archive-scoped admin audit history, and live EDU-Letters group management (description, send+pin guide, canonical group photo, status). Audit storage uses Supabase RLS restricted to archive admins. Existing automated suite passes 308 tests.
-
-## 2026-10-05 — Failed processing recovery
-
-eLetters Admin now exposes failed processing jobs and an explicit safe retry action. Dashboard includes failed-job count. Retry is failed-only, preserves attempts, resets claim/error runtime state, and is audit-logged. Current live queue had 2 failed jobs at verification time; no automatic retry was performed.
-
-## 2026-10-05 — Soft delete/restore
-
-Admin-managed users, recipients and categories now follow reversible removal semantics. Users disable/restore, recipients move between Active/Removed and disable delivery when removed, and categories move between Active/Removed using is_active. Permanent recipient/category deletion remains separate and confirmed. Test suite passes 310 tests.
