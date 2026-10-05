@@ -1,3 +1,10 @@
+## 2026-10-05 — Add Google Drive restore and permanent delete helpers
+- Commit: 505abbd81c73c5a3863208c79898ba1028aa31dc
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/google_drive_writer.py`
+
 ## 2026-10-05 — Improve recipient view and single-channel handling
 - Commit: d2a87c0c0584ae5849c95209ce1665e4122a4296
 - Author: PRASHANT KUMAR SAH
