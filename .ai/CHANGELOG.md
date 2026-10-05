@@ -1,3 +1,12 @@
+## 2026-10-05 — Fix unmatched authority review list
+- Commit: ee5560624e4e3791b63e308caf144c68a899c963
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `brain/ui-governance/CURRENT_STATE.md`
+- `docs/PROJECT-HANDOFF.md`
+- `src/letter_registry/api.py`
+
 ## 2026-10-05 — Stabilize authority display and reprocessing
 - Commit: e01aa68a78d3c7ba17df5096a48a7e31a88350f9
 - Author: Prashant
