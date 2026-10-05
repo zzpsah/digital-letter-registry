@@ -1,3 +1,18 @@
+## 2026-10-05 — Improve DLR search and Hindi-first display
+- Commit: 8c933071a309ee7c998e3c685cb864d6f9ba2b93
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `.gitignore`
+- `src/letter_registry/api.py`
+- `src/letter_registry/gemini_provider.py`
+- `src/letter_registry/hermes_context_provider.py`
+- `src/letter_registry/search.py`
+- `src/letter_registry/structured_analysis.py`
+- `src/letter_registry/supabase_gemini_gateway.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261005170000_improve_search_and_hindi_display.sql`
+
 ## 2026-10-05 — Build professional DLR web operations portal
 - Commit: 4e1c1a4f6b86d12dad8db4f323363969d186e9eb
 - Author: Prashant
