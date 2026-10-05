@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: ae496093c875e7c3397c0d7607cac42c4fd4af56
-- Last commit: Rename mixed language mode to Hinglish
+- HEAD: 2352ff3c2a17512c4b53f0692f6a295f54ad5edd
+- Last commit: Lock eLetters UI and behavior governance
 - Last commit date: 2026-10-05
 - Last commit author: Prashant
 
@@ -23,12 +23,10 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
 2. Read `.ai/CURRENT-STATE.md`, `.ai/TASKS.md`, and relevant decisions/architecture.
 3. Inspect source code and Git history.
 4. Treat this index as evidence, not semantic authority.
-
-- UI/UX locked baseline: `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/` (mandatory before UI/auth/search/admin/recipient/trash work).

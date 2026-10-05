@@ -1,3 +1,20 @@
+## 2026-10-05 — Lock eLetters UI and behavior governance
+- Commit: 2352ff3c2a17512c4b53f0692f6a295f54ad5edd
+- Author: Prashant
+- Classification: routine
+- Changed files:
+- `AGENTS.md`
+- `README.md`
+- `RULES.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `brain/ui-governance/CURRENT_STATE.md`
+- `brain/ui-governance/DECISIONS.md`
+- `brain/ui-governance/README.md`
+- `brain/ui-governance/TESTS.md`
+- `docs/PROJECT-HANDOFF.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+
 ## 2026-10-05 — Persistent UI/behavior governance
 - Added `docs/UI-DESIGN-CONTRACT.md` as the locked UI/UX baseline.
 - Added `brain/ui-governance/` with current state, decisions and test expectations.
