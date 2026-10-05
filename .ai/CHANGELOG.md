@@ -1,3 +1,10 @@
+## 2026-10-05 — Label language selector clearly
+- Commit: 83557e732f04ce605b251571348eb4df3357ca99
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Return home after refreshing a quick search
 - Commit: d68c2fc83501036bf74fa3f0ca3986f6114116a5
 - Author: PRASHANT KUMAR SAH
