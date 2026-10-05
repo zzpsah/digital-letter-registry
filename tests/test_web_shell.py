@@ -96,6 +96,16 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('r.summary_hi||r.summary', self.html)
         self.assertIn('r.action_required_hi||r.action_required', self.html)
 
+    def test_language_toggle_and_smart_search_are_exposed(self) -> None:
+        self.assertIn('id="languageMode"', self.html)
+        self.assertIn('value="mixed"', self.html)
+        self.assertIn('value="hi"', self.html)
+        self.assertIn('value="en"', self.html)
+        self.assertIn('elettersLanguage', self.html)
+        self.assertIn('Smart Search', self.html)
+        self.assertIn('displayLanguage==="en"', self.html)
+        self.assertIn('displayLanguage==="hi"', self.html)
+
     def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
         self.assertNotIn('id="loginForm"', self.html)
         self.assertNotIn('id="registerMagicLink"', self.html)
