@@ -1,3 +1,15 @@
+## 2026-10-05 — Make reprocessing source grounded and stable
+- Commit: f34c0a5e264049b12d180a732e8f4dbced10cbf6
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `src/letter_registry/deterministic_context.py`
+- `src/letter_registry/processing_pipeline.py`
+- `src/letter_registry/supabase_repository.py`
+- `tests/test_processing_pipeline.py`
+
 ## 2026-10-05 — Standardize WhatsApp English headings and Hindi details
 - Commit: 975faa9c16055597406217f8292cfac5ddbbcc5f
 - Author: Prashant
