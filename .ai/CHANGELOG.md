@@ -1,3 +1,17 @@
+## 2026-10-05 — Add admin control center and approval workflow
+- Commit: b92e2f51f9872b1a43118685a08e5aad3f4e7a6f
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `src/letter_registry/supabase_runtime.py`
+- `src/letter_registry/web/index.html`
+- `supabase/functions/dlr-complete-approved-account/index.ts`
+- `supabase/migrations/20261005190000_add_admin_approval_account_requests.sql`
+- `supabase/migrations/20261005190500_harden_account_request_resubmission.sql`
+- `tests/test_api.py`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Simplify eLetters UI and add category admin
 - Commit: 69e1e39fda71227c4d1d7a08dbf3bc1dc6863246
 - Author: Prashant
