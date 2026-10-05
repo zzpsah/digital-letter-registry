@@ -81,11 +81,13 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('id="sortOrder"', self.html)
         self.assertIn('Latest first', self.html)
         self.assertIn('Important first', self.html)
-        self.assertIn('data-important=', self.html)
+        self.assertIn('data-star=', self.html)
         self.assertIn('data-edit-note=', self.html)
         self.assertIn('/highlight', self.html)
-        self.assertIn('important-badge', self.html)
+        self.assertIn('class="star ', self.html)
         self.assertIn('user-note', self.html)
+        self.assertIn('upload-date', self.html)
+        self.assertIn('displayUploadDate', self.html)
 
     def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
         self.assertNotIn('id="loginForm"', self.html)
