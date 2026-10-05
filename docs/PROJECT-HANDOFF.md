@@ -387,3 +387,8 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 - Reprocess always targets the existing archived original and updates derived OCR/context/summary/authority/action; it must not create a duplicate letter or replace the original file.
 - Weak or inaccurate processing output must not be described as a poor PDF unless the source file itself is actually poor.
 - Delivery remains idempotent: wording-only changes do not resend; material corrections or real poor-context-to-usable-context improvements use the same Gmail thread / WhatsApp replacement path.
+
+## Manual reprocessing
+- Editor/Admin document cards expose a Reprocess action for missing or incorrect derived output even when the original PDF/image is clear.
+- Reprocess updates the existing letter's derived processing; it must not create a duplicate letter/original.
+- If a processing job for the same letter is already pending or running, another reprocess request is not queued.

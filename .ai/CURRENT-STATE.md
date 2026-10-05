@@ -69,3 +69,15 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Change: Add manual letter reprocessing
 - Date: 2026-10-05
 - Durable context synchronization: completed
+## Delivery quality recovery / duplicate suppression
+- Quality engine v2 marks low-context-confidence + no-clean-document-text results for bounded reprocessing even when the aggregate score is above the old threshold.
+- Low-quality first-pass results may still be delivered; they are not permanently held.
+- Later corrected context should use the existing same-thread correction path.
+- Reprocessing must not resend mail merely because AI paraphrased summary/action wording.
+
+## Manual document reprocessing
+- Editor/Admin users can request Reprocess from each letter card when derived output is missing or wrong, even when the source PDF/image is clear.
+- Reprocess always targets the existing archived original and updates derived OCR/context/summary/authority/action; it must not create a duplicate letter or replace the original file.
+- If the same letter already has a pending/processing job, another reprocess request is not queued.
+- Weak or inaccurate processing output must not be described as a poor PDF unless the source file itself is actually poor.
+- Delivery remains idempotent: wording-only changes do not resend; material corrections or real poor-context-to-usable-context improvements use the same Gmail thread / WhatsApp replacement path.
