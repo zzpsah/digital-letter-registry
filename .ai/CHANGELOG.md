@@ -1,3 +1,10 @@
+## 2026-10-05 — Add portal refresh and live auto-sync
+- Commit: 27c8a64f111aee08b33df79c3a1f4e8019d12b4f
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Separate detailed Hindi brief from Hindi action items
 - Commit: 4e6fd3eb53abf71973a509452356cecbd5311a76
 - Author: PRASHANT KUMAR SAH
