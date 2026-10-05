@@ -72,15 +72,17 @@ def main() -> int:
         else None
     )
 
-    healing = SelfHealingReprocessor(
-        transport=transport,
-        queue=queue,
-    ).scan(
-        target_context_version=str(getattr(context_provider, "version")),
-        target_dictionary_version=DICTIONARY_VERSION,
-    )
-    if healing.enqueued:
-        print(f"self_healing_enqueued={healing.enqueued}")
+    if gateway_configured or gemini_key:
+        healing = SelfHealingReprocessor(
+            transport=transport,
+            queue=queue,
+        ).scan(
+            target_context_version=str(getattr(context_provider, "version")),
+            target_dictionary_version=DICTIONARY_VERSION,
+            max_enqueues=int(os.environ.get("DLR_AUTO_REPROCESS_DAILY_LIMIT", "5")),
+        )
+        if healing.enqueued:
+            print(f"self_healing_enqueued={healing.enqueued}")
 
     worker = DocumentProcessingWorker(
         queue=queue,
