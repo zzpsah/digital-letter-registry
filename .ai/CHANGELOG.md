@@ -1,3 +1,10 @@
+## 2026-10-05 — Improve recipient view and single-channel handling
+- Commit: d2a87c0c0584ae5849c95209ce1665e4122a4296
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Add retired jobs and completed approval notifications
 - Commit: a1db5cac1ffd322fcdf9aefa996218c265968633
 - Author: PRASHANT KUMAR SAH
