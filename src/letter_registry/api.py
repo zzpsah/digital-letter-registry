@@ -3738,6 +3738,126 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             )
         )
 
+    @app.get("/api/v1/admin/trash")
+    def list_admin_trash(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        rows = database.select(
+            "letters",
+            filters={"is_trashed": True},
+            columns=(
+                "id,title,original_filename,authority,reference_number,"
+                "uploaded_at,trashed_at,storage_provider,storage_object_id"
+            ),
+        )
+        rows.sort(key=lambda x: str(x.get("trashed_at") or ""), reverse=True)
+        return {"items": rows[:100], "count": min(len(rows), 100)}
+
+    @app.post(
+        "/api/v1/admin/trash/{record_id}/restore",
+        response_model=MessageResponse,
+    )
+    def restore_trashed_letter(
+        record_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        membership = _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        rows = database.select(
+            "letters",
+            filters={"id": record_id},
+            columns="id,is_trashed,storage_provider,storage_object_id",
+        )
+        if not rows:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Letter not found")
+        row = rows[0]
+        if not bool(row.get("is_trashed")):
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Letter is not in Trash")
+        provider = str(row.get("storage_provider") or "").casefold()
+        object_id = str(row.get("storage_object_id") or "").strip()
+        if provider == "gdrive" and object_id:
+            try:
+                GoogleDrivePrivateWriter.from_environment().restore_file(
+                    object_reference=object_id,
+                )
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail="Could not restore original file from Drive Trash",
+                ) from exc
+        now = datetime.now(timezone.utc).isoformat()
+        updated = database.update(
+            "letters",
+            {
+                "is_trashed": False,
+                "trashed_at": None,
+                "trashed_by": None,
+                "updated_at": now,
+            },
+            filters={"id": record_id},
+        )
+        if not updated:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Letter could not be restored")
+        _audit_admin_action(
+            access_token,
+            action="letter_restored",
+            target_type="letter",
+            target_id=record_id,
+            detail={"restored_by": membership.user_id},
+        )
+        return MessageResponse(message="Letter restored.")
+
+    @app.delete(
+        "/api/v1/admin/trash/{record_id}/permanent",
+        response_model=MessageResponse,
+    )
+    def permanently_delete_trashed_letter(
+        record_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        rows = database.select(
+            "letters",
+            filters={"id": record_id},
+            columns="id,is_trashed,storage_provider,storage_object_id",
+        )
+        if not rows:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Letter not found")
+        row = rows[0]
+        if not bool(row.get("is_trashed")):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Only trashed letters can be permanently deleted",
+            )
+        provider = str(row.get("storage_provider") or "").casefold()
+        object_id = str(row.get("storage_object_id") or "").strip()
+        if provider == "gdrive" and object_id:
+            try:
+                GoogleDrivePrivateWriter.from_environment().delete_file(
+                    object_reference=object_id,
+                )
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail="Could not permanently delete original Drive file",
+                ) from exc
+        deleted = database.delete("letters", filters={"id": record_id})
+        if not deleted:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Letter record could not be permanently deleted",
+            )
+        _audit_admin_action(
+            access_token,
+            action="letter_permanently_deleted",
+            target_type="letter",
+            target_id=record_id,
+        )
+        return MessageResponse(message="Letter permanently deleted.")
+
     @app.delete(
         "/api/v1/letters/{record_id}",
         response_model=MessageResponse,
@@ -3803,14 +3923,34 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     detail="Could not move original file to Drive Trash",
                 ) from exc
 
-        deleted = database.delete("letters", filters={"id": record_id})
-        if not deleted:
+        membership = _archive_membership(
+            access_token,
+            roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR},
+        )
+        now = datetime.now(timezone.utc).isoformat()
+        updated = database.update(
+            "letters",
+            {
+                "is_trashed": True,
+                "trashed_at": now,
+                "trashed_by": membership.user_id,
+                "updated_at": now,
+            },
+            filters={"id": record_id},
+        )
+        if not updated:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="Document could not be removed from the registry",
+                detail="Document could not be moved to Trash",
             )
+        _audit_admin_action(
+            access_token,
+            action="letter_trashed",
+            target_type="letter",
+            target_id=record_id,
+        )
         return MessageResponse(
-            message="Document moved to Drive Trash and removed from the registry."
+            message="Document moved to Trash and can be restored by an administrator."
         )
 
     return app
