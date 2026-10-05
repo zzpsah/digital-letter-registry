@@ -88,3 +88,8 @@ Keep document meaning source-first. Category is secondary taxonomy and must neve
 ## Importance/sorting handoff — 2026-10-05
 
 Keep default portal sorting by `uploaded_at desc`. Do not silently switch the default to issue_date. Preserve the distinction between shared importance state and internal comment privacy: authenticated portal can display `user_comment`; public Drive index must not publish it. Editor/Admin writes must continue through guarded API/RLS.
+
+
+## UI/behavior governance baseline
+
+`docs/UI-DESIGN-CONTRACT.md` + `brain/ui-governance/` are mandatory context for UI/auth/search/admin/recipient/trash changes. Do not wholesale redesign or recolor eLetters.

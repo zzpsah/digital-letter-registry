@@ -217,3 +217,8 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Public Drive index receives the Important visual flag only; internal user comments stay private to authenticated portal users.
 - Search RPC now returns importance/note/upload timestamps.
 - Test suite passes 314 tests after the UI/API change.
+
+
+## UI/behavior governance baseline
+
+The live accepted UI/UX contract is recorded in `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/`. It locks the purple compact/mobile system, Hinglish default, Smart Search, Remember me, recipient single-channel handling, recoverable document Trash, failed-job controls, and no-wholesale-redesign rule.

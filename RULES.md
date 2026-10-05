@@ -9,3 +9,4 @@
 7. Do not deploy, import live data, configure credentials, or change production infrastructure without explicit approval.
 8. Before meaningful work, read the repository's README, RULES, AGENTS, relevant docs, `.ai/` state, and relevant `brain/` enhancement context. Repository evidence is authoritative over chat memory.
 9. After meaningful work, synchronize all affected source evidence and status records, including README/docs when scope or behavior changes, root TASKS, `.ai/`, and the relevant `brain/` files. Never leave stale project status documentation knowingly.
+10. UI/UX work is governed by `docs/UI-DESIGN-CONTRACT.md`; preserve its colors, layout, language/search/auth/delete/restore invariants unless explicitly asked to change them. Do not wholesale redesign the portal as incidental work.

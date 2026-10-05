@@ -246,3 +246,8 @@ WhatsApp uses English section headings with Hindi document intelligence beneath 
 eLetters defaults to **Latest first** using the archive upload timestamp. Search users can also sort by Important first, Issue date, Title A–Z, or Relevance.
 
 Editors/Admins can mark a document as **Important** and attach an optional archive note. Important cards are yellow-highlighted with a `★ Important` badge. The mark and note are stored in Supabase so they survive refresh/relogin and are shared across authorized portal users. Viewers can see the highlight/note but cannot modify it.
+
+
+## UI/behavior governance baseline
+
+The accepted eLetters interface and workflows are protected by `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/`. Future AI/tools must read them before UI/UX work and must not wholesale redesign or recolor the portal. The contract records the purple palette, compact/mobile layout, Hinglish default language selector, Smart Search behavior, Remember-me login semantics, admin controls, recipient single-channel behavior, recoverable document Trash, Operations Retry/Retire/Delete, important-star rules, and safe change/test procedure.

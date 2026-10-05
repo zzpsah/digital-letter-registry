@@ -69,3 +69,8 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Change: Rename mixed language mode to Hinglish
 - Date: 2026-10-05
 - Durable context synchronization: completed
+
+
+## UI/behavior governance baseline
+
+The authoritative UI/UX contract is `docs/UI-DESIGN-CONTRACT.md`; the enhancement brain is `brain/ui-governance/`. Any new AI/tool must preserve this accepted baseline and avoid wholesale redesigns or incidental behavior changes.

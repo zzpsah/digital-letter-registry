@@ -1,3 +1,9 @@
+## 2026-10-05 — Persistent UI/behavior governance
+- Added `docs/UI-DESIGN-CONTRACT.md` as the locked UI/UX baseline.
+- Added `brain/ui-governance/` with current state, decisions and test expectations.
+- Mandatory repo instructions now require agents to read the design contract before UI/auth/search/recipient/trash/admin work.
+- Locked the purple palette, compact layout, Hinglish default, Smart Search, Remember me, recipient rules, document Trash, failed-job controls and no-wholesale-redesign rule.
+
 ## 2026-10-05 — Rename mixed language mode to Hinglish
 - Commit: ae496093c875e7c3397c0d7607cac42c4fd4af56
 - Author: Prashant

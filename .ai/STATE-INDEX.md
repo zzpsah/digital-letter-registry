@@ -30,3 +30,5 @@ Generated automatically by Development OS.
 2. Read `.ai/CURRENT-STATE.md`, `.ai/TASKS.md`, and relevant decisions/architecture.
 3. Inspect source code and Git history.
 4. Treat this index as evidence, not semantic authority.
+
+- UI/UX locked baseline: `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/` (mandatory before UI/auth/search/admin/recipient/trash work).
