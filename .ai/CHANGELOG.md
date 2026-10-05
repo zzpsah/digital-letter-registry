@@ -1,3 +1,15 @@
+## 2026-10-05 — Add authority merge and permanent delete
+- Commit: 17a9a16b6914519ca5819c66386ff40a35886c26
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `brain/ui-governance/CURRENT_STATE.md`
+- `docs/PROJECT-HANDOFF.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Fix unmatched authority review list
 - Commit: ee5560624e4e3791b63e308caf144c68a899c963
 - Author: Prashant
