@@ -345,3 +345,9 @@ Bulk account, recipient, and category actions use the existing guarded per-item 
 ## Intelligence/category separation — 2026-10-05
 
 Do not let category drive document meaning. Category/subcategory and deterministic hints are routing/search taxonomy; title, summary, action_required, applies_to and whatsapp_summary must be derived from the document's operative content, annexures and repeated evidence. If taxonomy conflicts with the source, the source wins. Delivery formatting also treats category only as a final fallback.
+
+## WhatsApp language contract — 2026-10-05
+
+For every document, keep WhatsApp presentation labels in English. What this is must contain a concise Hindi explanation of the actual document context. Action items must contain concise Hindi instructions grounded in the document; preserve official English terms such as ICT Lab, Smart Class, e-ShikshaKosh, Mark On Duty, portal names and official designations when useful. Do not convert headings themselves to Hindi.
+
+The intelligence providers generate summary_hi and action_required_hi for this purpose. Category/subcategory remains secondary taxonomy.

@@ -15,6 +15,18 @@ from .structured_analysis import (
 from .deterministic_context import DeterministicDocumentContextProvider
 
 
+def _string_tuple(value: object) -> tuple[str, ...]:
+    if value is None:
+        return ()
+    if isinstance(value, str):
+        text = value.strip()
+        return (text,) if text else ()
+    if isinstance(value, (list, tuple, set)):
+        return tuple(str(x).strip() for x in value if str(x).strip())
+    text = str(value).strip()
+    return (text,) if text else ()
+
+
 def _parse_json(text: str) -> dict:
     text = text.strip()
     if text.startswith("~~~"):
@@ -42,14 +54,16 @@ class HermesDefaultModelContextProvider:
             "issue_date, reference_number, concepts, important_dates, deadline, applies_to, important_amounts, "
             "page_references, page_count, related_terms_hi, related_terms_en, confidence, key_points, clean_document_text.\n"
             "INTELLIGENCE PRIORITY: category/subcategory and deterministic hints are secondary taxonomy only. Never derive title, summary, action, audience, or WhatsApp text from taxonomy unless the document itself supports it. If taxonomy conflicts with document evidence, trust the document and keep classification separate.\n"
+            "WHATSAPP LANGUAGE RULE: whatsapp_summary and action_required_hi must be populated whenever the document has enough evidence. Write them in clear Hindi/Hinglish using common official English terms where natural (for example ICT Lab, Smart Class, Nodal Teacher, Mark On Duty). Do not merely translate a category label; describe the actual document.\n"
             "TITLE: create a concise semantic title (4-12 words) from the actual purpose. Never use generic titles like "
             "'Official Education Document', 'Official Notice', 'आधिकारिक दस्तावेज़', or merely 'Letter'.\n"
             "OUTPUT LANGUAGE: title may follow the source language. Write summary, action_required, key_points, applies_to, "
-            "amount labels and page-reference labels in simple concise English for email. Also write summary_hi and action_required_hi in clear natural Hindi (Devanagari). Write whatsapp_summary in simple "
+            "amount labels and page-reference labels in simple concise English for email. Also write summary_hi and action_required_hi in clear natural Hindi (Devanagari) for WhatsApp. Write whatsapp_summary in clear natural Hindi (Devanagari), keeping necessary English technical terms in "
             "Roman-English/Hinglish using Latin script. Keep clean_document_text in the source language.\n"
             "SUMMARY: summary must say only what the document is about and its main purpose/decision in 1-2 short sentences. "
-            "whatsapp_summary must express the same subject/purpose in clear Roman-English/Hinglish. Do not repeat action steps, "
+            "whatsapp_summary must express the same subject/purpose in clear natural Hindi (Devanagari), keeping necessary English technical terms unchanged. Do not repeat action steps, "
             "deadline, required documents or amounts in either summary unless they are the actual central subject.\n"
+            "IDENTITY: reference_number must be the current document's own memo/letter/reference number, never an older memo merely cited in the body. If the current number is unclear, return null.\n"
             "ACTION: state exactly what the recipient must do. Extract the actual last date into deadline. "
             "applies_to identifies affected classes, teachers, students, schools or districts.\n"
             "AMOUNTS: important_amounts is an array of {label,value,currency,page}; include only operationally important fees/rates. "
@@ -143,16 +157,16 @@ class HermesDefaultModelContextProvider:
             action_required_hi=data.get("action_required_hi"),
             issue_date=data.get("issue_date"),
             reference_number=data.get("reference_number"),
-            concepts=tuple(data.get("concepts") or ()),
+            concepts=_string_tuple(data.get("concepts")),
             important_dates=dates,
             deadline=data.get("deadline"),
-            applies_to=tuple(str(x) for x in data.get("applies_to") or ()),
+            applies_to=_string_tuple(data.get("applies_to")),
             important_amounts=tuple(amounts),
             page_references=tuple(page_refs),
             page_count=page_count,
-            related_terms_hi=tuple(data.get("related_terms_hi") or ()),
-            related_terms_en=tuple(data.get("related_terms_en") or ()),
+            related_terms_hi=_string_tuple(data.get("related_terms_hi")),
+            related_terms_en=_string_tuple(data.get("related_terms_en")),
             confidence=normalize_confidence(data.get("confidence")),
-            key_points=tuple(str(x) for x in data.get("key_points") or ()),
+            key_points=_string_tuple(data.get("key_points")),
             clean_document_text=(str(data.get("clean_document_text")).strip() if data.get("clean_document_text") else None),
         )

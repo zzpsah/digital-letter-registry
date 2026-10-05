@@ -22,6 +22,18 @@ from .structured_analysis import (
 )
 
 
+def _string_tuple(value: object) -> tuple[str, ...]:
+    if value is None:
+        return ()
+    if isinstance(value, str):
+        text = value.strip()
+        return (text,) if text else ()
+    if isinstance(value, (list, tuple, set)):
+        return tuple(str(x).strip() for x in value if str(x).strip())
+    text = str(value).strip()
+    return (text,) if text else ()
+
+
 class GeminiProviderError(RuntimeError):
     """Raised when Gemini analysis fails or returns an invalid response."""
 
@@ -213,15 +225,17 @@ class GeminiDocumentContextProvider:
             "spelling, spacing, character-confusion and line-break errors when the intended text is clear. "
             "Do not copy unreadable garbage into user-facing fields. The title may follow the source language. Write "
             "summary, action_required, key_points, applies_to, amount labels and page-reference labels in simple concise English for email. "
-            "Also write summary_hi and action_required_hi in clear natural Hindi (Devanagari), preserving official names/numbers. "
-            "Write whatsapp_summary in simple Roman-English/Hinglish (Latin script, no Devanagari unless an official title/name must be preserved). "
+            "Also write summary_hi and action_required_hi in clear natural Hindi (Devanagari) for WhatsApp, preserving official names/numbers and necessary English technical terms. "
+            "Write whatsapp_summary in clear natural Hindi (Devanagari), keeping necessary English technical terms and official names unchanged. "
             "Keep clean_document_text in the source language (clean natural Hindi for Hindi documents). "
             "Preserve official names, UDISE codes, reference numbers, dates and amounts exactly.\n\n"
             "INTELLIGENCE PRIORITY RULE: category/subcategory are secondary taxonomy only. Never use a category label or deterministic hint as the basis for title, summary, action, audience, or WhatsApp text unless the document evidence itself supports it. If category/hints conflict with the actual document, trust the document and classify separately. Build user-facing meaning from the document purpose, operative clauses, annexures, filename/context clues, and repeated evidence. "
+            "WHATSAPP LANGUAGE RULE: whatsapp_summary and action_required_hi must be populated whenever the document has enough evidence. Write them in clear Hindi/Hinglish using common official English terms where natural (for example ICT Lab, Smart Class, Nodal Teacher, Mark On Duty). Do not merely translate a category label; describe the actual document.\n"
             "TITLE RULE: create a concise semantic title from the document's actual purpose, preferably 4-12 words. "
             "Avoid generic titles such as 'Official Education Document', 'Official Notice', 'आधिकारिक शैक्षणिक दस्तावेज़', "
             "'आधिकारिक सूचना', or merely 'Letter'. Include the real subject/action, for example fee revision, teacher grievance SOP, "
             "registration schedule, transfer order, scholarship instruction, etc.\n"
+            "IDENTITY RULE: reference_number must be the current document's own memo/letter/reference number. Do not use a memo number merely cited in the body as the basis/order being followed. If the current document number is unreadable or uncertain, return null rather than a cited older memo number. "
             "ACTION RULE: action_required should say exactly what the recipient must do, if anything. "
             "Extract the actual deadline separately. applies_to should identify the affected class, employee group, school type, district, "
             "student group, or other audience.\n"
@@ -232,7 +246,7 @@ class GeminiDocumentContextProvider:
             "page_count should be the highest reliable page marker, otherwise null.\n"
             "SUMMARY RULE: summary must answer only what the document is about and its main purpose/decision, in 1-2 short sentences. "
             "Do not repeat action steps, deadline, required documents or fee details unless they are the actual central subject; those belong in separate fields. "
-            "whatsapp_summary must express the same subject/purpose in clear Roman-English/Hinglish, ideally 1-2 short lines. "
+            "whatsapp_summary must express the same subject/purpose in clear Hindi (Devanagari), preserving useful official English terms, ideally 1-2 short lines. "
             "key_points should contain 3-6 useful operational points, not boilerplate.\n\n"
             f"Deterministic concept hints: {concepts}\n"
             f"Government structure hints: {structure}\n\n"
@@ -296,17 +310,17 @@ class GeminiDocumentContextProvider:
             action_required_hi=data.get("action_required_hi"),
             issue_date=issue_date,
             reference_number=data.get("reference_number"),
-            concepts=tuple(str(x) for x in data.get("concepts", [])),
+            concepts=_string_tuple(data.get("concepts")),
             important_dates=dates,
             deadline=data.get("deadline"),
-            applies_to=tuple(str(x) for x in data.get("applies_to", [])),
+            applies_to=_string_tuple(data.get("applies_to")),
             important_amounts=amounts,
             page_references=page_references,
             page_count=(int(data["page_count"]) if data.get("page_count") is not None else None),
-            related_terms_hi=tuple(str(x) for x in data.get("related_terms_hi", [])),
-            related_terms_en=tuple(str(x) for x in data.get("related_terms_en", [])),
+            related_terms_hi=_string_tuple(data.get("related_terms_hi")),
+            related_terms_en=_string_tuple(data.get("related_terms_en")),
             confidence=normalize_confidence(data.get("confidence")),
-            key_points=tuple(str(x) for x in data.get("key_points", [])),
+            key_points=_string_tuple(data.get("key_points")),
             clean_document_text=(
                 str(data.get("clean_document_text")).strip()
                 if data.get("clean_document_text") is not None

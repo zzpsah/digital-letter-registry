@@ -236,3 +236,7 @@ Bulk controls are available for account users, recipients, and categories. Bulk 
 ## Intelligence-first document meaning — 2026-10-05
 
 Document category/subcategory is secondary taxonomy only. User-facing title, summary, action, audience and WhatsApp text must be grounded independently in the source document. Gemini, Supabase-Gemini and Hermes context prompts explicitly require document evidence to override conflicting category/hint labels.
+
+## Global delivery presentation contract — 2026-10-05
+
+WhatsApp uses English section headings with Hindi document intelligence beneath them. The primary sections are What this is and Action items; their content is Hindi (Devanagari) while official English product/system terms may remain unchanged. Category remains secondary taxonomy and must not drive these sections.

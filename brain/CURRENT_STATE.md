@@ -186,3 +186,12 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Category conflicts must not leak into user-facing meaning.
 - The ICT Lab/Smart Class misclassification incident is the regression case for this rule.
 - Full DLR suite remains green at 311 tests.
+
+## 2026-10-05 — Global WhatsApp language/presentation rule
+
+- English headings remain: What this is, Action items, Required documents, Applies to, Deadline, Important.
+- What this is content is Hindi (Devanagari), with useful official English terms preserved.
+- Action items content is Hindi (Devanagari), with useful official English terms preserved.
+- Category is secondary and cannot dictate meaning.
+- This applies to all future/reprocessed documents.
+- Full DLR suite passes 311 tests.

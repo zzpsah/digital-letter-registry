@@ -76,3 +76,7 @@ Preserve the no-secrets backup contract. Never add passwords, Supabase keys, acc
 ## Intelligence handoff — 2026-10-05
 
 Never restore category-first title/summary templates. Taxonomy is secondary. A wrong category must not force a wrong email subject or WhatsApp summary. Keep source-grounded title/summary/action/audience as the primary contract across Gemini, Supabase-Gemini, Hermes fallback, delivery email and WhatsApp.
+
+## Global delivery language handoff — 2026-10-05
+
+Do not translate WhatsApp headings. Keep What this is and Action items in English; write their content in Hindi. Preserve official English terms where they improve clarity. Apply this to every document, not per-document exceptions.
