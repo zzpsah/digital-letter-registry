@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: ecac1f32bae7fd318bc5a7a857808714267b2a76
-- Last commit: Add manual document reprocess action
+- HEAD: e01aa68a78d3c7ba17df5096a48a7e31a88350f9
+- Last commit: Stabilize authority display and reprocessing
 - Last commit date: 2026-10-05
 - Last commit author: Prashant
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

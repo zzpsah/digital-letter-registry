@@ -1,3 +1,20 @@
+## 2026-10-05 — Stabilize authority display and reprocessing
+- Commit: e01aa68a78d3c7ba17df5096a48a7e31a88350f9
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `brain/ui-governance/CURRENT_STATE.md`
+- `docs/PROJECT-HANDOFF.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/detail.py`
+- `src/letter_registry/gemini_provider.py`
+- `src/letter_registry/supabase_gemini_gateway.py`
+- `src/letter_registry/supabase_repository.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261006003000_use_authority_short_names_in_search.sql`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Add manual document reprocess action
 - Commit: ecac1f32bae7fd318bc5a7a857808714267b2a76
 - Author: Prashant
