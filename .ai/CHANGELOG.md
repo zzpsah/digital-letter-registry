@@ -1,3 +1,10 @@
+## 2026-10-05 — Document bounded self-healing queue policy
+- Commit: 42afd42ab4e0c3547a207e341715bb41547ca0d3
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PRODUCTION_ARCHITECTURE.md`
+
 ## 2026-10-05 — Test bounded self-healing queue pressure
 - Commit: 432ae0ac3d0d499c3c5a56825d53a3340f673cb8
 - Author: PRASHANT KUMAR SAH
