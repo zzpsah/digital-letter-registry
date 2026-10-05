@@ -34,35 +34,56 @@ def _explicit_authority(text: str) -> str | None:
 
 
 def _explicit_reference_number(text: str) -> str | None:
+    # Deterministic fallback must identify the current document's own header,
+    # not a prior memo/reference merely cited in the body.
     cbse_match = re.search(
-        r"\bCBSE/[A-Za-z0-9.]+/[A-Za-z0-9.]+/\d{4}\b",
+        r"^\s*(CBSE/[A-Za-z0-9.]+(?:/[A-Za-z0-9.]+)+/\d{4})\b",
         text,
-        flags=re.IGNORECASE,
+        flags=re.IGNORECASE | re.MULTILINE,
     )
     if cbse_match:
-        return cbse_match.group(0)
+        return cbse_match.group(1)
 
-    match = re.search(
-        r"\b[A-Z]{2,}[A-Za-z0-9.]*"
-        r"(?:/[A-Za-z0-9.]+){2,}/\d{4}/\d+\b",
-        text,
+    header = re.compile(
+        r"^\s*(?:पत्रांक|पंत्रांक|ज्ञापांक|memo(?:\s+no\.?)?|reference|ref\.?|letter\s+no\.?)"
+        r"\s*[:：-]?\s*([^\s]+)",
+        flags=re.IGNORECASE,
     )
-    return match.group(0) if match else None
+    for line in text.splitlines():
+        match = header.match(line)
+        if not match:
+            continue
+        candidate = match.group(1).strip(" .,:;-")
+        alnum = re.sub(r"[^A-Za-z0-9\u0900-\u097f]", "", candidate)
+        if len(alnum) < 2:
+            continue
+        if re.fullmatch(r"[.\-_/():;]+", candidate):
+            continue
+        return candidate[:120]
+    return None
 
 
 def _explicit_issue_date(text: str) -> str | None:
-    match = re.search(
-        r"(?:दिनांक|dated)\s*[:：]?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{4})",
-        text,
+    date_pattern = re.compile(
+        r"(?:दिनांक|dated?)\s*[:：]?\s*(\d{1,2}[./-]\d{1,2}[./-]\d{4})",
         flags=re.IGNORECASE,
     )
-    if not match:
-        return None
-    raw = match.group(1).replace("-", "/")
-    try:
-        return datetime.strptime(raw, "%d/%m/%Y").date().isoformat()
-    except ValueError:
-        return None
+    header_start = re.compile(
+        r"^\s*(?:पत्रांक|पंत्रांक|ज्ञापांक|memo(?:\s+no\.?)?|reference|ref\.?|letter\s+no\.?|CBSE/)",
+        flags=re.IGNORECASE,
+    )
+    for line in text.splitlines():
+        if not header_start.match(line):
+            continue
+        match = date_pattern.search(line)
+        if not match:
+            continue
+        raw = match.group(1).replace("-", "/").replace(".", "/")
+        try:
+            return datetime.strptime(raw, "%d/%m/%Y").date().isoformat()
+        except ValueError:
+            continue
+    return None
 
 
 def _authority(text: str) -> str | None:
@@ -133,19 +154,8 @@ def _title(concepts: tuple[str, ...]) -> str | None:
         return "Exam Form Deadline Extension"
     if "deadline_extension" in values and "registration" in values:
         return "Registration Deadline Extension"
-    if "exam_form" in values:
-        return "Exam Form Notice"
-    if "registration" in values:
-        return "Registration Notice"
-    if "udise" in values:
-        return "UDISE Notice"
-    if "eshikshakosh" in values:
-        return "eShikshaKosh Notice"
-    if "scholarship" in values:
-        return "Scholarship Notice"
-    if "admission" in values:
-        return "Admission Notice"
     return None
+
 
 
 @dataclass(frozen=True, slots=True)
@@ -162,7 +172,7 @@ class DeterministicDocumentContextProvider:
         hints: ContextHints,
     ) -> StructuredDocumentContext:
         normalized = normalize_extracted_text(extracted_text)
-        summary = normalized[: self.summary_characters].strip() or None
+        summary = None
         concepts = tuple(dict.fromkeys(hints.concepts))
         explicit_title = _explicit_title(normalized)
         explicit_category = _explicit_category(normalized)

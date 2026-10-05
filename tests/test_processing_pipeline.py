@@ -9,6 +9,7 @@ from letter_registry.models import DocumentRecord
 from letter_registry.processing_pipeline import (
     _issue_date_from_text,
     _merge_operational_context,
+    _semantic_title,
     process_archived_document,
 )
 from letter_registry.structured_analysis import StructuredDocumentContext
@@ -80,6 +81,19 @@ class ProcessingPipelineTests(unittest.TestCase):
         self.assertIn("deadline", outcome.context.context.concepts)
         self.assertIn("deadline_extension", outcome.context.context.concepts)
 
+
+    def test_semantic_title_ignores_wrong_category_when_source_is_ict_order(self) -> None:
+        title = _semantic_title(
+            "UDISE Notice",
+            extracted_text=(
+                "ICT Lab और Smart Class के संचालन के लिए कम्प्यूटर विज्ञान के शिक्षक को Nodal बनाया जाता है। "
+                "जहाँ कम्प्यूटर शिक्षक नहीं हैं वहाँ deputation होगा और Mark On Duty attendance दर्ज की जाएगी।"
+            ),
+            summary="",
+            category="student-data",
+            filename="Nodel for ICT Lab & Smart Class Memo No. 2337 Dated 28-08-2026.pdf",
+        )
+        self.assertEqual(title, "ICT Lab / Smart Class Nodal & Deputation Order")
 
     def test_issue_date_prefers_final_official_memo_date(self) -> None:
         text = (

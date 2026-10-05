@@ -80,3 +80,7 @@ Never restore category-first title/summary templates. Taxonomy is secondary. A w
 ## Global delivery language handoff — 2026-10-05
 
 Do not translate WhatsApp headings. Keep What this is and Action items in English; write their content in Hindi. Preserve official English terms where they improve clarity. Apply this to every document, not per-document exceptions.
+
+## Reprocess intelligence handoff — 2026-10-05
+
+Keep document meaning source-first. Category is secondary taxonomy and must never override stronger document evidence. A reprocess should update the same logical document everywhere (email thread, WhatsApp generated reply, index and portal). For WhatsApp, delete the previous generated reply for everyone before posting the replacement, and persist the new message id for the next replacement.

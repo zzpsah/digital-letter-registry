@@ -178,6 +178,30 @@ class SupabaseLetterRepository:
             if callable(select_existing)
             else []
         )
+        processing_rows = (
+            select_existing(
+                "letter_processing",
+                filters={"letter_id": record.record_id},
+                columns="structured_context",
+            )
+            if callable(select_existing)
+            else []
+        )
+        previous_structured = (
+            processing_rows[0].get("structured_context")
+            if processing_rows and isinstance(processing_rows[0].get("structured_context"), dict)
+            else {}
+        )
+        previous_confidence = float(previous_structured.get("confidence") or 0.0)
+        result_context = getattr(result, "context", None)
+        incoming_confidence = float(getattr(result_context, "confidence", None) or 0.0)
+        confidence_downgrade = bool(
+            result_context is not None
+            and previous_structured
+            and previous_confidence >= 0.55
+            and incoming_confidence + 0.08 < previous_confidence
+        )
+
         if existing_rows:
             existing = existing_rows[0]
             context = result.context
@@ -194,8 +218,33 @@ class SupabaseLetterRepository:
             ):
                 current = getattr(context, field_name)
                 previous = existing.get(field_name)
-                if not str(current or "").strip() and str(previous or "").strip():
+                preserve_previous = (
+                    not str(current or "").strip()
+                    or (
+                        confidence_downgrade
+                        and str(previous or "").strip()
+                    )
+                )
+                if preserve_previous and str(previous or "").strip():
                     merged[field_name] = str(previous)
+            if confidence_downgrade:
+                for field_name in (
+                    "summary_hi",
+                    "whatsapp_summary",
+                    "action_required_hi",
+                    "applies_to",
+                    "key_points",
+                    "clean_document_text",
+                ):
+                    previous = previous_structured.get(field_name)
+                    if previous not in (None, "", [], ()):
+                        merged[field_name] = (
+                            tuple(str(x) for x in previous)
+                            if field_name in {"applies_to", "key_points"} and isinstance(previous, list)
+                            else previous
+                        )
+                if previous_confidence:
+                    merged["confidence"] = previous_confidence
             if merged:
                 result = replace(result, context=replace(context, **merged))
 

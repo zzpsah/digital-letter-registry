@@ -79,6 +79,11 @@ _GENERIC_TITLES = {
     "official education document",
     "official document",
     "official notice",
+    "udise notice",
+    "udise notice / document",
+    "school fee order / instructions",
+    "विद्यालय शुल्क संबंधी आदेश",
+    "विद्यालय शुल्क संबंधी आदेश/निर्देश",
     "education department letter",
     "आधिकारिक शैक्षणिक दस्तावेज़",
     "आधिकारिक शैक्षणिक दस्तावेज",
@@ -145,22 +150,20 @@ def _semantic_title(
     def choose(hi: str, en: str) -> str:
         return hi if hindi else en
 
-    # Trust a specific classified document type before incidental words inside
-    # tables/annexures (e.g. a registration circular can contain a fee amount).
-    if any(term in category_folded for term in ("registration", "पंजीयन", "पंजीकरण")):
-        if any(term in folded for term in ("last date", "अंतिम तिथि", "schedule", "कार्यक्रम")):
-            return choose("पंजीयन कार्यक्रम एवं अंतिम तिथि", "Registration Schedule and Deadline")
-        return choose("पंजीयन संबंधी निर्देश", "Registration Instructions")
-    if any(term in category_folded for term in ("admission", "नामांकन", "प्रवेश")):
-        return choose("नामांकन संबंधी निर्देश", "Admission Instructions")
-    if any(term in category_folded for term in ("exam", "examination", "परीक्षा")):
-        return choose("परीक्षा संबंधी निर्देश", "Examination Instructions")
-    if any(term in category_folded for term in ("scholarship", "छात्रवृत्ति")):
-        return choose("छात्रवृत्ति संबंधी निर्देश", "Scholarship Instructions")
-    if any(term in category_folded for term in ("fee", "शुल्क")):
-        if any(term in folded for term in ("पुनरीक्षित", "संशोधित", "revised", "revision")):
-            return choose("विद्यालय शुल्क पुनरीक्षण आदेश", "School Fee Revision Order")
-        return choose("विद्यालय शुल्क संबंधी आदेश", "School Fee Order and Instructions")
+    # Source evidence wins over taxonomy. Category is only a last-resort fallback.
+    ict_signals = sum(
+        term in folded
+        for term in (
+            "ict lab", "आई०सी०टी०", "आईसीटी", "smart class", "स्मार्ट क्लास",
+            "computer science teacher", "कम्प्यूटर विज्ञान", "कंप्यूटर विज्ञान",
+        )
+    )
+    nodal_signals = sum(
+        term in folded
+        for term in ("नोडल", "nodal", "प्रतिनियुक्त", "deputation", "mark on duty")
+    )
+    if ict_signals >= 2 and nodal_signals >= 1:
+        return "ICT Lab / Smart Class Nodal & Deputation Order"
 
     if any(term in folded for term in ("teacher grievance", "शिक्षक शिकायत", "service grievance")):
         return choose("शिक्षक सेवा शिकायत निवारण निर्देश", "Teacher Service Grievance Instructions")
@@ -181,6 +184,18 @@ def _semantic_title(
     ):
         return choose("विद्यालय शुल्क पुनरीक्षण आदेश", "School Fee Revision Order")
     if ("शुल्क" in folded or "fee" in folded):
+        return choose("विद्यालय शुल्क संबंधी आदेश", "School Fee Order and Instructions")
+
+    # Taxonomy is consulted only after source-semantic rules fail.
+    if any(term in category_folded for term in ("registration", "पंजीयन", "पंजीकरण")):
+        return choose("पंजीयन संबंधी निर्देश", "Registration Instructions")
+    if any(term in category_folded for term in ("admission", "नामांकन", "प्रवेश")):
+        return choose("नामांकन संबंधी निर्देश", "Admission Instructions")
+    if any(term in category_folded for term in ("exam", "examination", "परीक्षा")):
+        return choose("परीक्षा संबंधी निर्देश", "Examination Instructions")
+    if any(term in category_folded for term in ("scholarship", "छात्रवृत्ति")):
+        return choose("छात्रवृत्ति संबंधी निर्देश", "Scholarship Instructions")
+    if any(term in category_folded for term in ("fee", "शुल्क")):
         return choose("विद्यालय शुल्क संबंधी आदेश", "School Fee Order and Instructions")
 
     # Last-resort semantic fallback: a meaningful filename is better than a

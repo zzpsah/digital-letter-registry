@@ -195,3 +195,13 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Category is secondary and cannot dictate meaning.
 - This applies to all future/reprocessed documents.
 - Full DLR suite passes 311 tests.
+
+## 2026-10-05 — Reprocess context and clutter-free delivery
+
+- Semantic title fallback is source-first; category is consulted only after document evidence fails.
+- Generic taxonomy titles such as UDISE Notice / School Fee Order are no longer trusted as document meaning.
+- Deterministic fallback avoids inventing generic summaries/titles and validates current-document reference/date more conservatively.
+- Reprocessing preserves stronger prior structured intelligence when a lower-confidence pass would degrade it.
+- Regression coverage verifies a wrongly categorized ICT Lab / Smart Class order still receives the correct semantic title.
+- WhatsApp delivery policy is: What this is heading with Hindi/Hinglish context, Action items heading with Hindi/Hinglish actions, Important may remain English.
+- Reprocessed documents replace the previous generated WhatsApp reply; only the latest generated reply should remain.
