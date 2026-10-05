@@ -252,6 +252,8 @@ _ARCHIVE_SCOPED_TABLES = frozenset({
     "processing_jobs",
     "processing_profiles",
     "letter_sources",
+    "document_categories",
+    "account_access_requests",
 })
 
 _ARCHIVE_SCOPED_RPCS = frozenset()

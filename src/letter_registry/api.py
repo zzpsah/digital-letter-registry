@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+import importlib.util
+import json
 import os
+import re
+import subprocess
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib import error as urlerror, request as urlrequest
 from urllib.parse import quote, urlsplit
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile, status
 from fastapi.responses import FileResponse, RedirectResponse, Response
@@ -82,7 +87,19 @@ class PasswordChangeRequest(BaseModel):
 
 class CreateAccountRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
+    # Kept optional only for backward-compatible clients. It is never stored
+    # or used before administrator approval.
+    password: str | None = Field(default=None, min_length=8, max_length=256)
+
+
+class ApprovedAccountCompleteRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=8, max_length=256)
+    approval_token: str = Field(min_length=36, max_length=36)
+
+
+class AdminAccountRequestDecision(BaseModel):
+    role: str = Field(default="viewer", min_length=5, max_length=6)
 
 
 class RegistrationRequest(BaseModel):
@@ -143,6 +160,28 @@ class AdminMemberResponse(BaseModel):
     email: str
     role: str
     status: str
+
+
+class AdminRecipientCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    email: str | None = Field(default=None, max_length=254)
+    mobile: str | None = Field(default=None, max_length=32)
+
+
+class AdminRecipientUpdateRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=80)
+    email: str | None = Field(default=None, max_length=254)
+    mobile: str | None = Field(default=None, max_length=32)
+    email_enabled: bool | None = None
+    whatsapp_enabled: bool | None = None
+
+
+class AdminRecipientDefaultRequest(BaseModel):
+    recipient_id: str | None = Field(default=None, max_length=80)
+
+
+class AdminWhatsAppUserRequest(BaseModel):
+    mobile: str = Field(min_length=10, max_length=32)
 
 
 class AdminCategoryRequest(BaseModel):
@@ -464,6 +503,71 @@ def _raw_transport(access_token: str) -> SupabasePostgrestTransport:
     )
 
 
+def _anon_transport() -> SupabasePostgrestTransport:
+    key = _required_env("SUPABASE_PUBLISHABLE_KEY")
+    return SupabasePostgrestTransport(
+        base_url=_required_env("SUPABASE_URL"),
+        publishable_key=key,
+        access_token=key,
+    )
+
+
+def _complete_approved_account(
+    *,
+    email: str,
+    password: str,
+    approval_token: str,
+) -> None:
+    endpoint = (
+        _required_env("SUPABASE_URL").rstrip("/")
+        + "/functions/v1/dlr-complete-approved-account"
+    )
+    body = json.dumps(
+        {
+            "email": email,
+            "password": password,
+            "approval_token": approval_token,
+        }
+    ).encode("utf-8")
+    req = urlrequest.Request(
+        endpoint,
+        data=body,
+        headers={
+            "apikey": _required_env("SUPABASE_PUBLISHABLE_KEY"),
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urlrequest.urlopen(req, timeout=45) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+    except urlerror.HTTPError as exc:
+        raw = exc.read().decode("utf-8", errors="replace")
+        try:
+            payload = json.loads(raw)
+            detail = str(payload.get("error") or "Account activation failed")
+        except Exception:
+            detail = "Account activation failed"
+        raise HTTPException(
+            status_code=(
+                status.HTTP_403_FORBIDDEN
+                if exc.code in {401, 403}
+                else status.HTTP_400_BAD_REQUEST
+            ),
+            detail=detail,
+        ) from exc
+    except (urlerror.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Account activation service is temporarily unavailable",
+        ) from exc
+    if not bool(payload.get("activated")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Account activation failed",
+        )
+
+
 def _archive_membership(
     access_token: str,
     *,
@@ -664,6 +768,127 @@ def _proxy_error_detail(raw: bytes, fallback: str) -> str:
     return fallback
 
 
+def _proxy_admin_json(
+    *,
+    path: str,
+    access_token: str,
+    method: str = "GET",
+    payload: dict[str, object] | None = None,
+) -> object:
+    body = None if payload is None else json.dumps(payload).encode("utf-8")
+    code, raw, _ctype = _proxy_json_request(
+        path=path,
+        access_token=access_token,
+        method=method,
+        body=body,
+        content_type="application/json" if body is not None else None,
+        timeout=45,
+    )
+    if code < 200 or code >= 300:
+        raise HTTPException(
+            status_code=code,
+            detail=_proxy_error_detail(raw, "Admin operation failed"),
+        )
+    try:
+        return json.loads(raw.decode("utf-8"))
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Admin service returned an invalid response",
+        ) from exc
+
+
+def _oracle_recipient_registry():
+    source = Path(
+        "/home/prashant/projects/oracle-server/scripts/dlr_recipient_registry.py"
+    )
+    if not source.is_file():
+        return None
+    spec = importlib.util.spec_from_file_location(
+        "_dlr_recipient_registry_runtime",
+        source,
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Recipient registry module could not be loaded")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _normalize_admin_mobile(value: str) -> str:
+    digits = re.sub(r"\D", "", str(value or ""))
+    if len(digits) == 10:
+        digits = "91" + digits
+    if len(digits) < 10 or len(digits) > 15:
+        raise ValueError("Invalid mobile number")
+    return digits
+
+
+def _whatsapp_env_path() -> Path:
+    return Path("/home/prashant/.hermes/.env")
+
+
+def _read_whatsapp_allowed_users() -> list[str]:
+    source = _whatsapp_env_path()
+    if not source.is_file():
+        raise RuntimeError("WhatsApp runtime configuration is unavailable")
+    raw = ""
+    for line in source.read_text(encoding="utf-8").splitlines():
+        if line.startswith("WHATSAPP_ALLOWED_USERS="):
+            raw = line.split("=", 1)[1].strip()
+            break
+    if raw == "*":
+        return ["*"]
+    return [
+        item
+        for item in dict.fromkeys(
+            _normalize_admin_mobile(value)
+            for value in raw.split(",")
+            if value.strip()
+        )
+    ]
+
+
+def _write_whatsapp_allowed_users(values: list[str]) -> None:
+    source = _whatsapp_env_path()
+    if not source.is_file():
+        raise RuntimeError("WhatsApp runtime configuration is unavailable")
+    cleaned = list(dict.fromkeys(values))
+    value = ",".join(cleaned)
+    lines = source.read_text(encoding="utf-8").splitlines()
+    replaced = False
+    output: list[str] = []
+    for line in lines:
+        if line.startswith("WHATSAPP_ALLOWED_USERS="):
+            output.append("WHATSAPP_ALLOWED_USERS=" + value)
+            replaced = True
+        else:
+            output.append(line)
+    if not replaced:
+        output.append("WHATSAPP_ALLOWED_USERS=" + value)
+    temp = source.with_name(f".{source.name}.{uuid4().hex}.tmp")
+    temp.write_text("\n".join(output) + "\n", encoding="utf-8")
+    os.chmod(temp, source.stat().st_mode & 0o777)
+    os.replace(temp, source)
+
+
+def _restart_whatsapp_gateway() -> None:
+    uid = os.getuid()
+    env = os.environ.copy()
+    env["XDG_RUNTIME_DIR"] = f"/run/user/{uid}"
+    env["DBUS_SESSION_BUS_ADDRESS"] = f"unix:path=/run/user/{uid}/bus"
+    result = subprocess.run(
+        ["systemctl", "--user", "restart", "hermes-gateway.service"],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise RuntimeError("WhatsApp gateway restart failed")
+
+
 def _letter_storage_row(
     access_token: str,
     record_id: str,
@@ -849,31 +1074,71 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         payload: CreateAccountRequest,
         _: None = Depends(_require_same_origin),
     ) -> Response:
-        auth = SupabasePasswordlessAuth.from_environment()
+        # Account creation is admin-approved. No password is stored and no
+        # user verification email is sent before approval.
         try:
-            result = auth.sign_up_with_password(
-                email=payload.email,
-                password=payload.password,
+            _anon_transport().rpc(
+                "dlr_request_archive_access",
+                {
+                    "target_archive_id": _archive_id(),
+                    "target_email": payload.email.strip().lower(),
+                },
             )
-        except (SupabaseAuthError, ValueError) as exc:
+        except (SupabaseRuntimeError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Account creation failed",
+                detail="Account access request could not be submitted",
             ) from exc
 
         body = RegistrationResponse(
             authenticated=False,
-            confirmation_required=result.confirmation_required,
+            confirmation_required=False,
             role=None,
-            message=(
-                "Account created. Admin approval is required before archive access."
-            ),
+            message="Access request submitted for administrator approval.",
         )
         return Response(
             content=body.model_dump_json(),
             media_type="application/json",
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_202_ACCEPTED,
         )
+
+    @app.post(
+        "/api/v1/auth/complete-approved-account",
+        response_model=RegistrationResponse,
+    )
+    def complete_approved_account(
+        payload: ApprovedAccountCompleteRequest,
+        _: None = Depends(_require_same_origin),
+    ) -> Response:
+        _complete_approved_account(
+            email=payload.email.strip().lower(),
+            password=payload.password,
+            approval_token=payload.approval_token,
+        )
+        try:
+            session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
+                email=payload.email,
+                password=payload.password,
+            )
+            membership = _archive_membership(session.access_token)
+        except (SupabaseAuthError, SupabaseSessionError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Account activated but sign-in could not be completed",
+            ) from exc
+
+        body = RegistrationResponse(
+            authenticated=True,
+            confirmation_required=False,
+            role=membership.role.value,
+            message="Account activated.",
+        )
+        response = Response(
+            content=body.model_dump_json(),
+            media_type="application/json",
+        )
+        _set_session_cookies(response, session)
+        return response
 
     @app.post(
         "/api/v1/auth/register",
@@ -1292,6 +1557,391 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 detail="Pending invitation not found",
             )
         return MessageResponse(message="Invitation revoked")
+
+    @app.get("/api/v1/admin/recipients")
+    def list_admin_recipients(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        module = _oracle_recipient_registry()
+        if module is None:
+            result = _proxy_admin_json(
+                path="/api/v1/admin/recipients",
+                access_token=access_token,
+            )
+            return dict(result) if isinstance(result, dict) else {"items": []}
+        data = module.load_registry()
+        items = [
+            dict(item)
+            for item in data.get("recipients", [])
+            if isinstance(item, dict)
+        ]
+        return {
+            "items": items,
+            "default_recipient_id": data.get("default_recipient_id"),
+            "school_default_email": module.DEFAULT_EMAIL,
+        }
+
+    @app.post("/api/v1/admin/recipients")
+    def create_admin_recipient(
+        payload: AdminRecipientCreateRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        module = _oracle_recipient_registry()
+        if module is None:
+            result = _proxy_admin_json(
+                path="/api/v1/admin/recipients",
+                access_token=access_token,
+                method="POST",
+                payload=payload.model_dump(),
+            )
+            return dict(result) if isinstance(result, dict) else {}
+        try:
+            return dict(
+                module.add_recipient(
+                    payload.name,
+                    payload.email or "",
+                    payload.mobile or "",
+                )
+            )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+
+    @app.patch("/api/v1/admin/recipients/{recipient_id}")
+    def update_admin_recipient(
+        recipient_id: str,
+        payload: AdminRecipientUpdateRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        module = _oracle_recipient_registry()
+        if module is None:
+            result = _proxy_admin_json(
+                path=f"/api/v1/admin/recipients/{quote(recipient_id, safe='')}",
+                access_token=access_token,
+                method="PATCH",
+                payload=payload.model_dump(exclude_none=True),
+            )
+            return dict(result) if isinstance(result, dict) else {}
+        try:
+            if payload.name is not None:
+                module.update_recipient(recipient_id, "name", payload.name)
+            if payload.email is not None:
+                module.update_recipient(recipient_id, "email", payload.email)
+            if payload.mobile is not None:
+                module.update_recipient(recipient_id, "mobile", payload.mobile)
+            if payload.email_enabled is not None:
+                module.set_enabled(
+                    recipient_id,
+                    "email",
+                    payload.email_enabled,
+                )
+            if payload.whatsapp_enabled is not None:
+                module.set_enabled(
+                    recipient_id,
+                    "whatsapp",
+                    payload.whatsapp_enabled,
+                )
+            data = module.load_registry()
+            return dict(module.resolve_recipient(data, recipient_id))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+
+    @app.delete(
+        "/api/v1/admin/recipients/{recipient_id}",
+        response_model=MessageResponse,
+    )
+    def delete_admin_recipient(
+        recipient_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        module = _oracle_recipient_registry()
+        if module is None:
+            result = _proxy_admin_json(
+                path=f"/api/v1/admin/recipients/{quote(recipient_id, safe='')}",
+                access_token=access_token,
+                method="DELETE",
+            )
+            return MessageResponse(
+                message=str(
+                    result.get("message") if isinstance(result, dict) else "Recipient removed"
+                )
+            )
+        try:
+            module.remove_recipient(recipient_id)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=str(exc),
+            ) from exc
+        return MessageResponse(message="Recipient removed")
+
+    @app.patch(
+        "/api/v1/admin/recipients-default",
+        response_model=MessageResponse,
+    )
+    def set_admin_default_recipient(
+        payload: AdminRecipientDefaultRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        module = _oracle_recipient_registry()
+        if module is None:
+            result = _proxy_admin_json(
+                path="/api/v1/admin/recipients-default",
+                access_token=access_token,
+                method="PATCH",
+                payload=payload.model_dump(),
+            )
+            return MessageResponse(
+                message=str(
+                    result.get("message") if isinstance(result, dict) else "Default recipient updated"
+                )
+            )
+        try:
+            module.set_default(payload.recipient_id)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        return MessageResponse(message="Default recipient updated")
+
+    @app.get("/api/v1/admin/whatsapp-users")
+    def list_admin_whatsapp_users(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if not _whatsapp_env_path().is_file():
+            result = _proxy_admin_json(
+                path="/api/v1/admin/whatsapp-users",
+                access_token=access_token,
+            )
+            return dict(result) if isinstance(result, dict) else {"items": []}
+        try:
+            return {"items": _read_whatsapp_allowed_users()}
+        except (RuntimeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="WhatsApp allowlist could not be read",
+            ) from exc
+
+    @app.post("/api/v1/admin/whatsapp-users")
+    def add_admin_whatsapp_user(
+        payload: AdminWhatsAppUserRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if not _whatsapp_env_path().is_file():
+            result = _proxy_admin_json(
+                path="/api/v1/admin/whatsapp-users",
+                access_token=access_token,
+                method="POST",
+                payload=payload.model_dump(),
+            )
+            return dict(result) if isinstance(result, dict) else {}
+        try:
+            mobile = _normalize_admin_mobile(payload.mobile)
+            values = _read_whatsapp_allowed_users()
+            if "*" in values:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="WhatsApp is currently open to all users",
+                )
+            if mobile not in values:
+                values.append(mobile)
+                _write_whatsapp_allowed_users(values)
+                _restart_whatsapp_gateway()
+            return {"mobile": mobile, "items": values}
+        except HTTPException:
+            raise
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except RuntimeError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="WhatsApp user could not be added",
+            ) from exc
+
+    @app.delete(
+        "/api/v1/admin/whatsapp-users/{mobile}",
+        response_model=MessageResponse,
+    )
+    def delete_admin_whatsapp_user(
+        mobile: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if not _whatsapp_env_path().is_file():
+            result = _proxy_admin_json(
+                path=f"/api/v1/admin/whatsapp-users/{quote(mobile, safe='')}",
+                access_token=access_token,
+                method="DELETE",
+            )
+            return MessageResponse(
+                message=str(
+                    result.get("message") if isinstance(result, dict) else "WhatsApp user removed"
+                )
+            )
+        try:
+            normalized = _normalize_admin_mobile(mobile)
+            values = _read_whatsapp_allowed_users()
+            if "*" in values:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="WhatsApp is currently open to all users",
+                )
+            if normalized not in values:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="WhatsApp user not found",
+                )
+            values = [value for value in values if value != normalized]
+            _write_whatsapp_allowed_users(values)
+            _restart_whatsapp_gateway()
+            return MessageResponse(message="WhatsApp user removed")
+        except HTTPException:
+            raise
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except RuntimeError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="WhatsApp user could not be removed",
+            ) from exc
+
+    @app.get("/api/v1/admin/account-requests")
+    def list_admin_account_requests(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        rows = database.select(
+            "account_access_requests",
+            columns=(
+                "id,email,status,approved_role,requested_at,notified_at,"
+                "approved_at,approval_notified_at,completed_at,rejected_at"
+            ),
+        )
+        rows.sort(
+            key=lambda item: str(item.get("requested_at") or ""),
+            reverse=True,
+        )
+        return {"items": rows}
+
+    @app.post("/api/v1/admin/account-requests/{request_id}/approve")
+    def approve_admin_account_request(
+        request_id: str,
+        payload: AdminAccountRequestDecision,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        try:
+            normalized_id = str(UUID(request_id))
+            role = ArchiveRole(payload.role)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid account request",
+            ) from exc
+
+        rows = database.select(
+            "account_access_requests",
+            filters={"id": normalized_id},
+            columns="id,email,status",
+        )
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account request not found",
+            )
+        current = str(rows[0].get("status") or "")
+        if current == "completed":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Account request is already completed",
+            )
+
+        now = datetime.now(timezone.utc).isoformat()
+        row = database.update(
+            "account_access_requests",
+            {
+                "status": "approved",
+                "approved_role": role.value,
+                "approval_token": str(uuid4()),
+                "approved_at": now,
+                "approval_notified_at": None,
+                "rejected_at": None,
+                "updated_at": now,
+            },
+            filters={"id": normalized_id},
+        )
+        return row
+
+    @app.post("/api/v1/admin/account-requests/{request_id}/reject")
+    def reject_admin_account_request(
+        request_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        try:
+            normalized_id = str(UUID(request_id))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid account request",
+            ) from exc
+
+        rows = database.select(
+            "account_access_requests",
+            filters={"id": normalized_id},
+            columns="id,status",
+        )
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account request not found",
+            )
+        if str(rows[0].get("status") or "") == "completed":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Completed accounts cannot be rejected",
+            )
+
+        now = datetime.now(timezone.utc).isoformat()
+        row = database.update(
+            "account_access_requests",
+            {
+                "status": "rejected",
+                "approval_token": None,
+                "approved_role": None,
+                "rejected_at": now,
+                "updated_at": now,
+            },
+            filters={"id": normalized_id},
+        )
+        return row
 
     @app.get("/api/v1/admin/categories")
     def list_admin_categories(

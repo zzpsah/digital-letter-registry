@@ -25,9 +25,9 @@ details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;backgr
 .doc{padding:14px;margin:9px 0}.doc-title{font-weight:800}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px;color:var(--muted);font-size:.8rem}.pill{padding:3px 7px;border-radius:999px;background:#f0f4f2}.summary{margin-top:8px;line-height:1.45}.action{margin-top:8px;padding:9px;border-radius:9px;background:#fff9e8;border:1px solid #f0e5b8;font-size:.88rem}.doc-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
 .drop{border:2px dashed #cbd8d3;border-radius:14px;padding:24px;text-align:center;background:#fbfcfc}.progress{height:7px;border-radius:999px;background:#e8eeeb;overflow:hidden;margin-top:10px}.progress span{display:block;height:100%;width:0;background:var(--brand)}
 .admin-tabs{display:flex;gap:7px;margin-bottom:12px}.admin-tab.active{background:var(--soft);color:var(--brand);border-color:#b8d1c9}.admin-pane{display:none}.admin-pane.active{display:block}
-.access-item,.category-item{display:grid;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.access-item{grid-template-columns:1fr 120px 120px auto}.category-item{grid-template-columns:52px 1.2fr 1.2fr 1.8fr 80px auto}.category-item input{min-width:0}.empty{padding:28px;text-align:center;color:var(--muted)}
+.access-item,.category-item,.request-item,.recipient-item,.wa-item{display:grid;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.access-item{grid-template-columns:1fr 120px 120px auto}.category-item{grid-template-columns:52px 1.2fr 1.2fr 1.8fr 80px auto}.request-item{grid-template-columns:1.7fr 120px 110px auto}.recipient-item{grid-template-columns:1.1fr 1.4fr 1fr auto}.wa-item{grid-template-columns:1fr auto}.category-item input,.recipient-item input{min-width:0}.empty{padding:28px;text-align:center;color:var(--muted)}.admin-tabs{overflow-x:auto;white-space:nowrap}.setup-card{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
 @media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:sticky;top:0;z-index:20;padding:8px 10px}.brand{padding:0 4px 7px}.mark{width:32px;height:32px}.nav{display:flex;gap:5px;overflow-x:auto}.nav button{white-space:nowrap;padding:8px 10px}.topbar{position:static;height:52px;padding:0 13px}.content{padding:14px}.filters{grid-template-columns:1fr 1fr}.category-item{grid-template-columns:44px 1fr 1fr}.category-item .wide{grid-column:1/-1}.access-item{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.content{padding:11px}.toolbar{display:grid;grid-template-columns:1fr auto}.toolbar .input{min-width:0}.filters{grid-template-columns:1fr}.page-head{display:block}.page-head p{font-size:.9rem}.nav button[data-page="access"]{display:none}.category-item,.access-item{grid-template-columns:1fr}.panel{padding:13px}}
+@media(max-width:560px){.content{padding:11px}.toolbar{display:grid;grid-template-columns:1fr auto}.toolbar .input{min-width:0}.filters{grid-template-columns:1fr}.page-head{display:block}.page-head p{font-size:.9rem}.category-item,.access-item,.request-item,.recipient-item{grid-template-columns:1fr}.panel{padding:13px}}
 </style>
 </head>
 <body>
@@ -36,24 +36,36 @@ details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;backgr
     <div class="logo">eL</div>
     <h1>eLetters</h1>
     <div class="sub">Official document search and management</div>
-    <form id="passwordLoginForm">
-      <input id="passwordLoginEmail" class="field" type="email" autocomplete="username" placeholder="Email" required>
-      <input id="passwordLoginPassword" class="field" type="password" autocomplete="current-password" placeholder="Password" required>
-      <button class="btn primary full" style="margin-top:12px" type="submit">Sign in</button>
-    </form>
-    <div id="passwordLoginStatus" class="status"></div>
+    <div id="approvedSetup" class="hidden setup-card">
+      <strong>Activate approved account</strong>
+      <div class="sub">Set your password to finish account setup.</div>
+      <form id="approvedSetupForm">
+        <input id="setupEmail" class="field" type="email" readonly>
+        <input id="setupPassword" class="field" type="password" minlength="8" placeholder="New password" required>
+        <input id="setupConfirmPassword" class="field" type="password" minlength="8" placeholder="Confirm password" required>
+        <button class="btn primary full" style="margin-top:10px" type="submit">Activate account</button>
+      </form>
+      <div id="approvedSetupStatus" class="status"></div>
+    </div>
+    <div id="normalAuth">
+      <form id="passwordLoginForm">
+        <input id="passwordLoginEmail" class="field" type="email" autocomplete="username" placeholder="Email" required>
+        <input id="passwordLoginPassword" class="field" type="password" autocomplete="current-password" placeholder="Password" required>
+        <button class="btn primary full" style="margin-top:12px" type="submit">Sign in</button>
+      </form>
+      <div id="passwordLoginStatus" class="status"></div>
     <a id="googleLogin" class="btn full" href="/auth/google" style="display:none;text-align:center;text-decoration:none;margin-top:10px">Continue with Google</a>
     <div id="googleLoginNote" class="status"></div>
-    <details>
-      <summary>Create Account</summary>
-      <form id="registerForm">
-        <input id="registerEmail" class="field" type="email" placeholder="Email" required>
-        <input id="registerPassword" class="field" type="password" minlength="8" placeholder="New password" required>
-        <input id="registerConfirmPassword" class="field" type="password" minlength="8" placeholder="Confirm password" required>
-        <button class="btn full" style="margin-top:10px" type="submit">Create Account</button>
-      </form>
-      <div id="registerStatus" class="status"></div>
-    </details>
+      <details>
+        <summary>Request Access</summary>
+        <form id="registerForm">
+          <input id="registerEmail" class="field" type="email" placeholder="Email" required>
+          <button class="btn full" style="margin-top:10px" type="submit">Submit request</button>
+        </form>
+        <div class="sub" style="margin-top:8px">An administrator will review the request and assign an access level.</div>
+        <div id="registerStatus" class="status"></div>
+      </details>
+    </div>
   </div>
 </section>
 
@@ -108,9 +120,54 @@ details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;backgr
       </section>
 
       <section id="page-access" class="page" data-admin>
-        <div class="page-head"><div><h1>Admin</h1><p>Manage access and document categories.</p></div></div>
-        <div class="admin-tabs"><button class="btn admin-tab active" data-admin-pane="users">Users</button><button class="btn admin-tab" data-admin-pane="categories">Categories</button></div>
-        <div id="admin-users" class="admin-pane active"><div class="panel"><h2>Users & roles</h2><div id="accessList"></div></div></div>
+        <div class="page-head"><div><h1>Admin</h1><p>Manage account approvals, users, recipients, WhatsApp access and categories.</p></div></div>
+        <div class="admin-tabs">
+          <button class="btn admin-tab active" data-admin-pane="requests">Requests</button>
+          <button class="btn admin-tab" data-admin-pane="users">Users</button>
+          <button class="btn admin-tab" data-admin-pane="recipients">Recipients</button>
+          <button class="btn admin-tab" data-admin-pane="whatsapp">WhatsApp</button>
+          <button class="btn admin-tab" data-admin-pane="categories">Categories</button>
+        </div>
+
+        <div id="admin-requests" class="admin-pane active">
+          <div class="panel"><h2>Account requests</h2><div class="sub">Approve a request and choose its access level. The applicant receives the activation link only after approval.</div><div id="accountRequestList"></div></div>
+        </div>
+
+        <div id="admin-users" class="admin-pane">
+          <div class="panel"><h2>Users & roles</h2><div id="accessList"></div></div>
+        </div>
+
+        <div id="admin-recipients" class="admin-pane">
+          <div class="panel"><h2>Add recipient</h2>
+            <form id="recipientCreateForm">
+              <div class="filters">
+                <input id="recipientName" class="input" placeholder="Name" required>
+                <input id="recipientEmail" class="input" type="email" placeholder="Email (optional)">
+                <input id="recipientMobile" class="input" placeholder="WhatsApp/mobile (optional)">
+              </div>
+              <button class="btn primary" style="margin-top:10px" type="submit">Add recipient</button>
+            </form>
+            <div id="recipientCreateStatus" class="status"></div>
+          </div>
+          <div class="panel">
+            <h2>Delivery recipients</h2>
+            <div id="recipientDefaultStatus" class="sub"></div>
+            <div id="recipientList"></div>
+          </div>
+        </div>
+
+        <div id="admin-whatsapp" class="admin-pane">
+          <div class="panel"><h2>Allowed WhatsApp users</h2>
+            <div class="sub">These numbers can directly interact with the WhatsApp assistant.</div>
+            <form id="whatsappUserForm" class="toolbar" style="margin-top:10px">
+              <input id="whatsappUserMobile" class="input" placeholder="Mobile number" required>
+              <button class="btn primary" type="submit">Add user</button>
+            </form>
+            <div id="whatsappUserStatus" class="status"></div>
+            <div id="whatsappUserList"></div>
+          </div>
+        </div>
+
         <div id="admin-categories" class="admin-pane">
           <div class="panel"><h2>Add category</h2>
             <form id="categoryCreateForm">
@@ -145,7 +202,7 @@ details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;backgr
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let currentRole="viewer";
 function pageTitle(n){return({dashboard:"Home",library:"Search",upload:"Upload",access:"Admin",account:"Account"})[n]||"eLetters"}
-function setPage(n){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id==="page-"+n));document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===n));$("topTitle").textContent=pageTitle(n);if(n==="access"&&currentRole==="admin"){refreshAdminAccess();refreshCategories()}}
+function setPage(n){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id==="page-"+n));document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===n));$("topTitle").textContent=pageTitle(n);if(n==="access"&&currentRole==="admin"){refreshAccountRequests()}}
 document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 function setSessionUi(v){$("loginView").classList.toggle("hidden",v);$("appView").classList.toggle("hidden",!v)}
 function applyRole(r){currentRole=r||"viewer";const write=["editor","admin"].includes(currentRole),admin=currentRole==="admin";document.querySelectorAll("[data-write]").forEach(x=>x.classList.toggle("hidden",!write));document.querySelectorAll("[data-admin]").forEach(x=>x.classList.toggle("hidden",!admin))}
@@ -164,12 +221,54 @@ async function loadDashboard(){const r=await fetch("/api/v1/search?limit=6",{cac
 async function refreshAdminAccess(){const r=await fetch("/api/v1/admin/access",{cache:"no-store"});if(!r.ok)return;const d=await r.json();$("accessList").innerHTML=d.items.filter(x=>x.kind==="member").map(x=>'<div class="access-item"><div><strong>'+esc(x.email)+'</strong><div class="sub">'+esc(x.user_id||"")+'</div></div><select class="select" data-member-role="'+esc(x.user_id)+'">'+["viewer","editor","admin"].map(v=>'<option '+(v===x.role?"selected":"")+'>'+v+'</option>').join("")+'</select><select class="select" data-member-status="'+esc(x.user_id)+'">'+["active","disabled"].map(v=>'<option '+(v===x.status?"selected":"")+'>'+v+'</option>').join("")+'</select><button class="btn" data-save-member="'+esc(x.user_id)+'">Save</button></div>').join("")||'<div class="empty">No accounts.</div>'}
 async function refreshCategories(){const r=await fetch("/api/v1/admin/categories",{cache:"no-store"});if(!r.ok){$("categoryList").innerHTML='<div class="empty">Could not load categories.</div>';return}const d=await r.json();$("categoryList").innerHTML=d.items.map(c=>'<div class="category-item" data-category-id="'+esc(c.id)+'"><input class="input" data-c-icon value="'+esc(c.icon)+'"><input class="input" data-c-en value="'+esc(c.name_en)+'"><input class="input" data-c-hi value="'+esc(c.name_hi)+'"><input class="input wide" data-c-keywords value="'+esc((c.keywords||[]).join(", "))+'"><input class="input" data-c-order type="number" value="'+esc(c.sort_order)+'"><div><label class="sub"><input data-c-active type="checkbox" '+(c.is_active?"checked":"")+'> Active</label><br><button class="btn" data-save-category>Save</button> <button class="btn danger" data-delete-category>Delete</button></div></div>').join("")||'<div class="empty">No categories.</div>'}
 
+async function refreshAccountRequests(){
+  const r=await fetch("/api/v1/admin/account-requests",{cache:"no-store"});
+  if(!r.ok){$("accountRequestList").innerHTML='<div class="empty">Could not load account requests.</div>';return}
+  const d=await r.json();
+  $("accountRequestList").innerHTML=(d.items||[]).map(x=>{
+    const state=esc(x.status||"pending"),role=esc(x.approved_role||"viewer"),id=esc(x.id),email=esc(x.email);
+    const controls=(x.status==="completed")
+      ? '<span class="pill">completed · '+role+'</span>'
+      : '<select class="select" data-request-role>'+["viewer","editor","admin"].map(v=>'<option '+(v===(x.approved_role||"viewer")?"selected":"")+'>'+v+'</option>').join("")+'</select><div><button class="btn primary" data-approve-request>'+(x.status==="approved"?"Reissue approval":"Approve")+'</button> <button class="btn danger" data-reject-request>Reject</button></div>';
+    return '<div class="request-item" data-request-id="'+id+'"><div><strong>'+email+'</strong><div class="sub">Status: '+state+'</div></div>'+controls+'</div>';
+  }).join("")||'<div class="empty">No account requests.</div>';
+}
+
+async function refreshRecipients(){
+  const r=await fetch("/api/v1/admin/recipients",{cache:"no-store"});
+  if(!r.ok){$("recipientList").innerHTML='<div class="empty">Could not load recipients.</div>';return}
+  const d=await r.json(),defaultId=String(d.default_recipient_id||"");
+  $("recipientDefaultStatus").textContent=defaultId?"Custom default recipient is active.":"Default: "+(d.school_default_email||"school email");
+  $("recipientList").innerHTML=(d.items||[]).map(x=>'<div class="recipient-item" data-recipient-id="'+esc(x.id)+'"><input class="input" data-r-name value="'+esc(x.name||"")+'"><input class="input" data-r-email value="'+esc(x.email||"")+'" placeholder="Email"><input class="input" data-r-mobile value="'+esc(x.mobile||"")+'" placeholder="Mobile"><div><label class="sub"><input data-r-email-enabled type="checkbox" '+(x.email_enabled?"checked":"")+'> Email</label> <label class="sub"><input data-r-wa-enabled type="checkbox" '+(x.whatsapp_enabled?"checked":"")+'> WhatsApp</label><br><button class="btn" data-save-recipient>Save</button> <button class="btn" data-default-recipient>'+(String(x.id)===defaultId?"Default ✓":"Make default")+'</button> <button class="btn danger" data-delete-recipient>Delete</button></div></div>').join("")||'<div class="empty">No custom recipients.</div>';
+  $("recipientList").insertAdjacentHTML("afterbegin",'<div style="margin:8px 0"><button class="btn" id="schoolDefaultRecipient">Use school email as default</button></div>');
+  $("schoolDefaultRecipient").addEventListener("click",async()=>{const rr=await fetch("/api/v1/admin/recipients-default",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({recipient_id:null})});if(!rr.ok)alert("Default recipient update failed.");else refreshRecipients()});
+}
+
+async function refreshWhatsAppUsers(){
+  const r=await fetch("/api/v1/admin/whatsapp-users",{cache:"no-store"});
+  if(!r.ok){$("whatsappUserList").innerHTML='<div class="empty">Could not load WhatsApp users.</div>';return}
+  const d=await r.json();
+  $("whatsappUserList").innerHTML=(d.items||[]).map(m=>m==="*"?'<div class="wa-item"><strong>All users (*)</strong><span class="pill">open</span></div>':'<div class="wa-item" data-wa-mobile="'+esc(m)+'"><strong>+'+esc(m)+'</strong><button class="btn danger" data-remove-wa-user>Remove</button></div>').join("")||'<div class="empty">No allowed WhatsApp users.</div>';
+}
+
 $("passwordLoginForm").addEventListener("submit",async e=>{e.preventDefault();$("passwordLoginStatus").textContent="Signing in…";const r=await fetch("/api/v1/auth/password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("passwordLoginEmail").value.trim(),password:$("passwordLoginPassword").value})});let b={};try{b=await r.json()}catch{}if(!r.ok){$("passwordLoginStatus").textContent=b.detail||"Sign in failed.";return}$("passwordLoginPassword").value="";await refreshSessionUi()});
-$("registerForm").addEventListener("submit",async e=>{e.preventDefault();const p=$("registerPassword").value,c=$("registerConfirmPassword").value;if(p!==c){$("registerStatus").textContent="Passwords do not match.";return}const r=await fetch("/api/v1/auth/create-account",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("registerEmail").value.trim(),password:p})});let b={};try{b=await r.json()}catch{};$("registerStatus").textContent=r.ok?(b.message||"Account created. Admin approval pending."):(b.detail||"Account creation failed.")});
+$("registerForm").addEventListener("submit",async e=>{e.preventDefault();$("registerStatus").textContent="Submitting…";const r=await fetch("/api/v1/auth/create-account",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("registerEmail").value.trim()})});let b={};try{b=await r.json()}catch{};$("registerStatus").textContent=r.ok?(b.message||"Access request submitted."):(b.detail||"Request could not be submitted.");if(r.ok)$("registerForm").reset()});
+let setupToken="";
+function initApprovedSetup(){const h=new URLSearchParams(location.hash.slice(1)),token=h.get("setup"),email=h.get("email");if(token&&email){setupToken=token;$("setupEmail").value=email;$("approvedSetup").classList.remove("hidden");$("normalAuth").classList.add("hidden")}}
+$("approvedSetupForm").addEventListener("submit",async e=>{e.preventDefault();const p=$("setupPassword").value,c=$("setupConfirmPassword").value;if(p!==c){$("approvedSetupStatus").textContent="Passwords do not match.";return}$("approvedSetupStatus").textContent="Activating…";const r=await fetch("/api/v1/auth/complete-approved-account",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("setupEmail").value.trim(),password:p,approval_token:setupToken})});let b={};try{b=await r.json()}catch{};if(!r.ok){$("approvedSetupStatus").textContent=b.detail||"Account activation failed.";return}history.replaceState(null,"","/");setupToken="";$("approvedSetup").classList.add("hidden");$("normalAuth").classList.remove("hidden");await refreshSessionUi()});
 $("passwordChangeForm").addEventListener("submit",async e=>{e.preventDefault();const p=$("newPassword").value,c=$("confirmPassword").value;if(p!==c){$("passwordChangeStatus").textContent="Passwords do not match.";return}const r=await fetch("/api/v1/auth/password/change",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:p})});let b={};try{b=await r.json()}catch{};$("passwordChangeStatus").textContent=r.ok?(b.message||"Password updated."):(b.detail||"Update failed.")});
 $("accessList").addEventListener("click",async e=>{const b=e.target.closest("[data-save-member]");if(!b)return;const id=b.dataset.saveMember,role=document.querySelector('[data-member-role="'+CSS.escape(id)+'"]').value,st=document.querySelector('[data-member-status="'+CSS.escape(id)+'"]').value;const r=await fetch("/api/v1/admin/members/"+encodeURIComponent(id),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({role,status:st})});if(!r.ok){alert("Member update failed.");return}await refreshAdminAccess()});
 
-document.querySelectorAll(".admin-tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".admin-tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".admin-pane").forEach(x=>x.classList.toggle("active",x.id==="admin-"+b.dataset.adminPane));if(b.dataset.adminPane==="categories")refreshCategories()}));
+document.querySelectorAll(".admin-tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".admin-tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".admin-pane").forEach(x=>x.classList.toggle("active",x.id==="admin-"+b.dataset.adminPane));const pane=b.dataset.adminPane;if(pane==="requests")refreshAccountRequests();else if(pane==="users")refreshAdminAccess();else if(pane==="recipients")refreshRecipients();else if(pane==="whatsapp")refreshWhatsAppUsers();else if(pane==="categories")refreshCategories()}));
+
+$("accountRequestList").addEventListener("click",async e=>{const row=e.target.closest("[data-request-id]");if(!row)return;const id=row.dataset.requestId;if(e.target.closest("[data-approve-request]")){const role=row.querySelector("[data-request-role]").value;const r=await fetch("/api/v1/admin/account-requests/"+encodeURIComponent(id)+"/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({role})});if(!r.ok){let d={};try{d=await r.json()}catch{};alert(d.detail||"Approval failed.");return}await refreshAccountRequests()}else if(e.target.closest("[data-reject-request]")){if(!confirm("Reject this account request?"))return;const r=await fetch("/api/v1/admin/account-requests/"+encodeURIComponent(id)+"/reject",{method:"POST"});if(!r.ok){alert("Request could not be rejected.");return}await refreshAccountRequests()}});
+
+$("recipientCreateForm").addEventListener("submit",async e=>{e.preventDefault();const body={name:$("recipientName").value.trim(),email:$("recipientEmail").value.trim()||null,mobile:$("recipientMobile").value.trim()||null};const r=await fetch("/api/v1/admin/recipients",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});let d={};try{d=await r.json()}catch{};$("recipientCreateStatus").textContent=r.ok?"Recipient added. Enable Email/WhatsApp below when ready.":(d.detail||"Recipient could not be added.");if(r.ok){$("recipientCreateForm").reset();await refreshRecipients()}});
+$("recipientList").addEventListener("click",async e=>{const row=e.target.closest("[data-recipient-id]");if(!row)return;const id=row.dataset.recipientId;if(e.target.closest("[data-save-recipient]")){const body={name:row.querySelector("[data-r-name]").value.trim(),email:row.querySelector("[data-r-email]").value.trim(),mobile:row.querySelector("[data-r-mobile]").value.trim(),email_enabled:row.querySelector("[data-r-email-enabled]").checked,whatsapp_enabled:row.querySelector("[data-r-wa-enabled]").checked};const r=await fetch("/api/v1/admin/recipients/"+encodeURIComponent(id),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok){let d={};try{d=await r.json()}catch{};alert(d.detail||"Recipient update failed.");return}await refreshRecipients()}else if(e.target.closest("[data-default-recipient]")){const r=await fetch("/api/v1/admin/recipients-default",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({recipient_id:id})});if(!r.ok){alert("Default recipient update failed.");return}await refreshRecipients()}else if(e.target.closest("[data-delete-recipient]")){if(!confirm("Delete this recipient?"))return;const r=await fetch("/api/v1/admin/recipients/"+encodeURIComponent(id),{method:"DELETE"});if(!r.ok){alert("Recipient delete failed.");return}await refreshRecipients()}});
+
+$("whatsappUserForm").addEventListener("submit",async e=>{e.preventDefault();$("whatsappUserStatus").textContent="Updating…";const r=await fetch("/api/v1/admin/whatsapp-users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mobile:$("whatsappUserMobile").value.trim()})});let d={};try{d=await r.json()}catch{};$("whatsappUserStatus").textContent=r.ok?"WhatsApp user added.":(d.detail||"Could not add WhatsApp user.");if(r.ok){$("whatsappUserForm").reset();await refreshWhatsAppUsers()}});
+$("whatsappUserList").addEventListener("click",async e=>{const row=e.target.closest("[data-wa-mobile]");if(!row||!e.target.closest("[data-remove-wa-user]"))return;if(!confirm("Remove this WhatsApp user?"))return;const r=await fetch("/api/v1/admin/whatsapp-users/"+encodeURIComponent(row.dataset.waMobile),{method:"DELETE"});if(!r.ok){alert("WhatsApp user could not be removed.");return}await refreshWhatsAppUsers()});
+
 $("categoryCreateForm").addEventListener("submit",async e=>{e.preventDefault();const body={code:$("catCode").value.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""),name_en:$("catNameEn").value.trim(),name_hi:$("catNameHi").value.trim(),icon:$("catIcon").value.trim()||"📁",keywords:$("catKeywords").value.split(",").map(x=>x.trim()).filter(Boolean),sort_order:Number($("catOrder").value||100),is_active:true};const r=await fetch("/api/v1/admin/categories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});let d={};try{d=await r.json()}catch{};$("categoryCreateStatus").textContent=r.ok?"Category added.":(d.detail||"Could not add category.");if(r.ok){$("categoryCreateForm").reset();$("catIcon").value="📁";$("catOrder").value="100";refreshCategories()}});
 $("categoryList").addEventListener("click",async e=>{const row=e.target.closest("[data-category-id]");if(!row)return;const id=row.dataset.categoryId;if(e.target.closest("[data-save-category]")){const body={name_en:row.querySelector("[data-c-en]").value.trim(),name_hi:row.querySelector("[data-c-hi]").value.trim(),icon:row.querySelector("[data-c-icon]").value.trim()||"📁",keywords:row.querySelector("[data-c-keywords]").value.split(",").map(x=>x.trim()).filter(Boolean),sort_order:Number(row.querySelector("[data-c-order]").value||100),is_active:row.querySelector("[data-c-active]").checked};const r=await fetch("/api/v1/admin/categories/"+encodeURIComponent(id),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)alert("Category update failed.");else refreshCategories()}if(e.target.closest("[data-delete-category]")){if(!confirm("Delete this category?"))return;const r=await fetch("/api/v1/admin/categories/"+encodeURIComponent(id),{method:"DELETE"});if(!r.ok)alert("Category delete failed.");else refreshCategories()}});
 
@@ -177,7 +276,7 @@ $("uploadForm").addEventListener("submit",async e=>{e.preventDefault();const f=$
 $("searchForm").addEventListener("submit",async e=>{e.preventDefault();await searchDocuments()});$("clearSearch").addEventListener("click",()=>{["q","authority","category","year"].forEach(id=>$(id).value="");$("statusFilter").value="";$("fileType").value="";searchDocuments()});$("quickSearch").addEventListener("click",()=>{$("q").value=$("quickQ").value;setPage("library");searchDocuments()});$("quickQ").addEventListener("keydown",e=>{if(e.key==="Enter")$("quickSearch").click()});let searchTimer;$("q").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(searchDocuments,350)});["authority","category","statusFilter","year","fileType"].forEach(id=>$(id).addEventListener("change",searchDocuments));
 $("logoutButton").addEventListener("click",async()=>{await fetch("/api/v1/auth/logout",{method:"POST"});setSessionUi(false)});
 if("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js?v=2",{updateViaCache:"none"}).catch(()=>{})}
-refreshAuthProviders();refreshSessionUi();
+initApprovedSetup();refreshAuthProviders();refreshSessionUi();
 </script>
 </body>
 </html>

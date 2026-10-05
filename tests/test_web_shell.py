@@ -31,13 +31,20 @@ class WebShellTests(unittest.TestCase):
         )
         self.assertIn('id="confirmPassword"', self.html)
 
-    def test_self_service_password_account_creation_is_exposed(self) -> None:
-        self.assertIn('<summary>Create Account</summary>', self.html)
-        self.assertIn('id="registerConfirmPassword"', self.html)
+    def test_admin_approved_account_request_and_activation_are_exposed(self) -> None:
+        self.assertIn("<summary>Request Access</summary>", self.html)
+        self.assertNotIn('id="registerConfirmPassword"', self.html)
         self.assertIn(
             'fetch("/api/v1/auth/create-account"',
             self.html,
         )
+        self.assertIn('id="approvedSetupForm"', self.html)
+        self.assertIn(
+            'fetch("/api/v1/auth/complete-approved-account"',
+            self.html,
+        )
+        self.assertIn('data-admin-pane="recipients"', self.html)
+        self.assertIn('data-admin-pane="whatsapp"', self.html)
 
     def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
         self.assertNotIn('id="loginForm"', self.html)

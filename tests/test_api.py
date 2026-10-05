@@ -1,6 +1,6 @@
 import os
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
 
@@ -205,38 +205,39 @@ class ApiTests(unittest.TestCase):
                 )
         self.assertEqual(response.status_code, 403)
 
-    def test_create_account_uses_password_signup_without_invite(self):
-        from letter_registry.auth import SupabaseSignupResult
-
-        with patch(
-            "letter_registry.api.SupabasePasswordlessAuth.from_environment"
-        ) as factory:
-            factory.return_value.sign_up_with_password.return_value = (
-                SupabaseSignupResult(
-                    session=None,
-                    confirmation_required=True,
-                )
-            )
+    def test_create_account_submits_admin_approval_request_without_signup(self):
+        transport = MagicMock()
+        transport.rpc.return_value = [
+            {
+                "request_id": "22222222-2222-4222-8222-222222222222",
+                "request_status": "pending",
+            }
+        ]
+        with patch("letter_registry.api._anon_transport", return_value=transport):
             with patch.dict(
                 os.environ,
-                {"AUTH_APP_ORIGIN": "https://archive.example.com"},
+                {
+                    "AUTH_APP_ORIGIN": "https://archive.example.com",
+                    "DLR_ARCHIVE_ID": "11111111-1111-4111-8111-111111111111",
+                },
                 clear=False,
             ):
                 response = self.client.post(
                     "/api/v1/auth/create-account",
                     headers={"Origin": "https://archive.example.com"},
-                    json={
-                        "email": "new@example.com",
-                        "password": "synthetic-password",
-                    },
+                    json={"email": "new@example.com"},
                 )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 202)
         self.assertFalse(response.json()["authenticated"])
-        self.assertTrue(response.json()["confirmation_required"])
-        factory.return_value.sign_up_with_password.assert_called_once_with(
-            email="new@example.com",
-            password="synthetic-password",
+        self.assertFalse(response.json()["confirmation_required"])
+        self.assertIn("administrator approval", response.json()["message"])
+        transport.rpc.assert_called_once_with(
+            "dlr_request_archive_access",
+            {
+                "target_archive_id": "11111111-1111-4111-8111-111111111111",
+                "target_email": "new@example.com",
+            },
         )
 
     def test_registration_rejects_invalid_invite(self):
