@@ -174,6 +174,7 @@ class AdminRecipientUpdateRequest(BaseModel):
     mobile: str | None = Field(default=None, max_length=32)
     email_enabled: bool | None = None
     whatsapp_enabled: bool | None = None
+    is_active: bool | None = None
 
 
 class AdminRecipientDefaultRequest(BaseModel):
@@ -1758,6 +1759,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     "whatsapp",
                     payload.whatsapp_enabled,
                 )
+            if payload.is_active is not None:
+                module.set_active(recipient_id, payload.is_active)
             data = module.load_registry()
             updated = dict(module.resolve_recipient(data, recipient_id))
             _audit_admin_action(
@@ -1796,7 +1799,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 )
             )
         try:
-            module.remove_recipient(recipient_id)
+            module.set_active(recipient_id, False)
         except ValueError as exc:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -1804,11 +1807,62 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             ) from exc
         _audit_admin_action(
             access_token,
-            action="recipient_removed",
+            action="recipient_soft_removed",
             target_type="recipient",
             target_id=recipient_id,
         )
-        return MessageResponse(message="Recipient removed")
+        return MessageResponse(message="Recipient removed and can be restored")
+
+    @app.post(
+        "/api/v1/admin/recipients/{recipient_id}/restore",
+        response_model=MessageResponse,
+    )
+    def restore_admin_recipient(
+        recipient_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        module = _oracle_recipient_registry()
+        if module is None:
+            result = _proxy_admin_json(
+                path=f"/api/v1/admin/recipients/{quote(recipient_id, safe='')}/restore",
+                access_token=access_token,
+                method="POST",
+                payload={},
+            )
+            return MessageResponse(message=str(result.get("message") if isinstance(result, dict) else "Recipient restored"))
+        try:
+            module.set_active(recipient_id, True)
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        _audit_admin_action(access_token, action="recipient_restored", target_type="recipient", target_id=recipient_id)
+        return MessageResponse(message="Recipient restored")
+
+    @app.delete(
+        "/api/v1/admin/recipients/{recipient_id}/permanent",
+        response_model=MessageResponse,
+    )
+    def permanently_delete_admin_recipient(
+        recipient_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        module = _oracle_recipient_registry()
+        if module is None:
+            result = _proxy_admin_json(
+                path=f"/api/v1/admin/recipients/{quote(recipient_id, safe='')}/permanent",
+                access_token=access_token,
+                method="DELETE",
+            )
+            return MessageResponse(message=str(result.get("message") if isinstance(result, dict) else "Recipient permanently deleted"))
+        try:
+            module.remove_recipient(recipient_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        _audit_admin_action(access_token, action="recipient_permanently_deleted", target_type="recipient", target_id=recipient_id)
+        return MessageResponse(message="Recipient permanently deleted")
 
     @app.patch(
         "/api/v1/admin/recipients-default",
@@ -2525,9 +2579,16 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Category not found",
             )
+        category_action = (
+            "category_restored"
+            if changes.get("is_active") is True
+            else "category_soft_removed"
+            if changes.get("is_active") is False
+            else "category_updated"
+        )
         _audit_admin_action(
             access_token,
-            action="category_updated",
+            action=category_action,
             target_type="category",
             target_id=category_id,
             detail={"fields": sorted(changes)},

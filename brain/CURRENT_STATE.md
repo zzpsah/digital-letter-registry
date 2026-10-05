@@ -157,3 +157,12 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Retry clears claim/start/completion/error runtime fields but preserves attempt count/history.
 - Retry writes an admin audit event.
 - Live database verification found 2 failed jobs currently available for admin review; they were not automatically retried.
+
+## 2026-10-05 — Reversible removal baseline
+
+- Users expose clear Disable/Restore actions while retaining role/status controls.
+- Recipients now support Active/Removed sections, Restore, and separately confirmed permanent delete.
+- Recipient removal disables all delivery channels and cannot remain the default recipient.
+- Categories use Active/Removed sections with Restore; permanent delete is separate.
+- Soft remove/restore operations are audit logged.
+- 310 automated tests pass and recipient-registry soft-delete round-trip verification passes.

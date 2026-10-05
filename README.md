@@ -222,3 +222,7 @@ Admin Console now opens with an Overview dashboard showing document/user/request
 ## Operations / failure recovery — 2026-10-05
 
 Admin Console includes an Operations tab listing failed document-processing jobs with document title, reason, attempt count, last error and failure time. Admins can explicitly retry only failed jobs; retry returns the existing durable job to pending, clears the active claim/error state, preserves attempt history and records an audit event.
+
+## Reversible admin removal — 2026-10-05
+
+Admin removal is now reversible by default. Users use Active/Disabled status, recipients move to Removed and can be restored, and categories move to Removed by setting them inactive. Recipient removal automatically disables delivery channels and clears it as the default recipient. Permanent recipient/category deletion is a separate explicit action with confirmation.

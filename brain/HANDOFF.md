@@ -64,3 +64,7 @@ Preserve the Overview and Audit tabs and route WhatsApp group actions through th
 ## Processing recovery handoff — 2026-10-05
 
 Use Admin > Operations for manual failed-job recovery. Do not turn this into automatic bulk retry without a separate policy: repeated provider/OCR/config failures could otherwise loop. A retry should preserve attempts, clear the worker claim and last error, set availability to now, and let the normal worker claim path process it.
+
+## Reversible admin-state handoff — 2026-10-05
+
+Do not make normal Remove buttons destructive. User removal means disabled membership; recipient removal means is_active=false with delivery disabled; category removal means is_active=false. Restore must be available from the same Admin area. Permanent delete should remain secondary, explicit, and confirmed.

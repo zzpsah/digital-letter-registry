@@ -329,3 +329,7 @@ The Admin Console now includes Overview and Audit panes. Mutating account/member
 ## Failure and retry control — 2026-10-05
 
 The Admin Operations pane is the supported manual recovery path for failed processing jobs. It reads failed rows from the archive-scoped processing_jobs queue and exposes an explicit Retry action. Retry is guarded to status=failed only, resets claimed/runtime timestamps needed for a fresh worker claim, preserves attempts, and appends an admin audit event including bounded previous-error context. Do not auto-retry all failures from the UI.
+
+## Soft delete and restore — 2026-10-05
+
+Normal Admin removal must remain reversible. Members are disabled/restored through membership status. Recipients carry an is_active state in the private Oracle registry; soft removal disables Email/WhatsApp delivery, clears default-recipient selection when applicable, and keeps the record for restore. Categories use is_active=false for removal and true for restore. Permanent recipient/category deletion remains an explicit secondary action with a stronger confirmation.

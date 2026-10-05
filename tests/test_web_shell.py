@@ -52,6 +52,12 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('fetch("/api/v1/admin/operations"', self.html)
         self.assertIn('data-retry-job', self.html)
 
+    def test_admin_soft_delete_restore_controls_are_exposed(self) -> None:
+        self.assertIn("data-restore-recipient", self.html)
+        self.assertIn("data-purge-recipient", self.html)
+        self.assertIn("data-restore-category", self.html)
+        self.assertIn("data-toggle-member", self.html)
+
     def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
         self.assertNotIn('id="loginForm"', self.html)
         self.assertNotIn('id="registerMagicLink"', self.html)
