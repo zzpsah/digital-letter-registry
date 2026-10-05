@@ -1,3 +1,10 @@
+## 2026-10-05 — Add admin password reset and delete user controls
+- Commit: d8079864525e357322924a029d151581ae40a440
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Add admin password reset and user deletion APIs
 - Commit: 521f81d7240300378097222612f166e1f63c3b82
 - Author: PRASHANT KUMAR SAH

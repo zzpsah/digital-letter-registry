@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 521f81d7240300378097222612f166e1f63c3b82
-- Last commit: Add admin password reset and user deletion APIs
+- HEAD: d8079864525e357322924a029d151581ae40a440
+- Last commit: Add admin password reset and delete user controls
 - Last commit date: 2026-10-05
 - Last commit author: PRASHANT KUMAR SAH
 
