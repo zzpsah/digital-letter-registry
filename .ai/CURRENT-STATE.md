@@ -65,7 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 6d756f2612d4b236ea8799466758078dbfd94b19
-- Change: Add language display toggle and smart search label
+- Commit: d68c2fc83501036bf74fa3f0ca3986f6114116a5
+- Change: Return home after refreshing a quick search
 - Date: 2026-10-05
 - Durable context synchronization: completed

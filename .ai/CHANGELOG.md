@@ -1,3 +1,10 @@
+## 2026-10-05 — Return home after refreshing a quick search
+- Commit: d68c2fc83501036bf74fa3f0ca3986f6114116a5
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Add language display toggle and smart search label
 - Commit: 6d756f2612d4b236ea8799466758078dbfd94b19
 - Author: Prashant
