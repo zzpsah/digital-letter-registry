@@ -24,7 +24,7 @@ details{border:1px solid var(--line);border-radius:10px;padding:8px 10px;backgro
 .filters{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}.results-head{display:flex;justify-content:space-between;color:var(--muted);font-size:.84rem;margin:10px 2px 6px}
 .doc{padding:11px 12px;margin:7px 0}.doc-title{font-weight:800}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px;color:var(--muted);font-size:.8rem}.pill{padding:3px 7px;border-radius:999px;background:#f0f4f2}.summary{margin-top:8px;line-height:1.45}.action{margin-top:8px;padding:9px;border-radius:9px;background:#fff9e8;border:1px solid #f0e5b8;font-size:.88rem}.doc-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
 .drop{border:2px dashed #cfc2e8;border-radius:12px;padding:16px;text-align:center;background:#faf8ff}.progress{height:7px;border-radius:999px;background:#e8eeeb;overflow:hidden;margin-top:10px}.progress span{display:block;height:100%;width:0;background:var(--brand)}
-.admin-tabs{display:flex;gap:5px;margin-bottom:8px}.admin-tabs .btn{padding:7px 9px;font-size:.86rem}.admin-tab.active{background:var(--soft);color:var(--brand);border-color:#b8d1c9}.admin-pane{display:none}.admin-pane.active{display:block}
+.admin-tabs{display:flex;gap:5px;margin-bottom:8px}.admin-tabs .btn{padding:7px 9px;font-size:.86rem}.admin-tab.active{background:var(--soft);color:var(--brand);border-color:#b8d1c9}.admin-pane{display:none}.admin-pane.active{display:block}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px}.summary-card strong{display:block;font-size:1.35rem}.group-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.textarea{width:100%;min-height:105px;resize:vertical;border:1px solid #d3cae6;border-radius:9px;padding:9px 10px;background:#fff;color:var(--text);font:inherit}.audit-item{padding:9px 0;border-bottom:1px solid var(--line)}.audit-item:last-child{border-bottom:0}
 .access-item,.category-item,.request-item,.recipient-item,.wa-item{display:grid;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.access-item{grid-template-columns:1fr 120px 120px auto}.category-item{grid-template-columns:52px 1.2fr 1.2fr 1.8fr 80px auto}.request-item{grid-template-columns:1.7fr 120px 110px auto}.recipient-item{grid-template-columns:1.1fr 1.4fr 1fr auto}.wa-item{grid-template-columns:1fr auto}.category-item input,.recipient-item input{min-width:0}.empty{padding:28px;text-align:center;color:var(--muted)}.admin-tabs{overflow-x:auto;white-space:nowrap}.setup-card{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
 @media(max-width:900px){
 .sidebar{padding:7px 8px;gap:8px}.brand strong{display:none}.mark{width:30px;height:30px;border-radius:8px}.nav{gap:2px;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav button{padding:7px 8px;font-size:.88rem}
@@ -44,8 +44,8 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
 .doc-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}.doc-actions .btn{width:100%;padding:8px 9px}.doc-actions .danger{grid-column:1/-1}
 .results-head{font-size:.78rem;margin:7px 2px 5px}
 .admin-tabs{gap:4px;margin:0 -2px 7px;padding:0 2px 3px;scrollbar-width:none}.admin-tabs::-webkit-scrollbar{display:none}.admin-tabs .btn{padding:7px 8px;font-size:.8rem}
-.category-item,.access-item,.request-item,.recipient-item,.wa-item{grid-template-columns:1fr;padding:8px 0;gap:6px}
-.drop{padding:13px 9px}.login-shell{padding:14px}.login-card{padding:18px;border-radius:16px}.login-card h1{font-size:1.35rem}
+.category-item,.access-item,.request-item,.recipient-item,.wa-item{grid-template-columns:1fr;padding:8px 0;gap:6px}.summary-grid,.group-grid{grid-template-columns:1fr 1fr}
+.summary-grid,.group-grid{grid-template-columns:1fr}.drop{padding:13px 9px}.login-shell{padding:14px}.login-card{padding:18px;border-radius:16px}.login-card h1{font-size:1.35rem}
 }
 </style>
 </head>
@@ -141,14 +141,20 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
       <section id="page-access" class="page" data-admin>
         <div class="page-head"><div><h1>Admin</h1><p>Manage account approvals, users, recipients, WhatsApp access and categories.</p></div></div>
         <div class="admin-tabs">
-          <button class="btn admin-tab active" data-admin-pane="requests">Requests</button>
+          <button class="btn admin-tab active" data-admin-pane="overview">Overview</button>
+          <button class="btn admin-tab" data-admin-pane="requests">Requests</button>
           <button class="btn admin-tab" data-admin-pane="users">Users</button>
           <button class="btn admin-tab" data-admin-pane="recipients">Recipients</button>
           <button class="btn admin-tab" data-admin-pane="whatsapp">WhatsApp</button>
           <button class="btn admin-tab" data-admin-pane="categories">Categories</button>
+          <button class="btn admin-tab" data-admin-pane="audit">Audit</button>
         </div>
 
-        <div id="admin-requests" class="admin-pane active">
+        <div id="admin-overview" class="admin-pane active">
+          <div class="summary-grid" id="adminSummary"></div>
+        </div>
+
+        <div id="admin-requests" class="admin-pane">
           <div class="panel"><h2>Account requests</h2><div class="sub">Approve a request and choose its access level. The applicant receives the activation link only after approval.</div><div id="accountRequestList"></div></div>
         </div>
 
@@ -176,6 +182,22 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
         </div>
 
         <div id="admin-whatsapp" class="admin-pane">
+          <div class="panel">
+            <div class="page-head"><div><h2>EDU-Letters group</h2><p>Manage the live group presentation and pinned guide.</p></div><button id="refreshWhatsAppGroup" class="btn" type="button">Refresh</button></div>
+            <div id="whatsappGroupStatus" class="status"></div>
+            <div class="group-grid" style="margin-top:9px">
+              <div>
+                <label class="sub">Group description (plain text)</label>
+                <textarea id="whatsappGroupDescription" class="textarea" maxlength="2048"></textarea>
+                <button id="saveWhatsAppGroupDescription" class="btn primary" style="margin-top:7px" type="button">Save description</button>
+              </div>
+              <div>
+                <label class="sub">Guide message to send and pin</label>
+                <textarea id="whatsappGroupGuide" class="textarea" maxlength="4096"></textarea>
+                <div class="toolbar" style="margin-top:7px"><button id="sendPinWhatsAppGuide" class="btn primary" type="button">Send & pin guide</button><button id="applyWhatsAppGroupPhoto" class="btn" type="button">Apply group photo</button></div>
+              </div>
+            </div>
+          </div>
           <div class="panel"><h2>Allowed WhatsApp users</h2>
             <div class="sub">These numbers can directly interact with the WhatsApp assistant.</div>
             <form id="whatsappUserForm" class="toolbar" style="margin-top:10px">
@@ -185,6 +207,10 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
             <div id="whatsappUserStatus" class="status"></div>
             <div id="whatsappUserList"></div>
           </div>
+        </div>
+
+        <div id="admin-audit" class="admin-pane">
+          <div class="panel"><div class="page-head"><div><h2>Admin audit log</h2><p>Recent administrative changes.</p></div><button id="refreshAuditLog" class="btn" type="button">Refresh</button></div><div id="auditLog"></div></div>
         </div>
 
         <div id="admin-categories" class="admin-pane">
@@ -221,7 +247,7 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let currentRole="viewer";
 function pageTitle(n){return({dashboard:"Home",library:"Search",upload:"Upload",access:"Admin",account:"Account"})[n]||"eLetters"}
-function setPage(n){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id==="page-"+n));document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===n));$("topTitle").textContent=pageTitle(n);if(n==="access"&&currentRole==="admin"){refreshAccountRequests()}}
+function setPage(n){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id==="page-"+n));document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===n));$("topTitle").textContent=pageTitle(n);if(n==="access"&&currentRole==="admin"){refreshAdminDashboard()}}
 document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 function setSessionUi(v){$("loginView").classList.toggle("hidden",v);$("appView").classList.toggle("hidden",!v)}
 function applyRole(r){currentRole=r||"viewer";const write=["editor","admin"].includes(currentRole),admin=currentRole==="admin";document.querySelectorAll("[data-write]").forEach(x=>x.classList.toggle("hidden",!write));document.querySelectorAll("[data-admin]").forEach(x=>x.classList.toggle("hidden",!admin))}
@@ -237,6 +263,41 @@ async function deleteLetter(id,title){if(!confirm('Move "'+title+'" to Trash?'))
 async function searchDocuments(){$("status").textContent="Searching…";const r=await fetch("/api/v1/search?"+params(),{cache:"no-store"});if(!r.ok){$("status").textContent="Search failed.";return}const d=await r.json();$("status").textContent=d.count+" result"+(d.count===1?"":"s");$("resultMode").textContent="";$("results").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No matching documents.</div>';bindDocActions($("results"))}
 async function loadDashboard(){const r=await fetch("/api/v1/search?limit=6",{cache:"no-store"});if(!r.ok)return;const d=await r.json();$("recentResults").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No documents yet.</div>';bindDocActions($("recentResults"))}
 
+async function refreshAdminDashboard(){
+  const r=await fetch("/api/v1/admin/dashboard",{cache:"no-store"});
+  if(!r.ok){$("adminSummary").innerHTML='<div class="panel">Could not load admin summary.</div>';return}
+  const d=await r.json();
+  const cards=[["Documents",d.documents],["Active users",d.active_users],["Pending requests",d.pending_requests],["Recipients",d.recipients],["WhatsApp allowed",d.whatsapp_allowed],["Active categories",d.active_categories]];
+  $("adminSummary").innerHTML=cards.map(x=>'<div class="summary-card"><span class="sub">'+esc(x[0])+'</span><strong>'+esc(x[1]??0)+'</strong></div>').join("");
+}
+function defaultWhatsAppGuide(d){
+  return `📌 *EDU- Letters | महत्वपूर्ण पत्र संग्रह*
+
+🎯 शिक्षा विभाग के महत्वपूर्ण PDF/Image पत्रों को सुरक्षित, व्यवस्थित और आसानी से खोजने के लिए।
+
+📥 *पत्र भेजें*
+महत्वपूर्ण PDF या Image इसी ग्रुप में Forward/Send करें। जरूरत हो तो छोटा Caption/Note जोड़ें।
+
+🌐 *eLetters Web*
+${d.portal_url||"https://eletters.vercel.app"}
+
+🔎 *Public Index*
+${d.index_url||""}
+
+♻️ Index अपने-आप अपडेट होता रहेगा।`;
+}
+async function refreshWhatsAppGroup(){
+  const r=await fetch("/api/v1/admin/whatsapp-group",{cache:"no-store"});let d={};try{d=await r.json()}catch{}
+  if(!r.ok){$("whatsappGroupStatus").textContent=d.detail||"Could not load group settings.";return}
+  $("whatsappGroupDescription").value=d.description||"";
+  if(!$("whatsappGroupGuide").value.trim())$("whatsappGroupGuide").value=defaultWhatsAppGuide(d);
+  $("whatsappGroupStatus").textContent=(d.connected?"Connected":"Disconnected")+" · "+(d.name||"EDU- Letters")+(d.index_url?" · Index ready":" · Index link missing")+(d.last_pinned_at?" · Last pinned "+new Date(d.last_pinned_at).toLocaleString():"");
+}
+async function refreshAuditLog(){
+  const r=await fetch("/api/v1/admin/audit-log",{cache:"no-store"});if(!r.ok){$("auditLog").innerHTML='<div class="empty">Could not load audit log.</div>';return}
+  const d=await r.json();
+  $("auditLog").innerHTML=(d.items||[]).map(x=>'<div class="audit-item"><strong>'+esc(x.action||"admin_action")+'</strong><div class="sub">'+esc(x.target_type||"")+(x.target_id?' · '+esc(x.target_id):"")+' · '+esc(x.actor_user_id||"")+'</div><div class="sub">'+esc(x.created_at?new Date(x.created_at).toLocaleString():"")+'</div></div>').join("")||'<div class="empty">No admin actions logged yet.</div>';
+}
 async function refreshAdminAccess(){const r=await fetch("/api/v1/admin/access",{cache:"no-store"});if(!r.ok)return;const d=await r.json();$("accessList").innerHTML=d.items.filter(x=>x.kind==="member").map(x=>'<div class="access-item"><div><strong>'+esc(x.email)+'</strong><div class="sub">'+esc(x.user_id||"")+'</div></div><select class="select" data-member-role="'+esc(x.user_id)+'">'+["viewer","editor","admin"].map(v=>'<option '+(v===x.role?"selected":"")+'>'+v+'</option>').join("")+'</select><select class="select" data-member-status="'+esc(x.user_id)+'">'+["active","disabled"].map(v=>'<option '+(v===x.status?"selected":"")+'>'+v+'</option>').join("")+'</select><button class="btn" data-save-member="'+esc(x.user_id)+'">Save</button></div>').join("")||'<div class="empty">No accounts.</div>'}
 async function refreshCategories(){const r=await fetch("/api/v1/admin/categories",{cache:"no-store"});if(!r.ok){$("categoryList").innerHTML='<div class="empty">Could not load categories.</div>';return}const d=await r.json();$("categoryList").innerHTML=d.items.map(c=>'<div class="category-item" data-category-id="'+esc(c.id)+'"><input class="input" data-c-icon value="'+esc(c.icon)+'"><input class="input" data-c-en value="'+esc(c.name_en)+'"><input class="input" data-c-hi value="'+esc(c.name_hi)+'"><input class="input wide" data-c-keywords value="'+esc((c.keywords||[]).join(", "))+'"><input class="input" data-c-order type="number" value="'+esc(c.sort_order)+'"><div><label class="sub"><input data-c-active type="checkbox" '+(c.is_active?"checked":"")+'> Active</label><br><button class="btn" data-save-category>Save</button> <button class="btn danger" data-delete-category>Delete</button></div></div>').join("")||'<div class="empty">No categories.</div>'}
 
@@ -278,7 +339,7 @@ $("approvedSetupForm").addEventListener("submit",async e=>{e.preventDefault();co
 $("passwordChangeForm").addEventListener("submit",async e=>{e.preventDefault();const p=$("newPassword").value,c=$("confirmPassword").value;if(p!==c){$("passwordChangeStatus").textContent="Passwords do not match.";return}const r=await fetch("/api/v1/auth/password/change",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:p})});let b={};try{b=await r.json()}catch{};$("passwordChangeStatus").textContent=r.ok?(b.message||"Password updated."):(b.detail||"Update failed.")});
 $("accessList").addEventListener("click",async e=>{const b=e.target.closest("[data-save-member]");if(!b)return;const id=b.dataset.saveMember,role=document.querySelector('[data-member-role="'+CSS.escape(id)+'"]').value,st=document.querySelector('[data-member-status="'+CSS.escape(id)+'"]').value;const r=await fetch("/api/v1/admin/members/"+encodeURIComponent(id),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({role,status:st})});if(!r.ok){alert("Member update failed.");return}await refreshAdminAccess()});
 
-document.querySelectorAll(".admin-tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".admin-tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".admin-pane").forEach(x=>x.classList.toggle("active",x.id==="admin-"+b.dataset.adminPane));const pane=b.dataset.adminPane;if(pane==="requests")refreshAccountRequests();else if(pane==="users")refreshAdminAccess();else if(pane==="recipients")refreshRecipients();else if(pane==="whatsapp")refreshWhatsAppUsers();else if(pane==="categories")refreshCategories()}));
+document.querySelectorAll(".admin-tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".admin-tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".admin-pane").forEach(x=>x.classList.toggle("active",x.id==="admin-"+b.dataset.adminPane));const pane=b.dataset.adminPane;if(pane==="overview")refreshAdminDashboard();else if(pane==="requests")refreshAccountRequests();else if(pane==="users")refreshAdminAccess();else if(pane==="recipients")refreshRecipients();else if(pane==="whatsapp"){refreshWhatsAppUsers();refreshWhatsAppGroup()}else if(pane==="categories")refreshCategories();else if(pane==="audit")refreshAuditLog()}));
 
 $("accountRequestList").addEventListener("click",async e=>{const row=e.target.closest("[data-request-id]");if(!row)return;const id=row.dataset.requestId;if(e.target.closest("[data-approve-request]")){const role=row.querySelector("[data-request-role]").value;const r=await fetch("/api/v1/admin/account-requests/"+encodeURIComponent(id)+"/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({role})});if(!r.ok){let d={};try{d=await r.json()}catch{};alert(d.detail||"Approval failed.");return}await refreshAccountRequests()}else if(e.target.closest("[data-reject-request]")){if(!confirm("Reject this account request?"))return;const r=await fetch("/api/v1/admin/account-requests/"+encodeURIComponent(id)+"/reject",{method:"POST"});if(!r.ok){alert("Request could not be rejected.");return}await refreshAccountRequests()}});
 
@@ -288,6 +349,11 @@ $("recipientList").addEventListener("click",async e=>{const row=e.target.closest
 $("whatsappUserForm").addEventListener("submit",async e=>{e.preventDefault();$("whatsappUserStatus").textContent="Updating…";const r=await fetch("/api/v1/admin/whatsapp-users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mobile:$("whatsappUserMobile").value.trim()})});let d={};try{d=await r.json()}catch{};$("whatsappUserStatus").textContent=r.ok?"WhatsApp user added.":(d.detail||"Could not add WhatsApp user.");if(r.ok){$("whatsappUserForm").reset();await refreshWhatsAppUsers()}});
 $("whatsappUserList").addEventListener("click",async e=>{const row=e.target.closest("[data-wa-mobile]");if(!row||!e.target.closest("[data-remove-wa-user]"))return;if(!confirm("Remove this WhatsApp user?"))return;const r=await fetch("/api/v1/admin/whatsapp-users/"+encodeURIComponent(row.dataset.waMobile),{method:"DELETE"});if(!r.ok){alert("WhatsApp user could not be removed.");return}await refreshWhatsAppUsers()});
 
+$("refreshWhatsAppGroup").addEventListener("click",refreshWhatsAppGroup);
+$("refreshAuditLog").addEventListener("click",refreshAuditLog);
+$("saveWhatsAppGroupDescription").addEventListener("click",async()=>{$("whatsappGroupStatus").textContent="Saving description…";const r=await fetch("/api/v1/admin/whatsapp-group/description",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({description:$("whatsappGroupDescription").value.trim()})});let d={};try{d=await r.json()}catch{};$("whatsappGroupStatus").textContent=r.ok?"Description updated.":(d.detail||"Description update failed.");if(r.ok)refreshWhatsAppGroup()});
+$("sendPinWhatsAppGuide").addEventListener("click",async()=>{if(!confirm("Send a new guide message and pin it for 30 days?"))return;$("whatsappGroupStatus").textContent="Sending and pinning…";const r=await fetch("/api/v1/admin/whatsapp-group/pin-guide",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:$("whatsappGroupGuide").value.trim()})});let d={};try{d=await r.json()}catch{};$("whatsappGroupStatus").textContent=r.ok?"New guide sent and pinned.":(d.detail||"Guide could not be pinned.");if(r.ok)refreshWhatsAppGroup()});
+$("applyWhatsAppGroupPhoto").addEventListener("click",async()=>{$("whatsappGroupStatus").textContent="Applying group photo…";const r=await fetch("/api/v1/admin/whatsapp-group/photo",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});let d={};try{d=await r.json()}catch{};$("whatsappGroupStatus").textContent=r.ok?"Group photo applied.":(d.detail||"Group photo update failed.");});
 $("categoryCreateForm").addEventListener("submit",async e=>{e.preventDefault();const body={code:$("catCode").value.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""),name_en:$("catNameEn").value.trim(),name_hi:$("catNameHi").value.trim(),icon:$("catIcon").value.trim()||"📁",keywords:$("catKeywords").value.split(",").map(x=>x.trim()).filter(Boolean),sort_order:Number($("catOrder").value||100),is_active:true};const r=await fetch("/api/v1/admin/categories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});let d={};try{d=await r.json()}catch{};$("categoryCreateStatus").textContent=r.ok?"Category added.":(d.detail||"Could not add category.");if(r.ok){$("categoryCreateForm").reset();$("catIcon").value="📁";$("catOrder").value="100";refreshCategories()}});
 $("categoryList").addEventListener("click",async e=>{const row=e.target.closest("[data-category-id]");if(!row)return;const id=row.dataset.categoryId;if(e.target.closest("[data-save-category]")){const body={name_en:row.querySelector("[data-c-en]").value.trim(),name_hi:row.querySelector("[data-c-hi]").value.trim(),icon:row.querySelector("[data-c-icon]").value.trim()||"📁",keywords:row.querySelector("[data-c-keywords]").value.split(",").map(x=>x.trim()).filter(Boolean),sort_order:Number(row.querySelector("[data-c-order]").value||100),is_active:row.querySelector("[data-c-active]").checked};const r=await fetch("/api/v1/admin/categories/"+encodeURIComponent(id),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)alert("Category update failed.");else refreshCategories()}if(e.target.closest("[data-delete-category]")){if(!confirm("Delete this category?"))return;const r=await fetch("/api/v1/admin/categories/"+encodeURIComponent(id),{method:"DELETE"});if(!r.ok)alert("Category delete failed.");else refreshCategories()}});
 

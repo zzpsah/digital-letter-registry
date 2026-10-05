@@ -56,3 +56,7 @@ The hosted archive now uses membership/role authorization rather than a configur
 ## Latest web UI handoff — 2026-10-05
 
 Treat the current responsive eLetters shell as the UI baseline. Preserve the compact English-default navigation and mobile breakpoints. Do not regress Admin back to add-only recipient/WhatsApp controls: current entries must remain visible and manageable.
+
+## Admin operations handoff — 2026-10-05
+
+Preserve the Overview and Audit tabs and route WhatsApp group actions through the Oracle proxy when running on Vercel. Keep group descriptions plain text. Never convert send+pin into editing an assumed stale message ID: create a fresh message, pin it, then update runtime state. Audit persistence is best-effort after external side effects so a temporary audit write failure does not falsely report an already-completed WhatsApp/recipient action as rolled back.

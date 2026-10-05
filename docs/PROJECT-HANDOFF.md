@@ -321,3 +321,7 @@ The worker is wired with AutonomousCorrectionMemory.from_environment(). The path
 ## 2026-10-05 control-plane and mobile update
 
 The current eLetters web control plane includes admin-managed account requests and roles, delivery recipients, WhatsApp allowed-user management, and dynamic document categories. The narrow-screen UI was explicitly optimized for compact navigation, single-column filters, mobile-safe 16px form inputs, stacked admin records, horizontally scrollable admin tabs, and thumb-friendly document actions. Desktop behavior remains unchanged.
+
+## Admin dashboard, audit and WhatsApp group control — 2026-10-05
+
+The Admin Console now includes Overview and Audit panes. Mutating account/member/recipient/WhatsApp/category/group operations append archive-scoped audit events where applicable. The audit table is protected by admin-only RLS and grants only SELECT/INSERT to authenticated users subject to that policy. WhatsApp group presentation is managed through the existing Vercel-to-Oracle admin proxy: description is plain text, guide send/pin creates a new message and pins it for 30 days, and the canonical group image can be re-applied.

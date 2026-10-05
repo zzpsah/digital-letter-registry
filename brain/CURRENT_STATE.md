@@ -139,3 +139,12 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Admin can add/remove managed recipients/users and control the broader account/category workflow from the web console.
 - Mobile web CSS was refined for compact sticky navigation, responsive search/actions, one-column filters/forms, readable document cards, horizontal admin tabs and touch-friendly controls.
 - The full automated suite passed after the mobile change (308 tests).
+
+## 2026-10-05 — Admin dashboard/audit/group controls
+
+- Admin Overview summary cards are implemented.
+- Admin Audit pane reads the archive-scoped admin_audit_log.
+- Audit RLS permits admin-only SELECT/INSERT and verifies actor_user_id = auth.uid() on insert.
+- WhatsApp pane can load group status, edit plain-text description, send+pin a fresh guide for 30 days, and apply the canonical group photo through Oracle.
+- Supabase advisor found and the implementation fixed the new audit actor foreign-key index.
+- Existing 308-test suite remains green.

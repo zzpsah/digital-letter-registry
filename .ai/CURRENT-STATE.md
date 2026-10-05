@@ -73,3 +73,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 ## 2026-10-05 — eLetters mobile/admin baseline
 
 The eLetters responsive shell is now explicitly optimized for phones. Admin users can view/manage recipients and WhatsApp allowed users, in addition to account approvals, roles and dynamic categories. The post-change automated suite passed 308 tests. Preserve this as the current web baseline.
+
+## 2026-10-05 — Admin operations control center
+
+eLetters Admin now has Overview summary cards, archive-scoped admin audit history, and live EDU-Letters group management (description, send+pin guide, canonical group photo, status). Audit storage uses Supabase RLS restricted to archive admins. Existing automated suite passes 308 tests.

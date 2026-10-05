@@ -184,6 +184,14 @@ class AdminWhatsAppUserRequest(BaseModel):
     mobile: str = Field(min_length=10, max_length=32)
 
 
+class AdminWhatsAppGroupDescriptionRequest(BaseModel):
+    description: str = Field(min_length=1, max_length=2048)
+
+
+class AdminWhatsAppGroupGuideRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=4096)
+
+
 class AdminCategoryRequest(BaseModel):
     code: str = Field(min_length=2, max_length=80, pattern=r"^[a-z0-9_]+$")
     name_en: str = Field(min_length=2, max_length=120)
@@ -872,6 +880,93 @@ def _write_whatsapp_allowed_users(values: list[str]) -> None:
     os.replace(temp, source)
 
 
+def _whatsapp_group_state_path() -> Path:
+    return Path("/home/prashant/.hermes/state/dlr-index/state.json")
+
+
+def _whatsapp_group_photo_path() -> Path:
+    return Path("/home/prashant/.hermes/state/dlr-group/edu-letters-group.png")
+
+
+def _whatsapp_group_jid() -> str:
+    value = os.environ.get("DLR_WHATSAPP_GROUP_JID", "").strip()
+    if value:
+        return value
+    state = _whatsapp_group_state_path()
+    if state.is_file():
+        try:
+            data = json.loads(state.read_text(encoding="utf-8"))
+            return str(data.get("whatsapp_chat_id") or "").strip()
+        except Exception:
+            pass
+    return ""
+
+
+def _bridge_json(
+    path: str,
+    *,
+    method: str = "GET",
+    payload: dict[str, object] | None = None,
+) -> dict[str, object]:
+    body = None if payload is None else json.dumps(payload).encode("utf-8")
+    req = urlrequest.Request(
+        "http://127.0.0.1:3000" + path,
+        data=body,
+        headers={"Content-Type": "application/json"} if body is not None else {},
+        method=method,
+    )
+    try:
+        with urlrequest.urlopen(req, timeout=20) as resp:
+            value = json.loads(resp.read().decode("utf-8"))
+        return value if isinstance(value, dict) else {}
+    except Exception as exc:
+        raise RuntimeError("WhatsApp bridge unavailable") from exc
+
+
+def _load_whatsapp_group_state() -> dict[str, object]:
+    path = _whatsapp_group_state_path()
+    if not path.is_file():
+        return {}
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        return value if isinstance(value, dict) else {}
+    except Exception:
+        return {}
+
+
+def _save_whatsapp_group_state(state: dict[str, object]) -> None:
+    path = _whatsapp_group_state_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    os.chmod(path, 0o600)
+
+
+def _audit_admin_action(
+    access_token: str,
+    *,
+    action: str,
+    target_type: str,
+    target_id: str | None = None,
+    detail: dict[str, object] | None = None,
+) -> None:
+    try:
+        actor = SupabaseUserSession.from_environment(access_token=access_token).user_id()
+        _transport(access_token, roles={ArchiveRole.ADMIN}).insert(
+            "admin_audit_log",
+            {
+                "actor_user_id": actor,
+                "action": action,
+                "target_type": target_type,
+                "target_id": target_id,
+                "detail": detail or {},
+            },
+        )
+    except Exception:
+        # Admin action must not be rolled back after an external side effect
+        # merely because audit persistence is temporarily unavailable.
+        pass
+
+
 def _restart_whatsapp_gateway() -> None:
     uid = os.getuid()
     env = os.environ.copy()
@@ -1516,6 +1611,13 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Member update was rejected",
             ) from exc
+        _audit_admin_action(
+            access_token,
+            action="member_updated",
+            target_type="member",
+            target_id=result.user_id,
+            detail={"role": result.role.value, "status": result.status},
+        )
         return AdminMemberResponse(
             user_id=result.user_id,
             email=result.email,
@@ -1599,13 +1701,21 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             )
             return dict(result) if isinstance(result, dict) else {}
         try:
-            return dict(
+            created = dict(
                 module.add_recipient(
                     payload.name,
                     payload.email or "",
                     payload.mobile or "",
                 )
             )
+            _audit_admin_action(
+                access_token,
+                action="recipient_created",
+                target_type="recipient",
+                target_id=str(created.get("id") or ""),
+                detail={"name": payload.name},
+            )
+            return created
         except ValueError as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -1649,7 +1759,14 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     payload.whatsapp_enabled,
                 )
             data = module.load_registry()
-            return dict(module.resolve_recipient(data, recipient_id))
+            updated = dict(module.resolve_recipient(data, recipient_id))
+            _audit_admin_action(
+                access_token,
+                action="recipient_updated",
+                target_type="recipient",
+                target_id=recipient_id,
+            )
+            return updated
         except ValueError as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -1685,6 +1802,12 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=str(exc),
             ) from exc
+        _audit_admin_action(
+            access_token,
+            action="recipient_removed",
+            target_type="recipient",
+            target_id=recipient_id,
+        )
         return MessageResponse(message="Recipient removed")
 
     @app.patch(
@@ -1717,6 +1840,12 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(exc),
             ) from exc
+        _audit_admin_action(
+            access_token,
+            action="default_recipient_updated",
+            target_type="recipient",
+            target_id=payload.recipient_id,
+        )
         return MessageResponse(message="Default recipient updated")
 
     @app.get("/api/v1/admin/whatsapp-users")
@@ -1765,6 +1894,12 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 values.append(mobile)
                 _write_whatsapp_allowed_users(values)
                 _restart_whatsapp_gateway()
+                _audit_admin_action(
+                    access_token,
+                    action="whatsapp_user_allowed",
+                    target_type="whatsapp_user",
+                    target_id=mobile,
+                )
             return {"mobile": mobile, "items": values}
         except HTTPException:
             raise
@@ -1816,6 +1951,12 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             values = [value for value in values if value != normalized]
             _write_whatsapp_allowed_users(values)
             _restart_whatsapp_gateway()
+            _audit_admin_action(
+                access_token,
+                action="whatsapp_user_removed",
+                target_type="whatsapp_user",
+                target_id=normalized,
+            )
             return MessageResponse(message="WhatsApp user removed")
         except HTTPException:
             raise
@@ -1896,6 +2037,13 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             },
             filters={"id": normalized_id},
         )
+        _audit_admin_action(
+            access_token,
+            action="account_request_approved",
+            target_type="account_request",
+            target_id=normalized_id,
+            detail={"role": role.value},
+        )
         return row
 
     @app.post("/api/v1/admin/account-requests/{request_id}/reject")
@@ -1941,7 +2089,252 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             },
             filters={"id": normalized_id},
         )
+        _audit_admin_action(
+            access_token,
+            action="account_request_rejected",
+            target_type="account_request",
+            target_id=normalized_id,
+        )
         return row
+
+    @app.get("/api/v1/admin/dashboard")
+    def admin_dashboard(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        members = SupabaseArchiveAccountAdmin(
+            transport=_raw_transport(access_token),
+            archive_id=_archive_id(),
+        ).list_access()
+        requests = database.select(
+            "account_access_requests",
+            columns="id,status",
+        )
+        categories = database.select(
+            "document_categories",
+            columns="id,is_active",
+        )
+        letters = database.select("letters", columns="id")
+
+        recipient_count = 0
+        whatsapp_count = 0
+        module = _oracle_recipient_registry()
+        if module is not None:
+            data = module.load_registry()
+            recipient_count = len([x for x in data.get("recipients", []) if isinstance(x, dict)])
+        else:
+            try:
+                proxied = _proxy_admin_json(
+                    path="/api/v1/admin/recipients",
+                    access_token=access_token,
+                )
+                recipient_count = len(proxied.get("items", [])) if isinstance(proxied, dict) else 0
+            except Exception:
+                pass
+
+        if _whatsapp_env_path().is_file():
+            try:
+                whatsapp_count = len(_read_whatsapp_allowed_users())
+            except Exception:
+                pass
+        else:
+            try:
+                proxied = _proxy_admin_json(
+                    path="/api/v1/admin/whatsapp-users",
+                    access_token=access_token,
+                )
+                whatsapp_count = len(proxied.get("items", [])) if isinstance(proxied, dict) else 0
+            except Exception:
+                pass
+
+        return {
+            "documents": len(letters),
+            "active_users": len([x for x in members if x.kind == "member" and x.status == "active"]),
+            "pending_requests": len([x for x in requests if str(x.get("status") or "") == "pending"]),
+            "recipients": recipient_count,
+            "whatsapp_allowed": whatsapp_count,
+            "active_categories": len([x for x in categories if bool(x.get("is_active", True))]),
+        }
+
+
+    @app.get("/api/v1/admin/audit-log")
+    def admin_audit_log(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        rows = database.select(
+            "admin_audit_log",
+            columns="id,actor_user_id,action,target_type,target_id,detail,created_at",
+        )
+        rows.sort(key=lambda x: str(x.get("created_at") or ""), reverse=True)
+        return {"items": rows[:100]}
+
+
+    @app.get("/api/v1/admin/whatsapp-group")
+    def admin_whatsapp_group(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if not _whatsapp_group_state_path().is_file():
+            result = _proxy_admin_json(
+                path="/api/v1/admin/whatsapp-group",
+                access_token=access_token,
+            )
+            return dict(result) if isinstance(result, dict) else {}
+
+        chat_id = _whatsapp_group_jid()
+        state = _load_whatsapp_group_state()
+        connected = False
+        name = "EDU- Letters"
+        description = str(state.get("group_description") or "")
+        try:
+            health = _bridge_json("/health")
+            connected = str(health.get("status") or "") == "connected"
+            if chat_id:
+                meta = _bridge_json("/chat/" + quote(chat_id, safe=""))
+                name = str(meta.get("name") or name)
+                description = str(meta.get("description") or description)
+        except RuntimeError:
+            pass
+        return {
+            "connected": connected,
+            "name": name,
+            "chat_id": chat_id,
+            "description": description,
+            "portal_url": "https://eletters.vercel.app",
+            "index_url": str(state.get("drive_url") or ""),
+            "pinned_message_id": str(state.get("whatsapp_message_id") or ""),
+            "last_pinned_at": state.get("last_pinned_at"),
+            "photo_available": _whatsapp_group_photo_path().is_file(),
+        }
+
+
+    @app.post("/api/v1/admin/whatsapp-group/description")
+    def update_admin_whatsapp_group_description(
+        payload: AdminWhatsAppGroupDescriptionRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if not _whatsapp_group_state_path().is_file():
+            result = _proxy_admin_json(
+                path="/api/v1/admin/whatsapp-group/description",
+                access_token=access_token,
+                method="POST",
+                payload=payload.model_dump(),
+            )
+            return dict(result) if isinstance(result, dict) else {}
+        chat_id = _whatsapp_group_jid()
+        if not chat_id:
+            raise HTTPException(status_code=503, detail="WhatsApp group is not configured")
+        try:
+            result = _bridge_json(
+                "/groups/update-description",
+                method="POST",
+                payload={"chatId": chat_id, "description": payload.description.strip()},
+            )
+            state = _load_whatsapp_group_state()
+            state["group_description"] = payload.description.strip()
+            _save_whatsapp_group_state(state)
+            _audit_admin_action(
+                access_token,
+                action="whatsapp_group_description_updated",
+                target_type="whatsapp_group",
+                target_id=chat_id,
+            )
+            return result
+        except RuntimeError as exc:
+            raise HTTPException(status_code=502, detail="WhatsApp group description update failed") from exc
+
+
+    @app.post("/api/v1/admin/whatsapp-group/pin-guide")
+    def pin_admin_whatsapp_group_guide(
+        payload: AdminWhatsAppGroupGuideRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if not _whatsapp_group_state_path().is_file():
+            result = _proxy_admin_json(
+                path="/api/v1/admin/whatsapp-group/pin-guide",
+                access_token=access_token,
+                method="POST",
+                payload=payload.model_dump(),
+            )
+            return dict(result) if isinstance(result, dict) else {}
+        chat_id = _whatsapp_group_jid()
+        if not chat_id:
+            raise HTTPException(status_code=503, detail="WhatsApp group is not configured")
+        try:
+            sent = _bridge_json(
+                "/send",
+                method="POST",
+                payload={"chatId": chat_id, "message": payload.message.strip()},
+            )
+            message_id = str(sent.get("messageId") or "").strip()
+            if not message_id:
+                raise RuntimeError("WhatsApp send returned no message id")
+            pinned = _bridge_json(
+                "/pin-message",
+                method="POST",
+                payload={
+                    "chatId": chat_id,
+                    "messageId": message_id,
+                    "action": "pin",
+                    "durationSeconds": 2592000,
+                },
+            )
+            now = datetime.now(timezone.utc).isoformat()
+            state = _load_whatsapp_group_state()
+            state["whatsapp_message_id"] = message_id
+            state["last_pinned_at"] = now
+            _save_whatsapp_group_state(state)
+            _audit_admin_action(
+                access_token,
+                action="whatsapp_group_guide_pinned",
+                target_type="whatsapp_group",
+                target_id=chat_id,
+                detail={"message_id": message_id},
+            )
+            return {"success": bool(pinned.get("success")), "message_id": message_id, "pinned_at": now}
+        except RuntimeError as exc:
+            raise HTTPException(status_code=502, detail="WhatsApp guide could not be sent and pinned") from exc
+
+
+    @app.post("/api/v1/admin/whatsapp-group/photo")
+    def apply_admin_whatsapp_group_photo(
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        if not _whatsapp_group_state_path().is_file():
+            result = _proxy_admin_json(
+                path="/api/v1/admin/whatsapp-group/photo",
+                access_token=access_token,
+                method="POST",
+                payload={},
+            )
+            return dict(result) if isinstance(result, dict) else {}
+        chat_id = _whatsapp_group_jid()
+        photo = _whatsapp_group_photo_path()
+        if not chat_id or not photo.is_file():
+            raise HTTPException(status_code=503, detail="WhatsApp group photo is not available")
+        try:
+            result = _bridge_json(
+                "/groups/update-photo",
+                method="POST",
+                payload={"chatId": chat_id, "imagePath": str(photo)},
+            )
+            _audit_admin_action(
+                access_token,
+                action="whatsapp_group_photo_applied",
+                target_type="whatsapp_group",
+                target_id=chat_id,
+            )
+            return result
+        except RuntimeError as exc:
+            raise HTTPException(status_code=502, detail="WhatsApp group photo update failed") from exc
+
 
     @app.get("/api/v1/admin/categories")
     def list_admin_categories(
@@ -1981,6 +2374,13 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 "is_active": payload.is_active,
             },
         )
+        _audit_admin_action(
+            access_token,
+            action="category_created",
+            target_type="category",
+            target_id=str(row.get("id") or ""),
+            detail={"code": payload.code},
+        )
         return row
 
     @app.patch("/api/v1/admin/categories/{category_id}")
@@ -2017,6 +2417,13 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Category not found",
             )
+        _audit_admin_action(
+            access_token,
+            action="category_updated",
+            target_type="category",
+            target_id=category_id,
+            detail={"fields": sorted(changes)},
+        )
         return row
 
     @app.delete(
@@ -2038,6 +2445,12 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Category not found",
             )
+        _audit_admin_action(
+            access_token,
+            action="category_removed",
+            target_type="category",
+            target_id=category_id,
+        )
         return MessageResponse(message="Category removed")
 
     @app.get(

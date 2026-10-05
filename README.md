@@ -214,3 +214,7 @@ The private Oracle runtime can ingest official PDF/JPG/JPEG/PNG attachments from
 - eLetters uses a compact English-default responsive web UI with mobile-specific navigation, search/filter, document-card and admin-layout optimizations.
 - Admin can review account requests, manage users/roles, manage delivery recipients, view/add/remove allowed WhatsApp users, and manage dynamic document categories.
 - Mobile layouts preserve desktop behavior while stacking forms/actions cleanly on narrow screens.
+
+## Admin operations baseline — 2026-10-05
+
+Admin Console now opens with an Overview dashboard showing document/user/request/recipient/WhatsApp/category counts. It also includes an admin-only Supabase audit log and live EDU-Letters group controls for plain-text description, fresh guide send+30-day pin, group photo apply, connection/index/pin status.
