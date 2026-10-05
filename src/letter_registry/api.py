@@ -69,8 +69,18 @@ class SearchCard(BaseModel):
     file_type: str | None = None
     rank: float
     semantic_similarity: float | None = None
+    is_important: bool = False
+    user_comment: str | None = None
+    uploaded_at: str | None = None
+    important_at: str | None = None
     open_original_path: str
 
+
+
+
+class LetterHighlightRequest(BaseModel):
+    is_important: bool
+    user_comment: str | None = Field(default=None, max_length=1000)
 
 class MagicLinkRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
@@ -3140,6 +3150,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         status_filter: str | None = Query(default=None, alias="status"),
         year: int | None = Query(default=None, ge=1900, le=2100),
         file_type: str | None = Query(default=None, max_length=16),
+        sort: str = Query(default="latest", pattern=r"^(latest|important|issue_date|title|relevance)$"),
         limit: int = Query(default=25, ge=1, le=100),
         access_token: str = Depends(_access_token),
     ) -> SearchResponse:
@@ -3163,7 +3174,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 text_search=text_repo,
                 semantic_search=semantic_repo,
             )
-            hybrid_results = hybrid.search(q, filters=filters, limit=limit)
+            search_limit = 100 if sort != "relevance" else limit
+            hybrid_results = hybrid.search(q, filters=filters, limit=search_limit)
             cards = [
                 SearchCard(
                     id=item.result.record_id,
@@ -3188,13 +3200,18 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     file_type=item.result.file_type,
                     rank=item.hybrid_rank,
                     semantic_similarity=item.semantic_similarity,
+                    is_important=item.result.is_important,
+                    user_comment=item.result.user_comment,
+                    uploaded_at=item.result.uploaded_at,
+                    important_at=item.result.important_at,
                     open_original_path=f"/api/v1/letters/{item.result.record_id}/original",
                 )
                 for item in hybrid_results
             ]
             mode = "hybrid"
         else:
-            text_results = text_repo.search(q, filters=filters, limit=limit)
+            search_limit = 100 if sort != "relevance" else limit
+            text_results = text_repo.search(q, filters=filters, limit=search_limit)
             cards = [
                 SearchCard(
                     id=item.record_id,
@@ -3212,11 +3229,32 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     context_snippet=item.context_snippet,
                     file_type=item.file_type,
                     rank=item.combined_rank,
+                    is_important=item.is_important,
+                    user_comment=item.user_comment,
+                    uploaded_at=item.uploaded_at,
+                    important_at=item.important_at,
                     open_original_path=f"/api/v1/letters/{item.record_id}/original",
                 )
                 for item in text_results
             ]
             mode = "text"
+
+        if sort == "latest":
+            cards.sort(key=lambda x: x.uploaded_at or "", reverse=True)
+        elif sort == "important":
+            cards.sort(
+                key=lambda x: (
+                    bool(x.is_important),
+                    x.important_at or "",
+                    x.uploaded_at or "",
+                ),
+                reverse=True,
+            )
+        elif sort == "issue_date":
+            cards.sort(key=lambda x: (x.issue_date or "", x.uploaded_at or ""), reverse=True)
+        elif sort == "title":
+            cards.sort(key=lambda x: (x.title or "").casefold())
+        cards = cards[:limit]
 
         return SearchResponse(
             query=" ".join(q.split()),
@@ -3407,6 +3445,64 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 "Content-Disposition": f'attachment; filename="{safe_name}"',
                 "Cache-Control": "private, no-store",
             },
+        )
+
+    @app.patch(
+        "/api/v1/letters/{record_id}/highlight",
+        response_model=MessageResponse,
+    )
+    def update_letter_highlight(
+        record_id: str,
+        payload: LetterHighlightRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        membership = _archive_membership(
+            access_token,
+            roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR},
+        )
+        database = _transport(
+            access_token,
+            roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR},
+        )
+        rows = database.select(
+            "letters",
+            filters={"id": record_id},
+            columns="id",
+        )
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Letter not found",
+            )
+        comment = (payload.user_comment or "").strip() or None
+        values: dict[str, object] = {
+            "is_important": payload.is_important,
+            "user_comment": comment,
+            "important_at": (
+                datetime.now(timezone.utc).isoformat()
+                if payload.is_important
+                else None
+            ),
+            "important_by": membership.user_id if payload.is_important else None,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        updated = database.update(
+            "letters",
+            values,
+            filters={"id": record_id},
+        )
+        if not updated:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Highlight could not be updated",
+            )
+        return MessageResponse(
+            message=(
+                "Document marked important."
+                if payload.is_important
+                else "Important mark removed."
+            )
         )
 
     @app.delete(

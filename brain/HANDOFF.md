@@ -84,3 +84,7 @@ Do not translate WhatsApp headings. Keep What this is and Action items in Englis
 ## Reprocess intelligence handoff — 2026-10-05
 
 Keep document meaning source-first. Category is secondary taxonomy and must never override stronger document evidence. A reprocess should update the same logical document everywhere (email thread, WhatsApp generated reply, index and portal). For WhatsApp, delete the previous generated reply for everyone before posting the replacement, and persist the new message id for the next replacement.
+
+## Importance/sorting handoff — 2026-10-05
+
+Keep default portal sorting by `uploaded_at desc`. Do not silently switch the default to issue_date. Preserve the distinction between shared importance state and internal comment privacy: authenticated portal can display `user_comment`; public Drive index must not publish it. Editor/Admin writes must continue through guarded API/RLS.

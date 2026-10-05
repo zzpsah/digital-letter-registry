@@ -240,3 +240,9 @@ Document category/subcategory is secondary taxonomy only. User-facing title, sum
 ## Global delivery presentation contract — 2026-10-05
 
 WhatsApp uses English section headings with Hindi document intelligence beneath them. The primary sections are What this is and Action items; their content is Hindi (Devanagari) while official English product/system terms may remain unchanged. Category remains secondary taxonomy and must not drive these sections.
+
+## Sorting and important highlights — 2026-10-05
+
+eLetters defaults to **Latest first** using the archive upload timestamp. Search users can also sort by Important first, Issue date, Title A–Z, or Relevance.
+
+Editors/Admins can mark a document as **Important** and attach an optional archive note. Important cards are yellow-highlighted with a `★ Important` badge. The mark and note are stored in Supabase so they survive refresh/relogin and are shared across authorized portal users. Viewers can see the highlight/note but cannot modify it.

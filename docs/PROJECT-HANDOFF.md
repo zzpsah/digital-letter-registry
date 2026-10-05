@@ -351,3 +351,15 @@ Do not let category drive document meaning. Category/subcategory and determinist
 For every document, keep WhatsApp presentation labels in English. What this is must contain a concise Hindi explanation of the actual document context. Action items must contain concise Hindi instructions grounded in the document; preserve official English terms such as ICT Lab, Smart Class, e-ShikshaKosh, Mark On Duty, portal names and official designations when useful. Do not convert headings themselves to Hindi.
 
 The intelligence providers generate summary_hi and action_required_hi for this purpose. Category/subcategory remains secondary taxonomy.
+
+## Sorting / important-note policy — 2026-10-05
+
+Portal default order is latest-added first (`letters.uploaded_at desc`), not document issue date. Available sort modes are latest, important, issue_date, title and relevance.
+
+Shared letter metadata:
+- `letters.is_important`
+- `letters.user_comment`
+- `letters.important_at`
+- `letters.important_by`
+
+Only archive editors/admins may update importance/comment through `PATCH /api/v1/letters/{record_id}/highlight`; existing archive RLS remains the database authorization boundary. The authenticated portal displays the note. Public Drive index may display the `★ Important` highlight but must not expose `user_comment`, because the comment is an internal archive note.

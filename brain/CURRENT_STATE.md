@@ -205,3 +205,15 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Regression coverage verifies a wrongly categorized ICT Lab / Smart Class order still receives the correct semantic title.
 - WhatsApp delivery policy is: What this is heading with Hindi/Hinglish context, Action items heading with Hindi/Hinglish actions, Important may remain English.
 - Reprocessed documents replace the previous generated WhatsApp reply; only the latest generated reply should remain.
+
+## 2026-10-05 — Latest sort + important document notes
+
+- Default eLetters order: latest uploaded document first.
+- Search sort selector: Latest first / Important first / Issue date / Title A–Z / Relevance.
+- Editor/Admin can mark/unmark `★ Important` and add/edit an optional note.
+- Important portal cards are yellow highlighted.
+- Viewer can read highlight/note but cannot change it.
+- Importance/note persist in Supabase and are searchable.
+- Public Drive index receives the Important visual flag only; internal user comments stay private to authenticated portal users.
+- Search RPC now returns importance/note/upload timestamps.
+- Test suite passes 314 tests after the UI/API change.

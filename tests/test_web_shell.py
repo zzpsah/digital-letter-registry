@@ -77,6 +77,16 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('document.addEventListener("visibilitychange"', self.html)
         self.assertIn('Date.now()', self.html)
 
+    def test_sorting_and_important_highlight_controls_are_exposed(self) -> None:
+        self.assertIn('id="sortOrder"', self.html)
+        self.assertIn('Latest first', self.html)
+        self.assertIn('Important first', self.html)
+        self.assertIn('data-important=', self.html)
+        self.assertIn('data-edit-note=', self.html)
+        self.assertIn('/highlight', self.html)
+        self.assertIn('important-badge', self.html)
+        self.assertIn('user-note', self.html)
+
     def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
         self.assertNotIn('id="loginForm"', self.html)
         self.assertNotIn('id="registerMagicLink"', self.html)

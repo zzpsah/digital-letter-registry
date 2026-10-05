@@ -36,6 +36,10 @@ class SearchResult:
     combined_rank: float
     summary_hi: str | None = None
     action_required_hi: str | None = None
+    is_important: bool = False
+    user_comment: str | None = None
+    uploaded_at: str | None = None
+    important_at: str | None = None
 
 
 class SearchTransport(Protocol):
@@ -100,6 +104,10 @@ class SupabaseSearchRepository:
                     status=str(row["status"]),
                     action_required=row.get("action_required"),
                     action_required_hi=row.get("action_required_hi"),
+                    is_important=bool(row.get("is_important")),
+                    user_comment=row.get("user_comment"),
+                    uploaded_at=(str(row.get("uploaded_at")) if row.get("uploaded_at") else None),
+                    important_at=(str(row.get("important_at")) if row.get("important_at") else None),
                     concepts=tuple(str(x) for x in (row.get("concepts") or [])),
                     context_snippet=row.get("context_snippet"),
                     file_type=row.get("file_type"),
