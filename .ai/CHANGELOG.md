@@ -1,3 +1,16 @@
+## 2026-10-05 — Add admin backup restore and bulk actions
+- Commit: 63b1fcf3ff843f11c1efd071283fa4121783b7da
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `docs/PROJECT-HANDOFF.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Add reversible admin remove and restore
 - Commit: df5beaa5dea4cd45410a7008a98e1612cb240ac3
 - Author: Prashant
