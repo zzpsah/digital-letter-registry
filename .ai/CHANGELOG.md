@@ -1,3 +1,13 @@
+## 2026-10-05 — Simplify eLetters UI and add category admin
+- Commit: 69e1e39fda71227c4d1d7a08dbf3bc1dc6863246
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261005183000_add_admin_managed_document_categories.sql`
+- `tests/test_api.py`
+
 ## 2026-10-05 — Improve DLR search and Hindi-first display
 - Commit: 8c933071a309ee7c998e3c685cb864d6f9ba2b93
 - Author: Prashant

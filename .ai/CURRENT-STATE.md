@@ -65,7 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 8c933071a309ee7c998e3c685cb864d6f9ba2b93
-- Change: Improve DLR search and Hindi-first display
+- Commit: 69e1e39fda71227c4d1d7a08dbf3bc1dc6863246
+- Change: Simplify eLetters UI and add category admin
 - Date: 2026-10-05
 - Durable context synchronization: completed
