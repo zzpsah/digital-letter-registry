@@ -61,3 +61,5 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 - Merge moves all linked letter mappings and aliases to the selected target, updates child-parent references, then deletes the duplicate source authority.
 - Permanent Delete removes the authority master; linked letters keep their raw authority text but become unmatched for later review/remapping.
 - Authority rows show linked-letter counts before destructive actions.
+
+- Admin → Recipients shows a separate read-only `Allowed recipients` summary above management, with enabled Email/WhatsApp/Both channels and the current Default recipient clearly visible.

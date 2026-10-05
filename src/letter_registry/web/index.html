@@ -180,7 +180,12 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
             <div id="recipientCreateStatus" class="status"></div>
           </div>
           <div class="panel">
-            <h2>Delivery recipients</h2>
+            <h2>Allowed recipients</h2>
+            <p class="sub">Currently enabled delivery recipients and channels.</p>
+            <div id="recipientAllowedList"></div>
+          </div>
+          <div class="panel">
+            <h2>Manage recipients</h2>
             <div id="recipientDefaultStatus" class="sub"></div><div class="bulkbar"><button id="bulkRemoveRecipients" class="btn danger" type="button">Remove selected</button><button id="bulkRestoreRecipients" class="btn" type="button">Restore selected</button></div>
             <div id="recipientList"></div>
           </div>
@@ -385,6 +390,7 @@ async function refreshRecipients(){
   if(!r.ok){$("recipientList").innerHTML='<div class="empty">Could not load recipients.</div>';return}
   const d=await r.json(),defaultId=String(d.default_recipient_id||"");
   const rows=d.items||[],active=rows.filter(x=>x.is_active!==false),removed=rows.filter(x=>x.is_active===false);
+  $("recipientAllowedList").innerHTML=active.map(x=>{const channels=[];if(x.email_enabled&&x.email)channels.push("Email");if(x.whatsapp_enabled&&x.mobile)channels.push("WhatsApp");return '<div class="op-item"><div><strong>'+esc(x.name||x.email||x.mobile||"Recipient")+'</strong><div class="sub">'+esc(x.email||"")+(x.email&&x.mobile?' · ':'')+esc(x.mobile||"")+'</div></div><div class="toolbar"><span class="pill">'+esc(channels.length===2?"Email + WhatsApp":(channels[0]||"No channel"))+'</span>'+(String(x.id)===defaultId?'<span class="pill">Default</span>':'')+'</div></div>'}).join("")||'<div class="empty">No custom allowed recipients. School default email is used.</div>';
   const card=x=>'<div class="recipient-item" data-recipient-id="'+esc(x.id)+'" data-recipient-name="'+esc(x.name||"")+'" data-recipient-email="'+esc(x.email||"")+'" data-recipient-mobile="'+esc(x.mobile||"")+'" data-recipient-email-enabled="'+(x.email_enabled?"1":"0")+'" data-recipient-wa-enabled="'+(x.whatsapp_enabled?"1":"0")+'" data-recipient-active="'+(x.is_active===false?"0":"1")+'"><input class="selectbox" type="checkbox" data-select-recipient><input class="input" data-r-name value="'+esc(x.name||"")+'" '+(x.is_active===false?"disabled":"")+'><input class="input" data-r-email value="'+esc(x.email||"")+'" placeholder="Email" '+(x.is_active===false?"disabled":"")+'><input class="input" data-r-mobile value="'+esc(x.mobile||"")+'" placeholder="Mobile" '+(x.is_active===false?"disabled":"")+'><div>'+(x.is_active===false?'<span class="pill">Removed</span><br><button class="btn" data-view-recipient>View</button> <button class="btn" data-restore-recipient>Restore</button> <button class="btn danger" data-purge-recipient>Delete permanently</button>':'<label class="sub"><input data-r-email-enabled type="checkbox" '+(x.email_enabled?"checked":"")+' '+(!x.email?"disabled":"")+'> Email</label> <label class="sub"><input data-r-wa-enabled type="checkbox" '+(x.whatsapp_enabled?"checked":"")+' '+(!x.mobile?"disabled":"")+'> WhatsApp</label><br><button class="btn" data-view-recipient>View</button> <button class="btn" data-save-recipient>Save</button> <button class="btn" data-default-recipient>'+(String(x.id)===defaultId?"Default ✓":"Make default")+'</button> <button class="btn danger" data-delete-recipient>Remove</button>')+'</div></div>';
   $("recipientList").innerHTML='<h3>Active</h3>'+(active.map(card).join("")||'<div class="empty">No active custom recipients.</div>')+'<details '+(removed.length?"":"")+'><summary>Removed ('+removed.length+')</summary>'+(removed.map(card).join("")||'<div class="empty">No removed recipients.</div>')+'</details>';
   if(!$("schoolDefaultRecipient"))return;

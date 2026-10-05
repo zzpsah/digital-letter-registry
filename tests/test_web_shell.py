@@ -127,6 +127,11 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('data-restore-authority', self.html)
         self.assertIn('data-a-short', self.html)
 
+    def test_allowed_recipient_summary_is_exposed(self) -> None:
+        self.assertIn('Allowed recipients', self.html)
+        self.assertIn('recipientAllowedList', self.html)
+        self.assertIn('Email + WhatsApp', self.html)
+
     def test_search_authority_filter_prefers_short_names(self) -> None:
         self.assertIn('v.short_name||v.label||v.name_en', self.html)
 
