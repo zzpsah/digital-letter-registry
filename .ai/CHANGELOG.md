@@ -1,3 +1,16 @@
+## 2026-10-05 — Make document intelligence independent of category
+- Commit: 52e1b8517642e78c35c92632b00a951d53e3c721
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `docs/PROJECT-HANDOFF.md`
+- `src/letter_registry/gemini_provider.py`
+- `src/letter_registry/hermes_context_provider.py`
+- `src/letter_registry/supabase_gemini_gateway.py`
+
 ## 2026-10-05 — Add admin backup restore and bulk actions
 - Commit: 63b1fcf3ff843f11c1efd071283fa4121783b7da
 - Author: Prashant

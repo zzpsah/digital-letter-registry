@@ -65,31 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 63b1fcf3ff843f11c1efd071283fa4121783b7da
-- Change: Add admin backup restore and bulk actions
+- Commit: 52e1b8517642e78c35c92632b00a951d53e3c721
+- Change: Make document intelligence independent of category
 - Date: 2026-10-05
 - Durable context synchronization: completed
-
-## 2026-10-05 — eLetters mobile/admin baseline
-
-The eLetters responsive shell is now explicitly optimized for phones. Admin users can view/manage recipients and WhatsApp allowed users, in addition to account approvals, roles and dynamic categories. The post-change automated suite passed 308 tests. Preserve this as the current web baseline.
-
-## 2026-10-05 — Admin operations control center
-
-eLetters Admin now has Overview summary cards, archive-scoped admin audit history, and live EDU-Letters group management (description, send+pin guide, canonical group photo, status). Audit storage uses Supabase RLS restricted to archive admins. Existing automated suite passes 308 tests.
-
-## 2026-10-05 — Failed processing recovery
-
-eLetters Admin now exposes failed processing jobs and an explicit safe retry action. Dashboard includes failed-job count. Retry is failed-only, preserves attempts, resets claim/error runtime state, and is audit-logged. Current live queue had 2 failed jobs at verification time; no automatic retry was performed.
-
-## 2026-10-05 — Soft delete/restore
-
-Admin-managed users, recipients and categories now follow reversible removal semantics. Users disable/restore, recipients move between Active/Removed and disable delivery when removed, and categories move between Active/Removed using is_active. Permanent recipient/category deletion remains separate and confirmed. Test suite passes 310 tests.
-
-## 2026-10-05 — Backup restore and bulk admin baseline
-
-eLetters Admin now supports secret-free JSON configuration export, restore preview, automatic private rollback snapshot, and restore. Bulk reversible controls are available for users, recipients and categories. Restore is conservative for Supabase members/categories and exact for validated private recipient/WhatsApp allowlist configuration. Test suite passes 311 tests.
-
-## 2026-10-05 — Intelligence-first document context
-
-Category is now secondary taxonomy. Gemini, Supabase-Gemini and Hermes prompts require source-grounded title, summary, action, audience and WhatsApp meaning even when category/hints conflict. Delivery layer follows the same rule. Regression incident: an ICT Lab/Smart Class nodal/deputation order had been mislabeled as UDISE/fee.
