@@ -65,15 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 05f10016223fb46c53a67eea8d53f276e7dbb864
-- Change: Optimize eLetters mobile layout
+- Commit: 7d8aaab95322a2db497f82f6596864d88c7f7734
+- Change: Add admin dashboard audit and WhatsApp group controls
 - Date: 2026-10-05
 - Durable context synchronization: completed
-
-## 2026-10-05 — eLetters mobile/admin baseline
-
-The eLetters responsive shell is now explicitly optimized for phones. Admin users can view/manage recipients and WhatsApp allowed users, in addition to account approvals, roles and dynamic categories. The post-change automated suite passed 308 tests. Preserve this as the current web baseline.
-
-## 2026-10-05 — Admin operations control center
-
-eLetters Admin now has Overview summary cards, archive-scoped admin audit history, and live EDU-Letters group management (description, send+pin guide, canonical group photo, status). Audit storage uses Supabase RLS restricted to archive admins. Existing automated suite passes 308 tests.

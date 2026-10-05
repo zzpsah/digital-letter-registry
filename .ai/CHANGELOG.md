@@ -1,3 +1,18 @@
+## 2026-10-05 — Add admin dashboard audit and WhatsApp group controls
+- Commit: 7d8aaab95322a2db497f82f6596864d88c7f7734
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `docs/PROJECT-HANDOFF.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/supabase_runtime.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261005142625_add_admin_audit_log.sql`
+- `supabase/migrations/20261005143130_index_admin_audit_actor.sql`
+
 ## 2026-10-05 — Document eLetters mobile and admin baseline
 - Commit: 85f176051858ea2ced0b7d8c61f1d6d9915cac39
 - Author: Prashant
