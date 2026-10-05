@@ -133,6 +133,59 @@ class GoogleDrivePrivateWriter:
             )
         return returned_id
 
+    def restore_file(
+        self,
+        *,
+        object_reference: str,
+    ) -> str:
+        """Restore an existing Drive object from recoverable Trash."""
+        object_id = object_reference.strip()
+        if not object_id or "/" in object_id or "\\" in object_id:
+            raise ValueError("invalid Google Drive object reference")
+
+        req = request.Request(
+            f"https://www.googleapis.com/drive/v3/files/{object_id}?fields=id,trashed",
+            data=json.dumps({"trashed": False}).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {self._token()}",
+                "Content-Type": "application/json; charset=UTF-8",
+            },
+            method="PATCH",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise GoogleDriveWriteError(
+                f"unexpected Google Drive restore HTTP status: {status}"
+            )
+        payload = json.loads(raw)
+        returned_id = str(payload.get("id") or "").strip()
+        if returned_id != object_id:
+            raise GoogleDriveWriteError(
+                "Google Drive restore returned an unexpected object ID"
+            )
+        return returned_id
+
+    def delete_file(
+        self,
+        *,
+        object_reference: str,
+    ) -> str:
+        """Permanently delete an existing Drive object."""
+        object_id = object_reference.strip()
+        if not object_id or "/" in object_id or "\\" in object_id:
+            raise ValueError("invalid Google Drive object reference")
+        req = request.Request(
+            f"https://www.googleapis.com/drive/v3/files/{object_id}",
+            headers={"Authorization": f"Bearer {self._token()}"},
+            method="DELETE",
+        )
+        status, _raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise GoogleDriveWriteError(
+                f"unexpected Google Drive delete HTTP status: {status}"
+            )
+        return object_id
+
     def upload_file(
         self,
         *,
