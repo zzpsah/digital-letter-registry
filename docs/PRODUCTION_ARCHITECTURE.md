@@ -532,3 +532,13 @@ This is trial/staging behavior. It is designed to recover automatically from tem
 - Daily automatic enqueue volume is capped by `DLR_AUTO_REPROCESS_DAILY_LIMIT` (default 5) to prevent quota stampedes.
 - Job reasons include the target signature and, for provider recovery, a UTC day bucket, preserving idempotency and auditability.
 - Reprocessing never mutates immutable originals; only derived projections/artifacts may improve.
+
+## Bounded self-healing reprocessing
+
+- Low-quality documents marked `needs_reprocessing=true` are eligible for automatic reprocessing only when an AI/Gemini path is configured.
+- Reprocessing is provider/version aware: a document is retried when a higher provider tier, a new model/context version, a new dictionary version, or a new quality-engine version becomes available.
+- A result already produced by the current target context/dictionary/quality versions is not requeued, preventing infinite loops.
+- Recovery retries against a higher provider are day-bucketed and globally bounded by `DLR_AUTO_REPROCESS_DAILY_LIMIT` (default 5).
+- Existing same-day recovery jobs count toward the cap; repeated worker scans cannot enqueue another batch every minute.
+- Version-upgrade jobs are also pressure-bounded by the same configured limit while matching upgrade jobs are pending/processing.
+- Reprocessing changes only derived artifacts/projections. Immutable originals and source provenance remain unchanged.
