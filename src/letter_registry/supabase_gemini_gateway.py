@@ -38,7 +38,7 @@ class SupabaseGeminiFileContextProvider:
 
     @property
     def version(self) -> str:
-        return f"supabase-gemini:{self.model}:document-v1"
+        return f"supabase-gemini:{self.model}:document-v3"
 
     @classmethod
     def from_environment(cls) -> "SupabaseGeminiFileContextProvider":
@@ -67,20 +67,35 @@ class SupabaseGeminiFileContextProvider:
         concepts = ", ".join(hints.concepts) or "none"
         prompt = (
             "Return ONLY one valid JSON object, no markdown and no commentary.\n"
-            "Read the attached official Indian/Bihar education document directly. "
-            "The original file is authoritative; OCR below is supporting evidence and may be corrupted. "
-            "If the supporting text contains an [INTAKE MESSAGE / SENDER INSTRUCTION] section, use it for "
-            "routing, urgency, priority and requested handling, but NEVER treat it as evidence for document facts.\n"
-            "Do not invent facts. Read visible headings, tables, memo/reference numbers, dates, amounts and codes. "
-            "For Hindi documents write clean professional Hindi. If uncertain, use null. Do not copy OCR garbage. "
-            "Summary must explain what the document actually does. key_points must contain useful operational points. "
-            "clean_document_text should reconstruct readable meaningful text without guessing unreadable passages.\n"
-            "Required keys: title, authority, category, subcategory, summary, action_required, issue_date, "
-            "reference_number, concepts, important_dates, deadline, related_terms_hi, related_terms_en, confidence, "
-            "key_points, clean_document_text.\n"
+            "Read the attached official Indian/Bihar education document directly and understand the WHOLE document, "
+            "including later pages, tables, annexures and final memo/date lines. The original file is authoritative; "
+            "supporting extracted text may be imperfect. If the supporting text contains an "
+            "[INTAKE MESSAGE / SENDER INSTRUCTION] section, use it only for routing/priority, never as evidence for document facts.\n"
+            "Do not invent facts, dates, memo numbers, authority, deadlines, actions, amounts, audiences or page numbers. "
+            "The title may follow the source language. Write summary, action_required, key_points, applies_to, amount labels "
+            "and page-reference labels in simple concise English for email. Write whatsapp_summary in simple Roman-English/Hinglish "
+            "(Latin script, no Devanagari unless an official title/name must be preserved). Keep clean_document_text in the source language "
+            "(clean professional Hindi for Hindi documents). If uncertain use null/empty arrays.\n"
+            "TITLE RULE: create a concise semantic title from the actual purpose, preferably 4-12 words. Never use generic titles "
+            "such as 'Official Education Document', 'Official Notice', 'आधिकारिक शैक्षणिक दस्तावेज़', 'आधिकारिक सूचना' or merely 'Letter'. "
+            "Name the real subject/action such as fee revision, teacher grievance SOP, registration schedule, transfer order, scholarship instruction, etc.\n"
+            "ACTION RULE: action_required must state exactly what the recipient must do, if anything. deadline is the actual last date/time. "
+            "applies_to lists affected classes, employees, school types, districts, students or other audiences.\n"
+            "AMOUNT RULE: important_amounts lists operationally relevant rupee amounts/fees/rates with a short label, currency INR, "
+            "and page number when confidently visible. Do not list incidental numbers.\n"
+            "PAGE RULE: page_references contains at most 6 useful 1-based page references for action, deadline, amount/table, eligibility/rule, "
+            "or key decision. page_count is the document page count when reliable.\n"
+            "SUMMARY RULE: summary must answer only what the document is about and its main purpose/decision in 1-2 short sentences. "
+            "Do not repeat action steps, deadline, required documents or fee details unless they are the central subject. "
+            "whatsapp_summary must express the same subject/purpose in clear Roman-English/Hinglish, ideally 1-2 short lines. "
+            "key_points contains 3-6 operational points. "
+            "clean_document_text reconstructs readable meaningful text without guessing unreadable passages.\n"
+            "Required keys: title, authority, category, subcategory, summary, whatsapp_summary, action_required, issue_date, "
+            "reference_number, concepts, important_dates, deadline, applies_to, important_amounts, page_references, page_count, "
+            "related_terms_hi, related_terms_en, confidence, key_points, clean_document_text.\n"
             f"Deterministic concept hints: {concepts}\n"
-            "Supporting OCR (may be noisy):\n"
-            + extracted_text[:40000]
+            "Supporting extracted text (may be noisy):\n"
+            + extracted_text[:50000]
         )
         payload = {
             "action": "analyze-file",

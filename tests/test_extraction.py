@@ -105,6 +105,13 @@ class ExtractionTests(unittest.TestCase):
     def test_usability_rejects_symbol_noise(self) -> None:
         self.assertFalse(is_usable_native_text("### --- ... " * 20))
 
+    def test_usability_rejects_dense_legacy_font_gibberish(self) -> None:
+        garbled = (
+            "q~iCfj-11(f.io)/fcro 32/2026 ~.7..~.~ xi\\!CfjI'l! "
+            "WsrcP, \\Sl0 eft0 \"U\\i)~, 3llR ~ xifiFl, "
+        ) * 20
+        self.assertFalse(is_usable_native_text(garbled))
+
     def test_usability_rejects_private_use_glyph_noise(self) -> None:
         garbled = (
             "काया\ue7e2लय िजला िश\ue88aा पदािधकारी SIWAN "

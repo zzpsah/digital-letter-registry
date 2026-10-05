@@ -7,7 +7,7 @@ UUID identifiers are enforced only at this boundary.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from typing import Protocol
 from uuid import UUID
 
@@ -15,6 +15,19 @@ from .extraction import ExtractionResult
 from .structured_analysis import ContextAnalysisResult
 from .models import DocumentRecord
 from .naming import FILENAME_RULE_VERSION, build_smart_filename
+
+
+def _validated_deadline_at(value: object) -> str | None:
+    """Return only absolute ISO date/datetime values suitable for timestamptz."""
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    candidate = raw[:-1] + "+00:00" if raw.endswith("Z") else raw
+    try:
+        datetime.fromisoformat(candidate)
+        return raw
+    except ValueError:
+        return None
 
 
 def _validated_uuid(value: str, *, field_name: str) -> str:
@@ -229,7 +242,8 @@ def build_supabase_letter_context_patch(
             original_filename=record.original_filename,
         )
 
-    if context.deadline:
-        row["deadline_at"] = context.deadline
+    deadline_at = _validated_deadline_at(context.deadline)
+    if deadline_at:
+        row["deadline_at"] = deadline_at
 
     return row

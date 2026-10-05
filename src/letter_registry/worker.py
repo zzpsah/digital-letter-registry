@@ -168,7 +168,7 @@ class DocumentProcessingWorker:
                     "letters",
                     filters={"owner_id": job.owner_id},
                     columns=(
-                        "id,reference_number,authority,category,title,summary"
+                        "id,reference_number,authority,category,title,summary,issue_date"
                     ),
                 )
                 candidates = [
@@ -199,6 +199,11 @@ class DocumentProcessingWorker:
                             if row.get("summary") is not None
                             else None
                         ),
+                        issue_date=(
+                            str(row["issue_date"])
+                            if row.get("issue_date") is not None
+                            else None
+                        ),
                     )
                     for row in candidate_rows
                 ]
@@ -210,6 +215,7 @@ class DocumentProcessingWorker:
                     source_text=outcome.extraction.text,
                     source_title=outcome.context.context.title,
                     source_summary=outcome.context.context.summary,
+                    source_issue_date=outcome.context.context.issue_date,
                     candidates=candidates,
                 )
                 for suggestion in suggestions:

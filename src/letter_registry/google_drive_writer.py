@@ -55,6 +55,47 @@ class GoogleDrivePrivateWriter:
             return StaticAccessTokenProvider(self.access_token).get_access_token()
         raise ValueError("Google Drive token provider is not configured")
 
+    def replace_file(
+        self,
+        *,
+        object_reference: str,
+        path: Path,
+    ) -> str:
+        """Replace the bytes of an existing private Drive file in place."""
+        if not path.is_file():
+            raise ValueError("replacement path must be an existing file")
+        object_id = object_reference.strip()
+        if not object_id or "/" in object_id or "\\" in object_id:
+            raise ValueError("invalid Google Drive object reference")
+
+        content_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        req = request.Request(
+            (
+                f"https://www.googleapis.com/upload/drive/v3/files/{object_id}"
+                "?uploadType=media&fields=id"
+            ),
+            data=path.read_bytes(),
+            headers={
+                "Authorization": f"Bearer {self._token()}",
+                "Content-Type": content_type,
+            },
+            method="PATCH",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise GoogleDriveWriteError(
+                f"unexpected Google Drive replace HTTP status: {status}"
+            )
+        try:
+            returned_id = str(json.loads(raw)["id"]).strip()
+        except (KeyError, TypeError, json.JSONDecodeError) as exc:
+            raise GoogleDriveWriteError(
+                "Google Drive returned an invalid replace response"
+            ) from exc
+        if returned_id != object_id:
+            raise GoogleDriveWriteError("Google Drive replace returned an unexpected object ID")
+        return returned_id
+
     def upload_file(
         self,
         *,

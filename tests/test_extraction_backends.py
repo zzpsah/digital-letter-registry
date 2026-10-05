@@ -37,6 +37,35 @@ class OcrmypdfBackendTests(unittest.TestCase):
 
             self.assertIn("शिक्षा विभाग", text)
 
+    def test_sidecar_page_boundaries_are_preserved(self) -> None:
+        with TemporaryDirectory() as directory:
+            source = Path(directory) / "synthetic.pdf"
+            source.write_bytes(b"%PDF-synthetic")
+
+            def fake_run(command, **kwargs):
+                sidecar_index = command.index("--sidecar") + 1
+                Path(command[sidecar_index]).write_text(
+                    "पहला पृष्ठ\fदूसरा पृष्ठ",
+                    encoding="utf-8",
+                )
+
+                class Result:
+                    returncode = 0
+                    stderr = ""
+                    stdout = ""
+
+                return Result()
+
+            with patch("subprocess.run", side_effect=fake_run):
+                text = OcrmypdfTesseractBackend().extract_text(
+                    source,
+                    languages=("hin", "eng"),
+                )
+
+            self.assertIn("[[PAGE 1]]", text)
+            self.assertIn("[[PAGE 2]]", text)
+            self.assertIn("दूसरा पृष्ठ", text)
+
     def test_ocrmypdf_child_path_includes_configured_tesseract(self) -> None:
         with TemporaryDirectory() as directory:
             source = Path(directory) / "synthetic.pdf"

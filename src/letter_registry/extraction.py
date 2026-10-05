@@ -50,6 +50,7 @@ def is_usable_native_text(
     minimum_alphanumeric_ratio: float = 0.35,
     maximum_private_use_ratio: float = 0.01,
     maximum_replacement_ratio: float = 0.005,
+    maximum_punctuation_ratio: float = 0.22,
 ) -> bool:
     """Heuristic: enough meaningful, correctly encoded native text to skip OCR."""
 
@@ -70,6 +71,17 @@ def is_usable_native_text(
 
     replacement = normalized.count("�")
     if replacement / length > maximum_replacement_ratio:
+        return False
+
+    # Broken legacy embedded-font PDFs often decode into Latin-looking
+    # gibberish with unusually dense punctuation (e.g. q~iCfj.../xifiFl).
+    # Reject those so the OCR fallback gets a chance to recover readable text.
+    punctuation = sum(
+        1
+        for char in normalized
+        if not char.isalnum() and not char.isspace()
+    )
+    if punctuation / length > maximum_punctuation_ratio:
         return False
 
     return True

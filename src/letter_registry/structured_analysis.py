@@ -21,18 +21,38 @@ class ImportantDate:
 
 
 @dataclass(frozen=True, slots=True)
+class ImportantAmount:
+    label: str
+    value: str
+    currency: str = "INR"
+    page: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class PageReference:
+    label: str
+    page: int
+    detail: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class StructuredDocumentContext:
     title: str | None = None
     authority: str | None = None
     category: str | None = None
     subcategory: str | None = None
     summary: str | None = None
+    whatsapp_summary: str | None = None
     action_required: str | None = None
     issue_date: str | None = None
     reference_number: str | None = None
     concepts: tuple[str, ...] = ()
     important_dates: tuple[ImportantDate, ...] = ()
     deadline: str | None = None
+    applies_to: tuple[str, ...] = ()
+    important_amounts: tuple[ImportantAmount, ...] = ()
+    page_references: tuple[PageReference, ...] = ()
+    page_count: int | None = None
     related_terms_hi: tuple[str, ...] = ()
     related_terms_en: tuple[str, ...] = ()
     confidence: float | None = None
@@ -47,6 +67,9 @@ class StructuredDocumentContext:
         data = asdict(self)
         data["concepts"] = list(self.concepts)
         data["important_dates"] = [asdict(item) for item in self.important_dates]
+        data["applies_to"] = list(self.applies_to)
+        data["important_amounts"] = [asdict(item) for item in self.important_amounts]
+        data["page_references"] = [asdict(item) for item in self.page_references]
         data["related_terms_hi"] = list(self.related_terms_hi)
         data["related_terms_en"] = list(self.related_terms_en)
         data["quality_flags"] = list(self.quality_flags)
@@ -109,12 +132,17 @@ def analyze_document_context(
             category=context.category,
             subcategory=context.subcategory,
             summary=context.summary,
+            whatsapp_summary=context.whatsapp_summary,
             action_required=context.action_required,
             issue_date=context.issue_date,
             reference_number=context.reference_number,
             concepts=merged_concepts,
             important_dates=context.important_dates,
             deadline=context.deadline,
+            applies_to=context.applies_to,
+            important_amounts=context.important_amounts,
+            page_references=context.page_references,
+            page_count=context.page_count,
             related_terms_hi=context.related_terms_hi,
             related_terms_en=context.related_terms_en,
             confidence=context.confidence,

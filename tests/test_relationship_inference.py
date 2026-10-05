@@ -104,6 +104,32 @@ class RelationshipInferenceTests(unittest.TestCase):
         self.assertEqual(rows[0].relationship_type, DocumentRelationship.RELATED_TO)
         self.assertIn("Possible revised/versioned document", rows[0].rationale)
 
+    def test_newer_revised_same_reference_recommends_supersede(self):
+        candidate = RelationshipCandidate(
+            record_id="33333333-3333-4333-8333-333333333333",
+            reference_number="BSEB/777/2026",
+            authority="BSEB",
+            category="fee",
+            title="School Fee Order",
+            summary="School fee rates and collection rules",
+            issue_date="2026-09-01",
+        )
+        rows = infer_relationship_suggestions(
+            source_letter_id="11111111-1111-4111-8111-111111111111",
+            source_reference_number="BSEB/777/2026",
+            source_authority="BSEB",
+            source_category="fee",
+            source_text="Revised school fee rates and collection rules are issued.",
+            source_title="Revised School Fee Order",
+            source_summary="Revised school fee rates and collection rules",
+            source_issue_date="2026-10-01",
+            candidates=[candidate],
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].relationship_type, DocumentRelationship.SUPERSEDES)
+        self.assertGreater(rows[0].confidence, 0.9)
+
+
     def test_no_reference_requires_very_high_metadata_similarity(self):
         candidate = RelationshipCandidate(
             record_id="33333333-3333-4333-8333-333333333333",

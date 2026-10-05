@@ -6,7 +6,7 @@ must provide a transport that is already authenticated for the intended user.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Protocol
 
 from .extraction import ExtractionResult
@@ -163,6 +163,42 @@ class SupabaseLetterRepository:
         owner_id: str,
         result: ContextAnalysisResult,
     ) -> None:
+        # Reprocessing must not erase previously verified metadata merely
+        # because a fallback provider cannot recover one field from noisy OCR.
+        select_existing = getattr(self.transport, "select", None)
+        existing_rows = (
+            select_existing(
+                "letters",
+                filters={"id": record.record_id},
+                columns=(
+                    "title,authority,category,subcategory,summary,reference_number,"
+                    "issue_date,action_required"
+                ),
+            )
+            if callable(select_existing)
+            else []
+        )
+        if existing_rows:
+            existing = existing_rows[0]
+            context = result.context
+            merged = {}
+            for field_name in (
+                "title",
+                "authority",
+                "category",
+                "subcategory",
+                "summary",
+                "reference_number",
+                "issue_date",
+                "action_required",
+            ):
+                current = getattr(context, field_name)
+                previous = existing.get(field_name)
+                if not str(current or "").strip() and str(previous or "").strip():
+                    merged[field_name] = str(previous)
+            if merged:
+                result = replace(result, context=replace(context, **merged))
+
         processing_row = build_supabase_context_processing_patch(
             record,
             owner_id=owner_id,

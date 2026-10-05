@@ -7,6 +7,7 @@ or changes status by itself.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from difflib import SequenceMatcher
 import re
 
@@ -22,6 +23,7 @@ class RelationshipCandidate:
     category: str | None
     title: str | None
     summary: str | None
+    issue_date: str | None = None
 
 
 _EXTEND_TERMS = (
@@ -41,8 +43,22 @@ _CORRECT_TERMS = (
 _SUPERSEDE_TERMS = (
     "पूर्व आदेश निरस्त",
     "पूर्व पत्र निरस्त",
+    "पूर्व आदेश को निरस्त",
+    "पूर्व पत्र को निरस्त",
     "supersedes",
     "replaces previous",
+    "in supersession of",
+)
+_REVISION_TERMS = (
+    "पुनरीक्षित",
+    "संशोधित",
+    "संशोधन",
+    "revised",
+    "revision",
+    "amended",
+    "amendment",
+    "corrigendum",
+    "शुद्धि पत्र",
 )
 
 
@@ -72,6 +88,21 @@ def _similarity(left: str | None, right: str | None) -> float:
     return max(seq, token)
 
 
+def _parse_iso_date(value: str | None) -> date | None:
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    try:
+        return date.fromisoformat(raw[:10])
+    except ValueError:
+        return None
+
+
+def _has_revision_cue(*values: str | None) -> bool:
+    text = " ".join(_normalized(value) for value in values if value)
+    return any(term in text for term in _REVISION_TERMS)
+
+
 def _near_duplicate_suggestions(
     *,
     source_letter_id: str,
@@ -80,6 +111,8 @@ def _near_duplicate_suggestions(
     source_category: str | None,
     source_title: str | None,
     source_summary: str | None,
+    source_issue_date: str | None,
+    source_text: str,
     candidates: list[RelationshipCandidate],
     version: str,
 ) -> list[RelationshipSuggestion]:
@@ -87,6 +120,8 @@ def _near_duplicate_suggestions(
     src_ref = _normalized(source_reference_number)
     src_auth = _normalized(source_authority)
     src_cat = _normalized(source_category)
+    src_date = _parse_iso_date(source_issue_date)
+    revision_cue = _has_revision_cue(source_text, source_title, source_summary)
 
     for candidate in candidates:
         if candidate.record_id == source_letter_id:
@@ -98,20 +133,45 @@ def _near_duplicate_suggestions(
         title_sim = _similarity(source_title, candidate.title)
         summary_sim = _similarity(source_summary, candidate.summary)
         content_sim = max(title_sim, summary_sim)
+        candidate_date = _parse_iso_date(candidate.issue_date)
+        later_than_candidate = bool(
+            src_date is not None and candidate_date is not None and src_date > candidate_date
+        )
 
         if ref_match:
-            # Same official reference is strong identity evidence, but not enough
-            # to silently collapse documents: revised/corrected scans can reuse it.
-            if content_sim >= 0.88 and (auth_match or not src_auth):
+            # A later document with the same official reference and explicit
+            # revision wording is much more likely to be a new authoritative
+            # version than a duplicate scan. Keep it reviewable, but recommend
+            # a supersede relationship.
+            if (
+                revision_cue
+                and later_than_candidate
+                and content_sim >= 0.50
+                and content_sim < 0.995
+            ):
+                rows.append(
+                    RelationshipSuggestion(
+                        source_letter_id=source_letter_id,
+                        target_letter_id=candidate.record_id,
+                        relationship_type=DocumentRelationship.SUPERSEDES,
+                        confidence=0.92 if (auth_match or not src_auth) else 0.84,
+                        rationale=(
+                            "Recommended supersede: same reference number, newer issue date, "
+                            f"revision wording, and related content (score={content_sim:.2f})."
+                        ),
+                        version=version,
+                    )
+                )
+            elif content_sim >= 0.92 and (auth_match or not src_auth):
                 rows.append(
                     RelationshipSuggestion(
                         source_letter_id=source_letter_id,
                         target_letter_id=candidate.record_id,
                         relationship_type=DocumentRelationship.DUPLICATE_OF,
-                        confidence=min(0.97, 0.90 + 0.05 * content_sim),
+                        confidence=min(0.97, 0.91 + 0.04 * content_sim),
                         rationale=(
                             "Possible near-duplicate: same reference number with "
-                            f"high metadata/content similarity (score={content_sim:.2f}). "
+                            f"very high metadata/content similarity (score={content_sim:.2f}). "
                             "Requires review before treating as duplicate."
                         ),
                         version=version,
@@ -123,11 +183,16 @@ def _near_duplicate_suggestions(
                         source_letter_id=source_letter_id,
                         target_letter_id=candidate.record_id,
                         relationship_type=DocumentRelationship.RELATED_TO,
-                        confidence=0.84 if auth_match else 0.76,
+                        confidence=0.86 if (later_than_candidate and auth_match) else (0.82 if auth_match else 0.74),
                         rationale=(
                             "Possible revised/versioned document: same reference number "
-                            f"but materially different title/summary similarity (score={content_sim:.2f}). "
-                            "Review as revised copy, correction, or separate issuance."
+                            f"with materially different content (score={content_sim:.2f}). "
+                            + (
+                                "The incoming document is newer. "
+                                if later_than_candidate
+                                else ""
+                            )
+                            + "Review before changing version status."
                         ),
                         version=version,
                     )
@@ -164,7 +229,8 @@ def infer_relationship_suggestions(
     candidates: list[RelationshipCandidate],
     source_title: str | None = None,
     source_summary: str | None = None,
-    version: str = "relationship-inference-v2",
+    source_issue_date: str | None = None,
+    version: str = "relationship-inference-v3",
 ) -> list[RelationshipSuggestion]:
     """Suggest only when explicit relationship wording + a reference match exist."""
 
@@ -198,6 +264,8 @@ def infer_relationship_suggestions(
             source_category=source_category,
             source_title=source_title,
             source_summary=source_summary,
+            source_issue_date=source_issue_date,
+            source_text=source_text,
             candidates=candidates,
             version=version,
         )
