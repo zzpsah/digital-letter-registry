@@ -1,3 +1,10 @@
+## 2026-10-05 — Add retired jobs and completed approval notifications
+- Commit: a1db5cac1ffd322fcdf9aefa996218c265968633
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261005223000_retire_jobs_and_completed_approval_mail.sql`
+
 ## 2026-10-05 — Add retire and delete controls for failed jobs
 - Commit: ebd9caa373a63e763e286f107c3fa72cef9f32f8
 - Author: PRASHANT KUMAR SAH
