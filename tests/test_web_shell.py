@@ -69,6 +69,14 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('fetch("/api/v1/admin/backup/preview"', self.html)
         self.assertIn('fetch("/api/v1/admin/backup/restore"', self.html)
 
+    def test_portal_refresh_and_auto_sync_controls_are_exposed(self) -> None:
+        self.assertIn('id="refreshDashboard"', self.html)
+        self.assertIn('id="refreshLibrary"', self.html)
+        self.assertIn('id="portalSyncStatus"', self.html)
+        self.assertIn('setInterval(()=>', self.html)
+        self.assertIn('document.addEventListener("visibilitychange"', self.html)
+        self.assertIn('Date.now()', self.html)
+
     def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
         self.assertNotIn('id="loginForm"', self.html)
         self.assertNotIn('id="registerMagicLink"', self.html)
