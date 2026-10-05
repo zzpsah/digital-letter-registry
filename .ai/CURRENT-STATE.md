@@ -69,3 +69,33 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Change: Fix unmatched authority review list
 - Date: 2026-10-05
 - Durable context synchronization: completed
+## Delivery quality recovery / duplicate suppression
+- Quality engine v2 marks low-context-confidence + no-clean-document-text results for bounded reprocessing even when the aggregate score is above the old threshold.
+- Low-quality first-pass results may still be delivered; they are not permanently held.
+- Later corrected context should use the existing same-thread correction path.
+- Reprocessing must not resend mail merely because AI paraphrased summary/action wording.
+
+## Manual document reprocessing
+- Editor/Admin users can request Reprocess from each letter card when derived output is missing or wrong, even when the source PDF/image is clear.
+- Reprocess always targets the existing archived original and updates derived OCR/context/summary/authority/action; it must not create a duplicate letter or replace the original file.
+- If the same letter already has a pending/processing job, another reprocess request is not queued.
+- Weak or inaccurate processing output must not be described as a poor PDF unless the source file itself is actually poor.
+- Delivery remains idempotent: wording-only changes do not resend; material corrections or real poor-context-to-usable-context improvements use the same Gmail thread / WhatsApp replacement path.
+
+## Authority display and editing
+- User-facing search/recent/detail views prefer the canonical authority short name (for example `DEO Siwan`, `DPO Establishment, Siwan`) when a canonical mapping exists; raw extracted authority remains preserved in the letter record.
+- Admin → Authorities lists active and removed authorities with editable short name, English/Hindi names, hierarchy level, jurisdiction and aliases.
+- Remove is soft/deactivate and preserves existing mappings; Restore reactivates it.
+- Letter cards show a compact 8-character ID with Copy ID for troubleshooting; normal portal reprocessing does not require the user to know the ID.
+- Reprocess requests are single-flight: if the same letter already has a pending/processing job, another active job is not created.
+- Direct Gemini extraction uses temperature 0.0; canonical normalization and confidence-preserving identity merge stabilize factual fields. Free-text summaries can still vary slightly, so delivery idempotency ignores wording-only paraphrases.
+
+## Stable document identity and authority display
+- Letter cards expose a compact 8-character Document ID pill; tapping/clicking it copies the full UUID for explicit reprocess commands. Portal Reprocess and WhatsApp reply-based Reprocess do not require manually typing the ID.
+- User-facing authority uses the canonical `short_name` when a letter is mapped, e.g. `DEO Siwan` or `DPO Establishment, Siwan`; raw issuer text remains preserved in `letters.authority`.
+- Admin → Authorities lists active and removed authorities and supports editing short/full names, Hindi name, hierarchy level, jurisdiction and aliases. Remove is soft (`is_active=false`) so existing letter mappings are preserved; Restore re-enables it.
+- AI generation temperature is fixed at 0 where supported. During reprocessing, existing title/authority/reference/date are preserved unless incoming evidence is materially stronger, reducing factual drift between runs.
+
+- Admin → Authorities unmatched list is computed null-safely from active letters; records with no `canonical_authority_id` must appear for review instead of being hidden by an invalid equality-to-NULL filter.
+
+- Search Authority filter uses only the canonical short name for display (for example `DEO Siwan`, `DPO Establishment, Siwan`); full English/Hindi canonical names remain metadata and aliases, not dropdown label clutter.

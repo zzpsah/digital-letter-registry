@@ -120,6 +120,9 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('data-restore-authority', self.html)
         self.assertIn('data-a-short', self.html)
 
+    def test_search_authority_filter_prefers_short_names(self) -> None:
+        self.assertIn('v.short_name||v.label||v.name_en', self.html)
+
     def test_dynamic_authority_filter_is_exposed(self) -> None:
         self.assertIn('id="authority"', self.html)
         self.assertIn('All authorities', self.html)

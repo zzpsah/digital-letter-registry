@@ -3610,7 +3610,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             short = str(row.get("short_name") or "").strip()
             en = str(row.get("name_en") or "").strip()
             hi = str(row.get("name_hi") or "").strip()
-            label = (short + " — " if short else "") + en + ((" / " + hi) if hi else "")
+            label = short or en or hi or "Authority"
             items.append({
                 "id": str(row.get("id") or ""),
                 "value": "authority:" + str(row.get("id") or ""),
