@@ -65,7 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 0881f4177d777f1910026cb59fb5142a203a4f66
-- Change: Show manageable WhatsApp users and recipients in admin
+- Commit: 05f10016223fb46c53a67eea8d53f276e7dbb864
+- Change: Optimize eLetters mobile layout
 - Date: 2026-10-05
 - Durable context synchronization: completed

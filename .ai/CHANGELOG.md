@@ -1,3 +1,10 @@
+## 2026-10-05 — Optimize eLetters mobile layout
+- Commit: 05f10016223fb46c53a67eea8d53f276e7dbb864
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Show manageable WhatsApp users and recipients in admin
 - Commit: 0881f4177d777f1910026cb59fb5142a203a4f66
 - Author: Prashant
