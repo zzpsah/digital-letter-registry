@@ -1,3 +1,16 @@
+## 2026-10-05 — Standardize WhatsApp English headings and Hindi details
+- Commit: 975faa9c16055597406217f8292cfac5ddbbcc5f
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `docs/PROJECT-HANDOFF.md`
+- `src/letter_registry/gemini_provider.py`
+- `src/letter_registry/hermes_context_provider.py`
+- `src/letter_registry/supabase_gemini_gateway.py`
+
 ## 2026-10-05 — Make document intelligence independent of category
 - Commit: 52e1b8517642e78c35c92632b00a951d53e3c721
 - Author: Prashant
