@@ -50,8 +50,10 @@ _CONTEXT_SCHEMA = {
         "category": {"type": ["string", "null"]},
         "subcategory": {"type": ["string", "null"]},
         "summary": {"type": ["string", "null"]},
+        "summary_hi": {"type": ["string", "null"]},
         "whatsapp_summary": {"type": ["string", "null"]},
         "action_required": {"type": ["string", "null"]},
+        "action_required_hi": {"type": ["string", "null"]},
         "issue_date": {"type": ["string", "null"]},
         "reference_number": {"type": ["string", "null"]},
         "concepts": {"type": "array", "items": {"type": "string"}},
@@ -107,8 +109,10 @@ _CONTEXT_SCHEMA = {
         "category",
         "subcategory",
         "summary",
+        "summary_hi",
         "whatsapp_summary",
         "action_required",
+        "action_required_hi",
         "issue_date",
         "reference_number",
         "concepts",
@@ -209,6 +213,7 @@ class GeminiDocumentContextProvider:
             "spelling, spacing, character-confusion and line-break errors when the intended text is clear. "
             "Do not copy unreadable garbage into user-facing fields. The title may follow the source language. Write "
             "summary, action_required, key_points, applies_to, amount labels and page-reference labels in simple concise English for email. "
+            "Also write summary_hi and action_required_hi in clear natural Hindi (Devanagari), preserving official names/numbers. "
             "Write whatsapp_summary in simple Roman-English/Hinglish (Latin script, no Devanagari unless an official title/name must be preserved). "
             "Keep clean_document_text in the source language (clean natural Hindi for Hindi documents). "
             "Preserve official names, UDISE codes, reference numbers, dates and amounts exactly.\n\n"
@@ -230,7 +235,7 @@ class GeminiDocumentContextProvider:
             "key_points should contain 3-6 useful operational points, not boilerplate.\n\n"
             f"Deterministic concept hints: {concepts}\n"
             f"Government structure hints: {structure}\n\n"
-            "Extract: title, authority, category, subcategory, summary, whatsapp_summary, action_required, "
+            "Extract: title, authority, category, subcategory, summary, summary_hi, whatsapp_summary, action_required, action_required_hi, "
             "issue_date (YYYY-MM-DD only when confidently present), reference_number, concepts, important_dates, deadline, "
             "applies_to, important_amounts, page_references, page_count, related_terms_hi, related_terms_en, confidence, "
             "key_points, clean_document_text.\n\n"
@@ -284,8 +289,10 @@ class GeminiDocumentContextProvider:
             category=data.get("category"),
             subcategory=data.get("subcategory"),
             summary=data.get("summary"),
+            summary_hi=data.get("summary_hi"),
             whatsapp_summary=data.get("whatsapp_summary"),
             action_required=data.get("action_required"),
+            action_required_hi=data.get("action_required_hi"),
             issue_date=issue_date,
             reference_number=data.get("reference_number"),
             concepts=tuple(str(x) for x in data.get("concepts", [])),

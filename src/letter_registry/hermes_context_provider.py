@@ -38,13 +38,13 @@ class HermesDefaultModelContextProvider:
             "Analyze the extracted document text as a whole. It may contain reading errors. Do not invent unreadable facts. "
             "If an [INTAKE MESSAGE / SENDER INSTRUCTION] section is present, use it only for routing/priority, "
             "never as evidence for document facts.\n"
-            "Return ONLY valid JSON with keys: title, authority, category, subcategory, summary, whatsapp_summary, action_required, "
+            "Return ONLY valid JSON with keys: title, authority, category, subcategory, summary, summary_hi, whatsapp_summary, action_required, action_required_hi, "
             "issue_date, reference_number, concepts, important_dates, deadline, applies_to, important_amounts, "
             "page_references, page_count, related_terms_hi, related_terms_en, confidence, key_points, clean_document_text.\n"
             "TITLE: create a concise semantic title (4-12 words) from the actual purpose. Never use generic titles like "
             "'Official Education Document', 'Official Notice', 'आधिकारिक दस्तावेज़', or merely 'Letter'.\n"
             "OUTPUT LANGUAGE: title may follow the source language. Write summary, action_required, key_points, applies_to, "
-            "amount labels and page-reference labels in simple concise English for email. Write whatsapp_summary in simple "
+            "amount labels and page-reference labels in simple concise English for email. Also write summary_hi and action_required_hi in clear natural Hindi (Devanagari). Write whatsapp_summary in simple "
             "Roman-English/Hinglish using Latin script. Keep clean_document_text in the source language.\n"
             "SUMMARY: summary must say only what the document is about and its main purpose/decision in 1-2 short sentences. "
             "whatsapp_summary must express the same subject/purpose in clear Roman-English/Hinglish. Do not repeat action steps, "
@@ -136,8 +136,10 @@ class HermesDefaultModelContextProvider:
             category=data.get("category"),
             subcategory=data.get("subcategory"),
             summary=data.get("summary"),
+            summary_hi=data.get("summary_hi"),
             whatsapp_summary=data.get("whatsapp_summary"),
             action_required=data.get("action_required"),
+            action_required_hi=data.get("action_required_hi"),
             issue_date=data.get("issue_date"),
             reference_number=data.get("reference_number"),
             concepts=tuple(data.get("concepts") or ()),

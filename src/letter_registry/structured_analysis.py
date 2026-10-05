@@ -42,8 +42,10 @@ class StructuredDocumentContext:
     category: str | None = None
     subcategory: str | None = None
     summary: str | None = None
+    summary_hi: str | None = None
     whatsapp_summary: str | None = None
     action_required: str | None = None
+    action_required_hi: str | None = None
     issue_date: str | None = None
     reference_number: str | None = None
     concepts: tuple[str, ...] = ()
@@ -132,8 +134,10 @@ def analyze_document_context(
             category=context.category,
             subcategory=context.subcategory,
             summary=context.summary,
+            summary_hi=context.summary_hi,
             whatsapp_summary=context.whatsapp_summary,
             action_required=context.action_required,
+            action_required_hi=context.action_required_hi,
             issue_date=context.issue_date,
             reference_number=context.reference_number,
             concepts=merged_concepts,

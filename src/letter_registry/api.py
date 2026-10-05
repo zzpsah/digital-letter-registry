@@ -51,12 +51,14 @@ class SearchCard(BaseModel):
     id: str
     title: str
     summary: str | None = None
+    summary_hi: str | None = None
     reference_number: str | None = None
     authority: str | None = None
     category: str | None = None
     issue_date: str | None = None
     status: str
     action_required: str | None = None
+    action_required_hi: str | None = None
     concepts: list[str] = Field(default_factory=list)
     context_snippet: str | None = None
     file_type: str | None = None
@@ -1567,6 +1569,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     or item.result.smart_filename
                     or "Untitled letter",
                     summary=item.result.summary,
+                    summary_hi=item.result.summary_hi,
                     reference_number=item.result.reference_number,
                     authority=item.result.authority,
                     category=item.result.category,
@@ -1577,6 +1580,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     ),
                     status=item.result.status,
                     action_required=item.result.action_required,
+                    action_required_hi=item.result.action_required_hi,
                     concepts=list(item.result.concepts),
                     context_snippet=item.result.context_snippet,
                     file_type=item.result.file_type,
@@ -1594,12 +1598,14 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     id=item.record_id,
                     title=item.title or item.smart_filename or "Untitled letter",
                     summary=item.summary,
+                    summary_hi=item.summary_hi,
                     reference_number=item.reference_number,
                     authority=item.authority,
                     category=item.category,
                     issue_date=item.issue_date.isoformat() if item.issue_date else None,
                     status=item.status,
                     action_required=item.action_required,
+                    action_required_hi=item.action_required_hi,
                     concepts=list(item.concepts),
                     context_snippet=item.context_snippet,
                     file_type=item.file_type,

@@ -22,3 +22,5 @@ build/
 
 *.egg-info/
 runtime-synthetic/
+.vercel
+.env*

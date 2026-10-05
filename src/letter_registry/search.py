@@ -34,6 +34,8 @@ class SearchResult:
     text_rank: float
     fuzzy_rank: float
     combined_rank: float
+    summary_hi: str | None = None
+    action_required_hi: str | None = None
 
 
 class SearchTransport(Protocol):
@@ -90,12 +92,14 @@ class SupabaseSearchRepository:
                     smart_filename=row.get("smart_filename"),
                     title=row.get("title"),
                     summary=row.get("summary"),
+                    summary_hi=row.get("summary_hi"),
                     reference_number=row.get("reference_number"),
                     authority=row.get("authority"),
                     category=row.get("category"),
                     issue_date=issue_date,
                     status=str(row["status"]),
                     action_required=row.get("action_required"),
+                    action_required_hi=row.get("action_required_hi"),
                     concepts=tuple(str(x) for x in (row.get("concepts") or [])),
                     context_snippet=row.get("context_snippet"),
                     file_type=row.get("file_type"),
