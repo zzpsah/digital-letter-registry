@@ -65,7 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 505abbd81c73c5a3863208c79898ba1028aa31dc
-- Change: Add Google Drive restore and permanent delete helpers
+- Commit: b30a1960d6f52dd7d349ebab80e7fc67a2c11b8a
+- Change: Add recoverable letter trash and restore
 - Date: 2026-10-05
 - Durable context synchronization: completed

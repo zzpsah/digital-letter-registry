@@ -1,3 +1,10 @@
+## 2026-10-05 — Add recoverable letter trash and restore
+- Commit: b30a1960d6f52dd7d349ebab80e7fc67a2c11b8a
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-05 — Add Google Drive restore and permanent delete helpers
 - Commit: 505abbd81c73c5a3863208c79898ba1028aa31dc
 - Author: PRASHANT KUMAR SAH
