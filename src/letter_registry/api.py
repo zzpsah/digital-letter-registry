@@ -2296,12 +2296,13 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             )
 
         now = datetime.now(timezone.utc).isoformat()
+        approval_token = str(uuid4())
         row = database.update(
             "account_access_requests",
             {
                 "status": "approved",
                 "approved_role": role.value,
-                "approval_token": str(uuid4()),
+                "approval_token": approval_token,
                 "approved_at": now,
                 "approval_notified_at": None,
                 "rejected_at": None,
@@ -2309,14 +2310,28 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             },
             filters={"id": normalized_id},
         )
+        initial_password = os.environ.get(
+            "DLR_DEFAULT_INITIAL_PASSWORD",
+            "eletter@1234",
+        )
+        _complete_approved_account(
+            email=str(rows[0].get("email") or ""),
+            password=initial_password,
+            approval_token=approval_token,
+        )
         _audit_admin_action(
             access_token,
             action="account_request_approved",
             target_type="account_request",
             target_id=normalized_id,
-            detail={"role": role.value},
+            detail={"role": role.value, "account_activated": True},
         )
-        return row
+        return {
+            "id": normalized_id,
+            "status": "completed",
+            "email": str(rows[0].get("email") or ""),
+            "approved_role": role.value,
+        }
 
     @app.post("/api/v1/admin/account-requests/{request_id}/reject")
     def reject_admin_account_request(
@@ -2693,6 +2708,112 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             },
         )
         return {"success": True, "job_id": normalized_id, "status": "pending"}
+
+    @app.post("/api/v1/admin/operations/{job_id}/retire")
+    def retire_admin_operation(
+        job_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        try:
+            normalized_id = str(UUID(job_id))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid processing job id",
+            ) from exc
+        rows = database.select(
+            "processing_jobs",
+            filters={"id": normalized_id},
+            columns="id,letter_id,status,reason,attempts",
+        )
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Processing job not found",
+            )
+        job = rows[0]
+        if str(job.get("status") or "") != "failed":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Only failed processing jobs can be retired",
+            )
+        now = datetime.now(timezone.utc).isoformat()
+        updated = database.update(
+            "processing_jobs",
+            {
+                "status": "retired",
+                "updated_at": now,
+            },
+            filters={"id": normalized_id},
+        )
+        if not updated:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Processing job could not be retired",
+            )
+        _audit_admin_action(
+            access_token,
+            action="processing_job_retired",
+            target_type="processing_job",
+            target_id=normalized_id,
+            detail={
+                "letter_id": str(job.get("letter_id") or ""),
+                "reason": str(job.get("reason") or ""),
+                "attempts": int(job.get("attempts") or 0),
+            },
+        )
+        return {"success": True, "job_id": normalized_id, "status": "retired"}
+
+    @app.delete("/api/v1/admin/operations/{job_id}")
+    def delete_admin_operation(
+        job_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        try:
+            normalized_id = str(UUID(job_id))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid processing job id",
+            ) from exc
+        rows = database.select(
+            "processing_jobs",
+            filters={"id": normalized_id},
+            columns="id,letter_id,status,reason,attempts",
+        )
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Processing job not found",
+            )
+        job = rows[0]
+        if str(job.get("status") or "") not in {"failed", "retired"}:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Only failed or retired processing jobs can be deleted",
+            )
+        deleted = database.delete("processing_jobs", filters={"id": normalized_id})
+        if not deleted:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Processing job could not be deleted",
+            )
+        _audit_admin_action(
+            access_token,
+            action="processing_job_deleted",
+            target_type="processing_job",
+            target_id=normalized_id,
+            detail={
+                "letter_id": str(job.get("letter_id") or ""),
+                "reason": str(job.get("reason") or ""),
+                "attempts": int(job.get("attempts") or 0),
+            },
+        )
+        return {"success": True, "job_id": normalized_id, "status": "deleted"}
 
 
     @app.get("/api/v1/admin/audit-log")
