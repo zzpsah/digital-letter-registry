@@ -65,19 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: ba8f71fe15906c5a3397327ffc5bb26cd1100ccf
-- Change: Add dynamic authority search filter
+- Commit: beb983e15ff7b765e64cab0d8bc509d48f06b6ce
+- Change: Add canonical authority hierarchy and learned aliases
 - Date: 2026-10-05
 - Durable context synchronization: completed
-
-
-## UI/behavior governance baseline
-
-The authoritative UI/UX contract is `docs/UI-DESIGN-CONTRACT.md`; the enhancement brain is `brain/ui-governance/`. Any new AI/tool must preserve this accepted baseline and avoid wholesale redesigns or incidental behavior changes.
-- Search Authority filter is a dynamic dropdown populated from distinct active/non-trashed letter authorities; new authorities appear automatically.
-
-## Authority intelligence contract
-
-Authority is exactly one actual issuing/signing authority, never a concatenation of issuer + recipient + cited offices. The classification hierarchy is **Headmaster/School → BEO (Block Education Officer / प्रखंड शिक्षा पदाधिकारी) → DPO (functional district programme authority such as Establishment) → DEO (one canonical DEO per district) → RDDE (division) → Education Department (state)**.
-
-Canonical authority records store designation, jurisdiction and level. DPO posts may be distinct by function, for example DPO Establishment vs another DPO branch. Raw document authority text stays preserved on the letter, while `canonical_authority_id` links it to the clean authority master. Admin-confirmed aliases are learned permanently; future matching issuer strings auto-map through normalized aliases. Uncertain or multi-office strings remain unmatched for review rather than being force-mapped. Search authority dropdown shows canonical authorities, not every raw spelling variant.

@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: ba8f71fe15906c5a3397327ffc5bb26cd1100ccf
-- Last commit: Add dynamic authority search filter
+- HEAD: beb983e15ff7b765e64cab0d8bc509d48f06b6ce
+- Last commit: Add canonical authority hierarchy and learned aliases
 - Last commit date: 2026-10-05
 - Last commit author: Prashant
 

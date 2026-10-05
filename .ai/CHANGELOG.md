@@ -1,3 +1,25 @@
+## 2026-10-05 — Add canonical authority hierarchy and learned aliases
+- Commit: beb983e15ff7b765e64cab0d8bc509d48f06b6ce
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `brain/ui-governance/CURRENT_STATE.md`
+- `docs/PROJECT-HANDOFF.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/deterministic_context.py`
+- `src/letter_registry/gemini_provider.py`
+- `src/letter_registry/hermes_context_provider.py`
+- `src/letter_registry/search.py`
+- `src/letter_registry/supabase_gemini_gateway.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261005235500_add_canonical_authority_intelligence.sql`
+- `tests/test_api.py`
+- `tests/test_deterministic_context.py`
+- `tests/test_search.py`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Add dynamic authority search filter
 - Commit: ba8f71fe15906c5a3397327ffc5bb26cd1100ccf
 - Author: Prashant
