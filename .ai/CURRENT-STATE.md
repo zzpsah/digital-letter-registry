@@ -99,3 +99,9 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Admin → Authorities unmatched list is computed null-safely from active letters; records with no `canonical_authority_id` must appear for review instead of being hidden by an invalid equality-to-NULL filter.
 
 - Search Authority filter uses only the canonical short name for display (for example `DEO Siwan`, `DPO Establishment, Siwan`); full English/Hindi canonical names remain metadata and aliases, not dropdown label clutter.
+
+## Authority merge and permanent deletion
+- Admin → Authorities supports Save/Edit, Remove/Restore, Merge into another canonical authority, and Delete permanently.
+- Merge moves all linked letter mappings and aliases to the selected target, updates child-parent references, then deletes the duplicate source authority.
+- Permanent Delete removes the authority master; linked letters keep their raw authority text but become unmatched for later review/remapping.
+- Authority rows show linked-letter counts before destructive actions.

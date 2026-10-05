@@ -283,3 +283,9 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 - AI generation temperature is fixed at 0 where supported. During reprocessing, existing title/authority/reference/date are preserved unless incoming evidence is materially stronger, reducing factual drift between runs.
 
 - Search Authority filter uses only the canonical short name for display (for example `DEO Siwan`, `DPO Establishment, Siwan`); full English/Hindi canonical names remain metadata and aliases, not dropdown label clutter.
+
+## Authority merge and permanent deletion
+- Admin → Authorities supports Save/Edit, Remove/Restore, Merge into another canonical authority, and Delete permanently.
+- Merge moves all linked letter mappings and aliases to the selected target, updates child-parent references, then deletes the duplicate source authority.
+- Permanent Delete removes the authority master; linked letters keep their raw authority text but become unmatched for later review/remapping.
+- Authority rows show linked-letter counts before destructive actions.

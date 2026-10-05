@@ -112,6 +112,13 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('/reprocess', self.html)
         self.assertIn('Reprocess this document and regenerate its context?', self.html)
 
+    def test_authority_admin_merge_and_delete_are_exposed(self) -> None:
+        self.assertIn('data-merge-authority', self.html)
+        self.assertIn('data-merge-authority-btn', self.html)
+        self.assertIn('data-delete-authority', self.html)
+        self.assertIn('/merge', self.html)
+        self.assertIn('Delete permanently', self.html)
+
     def test_authority_admin_edit_remove_restore_and_copy_id_are_exposed(self) -> None:
         self.assertIn('data-copy-id=', self.html)
         self.assertIn('Copy full letter ID', self.html)

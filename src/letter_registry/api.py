@@ -234,6 +234,10 @@ class AdminAuthorityLearnAliasRequest(BaseModel):
     alias: str = Field(min_length=2, max_length=240)
 
 
+class AdminAuthorityMergeRequest(BaseModel):
+    target_authority_id: str = Field(min_length=36, max_length=36)
+
+
 class AdminCategoryRequest(BaseModel):
     code: str = Field(min_length=2, max_length=80, pattern=r"^[a-z0-9_]+$")
     name_en: str = Field(min_length=2, max_length=120)
@@ -3069,6 +3073,14 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             filters={"is_trashed": False},
             columns="id,title,authority,canonical_authority_id,uploaded_at",
         )
+        linked_counts: dict[str, int] = {}
+        for letter_row in candidate_rows:
+            authority_id = str(letter_row.get("canonical_authority_id") or "").strip()
+            if authority_id:
+                linked_counts[authority_id] = linked_counts.get(authority_id, 0) + 1
+        for authority_row in authorities:
+            authority_row["linked_letters"] = linked_counts.get(str(authority_row.get("id") or ""), 0)
+
         unmatched = [
             row for row in candidate_rows
             if not str(row.get("canonical_authority_id") or "").strip()
@@ -3190,6 +3202,125 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             detail={"fields": sorted(changes), "aliases_updated": payload.aliases is not None},
         )
         return {"id": authority_id, "updated": True}
+
+    @app.post("/api/v1/admin/authorities/{authority_id}/merge")
+    def merge_admin_authority(
+        authority_id: str,
+        payload: AdminAuthorityMergeRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        target_id = payload.target_authority_id.strip()
+        if target_id == authority_id:
+            raise HTTPException(status_code=400, detail="Source and target authority must be different.")
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        source_rows = database.select(
+            "authorities",
+            filters={"id": authority_id, "archive_id": _archive_id()},
+            columns="id,short_name,name_en",
+        )
+        target_rows = database.select(
+            "authorities",
+            filters={"id": target_id, "archive_id": _archive_id()},
+            columns="id,short_name,name_en",
+        )
+        if not source_rows:
+            raise HTTPException(status_code=404, detail="Source authority not found")
+        if not target_rows:
+            raise HTTPException(status_code=404, detail="Target authority not found")
+
+        source_aliases = database.select(
+            "authority_aliases",
+            filters={"authority_id": authority_id, "archive_id": _archive_id()},
+            columns="id",
+        )
+        for alias_row in source_aliases:
+            database.update(
+                "authority_aliases",
+                {"authority_id": target_id},
+                filters={"id": str(alias_row["id"]), "archive_id": _archive_id()},
+            )
+
+        linked_letters = database.select(
+            "letters",
+            filters={"canonical_authority_id": authority_id},
+            columns="id",
+        )
+        if linked_letters:
+            database.update(
+                "letters",
+                {"canonical_authority_id": target_id},
+                filters={"canonical_authority_id": authority_id},
+            )
+
+        database.update(
+            "authorities",
+            {"parent_authority_id": target_id},
+            filters={"parent_authority_id": authority_id},
+        )
+        deleted = database.delete(
+            "authorities",
+            filters={"id": authority_id, "archive_id": _archive_id()},
+        )
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Source authority not found")
+
+        _audit_admin_action(
+            access_token,
+            action="authority_merged",
+            target_type="authority",
+            target_id=target_id,
+            detail={
+                "source_authority_id": authority_id,
+                "target_authority_id": target_id,
+                "moved_letters": len(linked_letters),
+                "moved_aliases": len(source_aliases),
+            },
+        )
+        return {
+            "merged": True,
+            "source_authority_id": authority_id,
+            "target_authority_id": target_id,
+            "moved_letters": len(linked_letters),
+            "moved_aliases": len(source_aliases),
+        }
+
+    @app.delete("/api/v1/admin/authorities/{authority_id}")
+    def delete_admin_authority(
+        authority_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        exists = database.select(
+            "authorities",
+            filters={"id": authority_id, "archive_id": _archive_id()},
+            columns="id,short_name,name_en",
+        )
+        if not exists:
+            raise HTTPException(status_code=404, detail="Authority not found")
+        linked_letters = database.select(
+            "letters",
+            filters={"canonical_authority_id": authority_id},
+            columns="id",
+        )
+        database.delete(
+            "authorities",
+            filters={"id": authority_id, "archive_id": _archive_id()},
+        )
+        _audit_admin_action(
+            access_token,
+            action="authority_deleted_permanently",
+            target_type="authority",
+            target_id=authority_id,
+            detail={"unmatched_letters": len(linked_letters)},
+        )
+        return MessageResponse(
+            message=(
+                "Authority deleted permanently. "
+                f"{len(linked_letters)} linked letter(s) are now unmatched."
+            )
+        )
 
     @app.post("/api/v1/admin/authorities/{authority_id}/learn-alias")
     def learn_admin_authority_alias(
