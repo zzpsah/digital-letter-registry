@@ -520,3 +520,15 @@ This is trial/staging behavior. It is designed to recover automatically from tem
 - The Drive file ID and file bytes remain unchanged.
 - `letters.original_filename` remains immutable provenance and is never replaced by the Drive display name.
 - Rename is idempotent and uses the existing private Drive OAuth transport.
+
+
+## Controlled automatic self-healing reprocessing
+
+- Low-quality results marked with `needs_reprocessing=true` are eligible for automatic recovery when a better/current AI provider is configured.
+- Provider quality tiers are ordered conservatively: Gemini > Hermes > deterministic.
+- A lower-tier low-quality result can receive a daily recovery job targeting the preferred provider.
+- Same-target low-quality results are not retried continuously; they wait for a provider/model, dictionary, or quality-engine version change.
+- Automatic reprocessing is gated to AI-enabled runtime (Gemini gateway or direct Gemini key).
+- Daily automatic enqueue volume is capped by `DLR_AUTO_REPROCESS_DAILY_LIMIT` (default 5) to prevent quota stampedes.
+- Job reasons include the target signature and, for provider recovery, a UTC day bucket, preserving idempotency and auditability.
+- Reprocessing never mutates immutable originals; only derived projections/artifacts may improve.
