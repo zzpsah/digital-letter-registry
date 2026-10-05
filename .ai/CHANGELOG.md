@@ -1,3 +1,10 @@
+## 2026-10-05 — Add admin user account control edge function
+- Commit: 014612cee2c8ab6832bc973c746a7388c1449341
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `supabase/functions/dlr-admin-user-account/index.ts`
+
 ## 2026-10-05 — Use compact corner star and upload date on letter cards
 - Commit: c0cadfcdf7a9689ed1413c6c1ca18245b9b00ac9
 - Author: Prashant
