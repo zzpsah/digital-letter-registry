@@ -1,3 +1,18 @@
+## 2026-10-05 — Add latest sorting and important document highlights
+- Commit: eb3ca2123906be3fb69103dc2083bc2d9ef193ee
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `docs/PROJECT-HANDOFF.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/search.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261005195000_add_letter_importance_and_notes.sql`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Test portal refresh and auto-sync controls
 - Commit: 323569411aa79a4b621521f5e0d4d909a6995c10
 - Author: PRASHANT KUMAR SAH

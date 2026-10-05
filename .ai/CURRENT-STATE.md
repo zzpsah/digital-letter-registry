@@ -65,11 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 27c8a64f111aee08b33df79c3a1f4e8019d12b4f
-- Change: Add portal refresh and live auto-sync
+- Commit: eb3ca2123906be3fb69103dc2083bc2d9ef193ee
+- Change: Add latest sorting and important document highlights
 - Date: 2026-10-05
 - Durable context synchronization: completed
-
-## 2026-10-05 — Sorting and important highlights
-
-eLetters defaults to latest uploaded first. Editors/admins can persist shared `★ Important` state plus an internal note in Supabase; yellow highlighting is visible to authorized portal users. Public Drive index may mirror importance but not the internal comment. Sort options include latest, important, issue date, title and relevance.
