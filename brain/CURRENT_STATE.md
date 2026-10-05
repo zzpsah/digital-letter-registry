@@ -132,3 +132,10 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Exactly one synthetic RLS verification row remains in `letters`; no real archive-letter row exists.
 - Destructive cleanup was not claimed because the connected cleanup action was blocked.
 - No secrets, private IDs, real letters, deployment, live import, or real rename were added.
+
+## 2026-10-05 — Admin controls and mobile web polish
+
+- Admin UI now exposes current delivery recipients and allowed WhatsApp users instead of providing add-only controls.
+- Admin can add/remove managed recipients/users and control the broader account/category workflow from the web console.
+- Mobile web CSS was refined for compact sticky navigation, responsive search/actions, one-column filters/forms, readable document cards, horizontal admin tabs and touch-friendly controls.
+- The full automated suite passed after the mobile change (308 tests).

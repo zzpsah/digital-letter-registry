@@ -52,3 +52,7 @@ The hosted archive now uses membership/role authorization rather than a configur
 - Full synthetic suite passes 249/249.
 - Supabase leaked-password protection is still disabled and should be enabled when Auth configuration access is available.
 - Resume from `brain/multi-user-authz/`.
+
+## Latest web UI handoff — 2026-10-05
+
+Treat the current responsive eLetters shell as the UI baseline. Preserve the compact English-default navigation and mobile breakpoints. Do not regress Admin back to add-only recipient/WhatsApp controls: current entries must remain visible and manageable.

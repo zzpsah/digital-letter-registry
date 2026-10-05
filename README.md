@@ -208,3 +208,9 @@ The private Oracle runtime began as a bounded manual pilot and now has active Wh
 ## WhatsApp intake
 
 The private Oracle runtime can ingest official PDF/JPG/JPEG/PNG attachments from a dedicated WhatsApp archive group through the existing Hermes session. The connector is group-allowlisted, stages media into a protected local queue, preserves WhatsApp message provenance for deduplication, and processes it through the same immutable Drive + Supabase + worker pipeline as manual intake. Exact content duplicates do not create a second Drive/archive row: the existing title/reference/date/Drive target is reported and a WhatsApp poll offers Overwrite, Cancel, or Supersede. No archive mutation occurs before a choice. Cancel is a true no-op; Overwrite replaces the existing Drive object's bytes in place and links the new provenance; Supersede is only valid for a genuinely revised/different document, not a byte-identical file. The poll decision is bound to the originating chat/requester. The initial WhatsApp rollout is separately capped at 20 documents. Runtime group/member identifiers and credentials are never stored in this public repository.
+
+## Current UI/Admin state — 2026-10-05
+
+- eLetters uses a compact English-default responsive web UI with mobile-specific navigation, search/filter, document-card and admin-layout optimizations.
+- Admin can review account requests, manage users/roles, manage delivery recipients, view/add/remove allowed WhatsApp users, and manage dynamic document categories.
+- Mobile layouts preserve desktop behavior while stacking forms/actions cleanly on narrow screens.

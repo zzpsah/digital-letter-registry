@@ -69,3 +69,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Change: Optimize eLetters mobile layout
 - Date: 2026-10-05
 - Durable context synchronization: completed
+
+## 2026-10-05 — eLetters mobile/admin baseline
+
+The eLetters responsive shell is now explicitly optimized for phones. Admin users can view/manage recipients and WhatsApp allowed users, in addition to account approvals, roles and dynamic categories. The post-change automated suite passed 308 tests. Preserve this as the current web baseline.
