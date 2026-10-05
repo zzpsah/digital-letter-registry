@@ -381,3 +381,9 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 - Low-quality first-pass results may still be delivered; they are not permanently held.
 - Later corrected context should use the existing same-thread correction path.
 - Reprocessing must not resend mail merely because AI paraphrased summary/action wording.
+
+## Manual document reprocessing
+- Editor/Admin users can request Reprocess from each letter card.
+- Reprocess always targets the existing archived original and updates derived OCR/context/summary/authority/action; it must not create a duplicate letter or replace the original file.
+- Weak or inaccurate processing output must not be described as a poor PDF unless the source file itself is actually poor.
+- Delivery remains idempotent: wording-only changes do not resend; material corrections or real poor-context-to-usable-context improvements use the same Gmail thread / WhatsApp replacement path.

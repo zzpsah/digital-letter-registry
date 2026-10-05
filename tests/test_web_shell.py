@@ -107,6 +107,11 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('DEO / District', self.html)
         self.assertIn('RDDE / Division', self.html)
 
+    def test_reprocess_control_is_exposed_for_write_roles(self) -> None:
+        self.assertIn('data-reprocess=', self.html)
+        self.assertIn('/reprocess', self.html)
+        self.assertIn('Reprocess this document and regenerate its context?', self.html)
+
     def test_dynamic_authority_filter_is_exposed(self) -> None:
         self.assertIn('id="authority"', self.html)
         self.assertIn('All authorities', self.html)

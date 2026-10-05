@@ -3699,6 +3699,40 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             open_original_path=f"/api/v1/letters/{detail.record_id}/original",
         )
 
+    @app.post("/api/v1/letters/{record_id}/reprocess", response_model=MessageResponse)
+    def reprocess_letter(
+        record_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        membership = _archive_membership(
+            access_token,
+            roles={ArchiveRole.EDITOR, ArchiveRole.ADMIN},
+        )
+        database = _transport(access_token)
+        rows = database.select(
+            "letters",
+            filters={"id": record_id},
+            columns="id,owner_id,is_trashed",
+        )
+        if not rows or bool(rows[0].get("is_trashed")):
+            raise HTTPException(status_code=404, detail="Letter not found")
+        owner_id = str(rows[0].get("owner_id") or membership.user_id)
+        reason = "manual_reprocess:" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        SupabaseProcessingQueue(database).enqueue(
+            letter_id=record_id,
+            owner_id=owner_id,
+            reason=reason,
+        )
+        _audit_admin_action(
+            access_token,
+            action="letter_reprocess_requested",
+            target_type="letter",
+            target_id=record_id,
+            detail={"reason": reason, "requested_by_role": membership.role.value},
+        )
+        return MessageResponse(message="Reprocess requested.")
+
     @app.get(
         "/api/v1/letters/{record_id}/relationships",
         response_model=list[RelationshipResponse],
