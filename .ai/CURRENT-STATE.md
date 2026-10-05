@@ -65,7 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 1a4cde77a7adab124591465042db0c53029f27d3
-- Change: Support safe Google Drive smart rename
-- Date: 2026-10-04
+- Commit: c8b2863b995d13f484c58d493ae1c77a86940484
+- Change: Harden automatic quality reprocessing
+- Date: 2026-10-05
 - Durable context synchronization: completed
