@@ -1184,7 +1184,7 @@ class ApiTests(unittest.TestCase):
             "/api/v1/letters/22222222-2222-4222-8222-222222222222/original",
         )
         self.assertNotIn("storage_object_id", body["results"][0])
-        self.assertEqual(fake.last_function, "search_letter_cards")
+        self.assertEqual(fake.last_function, "search_letter_cards_v2")
         self.assertEqual(fake.last_params["year_filter"], 2026)
 
     def test_authenticated_letter_detail_excludes_storage_reference(self):

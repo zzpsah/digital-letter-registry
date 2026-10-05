@@ -96,6 +96,17 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('r.summary_hi||r.summary', self.html)
         self.assertIn('r.action_required_hi||r.action_required', self.html)
 
+    def test_authority_admin_learning_ui_is_exposed(self) -> None:
+        self.assertIn('data-admin-pane="authorities"', self.html)
+        self.assertIn('id="admin-authorities"', self.html)
+        self.assertIn('id="unmatchedAuthorityList"', self.html)
+        self.assertIn('data-learn-alias', self.html)
+        self.assertIn('Headmaster / School', self.html)
+        self.assertIn('BEO / Block', self.html)
+        self.assertIn('DPO / District programme', self.html)
+        self.assertIn('DEO / District', self.html)
+        self.assertIn('RDDE / Division', self.html)
+
     def test_dynamic_authority_filter_is_exposed(self) -> None:
         self.assertIn('id="authority"', self.html)
         self.assertIn('All authorities', self.html)

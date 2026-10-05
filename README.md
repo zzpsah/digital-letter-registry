@@ -251,3 +251,9 @@ Editors/Admins can mark a document as **Important** and attach an optional archi
 ## UI/behavior governance baseline
 
 The accepted eLetters interface and workflows are protected by `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/`. Future AI/tools must read them before UI/UX work and must not wholesale redesign or recolor the portal. The contract records the purple palette, compact/mobile layout, Hinglish default language selector, Smart Search behavior, Remember-me login semantics, admin controls, recipient single-channel behavior, recoverable document Trash, Operations Retry/Retire/Delete, important-star rules, and safe change/test procedure.
+
+## Authority intelligence contract
+
+Authority is exactly one actual issuing/signing authority, never a concatenation of issuer + recipient + cited offices. The classification hierarchy is **Headmaster/School → BEO (Block Education Officer / प्रखंड शिक्षा पदाधिकारी) → DPO (functional district programme authority such as Establishment) → DEO (one canonical DEO per district) → RDDE (division) → Education Department (state)**.
+
+Canonical authority records store designation, jurisdiction and level. DPO posts may be distinct by function, for example DPO Establishment vs another DPO branch. Raw document authority text stays preserved on the letter, while `canonical_authority_id` links it to the clean authority master. Admin-confirmed aliases are learned permanently; future matching issuer strings auto-map through normalized aliases. Uncertain or multi-office strings remain unmatched for review rather than being force-mapped. Search authority dropdown shows canonical authorities, not every raw spelling variant.

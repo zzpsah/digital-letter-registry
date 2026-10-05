@@ -25,11 +25,15 @@ def _explicit_authority(text: str) -> str | None:
     ):
         return "CBSE"
 
-    for line in text.splitlines():
-        stripped = line.strip()
+    for line in text.splitlines()[:30]:
+        stripped = " ".join(line.split()).strip()
         folded = stripped.casefold()
-        if "जिला शिक्षा पदाधिकारी" in folded:
-            return stripped[:160]
+        if "जिला कार्यक्रम पदाधिकारी" in folded and ("स्थापना" in folded or "establishment" in folded):
+            if "सिवान" in folded or "siwan" in folded:
+                return "जिला कार्यक्रम पदाधिकारी (स्थापना), सिवान"
+        if "जिला शिक्षा पदाधिकारी" in folded and ("सिवान" in folded or "siwan" in folded):
+            if len(stripped) <= 120 and " एवं " not in stripped and " and " not in folded:
+                return "जिला शिक्षा पदाधिकारी, सिवान"
     return None
 
 

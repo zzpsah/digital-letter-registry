@@ -71,7 +71,7 @@ class SupabaseSearchRepository:
             raise ValueError("year must be between 1900 and 2100")
 
         rows = self.transport.rpc(
-            "search_letter_cards",
+            "search_letter_cards_v2",
             {
                 "search_query": normalized or None,
                 "authority_filter": filters.authority,

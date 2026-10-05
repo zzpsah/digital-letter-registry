@@ -207,6 +207,33 @@ class AdminWhatsAppGroupGuideRequest(BaseModel):
     message: str = Field(min_length=1, max_length=4096)
 
 
+class AdminAuthorityRequest(BaseModel):
+    code: str = Field(min_length=2, max_length=100, pattern=r"^[a-z0-9_]+$")
+    name_en: str = Field(min_length=2, max_length=180)
+    name_hi: str | None = Field(default=None, max_length=180)
+    short_name: str | None = Field(default=None, max_length=100)
+    authority_level: str = Field(pattern=r"^(school|block|district_programme|district|division|state)$")
+    jurisdiction: str | None = Field(default=None, max_length=180)
+    aliases: list[str] = Field(default_factory=list, max_length=100)
+    sort_order: int = Field(default=100, ge=0, le=9999)
+    is_active: bool = True
+
+
+class AdminAuthorityUpdateRequest(BaseModel):
+    name_en: str | None = Field(default=None, min_length=2, max_length=180)
+    name_hi: str | None = Field(default=None, max_length=180)
+    short_name: str | None = Field(default=None, max_length=100)
+    authority_level: str | None = Field(default=None, pattern=r"^(school|block|district_programme|district|division|state)$")
+    jurisdiction: str | None = Field(default=None, max_length=180)
+    aliases: list[str] | None = Field(default=None, max_length=100)
+    sort_order: int | None = Field(default=None, ge=0, le=9999)
+    is_active: bool | None = None
+
+
+class AdminAuthorityLearnAliasRequest(BaseModel):
+    alias: str = Field(min_length=2, max_length=240)
+
+
 class AdminCategoryRequest(BaseModel):
     code: str = Field(min_length=2, max_length=80, pattern=r"^[a-z0-9_]+$")
     name_en: str = Field(min_length=2, max_length=120)
@@ -3016,6 +3043,100 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             raise HTTPException(status_code=502, detail="WhatsApp group photo update failed") from exc
 
 
+    @app.get("/api/v1/admin/authorities")
+    def list_admin_authorities(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        authorities = database.select(
+            "authorities",
+            filters={"archive_id": _archive_id()},
+            columns="id,code,name_en,name_hi,short_name,authority_level,jurisdiction,parent_authority_id,sort_order,is_active,created_at,updated_at",
+        )
+        aliases = database.select(
+            "authority_aliases",
+            filters={"archive_id": _archive_id()},
+            columns="id,authority_id,alias,normalized_alias",
+        )
+        alias_map: dict[str, list[str]] = {}
+        for row in aliases:
+            alias_map.setdefault(str(row.get("authority_id") or ""), []).append(str(row.get("alias") or ""))
+        for row in authorities:
+            row["aliases"] = sorted(alias_map.get(str(row.get("id") or ""), []), key=str.casefold)
+        authorities.sort(key=lambda x: (str(x.get("authority_level") or ""), int(x.get("sort_order") or 100), str(x.get("name_en") or "").casefold()))
+        unmatched = database.select(
+            "letters",
+            filters={"is_trashed": False, "canonical_authority_id": None},
+            columns="id,title,authority,uploaded_at",
+        )
+        raw_counts: dict[str, dict[str, object]] = {}
+        for row in unmatched:
+            raw = " ".join(str(row.get("authority") or "").split()).strip()
+            if not raw:
+                continue
+            item = raw_counts.setdefault(raw, {"authority": raw, "count": 0, "letter_ids": []})
+            item["count"] = int(item["count"]) + 1
+            if len(item["letter_ids"]) < 10:
+                item["letter_ids"].append(str(row.get("id") or ""))
+        return {"items": authorities, "unmatched": sorted(raw_counts.values(), key=lambda x: (-int(x["count"]), str(x["authority"]).casefold()))}
+
+    @app.post("/api/v1/admin/authorities")
+    def create_admin_authority(
+        payload: AdminAuthorityRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        row = database.insert("authorities", {
+            "archive_id": _archive_id(),
+            "code": payload.code,
+            "name_en": payload.name_en.strip(),
+            "name_hi": (payload.name_hi or "").strip() or None,
+            "short_name": (payload.short_name or "").strip() or None,
+            "authority_level": payload.authority_level,
+            "jurisdiction": (payload.jurisdiction or "").strip() or None,
+            "sort_order": payload.sort_order,
+            "is_active": payload.is_active,
+        })
+        authority_id = str(row.get("id") or "")
+        seen: set[str] = set()
+        for alias in payload.aliases:
+            cleaned = " ".join(alias.split()).strip()
+            normalized = re.sub(r"[^0-9A-Za-z\u0900-\u097f]+", "", cleaned.casefold())
+            if not cleaned or not normalized or normalized in seen:
+                continue
+            seen.add(normalized)
+            database.insert("authority_aliases", {
+                "archive_id": _archive_id(),
+                "authority_id": authority_id,
+                "alias": cleaned,
+                "normalized_alias": normalized,
+            })
+        _audit_admin_action(access_token, action="authority_created", target_type="authority", target_id=authority_id)
+        return row
+
+    @app.post("/api/v1/admin/authorities/{authority_id}/learn-alias")
+    def learn_admin_authority_alias(
+        authority_id: str,
+        payload: AdminAuthorityLearnAliasRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        exists = database.select("authorities", filters={"id": authority_id, "archive_id": _archive_id()}, columns="id")
+        if not exists:
+            raise HTTPException(status_code=404, detail="Authority not found")
+        cleaned = " ".join(payload.alias.split()).strip()
+        normalized = re.sub(r"[^0-9A-Za-zऀ-ॿ]+", "", cleaned.casefold())
+        row = database.insert("authority_aliases", {
+            "archive_id": _archive_id(),
+            "authority_id": authority_id,
+            "alias": cleaned,
+            "normalized_alias": normalized,
+        })
+        _audit_admin_action(access_token, action="authority_alias_learned", target_type="authority", target_id=authority_id, detail={"alias": cleaned})
+        return row
+
     @app.get("/api/v1/admin/categories")
     def list_admin_categories(
         access_token: str = Depends(_access_token),
@@ -3402,19 +3523,29 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     ) -> dict[str, object]:
         database = _transport(access_token)
         rows = database.select(
-            "letters",
-            filters={"is_trashed": False},
-            columns="authority",
+            "authorities",
+            filters={"archive_id": _archive_id(), "is_active": True},
+            columns="id,code,name_en,name_hi,short_name,authority_level,jurisdiction,sort_order",
         )
-        authorities = sorted(
-            {
-                " ".join(str(row.get("authority") or "").split()).strip()
-                for row in rows
-                if str(row.get("authority") or "").strip()
-            },
-            key=str.casefold,
-        )
-        return {"items": authorities, "count": len(authorities)}
+        level_order = {"school": 10, "block": 20, "district_programme": 30, "district": 40, "division": 50, "state": 60}
+        rows.sort(key=lambda x: (level_order.get(str(x.get("authority_level") or ""), 999), int(x.get("sort_order") or 100), str(x.get("name_en") or "").casefold()))
+        items = []
+        for row in rows:
+            short = str(row.get("short_name") or "").strip()
+            en = str(row.get("name_en") or "").strip()
+            hi = str(row.get("name_hi") or "").strip()
+            label = (short + " — " if short else "") + en + ((" / " + hi) if hi else "")
+            items.append({
+                "id": str(row.get("id") or ""),
+                "value": "authority:" + str(row.get("id") or ""),
+                "label": label,
+                "name_en": en,
+                "name_hi": hi or None,
+                "short_name": short or None,
+                "authority_level": row.get("authority_level"),
+                "jurisdiction": row.get("jurisdiction"),
+            })
+        return {"items": items, "count": len(items)}
 
 
     @app.get("/api/v1/search", response_model=SearchResponse)

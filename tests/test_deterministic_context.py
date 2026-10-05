@@ -42,7 +42,7 @@ class DeterministicContextTests(unittest.TestCase):
         )
 
         self.assertEqual(result.title, "स्थानांतरण / पदस्थापन आदेश")
-        self.assertEqual(result.authority, "कार्यालय जिला शिक्षा पदाधिकारी, SIWAN")
+        self.assertEqual(result.authority, "जिला शिक्षा पदाधिकारी, सिवान")
         self.assertEqual(result.category, "transfer-posting")
         self.assertEqual(
             result.reference_number,
