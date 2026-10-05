@@ -1,3 +1,12 @@
+## 2026-10-05 — Add remember me and prefer Hinglish card content
+- Commit: 536a1c275f542a774980332810659db54e5f244e
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Add letter Trash restore UI
 - Commit: fdf527da0fa7c1e34c9863bd7fbddc3eb93bdbf2
 - Author: PRASHANT KUMAR SAH
