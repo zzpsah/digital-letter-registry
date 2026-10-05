@@ -3064,11 +3064,15 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         for row in authorities:
             row["aliases"] = sorted(alias_map.get(str(row.get("id") or ""), []), key=str.casefold)
         authorities.sort(key=lambda x: (str(x.get("authority_level") or ""), int(x.get("sort_order") or 100), str(x.get("name_en") or "").casefold()))
-        unmatched = database.select(
+        candidate_rows = database.select(
             "letters",
-            filters={"is_trashed": False, "canonical_authority_id": None},
-            columns="id,title,authority,uploaded_at",
+            filters={"is_trashed": False},
+            columns="id,title,authority,canonical_authority_id,uploaded_at",
         )
+        unmatched = [
+            row for row in candidate_rows
+            if not str(row.get("canonical_authority_id") or "").strip()
+        ]
         raw_counts: dict[str, dict[str, object]] = {}
         for row in unmatched:
             raw = " ".join(str(row.get("authority") or "").split()).strip()
