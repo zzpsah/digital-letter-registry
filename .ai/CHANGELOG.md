@@ -1,3 +1,13 @@
+## 2026-10-05 — Document eLetters mobile and admin baseline
+- Commit: 85f176051858ea2ced0b7d8c61f1d6d9915cac39
+- Author: Prashant
+- Classification: routine
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-05 — Optimize eLetters mobile layout
 - Commit: 05f10016223fb46c53a67eea8d53f276e7dbb864
 - Author: Prashant
