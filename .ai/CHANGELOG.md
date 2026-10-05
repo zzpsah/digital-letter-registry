@@ -1,3 +1,10 @@
+## 2026-10-05 — Gate self-healing reprocessing on AI availability
+- Commit: 0f83a4f7d28f434a2b0d850f8ac99519b3ecc155
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `scripts/run_worker_once.py`
+
 ## 2026-10-05 — Harden automatic quality reprocessing
 - Commit: c8b2863b995d13f484c58d493ae1c77a86940484
 - Author: PRASHANT KUMAR SAH

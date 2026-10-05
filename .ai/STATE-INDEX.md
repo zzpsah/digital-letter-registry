@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: c8b2863b995d13f484c58d493ae1c77a86940484
-- Last commit: Harden automatic quality reprocessing
+- HEAD: 0f83a4f7d28f434a2b0d850f8ac99519b3ecc155
+- Last commit: Gate self-healing reprocessing on AI availability
 - Last commit date: 2026-10-05
 - Last commit author: PRASHANT KUMAR SAH
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
