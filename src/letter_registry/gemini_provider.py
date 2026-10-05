@@ -217,6 +217,7 @@ class GeminiDocumentContextProvider:
             "Write whatsapp_summary in simple Roman-English/Hinglish (Latin script, no Devanagari unless an official title/name must be preserved). "
             "Keep clean_document_text in the source language (clean natural Hindi for Hindi documents). "
             "Preserve official names, UDISE codes, reference numbers, dates and amounts exactly.\n\n"
+            "INTELLIGENCE PRIORITY RULE: category/subcategory are secondary taxonomy only. Never use a category label or deterministic hint as the basis for title, summary, action, audience, or WhatsApp text unless the document evidence itself supports it. If category/hints conflict with the actual document, trust the document and classify separately. Build user-facing meaning from the document purpose, operative clauses, annexures, filename/context clues, and repeated evidence. "
             "TITLE RULE: create a concise semantic title from the document's actual purpose, preferably 4-12 words. "
             "Avoid generic titles such as 'Official Education Document', 'Official Notice', 'आधिकारिक शैक्षणिक दस्तावेज़', "
             "'आधिकारिक सूचना', or merely 'Letter'. Include the real subject/action, for example fee revision, teacher grievance SOP, "

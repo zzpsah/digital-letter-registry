@@ -178,3 +178,11 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - Users, recipients and categories have checkbox-based bulk reversible actions.
 - Backup export/restore is audit logged.
 - 311 automated tests pass; isolated recipient backup/restore validation passes.
+
+## 2026-10-05 — Intelligence-first context baseline
+
+- All three context providers now treat category/subcategory and deterministic hints as secondary taxonomy.
+- User-facing title/summary/action/audience/WhatsApp content must be independently grounded in document evidence.
+- Category conflicts must not leak into user-facing meaning.
+- The ICT Lab/Smart Class misclassification incident is the regression case for this rule.
+- Full DLR suite remains green at 311 tests.

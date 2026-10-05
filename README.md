@@ -232,3 +232,7 @@ Admin removal is now reversible by default. Users use Active/Disabled status, re
 Admin Console now exports a JSON configuration backup containing member role/status, document categories, private delivery-recipient configuration, WhatsApp allowlist, and EDU-Letters group metadata. Auth passwords, API keys, access/refresh tokens, cookies, invite tokens, and approval tokens are intentionally excluded. Restore requires a preview and creates a timestamped private rollback snapshot before applying changes.
 
 Bulk controls are available for account users, recipients, and categories. Bulk Disable/Remove remains reversible by default; Restore uses the existing safe active-state mechanisms.
+
+## Intelligence-first document meaning — 2026-10-05
+
+Document category/subcategory is secondary taxonomy only. User-facing title, summary, action, audience and WhatsApp text must be grounded independently in the source document. Gemini, Supabase-Gemini and Hermes context prompts explicitly require document evidence to override conflicting category/hint labels.

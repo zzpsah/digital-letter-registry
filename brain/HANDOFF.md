@@ -72,3 +72,7 @@ Do not make normal Remove buttons destructive. User removal means disabled membe
 ## Backup/bulk handoff — 2026-10-05
 
 Preserve the no-secrets backup contract. Never add passwords, Supabase keys, access/refresh tokens, cookies, invite codes or approval tokens to admin backups. Always run restore preview and create a private pre-restore snapshot first. Keep Supabase member/category restore conservative and local recipient/allowlist restore explicit. Bulk UI must continue to call guarded normal APIs rather than bypassing role/last-admin protections.
+
+## Intelligence handoff — 2026-10-05
+
+Never restore category-first title/summary templates. Taxonomy is secondary. A wrong category must not force a wrong email subject or WhatsApp summary. Keep source-grounded title/summary/action/audience as the primary contract across Gemini, Supabase-Gemini, Hermes fallback, delivery email and WhatsApp.

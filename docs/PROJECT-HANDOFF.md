@@ -341,3 +341,7 @@ Admin > Backup is the supported configuration portability/recovery path. Export 
 Restore behavior is deliberately conservative for Supabase-managed state: existing members found by user_id have role/status restored; missing historical users are skipped rather than recreated; categories present in the backup are updated or created, while unrelated newer categories are left untouched. The private recipient registry is restored exactly from the backup after validation, the WhatsApp allowlist is replaced with the backed-up allowlist, and the backed-up group description is re-applied when the bridge is available.
 
 Bulk account, recipient, and category actions use the existing guarded per-item APIs so last-admin protection, reversible removal semantics, and audit logging continue to apply.
+
+## Intelligence/category separation — 2026-10-05
+
+Do not let category drive document meaning. Category/subcategory and deterministic hints are routing/search taxonomy; title, summary, action_required, applies_to and whatsapp_summary must be derived from the document's operative content, annexures and repeated evidence. If taxonomy conflicts with the source, the source wins. Delivery formatting also treats category only as a final fallback.

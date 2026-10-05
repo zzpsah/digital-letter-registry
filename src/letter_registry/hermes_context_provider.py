@@ -41,6 +41,7 @@ class HermesDefaultModelContextProvider:
             "Return ONLY valid JSON with keys: title, authority, category, subcategory, summary, summary_hi, whatsapp_summary, action_required, action_required_hi, "
             "issue_date, reference_number, concepts, important_dates, deadline, applies_to, important_amounts, "
             "page_references, page_count, related_terms_hi, related_terms_en, confidence, key_points, clean_document_text.\n"
+            "INTELLIGENCE PRIORITY: category/subcategory and deterministic hints are secondary taxonomy only. Never derive title, summary, action, audience, or WhatsApp text from taxonomy unless the document itself supports it. If taxonomy conflicts with document evidence, trust the document and keep classification separate.\n"
             "TITLE: create a concise semantic title (4-12 words) from the actual purpose. Never use generic titles like "
             "'Official Education Document', 'Official Notice', 'आधिकारिक दस्तावेज़', or merely 'Letter'.\n"
             "OUTPUT LANGUAGE: title may follow the source language. Write summary, action_required, key_points, applies_to, "

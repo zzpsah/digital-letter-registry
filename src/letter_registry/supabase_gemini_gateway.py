@@ -76,6 +76,7 @@ class SupabaseGeminiFileContextProvider:
             "and page-reference labels in simple concise English for email. Also write summary_hi and action_required_hi in clear natural Hindi (Devanagari). Write whatsapp_summary in simple Roman-English/Hinglish "
             "(Latin script, no Devanagari unless an official title/name must be preserved). Keep clean_document_text in the source language "
             "(clean professional Hindi for Hindi documents). If uncertain use null/empty arrays.\n"
+            "INTELLIGENCE PRIORITY RULE: category/subcategory and deterministic concept hints are secondary taxonomy only. Never derive title, summary, action, audience, or WhatsApp text from a category/hint unless the document itself supports it. If taxonomy conflicts with document evidence, trust the document and keep classification separate. "
             "TITLE RULE: create a concise semantic title from the actual purpose, preferably 4-12 words. Never use generic titles "
             "such as 'Official Education Document', 'Official Notice', 'आधिकारिक शैक्षणिक दस्तावेज़', 'आधिकारिक सूचना' or merely 'Letter'. "
             "Name the real subject/action such as fee revision, teacher grievance SOP, registration schedule, transfer order, scholarship instruction, etc.\n"
