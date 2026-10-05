@@ -1,3 +1,10 @@
+## 2026-10-05 — Separate detailed Hindi brief from Hindi action items
+- Commit: 4e6fd3eb53abf71973a509452356cecbd5311a76
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/hermes_context_provider.py`
+
 ## 2026-10-05 — Make reprocessing source grounded and stable
 - Commit: f34c0a5e264049b12d180a732e8f4dbced10cbf6
 - Author: Prashant
