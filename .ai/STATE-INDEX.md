@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 014612cee2c8ab6832bc973c746a7388c1449341
-- Last commit: Add admin user account control edge function
+- HEAD: 521f81d7240300378097222612f166e1f63c3b82
+- Last commit: Add admin password reset and user deletion APIs
 - Last commit date: 2026-10-05
 - Last commit author: PRASHANT KUMAR SAH
 

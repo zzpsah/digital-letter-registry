@@ -1,3 +1,10 @@
+## 2026-10-05 — Add admin password reset and user deletion APIs
+- Commit: 521f81d7240300378097222612f166e1f63c3b82
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+
 ## 2026-10-05 — Add admin user account control edge function
 - Commit: 014612cee2c8ab6832bc973c746a7388c1449341
 - Author: PRASHANT KUMAR SAH
