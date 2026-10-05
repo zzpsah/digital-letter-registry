@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: d8079864525e357322924a029d151581ae40a440
-- Last commit: Add admin password reset and delete user controls
+- HEAD: ebd9caa373a63e763e286f107c3fa72cef9f32f8
+- Last commit: Add retire and delete controls for failed jobs
 - Last commit date: 2026-10-05
 - Last commit author: PRASHANT KUMAR SAH
 

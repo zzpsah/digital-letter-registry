@@ -1,3 +1,10 @@
+## 2026-10-05 — Add retire and delete controls for failed jobs
+- Commit: ebd9caa373a63e763e286f107c3fa72cef9f32f8
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Add admin password reset and delete user controls
 - Commit: d8079864525e357322924a029d151581ae40a440
 - Author: PRASHANT KUMAR SAH

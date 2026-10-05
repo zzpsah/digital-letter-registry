@@ -65,7 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: d8079864525e357322924a029d151581ae40a440
-- Change: Add admin password reset and delete user controls
+- Commit: ebd9caa373a63e763e286f107c3fa72cef9f32f8
+- Change: Add retire and delete controls for failed jobs
 - Date: 2026-10-05
 - Durable context synchronization: completed
