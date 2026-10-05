@@ -392,3 +392,17 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 - Editor/Admin document cards expose a Reprocess action for missing or incorrect derived output even when the original PDF/image is clear.
 - Reprocess updates the existing letter's derived processing; it must not create a duplicate letter/original.
 - If a processing job for the same letter is already pending or running, another reprocess request is not queued.
+
+## Authority display and editing
+- User-facing search/recent/detail views prefer the canonical authority short name (for example `DEO Siwan`, `DPO Establishment, Siwan`) when a canonical mapping exists; raw extracted authority remains preserved in the letter record.
+- Admin → Authorities lists active and removed authorities with editable short name, English/Hindi names, hierarchy level, jurisdiction and aliases.
+- Remove is soft/deactivate and preserves existing mappings; Restore reactivates it.
+- Letter cards show a compact 8-character ID with Copy ID for troubleshooting; normal portal reprocessing does not require the user to know the ID.
+- Reprocess requests are single-flight: if the same letter already has a pending/processing job, another active job is not created.
+- Direct Gemini extraction uses temperature 0.0; canonical normalization and confidence-preserving identity merge stabilize factual fields. Free-text summaries can still vary slightly, so delivery idempotency ignores wording-only paraphrases.
+
+## Stable document identity and authority display
+- Letter cards expose a compact 8-character Document ID pill; tapping/clicking it copies the full UUID for explicit reprocess commands. Portal Reprocess and WhatsApp reply-based Reprocess do not require manually typing the ID.
+- User-facing authority uses the canonical `short_name` when a letter is mapped, e.g. `DEO Siwan` or `DPO Establishment, Siwan`; raw issuer text remains preserved in `letters.authority`.
+- Admin → Authorities lists active and removed authorities and supports editing short/full names, Hindi name, hierarchy level, jurisdiction and aliases. Remove is soft (`is_active=false`) so existing letter mappings are preserved; Restore re-enables it.
+- AI generation temperature is fixed at 0 where supported. During reprocessing, existing title/authority/reference/date are preserved unless incoming evidence is materially stronger, reducing factual drift between runs.

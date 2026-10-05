@@ -3115,6 +3115,78 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         _audit_admin_action(access_token, action="authority_created", target_type="authority", target_id=authority_id)
         return row
 
+    @app.patch("/api/v1/admin/authorities/{authority_id}")
+    def update_admin_authority(
+        authority_id: str,
+        payload: AdminAuthorityUpdateRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        changes: dict[str, object] = {}
+        supplied = payload.model_fields_set
+        for key in ("name_en", "name_hi", "short_name", "authority_level", "jurisdiction", "sort_order", "is_active"):
+            if key not in supplied:
+                continue
+            value = getattr(payload, key)
+            changes[key] = value.strip() if isinstance(value, str) else value
+        if changes:
+            row = database.update(
+                "authorities",
+                changes,
+                filters={"id": authority_id, "archive_id": _archive_id()},
+            )
+            if not row:
+                raise HTTPException(status_code=404, detail="Authority not found")
+        else:
+            exists = database.select(
+                "authorities",
+                filters={"id": authority_id, "archive_id": _archive_id()},
+                columns="id",
+            )
+            if not exists:
+                raise HTTPException(status_code=404, detail="Authority not found")
+            row = exists[0]
+
+        if payload.aliases is not None:
+            database.delete(
+                "authority_aliases",
+                filters={"authority_id": authority_id, "archive_id": _archive_id()},
+            )
+            seen: set[str] = set()
+            for alias in payload.aliases:
+                cleaned = " ".join(alias.split()).strip()
+                normalized = re.sub(r"[^0-9A-Za-z\u0900-\u097f]+", "", cleaned.casefold())
+                if not cleaned or not normalized or normalized in seen:
+                    continue
+                seen.add(normalized)
+                try:
+                    database.insert("authority_aliases", {
+                        "archive_id": _archive_id(),
+                        "authority_id": authority_id,
+                        "alias": cleaned,
+                        "normalized_alias": normalized,
+                    })
+                except SupabaseRuntimeError as exc:
+                    raise HTTPException(
+                        status_code=409,
+                        detail=f"Alias already belongs to another authority: {cleaned}",
+                    ) from exc
+
+        action = (
+            "authority_restored" if changes.get("is_active") is True
+            else "authority_soft_removed" if changes.get("is_active") is False
+            else "authority_updated"
+        )
+        _audit_admin_action(
+            access_token,
+            action=action,
+            target_type="authority",
+            target_id=authority_id,
+            detail={"fields": sorted(changes), "aliases_updated": payload.aliases is not None},
+        )
+        return {"id": authority_id, "updated": True}
+
     @app.post("/api/v1/admin/authorities/{authority_id}/learn-alias")
     def learn_admin_authority_alias(
         authority_id: str,
@@ -3718,6 +3790,16 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         if not rows or bool(rows[0].get("is_trashed")):
             raise HTTPException(status_code=404, detail="Letter not found")
         owner_id = str(rows[0].get("owner_id") or membership.user_id)
+        active_jobs = [
+            row for row in database.select(
+                "processing_jobs",
+                filters={"letter_id": record_id},
+                columns="id,status,reason,updated_at",
+            )
+            if str(row.get("status") or "") in {"pending", "processing"}
+        ]
+        if active_jobs:
+            return MessageResponse(message="Reprocess already queued or running.")
         reason = "manual_reprocess:" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         SupabaseProcessingQueue(database).enqueue(
             letter_id=record_id,

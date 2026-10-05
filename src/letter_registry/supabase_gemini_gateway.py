@@ -105,6 +105,7 @@ class SupabaseGeminiFileContextProvider:
             "action": "analyze-file",
             "prompt": prompt,
             "model": self.model,
+            "temperature": 0.0,
             "file_name": filename,
             "mime_type": mime_type,
             "file_data": base64.b64encode(file_bytes).decode("ascii"),

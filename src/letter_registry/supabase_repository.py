@@ -218,11 +218,27 @@ class SupabaseLetterRepository:
             ):
                 current = getattr(context, field_name)
                 previous = existing.get(field_name)
+                identity_field = field_name in {
+                    "title", "authority", "reference_number", "issue_date"
+                }
+                identity_changed = bool(
+                    identity_field
+                    and str(previous or "").strip()
+                    and str(current or "").strip()
+                    and str(previous).strip().casefold() != str(current).strip().casefold()
+                )
+                stronger_identity_evidence = bool(
+                    incoming_confidence >= max(0.80, previous_confidence + 0.10)
+                )
                 preserve_previous = (
                     not str(current or "").strip()
                     or (
                         confidence_downgrade
                         and str(previous or "").strip()
+                    )
+                    or (
+                        identity_changed
+                        and not stronger_identity_evidence
                     )
                 )
                 if preserve_previous and str(previous or "").strip():

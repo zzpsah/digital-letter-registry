@@ -44,7 +44,7 @@ class SupabaseLetterDetailRepository:
             "letters",
             filters={"id": record_id},
             columns=(
-                "id,smart_filename,title,summary,reference_number,authority,"
+                "id,smart_filename,title,summary,reference_number,authority,canonical_authority_id,"
                 "category,subcategory,issue_date,status,action_required,deadline_at"
             ),
         )
@@ -58,6 +58,20 @@ class SupabaseLetterDetailRepository:
         )
 
         letter = letter_rows[0]
+        display_authority = letter.get("authority")
+        canonical_authority_id = str(letter.get("canonical_authority_id") or "").strip()
+        if canonical_authority_id:
+            authority_rows = self.transport.select(
+                "authorities",
+                filters={"id": canonical_authority_id},
+                columns="short_name,name_en",
+            )
+            if authority_rows:
+                display_authority = (
+                    authority_rows[0].get("short_name")
+                    or authority_rows[0].get("name_en")
+                    or display_authority
+                )
         processing = processing_rows[0] if processing_rows else {}
         return LetterDetail(
             record_id=str(letter["id"]),
@@ -65,7 +79,7 @@ class SupabaseLetterDetailRepository:
             title=letter.get("title"),
             summary=letter.get("summary"),
             reference_number=letter.get("reference_number"),
-            authority=letter.get("authority"),
+            authority=display_authority,
             category=letter.get("category"),
             subcategory=letter.get("subcategory"),
             issue_date=(

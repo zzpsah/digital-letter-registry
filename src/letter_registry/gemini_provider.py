@@ -179,7 +179,7 @@ class GeminiDocumentContextProvider:
         payload = {
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {
-                "temperature": 0.1,
+                "temperature": 0.0,
                 "responseFormat": {
                     "text": {
                         "mimeType": "application/json",
