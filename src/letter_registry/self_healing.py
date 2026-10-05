@@ -41,10 +41,13 @@ class SelfHealingReprocessor:
         target_dictionary_version: str,
         target_quality_version: str = QUALITY_VERSION,
         limit: int = 100,
+        max_enqueues: int = 5,
         now: datetime | None = None,
     ) -> SelfHealingScanResult:
         if limit < 1 or limit > 500:
             raise ValueError("limit must be between 1 and 500")
+        if max_enqueues < 1 or max_enqueues > 50:
+            raise ValueError("max_enqueues must be between 1 and 50")
         target_context_version = str(target_context_version or "").strip()
         target_dictionary_version = str(target_dictionary_version or "").strip()
         if not target_context_version or not target_dictionary_version:
@@ -95,6 +98,9 @@ class SelfHealingReprocessor:
                 or quality_upgrade
             ):
                 skipped_same_target += 1
+                continue
+
+            if enqueued >= max_enqueues:
                 continue
 
             target_signature = "|".join(
