@@ -42,7 +42,7 @@ class RecordingQueue(InMemoryProcessingQueue):
 
 
 class SelfHealingTests(unittest.TestCase):
-    def row(self, *, context_version="hermes:current-default:text-v1", needs=True):
+    def row(self, *, context_version="hermes:current-default:text-v1", needs=True, quality_version="document-quality-v2"):
         return {
             "letter_id": str(uuid4()),
             "owner_id": str(uuid4()),
@@ -50,7 +50,7 @@ class SelfHealingTests(unittest.TestCase):
             "dictionary_version": "gov-education-hi-en-auto-v2",
             "structured_context": {
                 "needs_reprocessing": needs,
-                "quality_version": "document-quality-v1",
+                "quality_version": quality_version,
             },
         }
 

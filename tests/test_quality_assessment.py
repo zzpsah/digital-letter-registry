@@ -34,6 +34,23 @@ class DocumentQualityAssessmentTests(unittest.TestCase):
         self.assertTrue(result.needs_reprocessing)
         self.assertIn("low_ocr_readability", result.flags)
 
+    def test_low_confidence_without_clean_text_requires_reprocessing_even_if_score_is_above_threshold(self):
+        result = assess_document_quality(
+            extracted_text=("पंजीयन संबंधी स्पष्ट पाठ और कुछ सामान्य निर्देश " * 20),
+            context_confidence=0.59,
+            title="पंजीयन संबंधी निर्देश",
+            authority="Education Department",
+            category="exam",
+            reference_number="09",
+            issue_date="2026-07-03",
+            clean_document_text=None,
+        )
+        self.assertGreaterEqual(result.score, 0.72)
+        self.assertTrue(result.needs_reprocessing)
+        self.assertIn("low_context_confidence", result.flags)
+        self.assertIn("no_clean_document_text", result.flags)
+        self.assertEqual(result.version, "document-quality-v2")
+
     def test_missing_reference_date_alone_does_not_force_failure(self):
         result = assess_document_quality(
             extracted_text=("विद्यालय शिक्षा विभाग द्वारा नामांकन संबंधी महत्वपूर्ण सूचना "

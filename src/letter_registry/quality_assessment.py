@@ -10,7 +10,7 @@ class DocumentQualityAssessment:
     score: float
     needs_reprocessing: bool
     flags: tuple[str, ...]
-    version: str = "document-quality-v1"
+    version: str = "document-quality-v2"
 
 
 def _readability_score(text: str) -> float:
@@ -117,8 +117,12 @@ def assess_document_quality(
     )
     score = round(max(0.0, min(1.0, score)), 4)
 
+    weak_context_without_clean_text = (
+        "low_context_confidence" in flags
+        and "no_clean_document_text" in flags
+    )
     return DocumentQualityAssessment(
         score=score,
-        needs_reprocessing=score < threshold,
+        needs_reprocessing=(score < threshold or weak_context_without_clean_text),
         flags=tuple(flags),
     )

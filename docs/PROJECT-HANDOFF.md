@@ -375,3 +375,9 @@ Before changing eLetters UI or workflows, read `docs/UI-DESIGN-CONTRACT.md` and 
 Authority is exactly one actual issuing/signing authority, never a concatenation of issuer + recipient + cited offices. The classification hierarchy is **Headmaster/School → BEO (Block Education Officer / प्रखंड शिक्षा पदाधिकारी) → DPO (functional district programme authority such as Establishment) → DEO (one canonical DEO per district) → RDDE (division) → Education Department (state)**.
 
 Canonical authority records store designation, jurisdiction and level. DPO posts may be distinct by function, for example DPO Establishment vs another DPO branch. Raw document authority text stays preserved on the letter, while `canonical_authority_id` links it to the clean authority master. Admin-confirmed aliases are learned permanently; future matching issuer strings auto-map through normalized aliases. Uncertain or multi-office strings remain unmatched for review rather than being force-mapped. Search authority dropdown shows canonical authorities, not every raw spelling variant.
+
+## Delivery quality recovery / duplicate suppression
+- Quality engine v2 marks low-context-confidence + no-clean-document-text results for bounded reprocessing even when the aggregate score is above the old threshold.
+- Low-quality first-pass results may still be delivered; they are not permanently held.
+- Later corrected context should use the existing same-thread correction path.
+- Reprocessing must not resend mail merely because AI paraphrased summary/action wording.

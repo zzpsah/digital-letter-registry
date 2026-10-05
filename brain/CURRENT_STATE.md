@@ -222,3 +222,9 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 ## UI/behavior governance baseline
 
 The live accepted UI/UX contract is recorded in `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/`. It locks the purple compact/mobile system, Hinglish default, Smart Search, Remember me, recipient single-channel handling, recoverable document Trash, failed-job controls, and no-wholesale-redesign rule.
+
+## Delivery quality recovery / duplicate suppression
+- Quality engine v2 marks low-context-confidence + no-clean-document-text results for bounded reprocessing even when the aggregate score is above the old threshold.
+- Low-quality first-pass results may still be delivered; they are not permanently held.
+- Later corrected context should use the existing same-thread correction path.
+- Reprocessing must not resend mail merely because AI paraphrased summary/action wording.
