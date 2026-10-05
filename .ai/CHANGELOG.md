@@ -1,3 +1,15 @@
+## 2026-10-05 — Harden low-quality context recovery
+- Commit: c7d6308c8d0070ffd3ad6c1297f1e6711914e985
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `brain/CURRENT_STATE.md`
+- `docs/PROJECT-HANDOFF.md`
+- `src/letter_registry/quality_assessment.py`
+- `src/letter_registry/self_healing.py`
+- `tests/test_quality_assessment.py`
+- `tests/test_self_healing.py`
+
 ## 2026-10-05 — Add canonical authority hierarchy and learned aliases
 - Commit: beb983e15ff7b765e64cab0d8bc509d48f06b6ce
 - Author: Prashant

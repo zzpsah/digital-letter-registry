@@ -65,13 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: beb983e15ff7b765e64cab0d8bc509d48f06b6ce
-- Change: Add canonical authority hierarchy and learned aliases
+- Commit: c7d6308c8d0070ffd3ad6c1297f1e6711914e985
+- Change: Harden low-quality context recovery
 - Date: 2026-10-05
 - Durable context synchronization: completed
-
-## Delivery quality recovery / duplicate suppression
-- Quality engine v2 marks low-context-confidence + no-clean-document-text results for bounded reprocessing even when the aggregate score is above the old threshold.
-- Low-quality first-pass results may still be delivered; they are not permanently held.
-- Later corrected context should use the existing same-thread correction path.
-- Reprocessing must not resend mail merely because AI paraphrased summary/action wording.
