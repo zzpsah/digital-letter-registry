@@ -96,6 +96,12 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('r.summary_hi||r.summary', self.html)
         self.assertIn('r.action_required_hi||r.action_required', self.html)
 
+    def test_dynamic_authority_filter_is_exposed(self) -> None:
+        self.assertIn('id="authority"', self.html)
+        self.assertIn('All authorities', self.html)
+        self.assertIn('/api/v1/search/authorities', self.html)
+        self.assertIn('refreshAuthorityOptions', self.html)
+
     def test_language_toggle_and_smart_search_are_exposed(self) -> None:
         self.assertIn('id="languageMode"', self.html)
         self.assertIn('value="mixed"', self.html)

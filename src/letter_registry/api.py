@@ -3396,6 +3396,27 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             ],
         )
 
+    @app.get("/api/v1/search/authorities")
+    def search_authorities(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        database = _transport(access_token)
+        rows = database.select(
+            "letters",
+            filters={"is_trashed": False},
+            columns="authority",
+        )
+        authorities = sorted(
+            {
+                " ".join(str(row.get("authority") or "").split()).strip()
+                for row in rows
+                if str(row.get("authority") or "").strip()
+            },
+            key=str.casefold,
+        )
+        return {"items": authorities, "count": len(authorities)}
+
+
     @app.get("/api/v1/search", response_model=SearchResponse)
     def search_letters(
         q: str = Query(default="", max_length=500),

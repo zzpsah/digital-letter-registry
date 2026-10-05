@@ -368,3 +368,4 @@ Only archive editors/admins may update importance/comment through `PATCH /api/v1
 ## UI/behavior governance baseline
 
 Before changing eLetters UI or workflows, read `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/`. This is a locked accepted baseline. Preserve the purple compact/mobile design, Hinglish default, Smart Search hybrid fallback, Remember me, admin/recipient controls, file Trash/Restore, Operations Retry/Retire/Delete, and source-grounded display behavior unless the user explicitly asks to change them.
+- Search Authority filter is a dynamic dropdown populated from distinct active/non-trashed letter authorities; new authorities appear automatically.

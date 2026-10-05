@@ -119,7 +119,7 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
         <form id="searchForm" class="panel">
           <div class="toolbar"><input id="q" class="input" autocomplete="off" placeholder="Search title, reference, authority or topic…"><select id="sortOrder" class="select" aria-label="Sort order"><option value="latest" selected>Latest first</option><option value="important">Important first</option><option value="issue_date">Issue date</option><option value="title">Title A–Z</option><option value="relevance">Relevance</option></select><button class="btn primary" type="submit">Smart Search</button><button class="btn" id="clearSearch" type="button">Clear</button></div>
           <details><summary>More filters</summary><div class="filters">
-            <input id="authority" class="input" placeholder="Authority">
+            <select id="authority" class="select" aria-label="Authority"><option value="">All authorities</option></select>
             <input id="category" class="input" placeholder="Category">
             <select id="statusFilter" class="select"><option value="">Any status</option><option value="current">Current</option><option value="expired">Expired</option><option value="historical">Historical</option><option value="superseded">Superseded</option><option value="unknown">Unknown</option></select>
             <input id="year" class="input" inputmode="numeric" placeholder="Year">
@@ -284,7 +284,8 @@ document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",(
 function setSessionUi(v){$("loginView").classList.toggle("hidden",v);$("appView").classList.toggle("hidden",!v)}
 function applyRole(r){currentRole=r||"viewer";const write=["editor","admin"].includes(currentRole),admin=currentRole==="admin";document.querySelectorAll("[data-write]").forEach(x=>x.classList.toggle("hidden",!write));document.querySelectorAll("[data-admin]").forEach(x=>x.classList.toggle("hidden",!admin))}
 async function refreshAuthProviders(){try{const r=await fetch("/api/v1/auth/providers",{cache:"no-store"}),d=await r.json();$("googleLogin").style.display=d.google?"block":"none";$("googleLoginNote").textContent=d.google?"Google sign-in available.":""}catch{}}
-async function refreshSessionUi(){const r=await fetch("/api/v1/auth/session",{cache:"no-store"});if(!r.ok){setSessionUi(false);return false}const s=await r.json();setSessionUi(true);applyRole(s.role||"viewer");await loadDashboard();return true}
+async function refreshAuthorityOptions(){const select=$("authority"),current=select.value;const r=await fetch("/api/v1/search/authorities",{cache:"no-store"});if(!r.ok)return;const d=await r.json();select.innerHTML='<option value="">All authorities</option>'+(d.items||[]).map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join("");if([...(select.options||[])].some(o=>o.value===current))select.value=current}
+async function refreshSessionUi(){const r=await fetch("/api/v1/auth/session",{cache:"no-store"});if(!r.ok){setSessionUi(false);return false}const s=await r.json();setSessionUi(true);applyRole(s.role||"viewer");await Promise.all([loadDashboard(),refreshAuthorityOptions()]);return true}
 
 function params(){const p=new URLSearchParams();[["q","q"],["authority","authority"],["category","category"],["status","statusFilter"],["year","year"],["file_type","fileType"]].forEach(([k,id])=>{const v=$(id).value.trim();if(v)p.set(k,v)});p.set("sort",$("sortOrder").value||"latest");p.set("limit","100");return p}
 function displayUploadDate(v){if(!v)return"";const d=new Date(v);if(Number.isNaN(d.getTime()))return String(v).slice(0,10);return String(d.getDate()).padStart(2,"0")+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+d.getFullYear()}

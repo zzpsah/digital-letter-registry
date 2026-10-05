@@ -74,3 +74,4 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 ## UI/behavior governance baseline
 
 The authoritative UI/UX contract is `docs/UI-DESIGN-CONTRACT.md`; the enhancement brain is `brain/ui-governance/`. Any new AI/tool must preserve this accepted baseline and avoid wholesale redesigns or incidental behavior changes.
+- Search Authority filter is a dynamic dropdown populated from distinct active/non-trashed letter authorities; new authorities appear automatically.

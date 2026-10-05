@@ -19,3 +19,4 @@ The accepted live baseline includes:
 - Default document ordering is latest upload first.
 
 Do not change these as cleanup/refactor side effects.
+- Search Authority filter is a dynamic dropdown populated from distinct active/non-trashed letter authorities; new authorities appear automatically.
