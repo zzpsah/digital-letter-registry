@@ -1,3 +1,10 @@
+## 2026-10-05 — Ignore pre-production benchmark fixtures
+- Commit: bb41ceba669a237c92cb8bce68dd43563d0d3cfc
+- Author: Prashant
+- Classification: routine
+- Changed files:
+- `scripts/benchmark_real_letters.py`
+
 ## 2026-10-05 — Add real-letter production benchmark
 - Commit: 089f348127dd0685d4f8e29fdeec1f4e54da3152
 - Author: Prashant
