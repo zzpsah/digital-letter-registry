@@ -1,3 +1,11 @@
+## 2026-10-05 — Add language display toggle and smart search label
+- Commit: 6d756f2612d4b236ea8799466758078dbfd94b19
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Add remember me and prefer Hinglish card content
 - Commit: 536a1c275f542a774980332810659db54e5f244e
 - Author: Prashant
