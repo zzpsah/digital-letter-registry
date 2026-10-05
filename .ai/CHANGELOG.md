@@ -1,3 +1,10 @@
+## 2026-10-05 — Show manageable WhatsApp users and recipients in admin
+- Commit: 0881f4177d777f1910026cb59fb5142a203a4f66
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Add admin control center and approval workflow
 - Commit: b92e2f51f9872b1a43118685a08e5aad3f4e7a6f
 - Author: Prashant

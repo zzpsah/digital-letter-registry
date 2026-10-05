@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: b92e2f51f9872b1a43118685a08e5aad3f4e7a6f
-- Last commit: Add admin control center and approval workflow
+- HEAD: 0881f4177d777f1910026cb59fb5142a203a4f66
+- Last commit: Show manageable WhatsApp users and recipients in admin
 - Last commit date: 2026-10-05
 - Last commit author: Prashant
 
