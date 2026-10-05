@@ -65,7 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: 4a1b097c64c35338ea31afbd75b63ff26b6b3350
-- Change: Enforce bounded self-healing queue pressure
+- Commit: 489352d107d64e1da07ea457a6882d6fcf24c255
+- Change: Improve WhatsApp letter intelligence and delivery metadata
 - Date: 2026-10-05
 - Durable context synchronization: completed

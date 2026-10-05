@@ -1,3 +1,29 @@
+## 2026-10-05 — Improve WhatsApp letter intelligence and delivery metadata
+- Commit: 489352d107d64e1da07ea457a6882d6fcf24c255
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `scripts/apply_whatsapp_duplicate_decision.py`
+- `scripts/ingest_whatsapp_attachment.py`
+- `src/letter_registry/extraction.py`
+- `src/letter_registry/extraction_backends.py`
+- `src/letter_registry/gemini_provider.py`
+- `src/letter_registry/google_drive_writer.py`
+- `src/letter_registry/hermes_context_provider.py`
+- `src/letter_registry/persistence.py`
+- `src/letter_registry/processing_pipeline.py`
+- `src/letter_registry/relationship_inference.py`
+- `src/letter_registry/structured_analysis.py`
+- `src/letter_registry/supabase_gemini_gateway.py`
+- `src/letter_registry/supabase_repository.py`
+- `src/letter_registry/worker.py`
+- `tests/test_extraction.py`
+- `tests/test_extraction_backends.py`
+- `tests/test_google_drive_writer.py`
+- `tests/test_processing_pipeline.py`
+- `tests/test_relationship_inference.py`
+
 ## 2026-10-05 — Ignore pre-production benchmark fixtures
 - Commit: bb41ceba669a237c92cb8bce68dd43563d0d3cfc
 - Author: Prashant
