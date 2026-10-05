@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 2e434abc8df5f088e8c58715db5f79bb059b2ad0
-- Last commit: Add manual letter reprocessing
+- HEAD: ecac1f32bae7fd318bc5a7a857808714267b2a76
+- Last commit: Add manual document reprocess action
 - Last commit date: 2026-10-05
 - Last commit author: Prashant
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

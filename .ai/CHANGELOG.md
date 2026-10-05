@@ -1,3 +1,12 @@
+## 2026-10-05 — Add manual document reprocess action
+- Commit: ecac1f32bae7fd318bc5a7a857808714267b2a76
+- Author: Prashant
+- Classification: routine
+- Changed files:
+- `brain/ui-governance/CURRENT_STATE.md`
+- `docs/PROJECT-HANDOFF.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+
 ## 2026-10-05 — Add manual letter reprocessing
 - Commit: 2e434abc8df5f088e8c58715db5f79bb059b2ad0
 - Author: Prashant
