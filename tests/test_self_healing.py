@@ -101,5 +101,50 @@ class SelfHealingTests(unittest.TestCase):
         self.assertEqual(scanner.scan(**kwargs).enqueued, 0)
 
 
+    def test_existing_recovery_jobs_count_toward_daily_cap(self):
+        transport = FakeTransport([self.row() for _ in range(4)])
+        queue = RecordingQueue(transport)
+        target = "supabase-gemini:gemini-3.6-flash:document-v1"
+        scanner = SelfHealingReprocessor(transport, queue)
+        first = scanner.scan(
+            target_context_version=target,
+            target_dictionary_version="gov-education-hi-en-auto-v2",
+            max_enqueues=3,
+            now=datetime(2026, 10, 5, tzinfo=timezone.utc),
+        )
+        second = scanner.scan(
+            target_context_version=target,
+            target_dictionary_version="gov-education-hi-en-auto-v2",
+            max_enqueues=3,
+            now=datetime(2026, 10, 5, tzinfo=timezone.utc),
+        )
+        self.assertEqual(first.enqueued, 3)
+        self.assertEqual(second.enqueued, 0)
+        self.assertEqual(len(transport.jobs), 3)
+
+    def test_active_upgrade_jobs_limit_additional_queue_pressure(self):
+        rows = [
+            self.row(
+                context_version="supabase-gemini:gemini-3.5-flash:document-v1"
+            )
+            for _ in range(4)
+        ]
+        transport = FakeTransport(rows)
+        queue = RecordingQueue(transport)
+        first = SelfHealingReprocessor(transport, queue).scan(
+            target_context_version="supabase-gemini:gemini-3.6-flash:document-v1",
+            target_dictionary_version="gov-education-hi-en-auto-v2",
+            max_enqueues=2,
+        )
+        second = SelfHealingReprocessor(transport, queue).scan(
+            target_context_version="supabase-gemini:gemini-3.6-flash:document-v1",
+            target_dictionary_version="gov-education-hi-en-auto-v2",
+            max_enqueues=2,
+        )
+        self.assertEqual(first.enqueued, 2)
+        self.assertEqual(second.enqueued, 0)
+        self.assertEqual(len(transport.jobs), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
