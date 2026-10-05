@@ -139,6 +139,9 @@ class AdminMemberUpdateRequest(BaseModel):
     role: str = Field(min_length=5, max_length=6)
     status: str = Field(min_length=6, max_length=8)
 
+class AdminMemberPasswordRequest(BaseModel):
+    password: str = Field(min_length=8, max_length=256)
+
 
 class ArchiveAccessEntryResponse(BaseModel):
     kind: str
@@ -529,6 +532,53 @@ def _anon_transport() -> SupabasePostgrestTransport:
         publishable_key=key,
         access_token=key,
     )
+
+
+def _admin_user_account_action(
+    *,
+    access_token: str,
+    user_id: str,
+    action: str,
+    password: str | None = None,
+) -> dict[str, object]:
+    endpoint = (
+        _required_env("SUPABASE_URL").rstrip("/")
+        + "/functions/v1/dlr-admin-user-account"
+    )
+    payload: dict[str, object] = {
+        "archive_id": _archive_id(),
+        "user_id": user_id,
+        "action": action,
+    }
+    if password is not None:
+        payload["password"] = password
+    body = json.dumps(payload).encode("utf-8")
+    req = urlrequest.Request(
+        endpoint,
+        data=body,
+        headers={
+            "apikey": _required_env("SUPABASE_PUBLISHABLE_KEY"),
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urlrequest.urlopen(req, timeout=45) as resp:
+            return dict(json.loads(resp.read().decode("utf-8")))
+    except urlerror.HTTPError as exc:
+        raw = exc.read().decode("utf-8", errors="replace")
+        try:
+            result = json.loads(raw)
+            detail = str(result.get("error") or "Admin account action failed")
+        except Exception:
+            detail = "Admin account action failed"
+        raise HTTPException(status_code=exc.code, detail=detail) from exc
+    except (urlerror.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Admin account service unavailable",
+        ) from exc
 
 
 def _complete_approved_account(
@@ -1731,6 +1781,68 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             role=result.role.value,
             status=result.status,
         )
+
+    @app.post(
+        "/api/v1/admin/members/{user_id}/password",
+        response_model=MessageResponse,
+    )
+    def admin_set_member_password(
+        user_id: str,
+        payload: AdminMemberPasswordRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        try:
+            normalized_user_id = str(UUID(user_id))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid user",
+            ) from exc
+        _admin_user_account_action(
+            access_token=access_token,
+            user_id=normalized_user_id,
+            action="reset_password",
+            password=payload.password,
+        )
+        _audit_admin_action(
+            access_token,
+            action="member_password_reset",
+            target_type="member",
+            target_id=normalized_user_id,
+        )
+        return MessageResponse(message="Password updated.")
+
+    @app.delete(
+        "/api/v1/admin/members/{user_id}",
+        response_model=MessageResponse,
+    )
+    def admin_delete_member_account(
+        user_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN})
+        try:
+            normalized_user_id = str(UUID(user_id))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid user",
+            ) from exc
+        _admin_user_account_action(
+            access_token=access_token,
+            user_id=normalized_user_id,
+            action="delete_user",
+        )
+        _audit_admin_action(
+            access_token,
+            action="member_account_deleted",
+            target_type="member",
+            target_id=normalized_user_id,
+        )
+        return MessageResponse(message="User account deleted.")
 
     @app.post(
         "/api/v1/admin/invites/{invite_id}/revoke",
