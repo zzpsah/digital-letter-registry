@@ -63,6 +63,32 @@ class SelfHealingReprocessor:
         current_time = now or datetime.now(timezone.utc)
         day_bucket = current_time.strftime("%Y%m%d")
         target_tier = provider_tier(target_context_version)
+        target_signature = "|".join(
+            (
+                target_context_version,
+                target_dictionary_version,
+                target_quality_version,
+            )
+        )
+        digest = hashlib.sha256(target_signature.encode()).hexdigest()[:16]
+        daily_recovery_reason = f"quality-recovery:{digest}:{day_bucket}"
+        upgrade_reason = f"quality-upgrade:{digest}"
+
+        existing_jobs = self.transport.select(
+            "processing_jobs",
+            columns="letter_id,reason,status",
+        )
+        recovery_jobs_today = sum(
+            1
+            for job in existing_jobs
+            if str(job.get("reason") or "") == daily_recovery_reason
+        )
+        active_upgrade_jobs = sum(
+            1
+            for job in existing_jobs
+            if str(job.get("reason") or "") == upgrade_reason
+            and str(job.get("status") or "") in {"pending", "processing"}
+        )
 
         scanned = 0
         low_quality = 0
@@ -100,24 +126,17 @@ class SelfHealingReprocessor:
                 skipped_same_target += 1
                 continue
 
-            if enqueued >= max_enqueues:
-                continue
-
-            target_signature = "|".join(
-                (
-                    target_context_version,
-                    target_dictionary_version,
-                    target_quality_version,
-                )
-            )
-            digest = hashlib.sha256(target_signature.encode()).hexdigest()[:16]
-
-            if higher_provider_waiting and not (
+            is_recovery = higher_provider_waiting and not (
                 version_upgrade or dictionary_upgrade or quality_upgrade
-            ):
-                reason = f"quality-recovery:{digest}:{day_bucket}"
+            )
+            if is_recovery:
+                if recovery_jobs_today + enqueued >= max_enqueues:
+                    continue
+                reason = daily_recovery_reason
             else:
-                reason = f"quality-upgrade:{digest}"
+                if active_upgrade_jobs + enqueued >= max_enqueues:
+                    continue
+                reason = upgrade_reason
 
             before = self.transport.select(
                 "processing_jobs",
