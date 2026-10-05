@@ -43,6 +43,11 @@ def _grade(score: int) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=10)
+    ap.add_argument(
+        "--since",
+        default=os.environ.get("DLR_BENCHMARK_SINCE", "").strip(),
+        help="ISO-8601 production cutoff; older test/legacy letters are ignored",
+    )
     ap.add_argument("--output", default=str(DEFAULT_OUT))
     args = ap.parse_args()
     if args.limit < 1 or args.limit > 100:
@@ -63,6 +68,21 @@ def main() -> int:
         row for row in letters
         if "synthetic" not in str(row.get("original_filename") or "").casefold()
     ]
+    if args.since:
+        cutoff = datetime.fromisoformat(args.since.replace("Z", "+00:00"))
+        if cutoff.tzinfo is None:
+            cutoff = cutoff.replace(tzinfo=timezone.utc)
+
+        def _received_at(row: dict[str, object]) -> datetime:
+            value = str(row.get("received_at") or "").strip()
+            if not value:
+                return datetime.min.replace(tzinfo=timezone.utc)
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            return parsed
+
+        letters = [row for row in letters if _received_at(row) >= cutoff]
     letters.sort(key=lambda row: str(row.get("received_at") or ""), reverse=True)
     sample = letters[: args.limit]
 
@@ -166,6 +186,7 @@ def main() -> int:
         "benchmark_version": "dlr-real-letter-benchmark-v1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "requested_limit": args.limit,
+        "production_cutoff": args.since or None,
         "available_real_documents": len(letters),
         "sample_size": len(scored),
         "average_score": avg,
