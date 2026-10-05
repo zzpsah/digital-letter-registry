@@ -65,19 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: c7d6308c8d0070ffd3ad6c1297f1e6711914e985
-- Change: Harden low-quality context recovery
+- Commit: 2e434abc8df5f088e8c58715db5f79bb059b2ad0
+- Change: Add manual letter reprocessing
 - Date: 2026-10-05
 - Durable context synchronization: completed
-
-## Delivery quality recovery / duplicate suppression
-- Quality engine v2 marks low-context-confidence + no-clean-document-text results for bounded reprocessing even when the aggregate score is above the old threshold.
-- Low-quality first-pass results may still be delivered; they are not permanently held.
-- Later corrected context should use the existing same-thread correction path.
-- Reprocessing must not resend mail merely because AI paraphrased summary/action wording.
-
-## Manual document reprocessing
-- Editor/Admin users can request Reprocess from each letter card.
-- Reprocess always targets the existing archived original and updates derived OCR/context/summary/authority/action; it must not create a duplicate letter or replace the original file.
-- Weak or inaccurate processing output must not be described as a poor PDF unless the source file itself is actually poor.
-- Delivery remains idempotent: wording-only changes do not resend; material corrections or real poor-context-to-usable-context improvements use the same Gmail thread / WhatsApp replacement path.

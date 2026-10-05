@@ -1,3 +1,15 @@
+## 2026-10-05 — Add manual letter reprocessing
+- Commit: 2e434abc8df5f088e8c58715db5f79bb059b2ad0
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `brain/ui-governance/CURRENT_STATE.md`
+- `docs/PROJECT-HANDOFF.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Harden low-quality context recovery
 - Commit: c7d6308c8d0070ffd3ad6c1297f1e6711914e985
 - Author: Prashant
