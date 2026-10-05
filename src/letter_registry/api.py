@@ -2115,6 +2115,11 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             columns="id,is_active",
         )
         letters = database.select("letters", columns="id")
+        failed_jobs = database.select(
+            "processing_jobs",
+            filters={"status": "failed"},
+            columns="id",
+        )
 
         recipient_count = 0
         whatsapp_count = 0
@@ -2154,7 +2159,110 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             "recipients": recipient_count,
             "whatsapp_allowed": whatsapp_count,
             "active_categories": len([x for x in categories if bool(x.get("is_active", True))]),
+            "failed_jobs": len(failed_jobs),
         }
+
+
+    @app.get("/api/v1/admin/operations")
+    def admin_operations(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        jobs = database.select(
+            "processing_jobs",
+            filters={"status": "failed"},
+            columns=(
+                "id,letter_id,reason,attempts,last_error,available_at,"
+                "started_at,created_at,updated_at"
+            ),
+        )
+        jobs.sort(key=lambda x: str(x.get("updated_at") or ""), reverse=True)
+        jobs = jobs[:100]
+        letter_ids = {str(x.get("letter_id") or "") for x in jobs if x.get("letter_id")}
+        titles: dict[str, str] = {}
+        for letter_id in letter_ids:
+            rows = database.select(
+                "letters",
+                filters={"id": letter_id},
+                columns="id,title,original_filename",
+            )
+            if rows:
+                titles[letter_id] = str(
+                    rows[0].get("title")
+                    or rows[0].get("original_filename")
+                    or letter_id
+                )
+        items = []
+        for job in jobs:
+            item = dict(job)
+            item["title"] = titles.get(str(job.get("letter_id") or ""), "Document")
+            items.append(item)
+        return {"items": items, "count": len(items)}
+
+
+    @app.post("/api/v1/admin/operations/{job_id}/retry")
+    def retry_admin_operation(
+        job_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        try:
+            normalized_id = str(UUID(job_id))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid processing job id",
+            ) from exc
+        rows = database.select(
+            "processing_jobs",
+            filters={"id": normalized_id},
+            columns="id,letter_id,status,reason,attempts,last_error",
+        )
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Processing job not found",
+            )
+        job = rows[0]
+        if str(job.get("status") or "") != "failed":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Only failed processing jobs can be retried",
+            )
+        previous_error = str(job.get("last_error") or "")[:500]
+        now = datetime.now(timezone.utc).isoformat()
+        updated = database.update(
+            "processing_jobs",
+            {
+                "status": "pending",
+                "claimed_by": None,
+                "available_at": now,
+                "started_at": None,
+                "completed_at": None,
+                "last_error": None,
+                "updated_at": now,
+            },
+            filters={"id": normalized_id},
+        )
+        if not updated:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Processing job could not be retried",
+            )
+        _audit_admin_action(
+            access_token,
+            action="processing_job_retried",
+            target_type="processing_job",
+            target_id=normalized_id,
+            detail={
+                "letter_id": str(job.get("letter_id") or ""),
+                "reason": str(job.get("reason") or ""),
+                "attempts": int(job.get("attempts") or 0),
+                "previous_error": previous_error,
+            },
+        )
+        return {"success": True, "job_id": normalized_id, "status": "pending"}
 
 
     @app.get("/api/v1/admin/audit-log")

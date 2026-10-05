@@ -46,6 +46,12 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('data-admin-pane="recipients"', self.html)
         self.assertIn('data-admin-pane="whatsapp"', self.html)
 
+    def test_admin_operations_failure_retry_panel_is_exposed(self) -> None:
+        self.assertIn('data-admin-pane="operations"', self.html)
+        self.assertIn('id="operationsList"', self.html)
+        self.assertIn('fetch("/api/v1/admin/operations"', self.html)
+        self.assertIn('data-retry-job', self.html)
+
     def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
         self.assertNotIn('id="loginForm"', self.html)
         self.assertNotIn('id="registerMagicLink"', self.html)

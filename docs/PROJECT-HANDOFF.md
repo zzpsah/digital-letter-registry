@@ -325,3 +325,7 @@ The current eLetters web control plane includes admin-managed account requests a
 ## Admin dashboard, audit and WhatsApp group control — 2026-10-05
 
 The Admin Console now includes Overview and Audit panes. Mutating account/member/recipient/WhatsApp/category/group operations append archive-scoped audit events where applicable. The audit table is protected by admin-only RLS and grants only SELECT/INSERT to authenticated users subject to that policy. WhatsApp group presentation is managed through the existing Vercel-to-Oracle admin proxy: description is plain text, guide send/pin creates a new message and pins it for 30 days, and the canonical group image can be re-applied.
+
+## Failure and retry control — 2026-10-05
+
+The Admin Operations pane is the supported manual recovery path for failed processing jobs. It reads failed rows from the archive-scoped processing_jobs queue and exposes an explicit Retry action. Retry is guarded to status=failed only, resets claimed/runtime timestamps needed for a fresh worker claim, preserves attempts, and appends an admin audit event including bounded previous-error context. Do not auto-retry all failures from the UI.

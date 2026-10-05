@@ -148,3 +148,12 @@ Real intake remains disabled by default. No real archive letter has been ingeste
 - WhatsApp pane can load group status, edit plain-text description, send+pin a fresh guide for 30 days, and apply the canonical group photo through Oracle.
 - Supabase advisor found and the implementation fixed the new audit actor foreign-key index.
 - Existing 308-test suite remains green.
+
+## 2026-10-05 — Operations failures/retry
+
+- Admin Overview now includes Failed jobs.
+- Operations tab lists up to 100 failed processing jobs with title, reason, attempts, error and last update.
+- Retry is available only for failed jobs and safely returns the durable queue row to pending.
+- Retry clears claim/start/completion/error runtime fields but preserves attempt count/history.
+- Retry writes an admin audit event.
+- Live database verification found 2 failed jobs currently available for admin review; they were not automatically retried.

@@ -218,3 +218,7 @@ The private Oracle runtime can ingest official PDF/JPG/JPEG/PNG attachments from
 ## Admin operations baseline — 2026-10-05
 
 Admin Console now opens with an Overview dashboard showing document/user/request/recipient/WhatsApp/category counts. It also includes an admin-only Supabase audit log and live EDU-Letters group controls for plain-text description, fresh guide send+30-day pin, group photo apply, connection/index/pin status.
+
+## Operations / failure recovery — 2026-10-05
+
+Admin Console includes an Operations tab listing failed document-processing jobs with document title, reason, attempt count, last error and failure time. Admins can explicitly retry only failed jobs; retry returns the existing durable job to pending, clears the active claim/error state, preserves attempt history and records an audit event.

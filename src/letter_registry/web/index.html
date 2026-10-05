@@ -24,7 +24,7 @@ details{border:1px solid var(--line);border-radius:10px;padding:8px 10px;backgro
 .filters{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}.results-head{display:flex;justify-content:space-between;color:var(--muted);font-size:.84rem;margin:10px 2px 6px}
 .doc{padding:11px 12px;margin:7px 0}.doc-title{font-weight:800}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px;color:var(--muted);font-size:.8rem}.pill{padding:3px 7px;border-radius:999px;background:#f0f4f2}.summary{margin-top:8px;line-height:1.45}.action{margin-top:8px;padding:9px;border-radius:9px;background:#fff9e8;border:1px solid #f0e5b8;font-size:.88rem}.doc-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
 .drop{border:2px dashed #cfc2e8;border-radius:12px;padding:16px;text-align:center;background:#faf8ff}.progress{height:7px;border-radius:999px;background:#e8eeeb;overflow:hidden;margin-top:10px}.progress span{display:block;height:100%;width:0;background:var(--brand)}
-.admin-tabs{display:flex;gap:5px;margin-bottom:8px}.admin-tabs .btn{padding:7px 9px;font-size:.86rem}.admin-tab.active{background:var(--soft);color:var(--brand);border-color:#b8d1c9}.admin-pane{display:none}.admin-pane.active{display:block}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px}.summary-card strong{display:block;font-size:1.35rem}.group-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.textarea{width:100%;min-height:105px;resize:vertical;border:1px solid #d3cae6;border-radius:9px;padding:9px 10px;background:#fff;color:var(--text);font:inherit}.audit-item{padding:9px 0;border-bottom:1px solid var(--line)}.audit-item:last-child{border-bottom:0}
+.admin-tabs{display:flex;gap:5px;margin-bottom:8px}.admin-tabs .btn{padding:7px 9px;font-size:.86rem}.admin-tab.active{background:var(--soft);color:var(--brand);border-color:#b8d1c9}.admin-pane{display:none}.admin-pane.active{display:block}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.summary-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px}.summary-card strong{display:block;font-size:1.35rem}.group-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.textarea{width:100%;min-height:105px;resize:vertical;border:1px solid #d3cae6;border-radius:9px;padding:9px 10px;background:#fff;color:var(--text);font:inherit}.audit-item,.op-item{padding:9px 0;border-bottom:1px solid var(--line)}.audit-item:last-child,.op-item:last-child{border-bottom:0}.op-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.error-box{margin-top:6px;padding:8px;border:1px solid #f0c7c2;background:#fff8f7;border-radius:8px;font-size:.82rem;white-space:pre-wrap;overflow-wrap:anywhere}
 .access-item,.category-item,.request-item,.recipient-item,.wa-item{display:grid;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.access-item{grid-template-columns:1fr 120px 120px auto}.category-item{grid-template-columns:52px 1.2fr 1.2fr 1.8fr 80px auto}.request-item{grid-template-columns:1.7fr 120px 110px auto}.recipient-item{grid-template-columns:1.1fr 1.4fr 1fr auto}.wa-item{grid-template-columns:1fr auto}.category-item input,.recipient-item input{min-width:0}.empty{padding:28px;text-align:center;color:var(--muted)}.admin-tabs{overflow-x:auto;white-space:nowrap}.setup-card{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
 @media(max-width:900px){
 .sidebar{padding:7px 8px;gap:8px}.brand strong{display:none}.mark{width:30px;height:30px;border-radius:8px}.nav{gap:2px;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav button{padding:7px 8px;font-size:.88rem}
@@ -147,6 +147,7 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
           <button class="btn admin-tab" data-admin-pane="recipients">Recipients</button>
           <button class="btn admin-tab" data-admin-pane="whatsapp">WhatsApp</button>
           <button class="btn admin-tab" data-admin-pane="categories">Categories</button>
+          <button class="btn admin-tab" data-admin-pane="operations">Operations</button>
           <button class="btn admin-tab" data-admin-pane="audit">Audit</button>
         </div>
 
@@ -209,6 +210,14 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
           </div>
         </div>
 
+        <div id="admin-operations" class="admin-pane">
+          <div class="panel">
+            <div class="page-head"><div><h2>Failures & retry</h2><p>Failed document-processing jobs that need attention.</p></div><button id="refreshOperations" class="btn" type="button">Refresh</button></div>
+            <div id="operationsStatus" class="status"></div>
+            <div id="operationsList"></div>
+          </div>
+        </div>
+
         <div id="admin-audit" class="admin-pane">
           <div class="panel"><div class="page-head"><div><h2>Admin audit log</h2><p>Recent administrative changes.</p></div><button id="refreshAuditLog" class="btn" type="button">Refresh</button></div><div id="auditLog"></div></div>
         </div>
@@ -267,7 +276,7 @@ async function refreshAdminDashboard(){
   const r=await fetch("/api/v1/admin/dashboard",{cache:"no-store"});
   if(!r.ok){$("adminSummary").innerHTML='<div class="panel">Could not load admin summary.</div>';return}
   const d=await r.json();
-  const cards=[["Documents",d.documents],["Active users",d.active_users],["Pending requests",d.pending_requests],["Recipients",d.recipients],["WhatsApp allowed",d.whatsapp_allowed],["Active categories",d.active_categories]];
+  const cards=[["Documents",d.documents],["Active users",d.active_users],["Pending requests",d.pending_requests],["Failed jobs",d.failed_jobs],["Recipients",d.recipients],["WhatsApp allowed",d.whatsapp_allowed],["Active categories",d.active_categories]];
   $("adminSummary").innerHTML=cards.map(x=>'<div class="summary-card"><span class="sub">'+esc(x[0])+'</span><strong>'+esc(x[1]??0)+'</strong></div>').join("");
 }
 function defaultWhatsAppGuide(d){
@@ -292,6 +301,13 @@ async function refreshWhatsAppGroup(){
   $("whatsappGroupDescription").value=d.description||"";
   if(!$("whatsappGroupGuide").value.trim())$("whatsappGroupGuide").value=defaultWhatsAppGuide(d);
   $("whatsappGroupStatus").textContent=(d.connected?"Connected":"Disconnected")+" · "+(d.name||"EDU- Letters")+(d.index_url?" · Index ready":" · Index link missing")+(d.last_pinned_at?" · Last pinned "+new Date(d.last_pinned_at).toLocaleString():"");
+}
+async function refreshOperations(){
+  $("operationsStatus").textContent="Loading…";
+  const r=await fetch("/api/v1/admin/operations",{cache:"no-store"});let d={};try{d=await r.json()}catch{}
+  if(!r.ok){$("operationsStatus").textContent=d.detail||"Could not load failures.";$("operationsList").innerHTML="";return}
+  $("operationsStatus").textContent=(d.count||0)+" failed job"+((d.count||0)===1?"":"s");
+  $("operationsList").innerHTML=(d.items||[]).map(x=>'<div class="op-item" data-job-id="'+esc(x.id)+'"><div><strong>'+esc(x.title||"Document")+'</strong><div class="sub">'+esc(x.reason||"processing")+' · attempts '+esc(x.attempts??0)+' · '+esc(x.updated_at?new Date(x.updated_at).toLocaleString():"")+'</div>'+(x.last_error?'<div class="error-box">'+esc(x.last_error)+'</div>':"")+'</div><button class="btn primary" data-retry-job type="button">Retry</button></div>').join("")||'<div class="empty">No failed processing jobs.</div>';
 }
 async function refreshAuditLog(){
   const r=await fetch("/api/v1/admin/audit-log",{cache:"no-store"});if(!r.ok){$("auditLog").innerHTML='<div class="empty">Could not load audit log.</div>';return}
@@ -339,7 +355,7 @@ $("approvedSetupForm").addEventListener("submit",async e=>{e.preventDefault();co
 $("passwordChangeForm").addEventListener("submit",async e=>{e.preventDefault();const p=$("newPassword").value,c=$("confirmPassword").value;if(p!==c){$("passwordChangeStatus").textContent="Passwords do not match.";return}const r=await fetch("/api/v1/auth/password/change",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:p})});let b={};try{b=await r.json()}catch{};$("passwordChangeStatus").textContent=r.ok?(b.message||"Password updated."):(b.detail||"Update failed.")});
 $("accessList").addEventListener("click",async e=>{const b=e.target.closest("[data-save-member]");if(!b)return;const id=b.dataset.saveMember,role=document.querySelector('[data-member-role="'+CSS.escape(id)+'"]').value,st=document.querySelector('[data-member-status="'+CSS.escape(id)+'"]').value;const r=await fetch("/api/v1/admin/members/"+encodeURIComponent(id),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({role,status:st})});if(!r.ok){alert("Member update failed.");return}await refreshAdminAccess()});
 
-document.querySelectorAll(".admin-tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".admin-tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".admin-pane").forEach(x=>x.classList.toggle("active",x.id==="admin-"+b.dataset.adminPane));const pane=b.dataset.adminPane;if(pane==="overview")refreshAdminDashboard();else if(pane==="requests")refreshAccountRequests();else if(pane==="users")refreshAdminAccess();else if(pane==="recipients")refreshRecipients();else if(pane==="whatsapp"){refreshWhatsAppUsers();refreshWhatsAppGroup()}else if(pane==="categories")refreshCategories();else if(pane==="audit")refreshAuditLog()}));
+document.querySelectorAll(".admin-tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".admin-tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".admin-pane").forEach(x=>x.classList.toggle("active",x.id==="admin-"+b.dataset.adminPane));const pane=b.dataset.adminPane;if(pane==="overview")refreshAdminDashboard();else if(pane==="requests")refreshAccountRequests();else if(pane==="users")refreshAdminAccess();else if(pane==="recipients")refreshRecipients();else if(pane==="whatsapp"){refreshWhatsAppUsers();refreshWhatsAppGroup()}else if(pane==="categories")refreshCategories();else if(pane==="operations")refreshOperations();else if(pane==="audit")refreshAuditLog()}));
 
 $("accountRequestList").addEventListener("click",async e=>{const row=e.target.closest("[data-request-id]");if(!row)return;const id=row.dataset.requestId;if(e.target.closest("[data-approve-request]")){const role=row.querySelector("[data-request-role]").value;const r=await fetch("/api/v1/admin/account-requests/"+encodeURIComponent(id)+"/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({role})});if(!r.ok){let d={};try{d=await r.json()}catch{};alert(d.detail||"Approval failed.");return}await refreshAccountRequests()}else if(e.target.closest("[data-reject-request]")){if(!confirm("Reject this account request?"))return;const r=await fetch("/api/v1/admin/account-requests/"+encodeURIComponent(id)+"/reject",{method:"POST"});if(!r.ok){alert("Request could not be rejected.");return}await refreshAccountRequests()}});
 
@@ -351,6 +367,8 @@ $("whatsappUserList").addEventListener("click",async e=>{const row=e.target.clos
 
 $("refreshWhatsAppGroup").addEventListener("click",refreshWhatsAppGroup);
 $("refreshAuditLog").addEventListener("click",refreshAuditLog);
+$("refreshOperations").addEventListener("click",refreshOperations);
+$("operationsList").addEventListener("click",async e=>{const row=e.target.closest("[data-job-id]");if(!row||!e.target.closest("[data-retry-job]"))return;if(!confirm("Retry this failed processing job?"))return;const b=e.target.closest("[data-retry-job]");b.disabled=true;b.textContent="Retrying…";const r=await fetch("/api/v1/admin/operations/"+encodeURIComponent(row.dataset.jobId)+"/retry",{method:"POST"});let d={};try{d=await r.json()}catch{};if(!r.ok){alert(d.detail||"Retry failed.");b.disabled=false;b.textContent="Retry";return}await refreshOperations();await refreshAdminDashboard()});
 $("saveWhatsAppGroupDescription").addEventListener("click",async()=>{$("whatsappGroupStatus").textContent="Saving description…";const r=await fetch("/api/v1/admin/whatsapp-group/description",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({description:$("whatsappGroupDescription").value.trim()})});let d={};try{d=await r.json()}catch{};$("whatsappGroupStatus").textContent=r.ok?"Description updated.":(d.detail||"Description update failed.");if(r.ok)refreshWhatsAppGroup()});
 $("sendPinWhatsAppGuide").addEventListener("click",async()=>{if(!confirm("Send a new guide message and pin it for 30 days?"))return;$("whatsappGroupStatus").textContent="Sending and pinning…";const r=await fetch("/api/v1/admin/whatsapp-group/pin-guide",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:$("whatsappGroupGuide").value.trim()})});let d={};try{d=await r.json()}catch{};$("whatsappGroupStatus").textContent=r.ok?"New guide sent and pinned.":(d.detail||"Guide could not be pinned.");if(r.ok)refreshWhatsAppGroup()});
 $("applyWhatsAppGroupPhoto").addEventListener("click",async()=>{$("whatsappGroupStatus").textContent="Applying group photo…";const r=await fetch("/api/v1/admin/whatsapp-group/photo",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});let d={};try{d=await r.json()}catch{};$("whatsappGroupStatus").textContent=r.ok?"Group photo applied.":(d.detail||"Group photo update failed.");});
