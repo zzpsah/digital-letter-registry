@@ -1,3 +1,10 @@
+## 2026-10-05 — Add letter Trash restore UI
+- Commit: fdf527da0fa7c1e34c9863bd7fbddc3eb93bdbf2
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Add recoverable letter trash and restore
 - Commit: b30a1960d6f52dd7d349ebab80e7fc67a2c11b8a
 - Author: PRASHANT KUMAR SAH
