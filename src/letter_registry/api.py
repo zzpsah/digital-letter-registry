@@ -145,6 +145,25 @@ class AdminMemberResponse(BaseModel):
     status: str
 
 
+class AdminCategoryRequest(BaseModel):
+    code: str = Field(min_length=2, max_length=80, pattern=r"^[a-z0-9_]+$")
+    name_en: str = Field(min_length=2, max_length=120)
+    name_hi: str = Field(min_length=1, max_length=120)
+    icon: str = Field(default="📁", min_length=1, max_length=8)
+    keywords: list[str] = Field(default_factory=list, max_length=40)
+    sort_order: int = Field(default=100, ge=0, le=9999)
+    is_active: bool = True
+
+
+class AdminCategoryUpdateRequest(BaseModel):
+    name_en: str | None = Field(default=None, min_length=2, max_length=120)
+    name_hi: str | None = Field(default=None, min_length=1, max_length=120)
+    icon: str | None = Field(default=None, min_length=1, max_length=8)
+    keywords: list[str] | None = Field(default=None, max_length=40)
+    sort_order: int | None = Field(default=None, ge=0, le=9999)
+    is_active: bool | None = None
+
+
 class MessageResponse(BaseModel):
     message: str
 
@@ -1273,6 +1292,103 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 detail="Pending invitation not found",
             )
         return MessageResponse(message="Invitation revoked")
+
+    @app.get("/api/v1/admin/categories")
+    def list_admin_categories(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        rows = database.select(
+            "document_categories",
+            filters={"archive_id": _archive_id()},
+            columns="id,code,name_en,name_hi,icon,keywords,sort_order,is_active,created_at,updated_at",
+        )
+        rows.sort(key=lambda item: (int(item.get("sort_order") or 100), str(item.get("name_en") or "").casefold()))
+        return {"items": rows}
+
+    @app.post("/api/v1/admin/categories")
+    def create_admin_category(
+        payload: AdminCategoryRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        keywords = [
+            item.strip()
+            for item in payload.keywords
+            if isinstance(item, str) and item.strip()
+        ]
+        row = database.insert(
+            "document_categories",
+            {
+                "archive_id": _archive_id(),
+                "code": payload.code,
+                "name_en": payload.name_en.strip(),
+                "name_hi": payload.name_hi.strip(),
+                "icon": payload.icon.strip(),
+                "keywords": keywords,
+                "sort_order": payload.sort_order,
+                "is_active": payload.is_active,
+            },
+        )
+        return row
+
+    @app.patch("/api/v1/admin/categories/{category_id}")
+    def update_admin_category(
+        category_id: str,
+        payload: AdminCategoryUpdateRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        changes: dict[str, object] = {}
+        for key in ("name_en", "name_hi", "icon", "sort_order", "is_active"):
+            value = getattr(payload, key)
+            if value is not None:
+                changes[key] = value.strip() if isinstance(value, str) else value
+        if payload.keywords is not None:
+            changes["keywords"] = [
+                item.strip()
+                for item in payload.keywords
+                if isinstance(item, str) and item.strip()
+            ]
+        if not changes:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No category changes supplied",
+            )
+        row = database.update(
+            "document_categories",
+            changes,
+            filters={"id": category_id, "archive_id": _archive_id()},
+        )
+        if not row:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Category not found",
+            )
+        return row
+
+    @app.delete(
+        "/api/v1/admin/categories/{category_id}",
+        response_model=MessageResponse,
+    )
+    def delete_admin_category(
+        category_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        deleted = database.delete(
+            "document_categories",
+            filters={"id": category_id, "archive_id": _archive_id()},
+        )
+        if not deleted:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Category not found",
+            )
+        return MessageResponse(message="Category removed")
 
     @app.get(
         "/api/v1/readiness",

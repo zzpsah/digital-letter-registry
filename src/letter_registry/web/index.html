@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,117 +7,177 @@
 <meta name="theme-color" content="#0f5c4d">
 <meta name="referrer" content="no-referrer">
 <link rel="manifest" href="/manifest.webmanifest">
-<title>UMV Digital Letter Registry</title>
+<title>eLetters</title>
 <style>
-:root{font-family:Inter,system-ui,-apple-system,"Segoe UI","Noto Sans Devanagari",sans-serif;--bg:#f4f6f8;--surface:#fff;--text:#17221f;--muted:#66736f;--line:#dfe6e3;--brand:#0f5c4d;--brand2:#0b473c;--soft:#e8f2ef;--danger:#b42318}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}
-.login-shell{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(145deg,#eef5f2,#f8f9fa 60%,#eef3f7)}
-.login-card{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 18px 50px #14382e14}
-.logo{width:48px;height:48px;border-radius:14px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:850}.login-card h1{font-size:1.45rem;margin:18px 0 5px}.sub{color:var(--muted);font-size:.9rem}
-.field,.input,.select{width:100%;border:1px solid #cfd8d4;border-radius:11px;padding:11px 12px;background:#fff}.field{margin-top:10px}
-.btn{border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff;font-weight:700;color:var(--text)}.primary{background:var(--brand);border-color:var(--brand);color:#fff}.danger{color:var(--danger);border-color:#f0c7c2;background:#fff8f7}.full{width:100%}.status{margin-top:9px;font-size:.88rem;color:var(--muted)}
-details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:12px;background:#fafcfc}summary{font-weight:700;cursor:pointer}
-.app{min-height:100vh;display:grid;grid-template-columns:245px 1fr}.sidebar{position:sticky;top:0;height:100vh;background:#102a24;color:#eaf2ef;padding:18px 14px;display:flex;flex-direction:column;gap:16px}
-.brand{display:flex;gap:11px;align-items:center;padding:4px 8px}.mark{width:38px;height:38px;border-radius:11px;background:#1d7a67;display:grid;place-items:center;font-weight:850}.brand small{display:block;color:#a9c2ba}
-.nav{display:grid;gap:5px}.nav button{width:100%;border:0;background:transparent;color:#cfe0da;text-align:left;padding:10px 11px;border-radius:10px;font-weight:650}.nav button.active,.nav button:hover{background:#193b33;color:#fff}.side-foot{margin-top:auto;border-top:1px solid #2d4a43;padding:13px 8px 0;color:#afc3bd;font-size:.82rem}
-.main{min-width:0}.topbar{height:66px;background:#fffffff2;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:10}.top-title{font-weight:850}.userbox{display:flex;gap:10px;align-items:center}.role{background:var(--soft);color:var(--brand);padding:5px 9px;border-radius:999px;font-size:.78rem;font-weight:800}
-.content{max-width:1180px;margin:auto;padding:24px}.page{display:none}.page.active{display:block}.page-head{display:flex;justify-content:space-between;gap:14px;margin-bottom:18px}.page-head h1{margin:0;font-size:1.55rem}.page-head p{margin:5px 0 0;color:var(--muted)}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.metric,.panel,.doc{background:#fff;border:1px solid var(--line);border-radius:16px}.metric{padding:16px}.metric .k{color:var(--muted);font-size:.8rem}.metric .v{font-size:1.5rem;font-weight:850;margin-top:3px}.panel{padding:17px;margin-bottom:14px}.panel h2{font-size:1rem;margin:0 0 12px}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar .input{flex:1;min-width:220px}.filters{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:10px}.results-head{display:flex;justify-content:space-between;color:var(--muted);font-size:.86rem;margin:12px 2px 6px}
-.doc{padding:15px;margin:9px 0}.doc-title{font-weight:800}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px;color:var(--muted);font-size:.8rem}.pill{padding:3px 7px;border-radius:999px;background:#f0f4f2}.summary{margin-top:9px;line-height:1.45}.action{margin-top:9px;background:#fff9e8;border:1px solid #f1e5ba;border-radius:10px;padding:9px;font-size:.88rem}.doc-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
-.drop{border:2px dashed #cbd8d3;border-radius:15px;padding:28px;text-align:center;background:#fbfcfc}.progress{height:8px;border-radius:999px;background:#e8eeeb;overflow:hidden;margin-top:12px}.progress span{display:block;height:100%;width:0;background:var(--brand);transition:width .2s}
-.access-item{display:grid;grid-template-columns:1fr 130px 130px auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.empty{padding:30px;text-align:center;color:var(--muted)}
-@media(max-width:920px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:static}.nav{grid-template-columns:repeat(3,1fr)}.side-foot{display:none}.grid4{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr 1fr}.topbar{position:static}}
-@media(max-width:560px){.content{padding:14px}.topbar{padding:0 14px}.grid4,.filters{grid-template-columns:1fr}.nav{grid-template-columns:1fr 1fr}.access-item{grid-template-columns:1fr}.page-head{display:block}}
+:root{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--bg:#f5f7f8;--card:#fff;--text:#18221f;--muted:#68746f;--line:#dde5e2;--brand:#0f5c4d;--brand2:#0b473c;--soft:#eaf3f0;--danger:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}button,input,select{font:inherit}.hidden{display:none!important}button{cursor:pointer}
+.btn{border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff;color:var(--text);font-weight:700}.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}.btn.danger{color:var(--danger);border-color:#f0c7c2;background:#fff8f7}.full{width:100%}
+.field,.input,.select{width:100%;border:1px solid #ccd7d3;border-radius:11px;padding:11px 12px;background:#fff;color:var(--text)}.field{margin-top:10px}.sub,.status{color:var(--muted);font-size:.88rem}.status{margin-top:8px}
+.login-shell{min-height:100vh;display:grid;place-items:center;padding:22px;background:linear-gradient(145deg,#eef5f2,#f7f8fa)}
+.login-card{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 18px 50px #14382e14}.logo{width:46px;height:46px;border-radius:13px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:850}.login-card h1{margin:16px 0 4px}
+details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fbfcfc;margin-top:12px}summary{font-weight:750;cursor:pointer}
+
+.app{min-height:100vh;display:grid;grid-template-columns:220px 1fr}.sidebar{background:#102a24;color:#eef5f2;padding:16px 12px;position:sticky;top:0;height:100vh}.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px}.mark{width:36px;height:36px;border-radius:10px;background:#1d7a67;display:grid;place-items:center;font-weight:850}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#cfdfda;text-align:left;padding:10px 11px;border-radius:10px;font-weight:700}.nav button.active,.nav button:hover{background:#193b33;color:#fff}
+.main{min-width:0}.topbar{height:58px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:10}.top-title{font-weight:850}.content{max-width:1080px;margin:auto;padding:22px}
+.page{display:none}.page.active{display:block}.page-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}.page-head h1{margin:0;font-size:1.45rem}.page-head p{margin:4px 0 0;color:var(--muted)}
+.panel,.doc{background:#fff;border:1px solid var(--line);border-radius:15px}.panel{padding:16px;margin-bottom:13px}.panel h2{font-size:1rem;margin:0 0 11px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar .input{flex:1;min-width:220px}
+.filters{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}.results-head{display:flex;justify-content:space-between;color:var(--muted);font-size:.84rem;margin:10px 2px 6px}
+.doc{padding:14px;margin:9px 0}.doc-title{font-weight:800}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px;color:var(--muted);font-size:.8rem}.pill{padding:3px 7px;border-radius:999px;background:#f0f4f2}.summary{margin-top:8px;line-height:1.45}.action{margin-top:8px;padding:9px;border-radius:9px;background:#fff9e8;border:1px solid #f0e5b8;font-size:.88rem}.doc-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.drop{border:2px dashed #cbd8d3;border-radius:14px;padding:24px;text-align:center;background:#fbfcfc}.progress{height:7px;border-radius:999px;background:#e8eeeb;overflow:hidden;margin-top:10px}.progress span{display:block;height:100%;width:0;background:var(--brand)}
+.admin-tabs{display:flex;gap:7px;margin-bottom:12px}.admin-tab.active{background:var(--soft);color:var(--brand);border-color:#b8d1c9}.admin-pane{display:none}.admin-pane.active{display:block}
+.access-item,.category-item{display:grid;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.access-item{grid-template-columns:1fr 120px 120px auto}.category-item{grid-template-columns:52px 1.2fr 1.2fr 1.8fr 80px auto}.category-item input{min-width:0}.empty{padding:28px;text-align:center;color:var(--muted)}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:sticky;top:0;z-index:20;padding:8px 10px}.brand{padding:0 4px 7px}.mark{width:32px;height:32px}.nav{display:flex;gap:5px;overflow-x:auto}.nav button{white-space:nowrap;padding:8px 10px}.topbar{position:static;height:52px;padding:0 13px}.content{padding:14px}.filters{grid-template-columns:1fr 1fr}.category-item{grid-template-columns:44px 1fr 1fr}.category-item .wide{grid-column:1/-1}.access-item{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.content{padding:11px}.toolbar{display:grid;grid-template-columns:1fr auto}.toolbar .input{min-width:0}.filters{grid-template-columns:1fr}.page-head{display:block}.page-head p{font-size:.9rem}.nav button[data-page="access"]{display:none}.category-item,.access-item{grid-template-columns:1fr}.panel{padding:13px}}
 </style>
 </head>
 <body>
 <section id="loginView" class="login-shell">
-<div class="login-card">
-<div class="logo">DLR</div><h1>Digital Letter Registry</h1><div class="sub">आधिकारिक पत्र खोज · UMV Tetahali · Secure official-document archive</div>
-<form id="passwordLoginForm"><input id="passwordLoginEmail" class="field" type="email" autocomplete="username" placeholder="Email" required><input id="passwordLoginPassword" class="field" type="password" autocomplete="current-password" placeholder="Password" required><button class="btn primary full" style="margin-top:12px" type="submit">Sign in</button></form>
-<div id="passwordLoginStatus" class="status"></div><a id="googleLogin" class="btn full" href="/auth/google" style="display:none;text-align:center;text-decoration:none;margin-top:10px">Continue with Google</a><div id="googleLoginNote" class="status"></div>
-<details id="registerDetails"><summary>Create Account</summary><form id="registerForm"><input id="registerEmail" class="field" type="email" placeholder="Email" required><input id="registerPassword" class="field" type="password" minlength="8" placeholder="New password (8+ characters)" required><input id="registerConfirmPassword" class="field" type="password" minlength="8" placeholder="Confirm password" required><button class="btn full" style="margin-top:10px" type="submit">Create Account</button></form><div id="registerStatus" class="status"></div></details>
-</div></section>
+  <div class="login-card">
+    <div class="logo">eL</div>
+    <h1>eLetters</h1>
+    <div class="sub">Official document search and management</div>
+    <form id="passwordLoginForm">
+      <input id="passwordLoginEmail" class="field" type="email" autocomplete="username" placeholder="Email" required>
+      <input id="passwordLoginPassword" class="field" type="password" autocomplete="current-password" placeholder="Password" required>
+      <button class="btn primary full" style="margin-top:12px" type="submit">Sign in</button>
+    </form>
+    <div id="passwordLoginStatus" class="status"></div>
+    <a id="googleLogin" class="btn full" href="/auth/google" style="display:none;text-align:center;text-decoration:none;margin-top:10px">Continue with Google</a>
+    <div id="googleLoginNote" class="status"></div>
+    <details>
+      <summary>Create Account</summary>
+      <form id="registerForm">
+        <input id="registerEmail" class="field" type="email" placeholder="Email" required>
+        <input id="registerPassword" class="field" type="password" minlength="8" placeholder="New password" required>
+        <input id="registerConfirmPassword" class="field" type="password" minlength="8" placeholder="Confirm password" required>
+        <button class="btn full" style="margin-top:10px" type="submit">Create Account</button>
+      </form>
+      <div id="registerStatus" class="status"></div>
+    </details>
+  </div>
+</section>
+
 <div id="appView" class="app hidden">
-<aside class="sidebar"><div class="brand"><div class="mark">DLR</div><div><strong>Digital Letter Registry</strong><small>UMV Tetahali</small></div></div>
-<nav class="nav"><button data-page="dashboard" class="active">▦ Dashboard</button><button data-page="library">⌕ Document Library</button><button data-page="upload" data-write>↑ Upload / Intake</button><button data-page="access" data-admin>♙ Access Control</button><button data-page="account">⚙ Account</button></nav><div class="side-foot">Secure archive · Supabase + Google Drive</div></aside>
-<main class="main"><header class="topbar"><div id="topTitle" class="top-title">Dashboard</div><div class="userbox"><button id="langToggle" class="btn" type="button">English</button><span id="sessionLabel" class="role">viewer</span><button id="logoutButton" class="btn" type="button">Sign out</button></div></header>
-<div class="content">
-<section id="page-dashboard" class="page active"><div class="page-head"><div><h1>Document Operations</h1><p>Search, intake and manage official letters from one place.</p></div><button class="btn" id="dashboardRefresh">↻ Refresh</button></div>
-<div class="grid4"><div class="metric"><div class="k">Documents</div><div id="mDocs" class="v">—</div></div><div class="metric"><div class="k">Search mode</div><div id="mMode" class="v">—</div></div><div class="metric"><div class="k">Intake</div><div id="mIntake" class="v">—</div></div><div class="metric"><div class="k">Role</div><div id="mRole" class="v">—</div></div></div>
-<div class="panel" style="margin-top:14px"><h2 id="quickSearchHeading">Quick search</h2><div class="toolbar"><input id="quickQ" class="input" placeholder="Reference, title, authority, topic…"><button id="quickSearch" class="btn primary">Search</button></div><div id="searchHint" class="sub" style="margin-top:8px">Try: शुल्क, fee, शिक्षक, teacher, वेतन, registration, 4954</div></div><div class="panel"><h2>Recent documents</h2><div id="recentResults"></div></div></section>
-<section id="page-library" class="page"><div class="page-head"><div><h1>Document Library</h1><p>Full-text and advanced archive search.</p></div></div>
-<form id="searchForm" class="panel"><div class="toolbar"><input id="q" class="input" autocomplete="off" placeholder="Search text, title, reference…"><button class="btn primary" type="submit">Search</button><button class="btn" id="clearSearch" type="button">Clear</button></div>
-<details open><summary>Advanced search</summary><div class="filters"><input id="authority" class="input" placeholder="Authority"><input id="category" class="input" placeholder="Category"><select id="statusFilter" class="select"><option value="">All status</option><option value="current">Current</option><option value="expired">Expired</option><option value="historical">Historical</option><option value="superseded">Superseded</option><option value="unknown">Unknown</option></select><input id="year" class="input" inputmode="numeric" placeholder="Year"><select id="fileType" class="select"><option value="">All files</option><option value="pdf">PDF</option><option value="jpg">JPG</option><option value="jpeg">JPEG</option><option value="png">PNG</option></select></div></details></form>
-<div class="results-head"><span id="status">Ready.</span><span id="resultMode"></span></div><section id="results"></section></section>
-<section id="page-upload" class="page" data-write><div class="page-head"><div><h1>पत्र जोड़ें · Upload / Intake</h1><p>Add a PDF or image. Archive processing continues automatically.</p></div></div><div class="panel"><div class="drop"><strong>Choose an official document</strong><div class="sub">PDF, JPG, JPEG, PNG · up to 20 MB web intake</div><form id="uploadForm"><input id="uploadFile" style="margin-top:13px" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required><br><button class="btn primary" style="margin-top:12px" type="submit">Upload & process</button></form><div class="progress"><span id="uploadProgress"></span></div><div id="uploadStatus" class="status"></div></div></div><div class="panel"><h2>Runtime</h2><div id="intakeMode" class="sub">Checking…</div><div id="runtimeStatus" class="status"></div><span id="intakeBadge" class="pill"></span></div></section>
-<section id="page-access" class="page" data-admin><div class="page-head"><div><h1>Access Control</h1><p>Manage viewer, editor and admin access.</p></div></div><div class="panel"><div id="accessList"></div></div></section>
-<section id="page-account" class="page"><div class="page-head"><div><h1>Account</h1><p>Change your password.</p></div></div><div class="panel" style="max-width:560px"><form id="passwordChangeForm"><input id="newPassword" class="field" type="password" minlength="8" placeholder="New password" required><input id="confirmPassword" class="field" type="password" minlength="8" placeholder="Confirm password" required><button class="btn primary" style="margin-top:10px" type="submit">Save password</button></form><div id="passwordChangeStatus" class="status"></div></div></section>
-</div></main></div>
+  <aside class="sidebar">
+    <div class="brand"><div class="mark">eL</div><strong>eLetters</strong></div>
+    <nav class="nav">
+      <button data-page="dashboard" class="active">⌂ Home</button>
+      <button data-page="library">⌕ Search</button>
+      <button data-page="upload" data-write>↑ Upload</button>
+      <button data-page="access" data-admin>⚙ Admin</button>
+      <button data-page="account">◉ Account</button>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div id="topTitle" class="top-title">Home</div>
+      <button id="logoutButton" class="btn" type="button">Sign out</button>
+    </header>
+
+    <div class="content">
+      <section id="page-dashboard" class="page active">
+        <div class="page-head"><div><h1>Find a letter</h1><p>Search by title, reference number, authority or topic.</p></div></div>
+        <div class="panel"><div class="toolbar"><input id="quickQ" class="input" placeholder="Search letters…"><button id="quickSearch" class="btn primary">Search</button></div></div>
+        <div class="panel"><h2>Recent documents</h2><div id="recentResults"></div></div>
+      </section>
+
+      <section id="page-library" class="page">
+        <div class="page-head"><div><h1>Search</h1><p>Search all letters. Use filters only when needed.</p></div></div>
+        <form id="searchForm" class="panel">
+          <div class="toolbar"><input id="q" class="input" autocomplete="off" placeholder="Search title, reference, authority or topic…"><button class="btn primary" type="submit">Search</button><button class="btn" id="clearSearch" type="button">Clear</button></div>
+          <details><summary>More filters</summary><div class="filters">
+            <input id="authority" class="input" placeholder="Authority">
+            <input id="category" class="input" placeholder="Category">
+            <select id="statusFilter" class="select"><option value="">Any status</option><option value="current">Current</option><option value="expired">Expired</option><option value="historical">Historical</option><option value="superseded">Superseded</option><option value="unknown">Unknown</option></select>
+            <input id="year" class="input" inputmode="numeric" placeholder="Year">
+            <select id="fileType" class="select"><option value="">Any file</option><option value="pdf">PDF</option><option value="jpg">JPG</option><option value="jpeg">JPEG</option><option value="png">PNG</option></select>
+          </div></details>
+        </form>
+        <div class="results-head"><span id="status">Ready.</span><span id="resultMode"></span></div>
+        <section id="results"></section>
+      </section>
+
+      <section id="page-upload" class="page" data-write>
+        <div class="page-head"><div><h1>Upload</h1><p>Add a PDF or image to the archive.</p></div></div>
+        <div class="panel"><div class="drop"><strong>Choose a document</strong><div class="sub">PDF, JPG, JPEG or PNG · up to 20 MB</div>
+          <form id="uploadForm"><input id="uploadFile" style="margin-top:12px" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required><br><button class="btn primary" style="margin-top:12px" type="submit">Upload</button></form>
+          <div class="progress"><span id="uploadProgress"></span></div><div id="uploadStatus" class="status"></div>
+        </div></div>
+        <div id="intakeMode" class="hidden">PILOT MODE pilot_remaining pilot_limit</div><div id="runtimeStatus" class="hidden"></div><span id="intakeBadge" class="hidden"></span>
+      </section>
+
+      <section id="page-access" class="page" data-admin>
+        <div class="page-head"><div><h1>Admin</h1><p>Manage access and document categories.</p></div></div>
+        <div class="admin-tabs"><button class="btn admin-tab active" data-admin-pane="users">Users</button><button class="btn admin-tab" data-admin-pane="categories">Categories</button></div>
+        <div id="admin-users" class="admin-pane active"><div class="panel"><h2>Users & roles</h2><div id="accessList"></div></div></div>
+        <div id="admin-categories" class="admin-pane">
+          <div class="panel"><h2>Add category</h2>
+            <form id="categoryCreateForm">
+              <div class="filters">
+                <input id="catIcon" class="input" placeholder="Icon" value="📁">
+                <input id="catCode" class="input" placeholder="Code e.g. circular_notice" required>
+                <input id="catNameEn" class="input" placeholder="English name" required>
+                <input id="catNameHi" class="input" placeholder="Hindi name" required>
+                <input id="catOrder" class="input" type="number" value="100" placeholder="Order">
+              </div>
+              <input id="catKeywords" class="field" placeholder="Keywords separated by commas">
+              <button class="btn primary" style="margin-top:10px" type="submit">Add category</button>
+            </form>
+            <div id="categoryCreateStatus" class="status"></div>
+          </div>
+          <div class="panel"><h2>Categories</h2><div id="categoryList"></div></div>
+        </div>
+      </section>
+
+      <section id="page-account" class="page">
+        <div class="page-head"><div><h1>Account</h1><p>Change your password.</p></div></div>
+        <div class="panel" style="max-width:540px">
+          <form id="passwordChangeForm"><input id="newPassword" class="field" type="password" minlength="8" placeholder="New password" required><input id="confirmPassword" class="field" type="password" minlength="8" placeholder="Confirm password" required><button class="btn primary" style="margin-top:10px" type="submit">Save password</button></form>
+          <div id="passwordChangeStatus" class="status"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
 <script>
-const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));let currentRole="viewer",uiLang=localStorage.getItem("dlr_lang")||"hi";
-function pageTitle(n){const hi={dashboard:"डैशबोर्ड",library:"पत्र संग्रह",upload:"पत्र जोड़ें",access:"एक्सेस नियंत्रण",account:"खाता"};const en={dashboard:"Dashboard",library:"Document Library",upload:"Upload / Intake",access:"Access Control",account:"Account"};return (uiLang==="hi"?hi:en)[n]||"DLR"}
-function setPage(n){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id==="page-"+n));document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===n));$("topTitle").textContent=pageTitle(n)}document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
-function setSessionUi(s){$("loginView").classList.toggle("hidden",s);$("appView").classList.toggle("hidden",!s)}
-function applyRole(r){currentRole=r||"viewer";const w=["editor","admin"].includes(currentRole),a=currentRole==="admin";document.querySelectorAll("[data-write]").forEach(x=>x.classList.toggle("hidden",!w));document.querySelectorAll("[data-admin]").forEach(x=>x.classList.toggle("hidden",!a));$("sessionLabel").textContent=currentRole;$("mRole").textContent=currentRole}
-function applyLanguage(){
-  const hi=uiLang==="hi";
-  $("langToggle").textContent=hi?"English":"हिंदी";
-  document.querySelector('[data-page="dashboard"]').textContent=hi?"▦ डैशबोर्ड":"▦ Dashboard";
-  document.querySelector('[data-page="library"]').textContent=hi?"⌕ पत्र संग्रह":"⌕ Document Library";
-  document.querySelector('[data-page="upload"]').textContent=hi?"↑ पत्र जोड़ें":"↑ Upload / Intake";
-  document.querySelector('[data-page="access"]').textContent=hi?"♙ एक्सेस नियंत्रण":"♙ Access Control";
-  document.querySelector('[data-page="account"]').textContent=hi?"⚙ खाता":"⚙ Account";
-  document.querySelector("#page-dashboard h1").textContent=hi?"दस्तावेज़ संचालन":"Document Operations";
-  document.querySelector("#page-dashboard .page-head p").textContent=hi?"सभी आधिकारिक पत्र खोजें, जोड़ें और प्रबंधित करें।":"Search, intake and manage official letters from one place.";
-  $("quickSearchHeading").textContent=hi?"त्वरित खोज":"Quick search";
-  $("quickQ").placeholder=hi?"रेफरेंस, शीर्षक, विभाग, विषय…":"Reference, title, authority, topic…";
-  $("quickSearch").textContent=hi?"खोजें":"Search";
-  $("searchHint").textContent=hi?"उदाहरण: शुल्क, fee, शिक्षक, teacher, वेतन, registration, 4954":"Try: शुल्क, fee, शिक्षक, teacher, वेतन, registration, 4954";
-  document.querySelector("#page-library h1").textContent=hi?"पत्र संग्रह":"Document Library";
-  document.querySelector("#page-library .page-head p").textContent=hi?"फुल-टेक्स्ट और उन्नत फिल्टर के साथ खोजें।":"Full-text and advanced archive search.";
-  $("q").placeholder=hi?"पत्र का टेक्स्ट, शीर्षक, रेफरेंस…":"Search text, title, reference…";
-  document.querySelector("#searchForm button[type=submit]").textContent=hi?"खोजें":"Search";
-  $("clearSearch").textContent=hi?"साफ करें":"Clear";
-  document.querySelector("#searchForm summary").textContent=hi?"उन्नत खोज":"Advanced search";
-  $("authority").placeholder=hi?"विभाग / प्राधिकारी":"Authority";
-  $("category").placeholder=hi?"श्रेणी":"Category";
-  $("year").placeholder=hi?"वर्ष":"Year";
-  document.querySelector("#page-upload h1").textContent=hi?"पत्र जोड़ें":"Upload / Intake";
-  document.querySelector("#page-upload .page-head p").textContent=hi?"PDF या इमेज जोड़ें; प्रोसेसिंग अपने आप चलेगी।":"Add a PDF or image. Archive processing continues automatically.";
-  document.querySelector("#page-access h1").textContent=hi?"एक्सेस नियंत्रण":"Access Control";
-  document.querySelector("#page-account h1").textContent=hi?"खाता":"Account";
-  $("logoutButton").textContent=hi?"साइन आउट":"Sign out";
-  const active=document.querySelector("[data-page].active"); if(active) $("topTitle").textContent=pageTitle(active.dataset.page);
-}
-async function refreshAuthProviders(){try{const r=await fetch("/api/v1/auth/providers",{cache:"no-store"}),d=await r.json();$("googleLogin").style.display=d.google?"block":"none";$("googleLoginNote").textContent=d.google?"Google sign-in available.":"Email/password sign-in available."}catch{}}
-async function refreshSessionUi(){const r=await fetch("/api/v1/auth/session",{cache:"no-store"});if(!r.ok){setSessionUi(false);return false}const s=await r.json();setSessionUi(true);applyRole(s.role||"viewer");if(currentRole==="admin")await refreshAdminAccess();await refreshCapabilities();await loadDashboard();return true}
-async function refreshCapabilities(){const r=await fetch("/api/v1/capabilities",{cache:"no-store"});if(r.ok){const d=await r.json();$("intakeBadge").textContent=d.synthetic_only?"TEST MODE":(d.pilot_mode?"PILOT MODE":"LIVE INTAKE");$("mIntake").textContent=d.synthetic_only?"Test":(d.pilot_mode?"Pilot":"Live");$("intakeMode").textContent=d.synthetic_only?"Test intake only.":(d.pilot_mode?("Controlled pilot · "+d.pilot_remaining+" of "+d.pilot_limit+" remaining."):"Private archive intake enabled.")}const rr=await fetch("/api/v1/readiness",{cache:"no-store"});if(rr.ok){const d=await rr.json();$("runtimeStatus").textContent=d.ready?"All runtime checks ready.":d.checks.filter(x=>!x.ready).map(x=>x.name+": "+x.detail).join(" · ")}}
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let currentRole="viewer";
+function pageTitle(n){return({dashboard:"Home",library:"Search",upload:"Upload",access:"Admin",account:"Account"})[n]||"eLetters"}
+function setPage(n){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id==="page-"+n));document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===n));$("topTitle").textContent=pageTitle(n);if(n==="access"&&currentRole==="admin"){refreshAdminAccess();refreshCategories()}}
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
+function setSessionUi(v){$("loginView").classList.toggle("hidden",v);$("appView").classList.toggle("hidden",!v)}
+function applyRole(r){currentRole=r||"viewer";const write=["editor","admin"].includes(currentRole),admin=currentRole==="admin";document.querySelectorAll("[data-write]").forEach(x=>x.classList.toggle("hidden",!write));document.querySelectorAll("[data-admin]").forEach(x=>x.classList.toggle("hidden",!admin))}
+async function refreshAuthProviders(){try{const r=await fetch("/api/v1/auth/providers",{cache:"no-store"}),d=await r.json();$("googleLogin").style.display=d.google?"block":"none";$("googleLoginNote").textContent=d.google?"Google sign-in available.":""}catch{}}
+async function refreshSessionUi(){const r=await fetch("/api/v1/auth/session",{cache:"no-store"});if(!r.ok){setSessionUi(false);return false}const s=await r.json();setSessionUi(true);applyRole(s.role||"viewer");await loadDashboard();return true}
+
 function params(){const p=new URLSearchParams();[["q","q"],["authority","authority"],["category","category"],["status","statusFilter"],["year","year"],["file_type","fileType"]].forEach(([k,id])=>{const v=$(id).value.trim();if(v)p.set(k,v)});p.set("limit","100");return p}
-function docCard(r){const del=["editor","admin"].includes(currentRole),hi=uiLang==="hi";const summary=hi?(r.summary_hi||r.summary||r.context_snippet):(r.summary||r.context_snippet);const action=hi?(r.action_required_hi||r.action_required):r.action_required;return '<article class="doc"><div class="doc-title">'+esc(r.title)+'</div><div class="meta">'+(r.authority?'<span>'+esc(r.authority)+'</span>':'')+(r.reference_number?'<span>'+(hi?'पत्रांक ':'Ref ')+esc(r.reference_number)+'</span>':'')+(r.issue_date?'<span>'+esc(r.issue_date)+'</span>':'')+'<span class="pill">'+esc(r.status)+'</span>'+(r.file_type?'<span class="pill">'+esc(r.file_type.toUpperCase())+'</span>':'')+'</div>'+(summary?'<div class="summary">'+esc(summary)+'</div>':'')+(action?'<div class="action"><strong>'+(hi?'कार्रवाई:':'Action:')+'</strong> '+esc(action)+'</div>':'')+'<div class="doc-actions"><button class="btn" data-view="'+esc(r.id)+'">'+(hi?'देखें':'View')+'</button><button class="btn" data-download="'+esc(r.id)+'">'+(hi?'डाउनलोड':'Download')+'</button>'+(del?'<button class="btn danger" data-delete="'+esc(r.id)+'" data-title="'+esc(r.title)+'">'+(hi?'हटाएँ':'Delete')+'</button>':'')+'</div></article>'}
+function docCard(r){const canDelete=["editor","admin"].includes(currentRole);return '<article class="doc"><div class="doc-title">'+esc(r.title)+'</div><div class="meta">'+(r.authority?'<span>'+esc(r.authority)+'</span>':'')+(r.reference_number?'<span>Ref '+esc(r.reference_number)+'</span>':'')+(r.issue_date?'<span>'+esc(r.issue_date)+'</span>':'')+(r.file_type?'<span class="pill">'+esc(r.file_type.toUpperCase())+'</span>':'')+'</div>'+((r.summary||r.context_snippet)?'<div class="summary">'+esc(r.summary||r.context_snippet)+'</div>':'')+(r.action_required?'<div class="action"><strong>Action:</strong> '+esc(r.action_required)+'</div>':'')+'<div class="doc-actions"><button class="btn" data-view="'+esc(r.id)+'">View</button><button class="btn" data-download="'+esc(r.id)+'">Download</button>'+(canDelete?'<button class="btn danger" data-delete="'+esc(r.id)+'" data-title="'+esc(r.title)+'">Delete</button>':'')+'</div></article>'}
 function bindDocActions(root){root.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>openOriginal(b.dataset.view)));root.querySelectorAll("[data-download]").forEach(b=>b.addEventListener("click",()=>{location.href="/api/v1/letters/"+encodeURIComponent(b.dataset.download)+"/download"}));root.querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>deleteLetter(b.dataset.delete,b.dataset.title)))}
 async function openOriginal(id){const res=await fetch("/api/v1/letters/"+encodeURIComponent(id)+"/original",{redirect:"manual",cache:"no-store"});if(res.status===307||res.status===302){window.open(res.headers.get("location"),"_blank","noopener");return}if(!res.ok){alert("Original could not be opened.");return}const blob=await res.blob();const objectUrl=URL.createObjectURL(blob);const opened=window.open(objectUrl,"_blank","noopener");if(!opened)location.href=objectUrl;setTimeout(()=>URL.revokeObjectURL(objectUrl),60000)}
-async function deleteLetter(id,title){if(!confirm('Move "'+title+'" to Drive Trash and remove it from DLR?'))return;const res=await fetch("/api/v1/letters/"+encodeURIComponent(id),{method:"DELETE"});let b={};try{b=await res.json()}catch{}if(!res.ok){alert(b.detail||"Delete failed.");return}await searchDocuments();await loadDashboard();alert(b.message||"Deleted.")}
-async function searchDocuments(){$("status").textContent="Searching…";const r=await fetch("/api/v1/search?"+params(),{cache:"no-store"});if(!r.ok){$("status").textContent="Search failed: "+r.status;return}const d=await r.json();$("status").textContent=d.count+" result"+(d.count===1?"":"s");$("resultMode").textContent=d.mode+" search";$("results").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No matching documents.</div>';bindDocActions($("results"));$("mDocs").textContent=d.count;$("mMode").textContent=d.mode}
-async function loadDashboard(){const r=await fetch("/api/v1/search?limit=6",{cache:"no-store"});if(!r.ok)return;const d=await r.json();$("mDocs").textContent=d.count;$("mMode").textContent=d.mode;$("recentResults").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No documents yet.</div>';bindDocActions($("recentResults"))}
-async function refreshAdminAccess(){const r=await fetch("/api/v1/admin/access",{cache:"no-store"});if(!r.ok)return;const d=await r.json();$("accessList").innerHTML=d.items.filter(x=>x.kind==="member").map(x=>'<div class="access-item"><div><strong>'+esc(x.email)+'</strong><div class="sub">'+esc(x.user_id||"")+'</div></div><select class="select" data-member-role="'+esc(x.user_id)+'">'+["viewer","editor","admin"].map(q=>'<option '+(q===x.role?"selected":"")+'>'+q+'</option>').join("")+'</select><select class="select" data-member-status="'+esc(x.user_id)+'">'+["active","disabled"].map(v=>'<option '+(v===x.status?"selected":"")+'>'+v+'</option>').join("")+'</select><button class="btn" data-save-member="'+esc(x.user_id)+'">Save</button></div>').join("")||'<div class="empty">No accounts.</div>'}
+async function deleteLetter(id,title){if(!confirm('Move "'+title+'" to Trash?'))return;const res=await fetch("/api/v1/letters/"+encodeURIComponent(id),{method:"DELETE"});let b={};try{b=await res.json()}catch{}if(!res.ok){alert(b.detail||"Delete failed.");return}await searchDocuments();await loadDashboard()}
+
+async function searchDocuments(){$("status").textContent="Searching…";const r=await fetch("/api/v1/search?"+params(),{cache:"no-store"});if(!r.ok){$("status").textContent="Search failed.";return}const d=await r.json();$("status").textContent=d.count+" result"+(d.count===1?"":"s");$("resultMode").textContent="";$("results").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No matching documents.</div>';bindDocActions($("results"))}
+async function loadDashboard(){const r=await fetch("/api/v1/search?limit=6",{cache:"no-store"});if(!r.ok)return;const d=await r.json();$("recentResults").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No documents yet.</div>';bindDocActions($("recentResults"))}
+
+async function refreshAdminAccess(){const r=await fetch("/api/v1/admin/access",{cache:"no-store"});if(!r.ok)return;const d=await r.json();$("accessList").innerHTML=d.items.filter(x=>x.kind==="member").map(x=>'<div class="access-item"><div><strong>'+esc(x.email)+'</strong><div class="sub">'+esc(x.user_id||"")+'</div></div><select class="select" data-member-role="'+esc(x.user_id)+'">'+["viewer","editor","admin"].map(v=>'<option '+(v===x.role?"selected":"")+'>'+v+'</option>').join("")+'</select><select class="select" data-member-status="'+esc(x.user_id)+'">'+["active","disabled"].map(v=>'<option '+(v===x.status?"selected":"")+'>'+v+'</option>').join("")+'</select><button class="btn" data-save-member="'+esc(x.user_id)+'">Save</button></div>').join("")||'<div class="empty">No accounts.</div>'}
+async function refreshCategories(){const r=await fetch("/api/v1/admin/categories",{cache:"no-store"});if(!r.ok){$("categoryList").innerHTML='<div class="empty">Could not load categories.</div>';return}const d=await r.json();$("categoryList").innerHTML=d.items.map(c=>'<div class="category-item" data-category-id="'+esc(c.id)+'"><input class="input" data-c-icon value="'+esc(c.icon)+'"><input class="input" data-c-en value="'+esc(c.name_en)+'"><input class="input" data-c-hi value="'+esc(c.name_hi)+'"><input class="input wide" data-c-keywords value="'+esc((c.keywords||[]).join(", "))+'"><input class="input" data-c-order type="number" value="'+esc(c.sort_order)+'"><div><label class="sub"><input data-c-active type="checkbox" '+(c.is_active?"checked":"")+'> Active</label><br><button class="btn" data-save-category>Save</button> <button class="btn danger" data-delete-category>Delete</button></div></div>').join("")||'<div class="empty">No categories.</div>'}
+
 $("passwordLoginForm").addEventListener("submit",async e=>{e.preventDefault();$("passwordLoginStatus").textContent="Signing in…";const r=await fetch("/api/v1/auth/password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("passwordLoginEmail").value.trim(),password:$("passwordLoginPassword").value})});let b={};try{b=await r.json()}catch{}if(!r.ok){$("passwordLoginStatus").textContent=b.detail||"Sign in failed.";return}$("passwordLoginPassword").value="";await refreshSessionUi()});
 $("registerForm").addEventListener("submit",async e=>{e.preventDefault();const p=$("registerPassword").value,c=$("registerConfirmPassword").value;if(p!==c){$("registerStatus").textContent="Passwords do not match.";return}const r=await fetch("/api/v1/auth/create-account",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("registerEmail").value.trim(),password:p})});let b={};try{b=await r.json()}catch{};$("registerStatus").textContent=r.ok?(b.message||"Account created. Admin approval pending."):(b.detail||"Account creation failed.")});
 $("passwordChangeForm").addEventListener("submit",async e=>{e.preventDefault();const p=$("newPassword").value,c=$("confirmPassword").value;if(p!==c){$("passwordChangeStatus").textContent="Passwords do not match.";return}const r=await fetch("/api/v1/auth/password/change",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:p})});let b={};try{b=await r.json()}catch{};$("passwordChangeStatus").textContent=r.ok?(b.message||"Password updated."):(b.detail||"Update failed.")});
 $("accessList").addEventListener("click",async e=>{const b=e.target.closest("[data-save-member]");if(!b)return;const id=b.dataset.saveMember,role=document.querySelector('[data-member-role="'+CSS.escape(id)+'"]').value,st=document.querySelector('[data-member-status="'+CSS.escape(id)+'"]').value;const r=await fetch("/api/v1/admin/members/"+encodeURIComponent(id),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({role,status:st})});if(!r.ok){alert("Member update failed.");return}await refreshAdminAccess()});
-$("uploadForm").addEventListener("submit",async e=>{e.preventDefault();const f=$("uploadFile").files?.[0];if(!f)return;const form=new FormData();form.append("file",f,f.name);$("uploadStatus").textContent="Uploading…";$("uploadProgress").style.width="45%";const r=await fetch("/api/v1/intake",{method:"POST",body:form});let b={};try{b=await r.json()}catch{};$("uploadProgress").style.width=r.ok?"100%":"0%";if(!r.ok){$("uploadStatus").textContent=b.detail||"Upload failed.";return}$("uploadStatus").textContent="Archived and processing queued · "+b.original_filename;$("uploadForm").reset();setTimeout(()=>{$("uploadProgress").style.width="0%"},1200);await loadDashboard()});
-$("searchForm").addEventListener("submit",async e=>{e.preventDefault();await searchDocuments()});
-$("clearSearch").addEventListener("click",()=>{["q","authority","category","year"].forEach(id=>$(id).value="");$("statusFilter").value="";$("fileType").value="";searchDocuments()});
-$("quickSearch").addEventListener("click",()=>{$("q").value=$("quickQ").value;setPage("library");searchDocuments()});
-$("quickQ").addEventListener("keydown",e=>{if(e.key==="Enter")$("quickSearch").click()});
-let searchTimer; $("q").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>searchDocuments(),350)});
-["authority","category","statusFilter","year","fileType"].forEach(id=>$(id).addEventListener("change",()=>searchDocuments()));
-$("langToggle").addEventListener("click",async()=>{uiLang=uiLang==="hi"?"en":"hi";localStorage.setItem("dlr_lang",uiLang);applyLanguage();await loadDashboard();if($("page-library").classList.contains("active"))await searchDocuments()});
-$("dashboardRefresh").addEventListener("click",loadDashboard);
-$("logoutButton").addEventListener("click",async()=>{await fetch("/api/v1/auth/logout",{method:"POST"});setSessionUi(false);$("results").innerHTML=""});
+
+document.querySelectorAll(".admin-tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".admin-tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".admin-pane").forEach(x=>x.classList.toggle("active",x.id==="admin-"+b.dataset.adminPane));if(b.dataset.adminPane==="categories")refreshCategories()}));
+$("categoryCreateForm").addEventListener("submit",async e=>{e.preventDefault();const body={code:$("catCode").value.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""),name_en:$("catNameEn").value.trim(),name_hi:$("catNameHi").value.trim(),icon:$("catIcon").value.trim()||"📁",keywords:$("catKeywords").value.split(",").map(x=>x.trim()).filter(Boolean),sort_order:Number($("catOrder").value||100),is_active:true};const r=await fetch("/api/v1/admin/categories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});let d={};try{d=await r.json()}catch{};$("categoryCreateStatus").textContent=r.ok?"Category added.":(d.detail||"Could not add category.");if(r.ok){$("categoryCreateForm").reset();$("catIcon").value="📁";$("catOrder").value="100";refreshCategories()}});
+$("categoryList").addEventListener("click",async e=>{const row=e.target.closest("[data-category-id]");if(!row)return;const id=row.dataset.categoryId;if(e.target.closest("[data-save-category]")){const body={name_en:row.querySelector("[data-c-en]").value.trim(),name_hi:row.querySelector("[data-c-hi]").value.trim(),icon:row.querySelector("[data-c-icon]").value.trim()||"📁",keywords:row.querySelector("[data-c-keywords]").value.split(",").map(x=>x.trim()).filter(Boolean),sort_order:Number(row.querySelector("[data-c-order]").value||100),is_active:row.querySelector("[data-c-active]").checked};const r=await fetch("/api/v1/admin/categories/"+encodeURIComponent(id),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)alert("Category update failed.");else refreshCategories()}if(e.target.closest("[data-delete-category]")){if(!confirm("Delete this category?"))return;const r=await fetch("/api/v1/admin/categories/"+encodeURIComponent(id),{method:"DELETE"});if(!r.ok)alert("Category delete failed.");else refreshCategories()}});
+
+$("uploadForm").addEventListener("submit",async e=>{e.preventDefault();const f=$("uploadFile").files?.[0];if(!f)return;const form=new FormData();form.append("file",f,f.name);$("uploadStatus").textContent="Uploading…";$("uploadProgress").style.width="45%";const r=await fetch("/api/v1/intake",{method:"POST",body:form});let b={};try{b=await r.json()}catch{};$("uploadProgress").style.width=r.ok?"100%":"0%";if(!r.ok){$("uploadStatus").textContent=b.detail||"Upload failed.";return}$("uploadStatus").textContent="Uploaded. Processing has started.";$("uploadForm").reset();setTimeout(()=>{$("uploadProgress").style.width="0%"},1000);await loadDashboard()});
+$("searchForm").addEventListener("submit",async e=>{e.preventDefault();await searchDocuments()});$("clearSearch").addEventListener("click",()=>{["q","authority","category","year"].forEach(id=>$(id).value="");$("statusFilter").value="";$("fileType").value="";searchDocuments()});$("quickSearch").addEventListener("click",()=>{$("q").value=$("quickQ").value;setPage("library");searchDocuments()});$("quickQ").addEventListener("keydown",e=>{if(e.key==="Enter")$("quickSearch").click()});let searchTimer;$("q").addEventListener("input",()=>{clearTimeout(searchTimer);searchTimer=setTimeout(searchDocuments,350)});["authority","category","statusFilter","year","fileType"].forEach(id=>$(id).addEventListener("change",searchDocuments));
+$("logoutButton").addEventListener("click",async()=>{await fetch("/api/v1/auth/logout",{method:"POST"});setSessionUi(false)});
 if("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js?v=2",{updateViaCache:"none"}).catch(()=>{})}
-applyLanguage();refreshAuthProviders();refreshSessionUi();
+refreshAuthProviders();refreshSessionUi();
 </script>
 </body>
 </html>

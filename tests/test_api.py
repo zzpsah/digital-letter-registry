@@ -1292,12 +1292,13 @@ class ApiTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 501)
 
-    def test_home_serves_hindi_first_interface(self):
+    def test_home_serves_simple_english_default_interface(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("आधिकारिक पत्र खोज", response.text)
-        self.assertIn("पत्र जोड़ें", response.text)
+        self.assertIn("Find a letter", response.text)
+        self.assertIn("Search letters", response.text)
         self.assertIn("uploadForm", response.text)
+        self.assertNotIn("UMV Tetahali", response.text)
 
 
 if __name__ == "__main__":
