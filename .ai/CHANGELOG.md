@@ -1,3 +1,16 @@
+## 2026-10-05 — Add admin failure recovery operations
+- Commit: 9975d303b35d70751aa49cdfa7f3a49975885992
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `docs/PROJECT-HANDOFF.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Add admin dashboard audit and WhatsApp group controls
 - Commit: 7d8aaab95322a2db497f82f6596864d88c7f7734
 - Author: Prashant
