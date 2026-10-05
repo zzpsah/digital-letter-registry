@@ -89,6 +89,13 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('upload-date', self.html)
         self.assertIn('displayUploadDate', self.html)
 
+    def test_login_remember_me_and_hinglish_card_priority(self) -> None:
+        self.assertIn('id="rememberMe"', self.html)
+        self.assertIn('Remember me on this device', self.html)
+        self.assertIn('remember_me:', self.html)
+        self.assertIn('r.summary_hi||r.summary', self.html)
+        self.assertIn('r.action_required_hi||r.action_required', self.html)
+
     def test_magic_link_controls_are_not_in_primary_ui(self) -> None:
         self.assertNotIn('id="loginForm"', self.html)
         self.assertNotIn('id="registerMagicLink"', self.html)

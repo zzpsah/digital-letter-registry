@@ -89,6 +89,7 @@ class MagicLinkRequest(BaseModel):
 class PasswordLoginRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=6, max_length=256)
+    remember_me: bool = True
 
 
 class PasswordChangeRequest(BaseModel):
@@ -376,6 +377,7 @@ def _required_env(name: str) -> str:
 
 _ACCESS_COOKIE = "dlr_access_token"
 _REFRESH_COOKIE = "dlr_refresh_token"
+_REMEMBER_COOKIE = "dlr_remember_me"
 
 
 def _cookie_secure() -> bool:
@@ -405,6 +407,8 @@ def _refresh_cookie_max_age() -> int:
 def _set_session_cookies(
     response: Response,
     session: SupabaseAuthSession,
+    *,
+    remember_me: bool = True,
 ) -> None:
     common = {
         "httponly": True,
@@ -412,24 +416,36 @@ def _set_session_cookies(
         "samesite": "lax",
         "path": "/",
     }
-    response.set_cookie(
-        _ACCESS_COOKIE,
-        session.access_token,
-        max_age=session.expires_in,
-        **common,
-    )
-    response.set_cookie(
-        _REFRESH_COOKIE,
-        session.refresh_token,
-        max_age=_refresh_cookie_max_age(),
-        **common,
-    )
+    if remember_me:
+        response.set_cookie(
+            _ACCESS_COOKIE,
+            session.access_token,
+            max_age=session.expires_in,
+            **common,
+        )
+        response.set_cookie(
+            _REFRESH_COOKIE,
+            session.refresh_token,
+            max_age=_refresh_cookie_max_age(),
+            **common,
+        )
+        response.set_cookie(
+            _REMEMBER_COOKIE,
+            "1",
+            max_age=_refresh_cookie_max_age(),
+            **common,
+        )
+    else:
+        response.set_cookie(_ACCESS_COOKIE, session.access_token, **common)
+        response.set_cookie(_REFRESH_COOKIE, session.refresh_token, **common)
+        response.set_cookie(_REMEMBER_COOKIE, "0", **common)
     response.headers["Cache-Control"] = "private, no-store"
 
 
 def _clear_session_cookies(response: Response) -> None:
     response.delete_cookie(_ACCESS_COOKIE, path="/")
     response.delete_cookie(_REFRESH_COOKIE, path="/")
+    response.delete_cookie(_REMEMBER_COOKIE, path="/")
     response.headers["Cache-Control"] = "private, no-store"
 
 
@@ -457,7 +473,8 @@ def _access_token(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Supabase session expired",
             ) from exc
-        _set_session_cookies(response, session)
+        remember_me = request.cookies.get(_REMEMBER_COOKIE, "1").strip() != "0"
+        _set_session_cookies(response, session, remember_me=remember_me)
         return session.access_token
 
     raise HTTPException(
@@ -1538,7 +1555,11 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             ),
             media_type="application/json",
         )
-        _set_session_cookies(response, session)
+        _set_session_cookies(
+            response,
+            session,
+            remember_me=payload.remember_me,
+        )
         return response
 
     @app.post("/api/v1/auth/magic-link", response_model=MessageResponse)
