@@ -1,3 +1,10 @@
+## 2026-10-05 — Rename mixed language mode to Hinglish
+- Commit: ae496093c875e7c3397c0d7607cac42c4fd4af56
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-05 — Label language selector clearly
 - Commit: 83557e732f04ce605b251571348eb4df3357ca99
 - Author: Prashant
