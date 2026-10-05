@@ -1,3 +1,14 @@
+## 2026-10-05 — Add dynamic authority search filter
+- Commit: ba8f71fe15906c5a3397327ffc5bb26cd1100ccf
+- Author: Prashant
+- Classification: meaningful
+- Changed files:
+- `brain/ui-governance/CURRENT_STATE.md`
+- `docs/PROJECT-HANDOFF.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-05 — Lock eLetters UI and behavior governance
 - Commit: 2352ff3c2a17512c4b53f0692f6a295f54ad5edd
 - Author: Prashant

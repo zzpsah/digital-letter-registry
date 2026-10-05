@@ -65,13 +65,7 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Drive write verification is complete with synthetic data; semantic embeddings remain a later optional enhancement.
 
 ## Last automated change
-- Commit: ae496093c875e7c3397c0d7607cac42c4fd4af56
-- Change: Rename mixed language mode to Hinglish
+- Commit: ba8f71fe15906c5a3397327ffc5bb26cd1100ccf
+- Change: Add dynamic authority search filter
 - Date: 2026-10-05
 - Durable context synchronization: completed
-
-
-## UI/behavior governance baseline
-
-The authoritative UI/UX contract is `docs/UI-DESIGN-CONTRACT.md`; the enhancement brain is `brain/ui-governance/`. Any new AI/tool must preserve this accepted baseline and avoid wholesale redesigns or incidental behavior changes.
-- Search Authority filter is a dynamic dropdown populated from distinct active/non-trashed letter authorities; new authorities appear automatically.
