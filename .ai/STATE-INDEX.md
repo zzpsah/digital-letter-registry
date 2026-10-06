@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 95051d5c9401e0678a583bc0b7983647b4cb1209
-- Last commit: Add year-wise document archive
+- HEAD: 815249302da6039d61d4a3d070c5490918a740d4
+- Last commit: Add Important workspace and page size controls
 - Last commit date: 2026-10-06
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

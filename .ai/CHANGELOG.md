@@ -1,3 +1,18 @@
+## 2026-10-06 — Add Important workspace and page size controls
+- Commit: 815249302da6039d61d4a3d070c5490918a740d4
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/search.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261006165500_add_important_pagination.sql`
+- `tests/test_api.py`
+- `tests/test_search.py`
+- `tests/test_web_shell.py`
+
 ## 2026-10-06 — Add year-wise document archive
 - Commit: 95051d5c9401e0678a583bc0b7983647b4cb1209
 - Author: development-os[bot]

@@ -87,15 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: d1be3918c7bad12b2f42f6b9f0b092e30fcbffad
-- Change: Add year-wise document archive
+- Commit: 815249302da6039d61d4a3d070c5490918a740d4
+- Change: Add Important workspace and page size controls
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Year-wise Archive — 2026-10-06
-
-The portal supports a separate `is_archived/archive_year` state. Archived documents are excluded from normal search/home/personal results and shown in a dedicated Archive tab grouped by year with restore support. Public Drive publication also excludes archived documents.
-
-## Navigation and pagination refinement — 2026-10-06
-
-The primary nav now uses `★ Important` instead of Personal. Personal state is preserved and remains reachable from Search visibility filtering/card actions. Home, Important, and Archive default to 50/page with user-selectable 20/50/100 page sizes. `search_letter_cards_v5` adds `important_only` for unbounded server-side Important pagination.
