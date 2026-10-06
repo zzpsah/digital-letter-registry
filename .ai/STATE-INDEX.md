@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: d5fe8ea2b1568c6d6b6adfcf04739854a9bbb0a1
-- Last commit: Trigger production deployment
+- HEAD: e3c63446e47c6a8239289a0347b743237f86c96c
+- Last commit: Restore archive view and speed reprocessing
 - Last commit date: 2026-10-06
 - Last commit author: development-os[bot]
 

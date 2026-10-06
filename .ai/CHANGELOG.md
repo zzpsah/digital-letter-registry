@@ -1,3 +1,18 @@
+## 2026-10-06 — Restore archive view and speed reprocessing
+- Commit: e3c63446e47c6a8239289a0347b743237f86c96c
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `brain/document-visibility/TESTS.md`
+- `docs/HISTORY.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/processing_pipeline.py`
+- `src/letter_registry/web/index.html`
+- `src/letter_registry/worker.py`
+- `tests/test_web_shell.py`
+- `tests/test_worker.py`
+
 ## 2026-10-06 — Trigger production deployment
 - Commit: d5fe8ea2b1568c6d6b6adfcf04739854a9bbb0a1
 - Author: development-os[bot]

@@ -87,11 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: d5fe8ea2b1568c6d6b6adfcf04739854a9bbb0a1
-- Change: Trigger production deployment
+- Commit: e3c63446e47c6a8239289a0347b743237f86c96c
+- Change: Restore archive view and speed reprocessing
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Portal archive visibility + reprocess speed — 2026-10-06
-
-Home was showing only the latest 6 documents, which made older documents appear missing after more uploads. Database/RLS/index validation confirmed all 28 active documents were intact and Public. Home now loads up to 100 latest-first. Manual reprocess and quality-upgrade jobs now reuse existing `letter_processing.extracted_text` when available instead of repeating full OCR; initial processing still performs OCR when required.
