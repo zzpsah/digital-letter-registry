@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 29d081f4db9a700a1bee7c532d98e63e8077e775
-- Last commit: Show live reprocess progress
+- HEAD: 73d214d51a4e0ca00d9499983c8ebda58f7957b1
+- Last commit: Fix reprocess derived data ownership
 - Last commit date: 2026-10-06
 - Last commit author: development-os[bot]
 

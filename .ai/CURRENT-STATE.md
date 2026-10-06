@@ -87,15 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 29d081f4db9a700a1bee7c532d98e63e8077e775
-- Change: Show live reprocess progress
+- Commit: 73d214d51a4e0ca00d9499983c8ebda58f7957b1
+- Change: Fix reprocess derived data ownership
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Reprocess live progress — 2026-10-06
-
-Manual reprocess is now observable end-to-end. `processing_jobs` stores stage/percent/detail, worker writes progress milestones, API exposes `/api/v1/letters/{id}/reprocess-status`, and card UI polls every 2s with a progress bar. Active job IDs are persisted in localStorage to resume status display after refresh.
-
-## Reprocess derived-owner RLS fix — 2026-10-06
-
-Fixed the 75% reprocess failure at metadata save. Worker now resolves the original letter owner for all derived writes while keeping the processing job owned by the requester.

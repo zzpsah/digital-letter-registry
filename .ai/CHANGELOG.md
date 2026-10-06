@@ -1,3 +1,11 @@
+## 2026-10-06 — Fix reprocess derived data ownership
+- Commit: 73d214d51a4e0ca00d9499983c8ebda58f7957b1
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `src/letter_registry/worker.py`
+
 ## 2026-10-06 — Show live reprocess progress
 - Commit: 29d081f4db9a700a1bee7c532d98e63e8077e775
 - Author: development-os[bot]
