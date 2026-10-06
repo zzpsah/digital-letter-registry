@@ -36,3 +36,12 @@ Home now renders up to 100 archive documents latest-first instead of only the la
 - Personal remains a separate action/workspace.
 - Home archive uses server-side pagination, 20 documents per page, with Previous/Next controls.
 - Pagination uses an offset-aware Supabase RPC, so the archive is not capped at 100 documents.
+
+## Year-wise Archive — 2026-10-06
+
+- Archive is separate from Public/Private/Personal visibility and Trash.
+- Editor/Admin can move a document to Archive and choose an archive year.
+- Archived documents are excluded from Home, normal Search, and Personal workspace.
+- Archive has its own top-level tab, year filter, search, 20-item pagination, and year-grouped cards.
+- Restore returns the document to the main archive without changing its visibility.
+- Archived documents are excluded from the generated public Drive index.

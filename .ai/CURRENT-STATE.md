@@ -91,3 +91,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Simplify privacy controls and paginate archive
 - Date: 2026-10-06
 - Durable context synchronization: completed
+
+## Year-wise document Archive — 2026-10-06
+
+The portal now supports `is_archived`, `archive_year`, `archived_at`, and `archived_by`. Normal search defaults to non-archived rows through `search_letter_cards_v4`; Archive uses the same paginated RPC with `archived=true` and optional year filtering. UI has a dedicated Archive tab and Archive/Restore card action. Public Drive index publication excludes archived rows. Existing documents remain unarchived unless explicitly moved.

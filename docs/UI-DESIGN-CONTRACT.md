@@ -316,3 +316,7 @@ Top navigation includes **🔒 Personal**. It lists only Personal documents owne
 ### Compact privacy control and archive pagination
 
 Document cards use a lock icon beside the Important star for Public/Private state instead of a dedicated visibility dropdown. `🔓` means Public and `🔒` means Private; tapping toggles the state. Personal remains a separate explicit action. The Home archive paginates at 20 documents per page using server-side offset pagination, allowing the collection to grow without a fixed 100-document UI cap.
+
+### Year-wise archive workspace
+
+The top navigation includes **🗄 Archive**. Archive is an organizational state separate from visibility and Trash. Editor/Admin document cards expose an `Archive` action that prompts for a year (defaulting from issue/upload year). Archived documents leave Home/Search/Personal and appear in Archive grouped by year, with a year filter, search, pagination, and `Restore`. Restoring preserves the document's Public/Private/Personal visibility.
