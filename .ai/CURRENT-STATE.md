@@ -87,11 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 62337c9bbc8aeae2fa9e0800f845f482bf46d8f6
-- Change: Add bulk year-month cold archive manager
+- Commit: f68d0be8450a9605d48391deffab511f56ad55d7
+- Change: Unify document privacy icon
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Unified privacy icon — 2026-10-06
-
-Card privacy control is now a single cycle icon: Public → Private → Personal → Public. Separate Personal card action removed; Personal navigation tab remains.

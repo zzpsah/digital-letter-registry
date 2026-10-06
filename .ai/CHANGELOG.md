@@ -1,3 +1,13 @@
+## 2026-10-06 — Unify document privacy icon
+- Commit: f68d0be8450a9605d48391deffab511f56ad55d7
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-06 — Add bulk year-month cold archive manager
 - Commit: 62337c9bbc8aeae2fa9e0800f845f482bf46d8f6
 - Author: development-os[bot]
