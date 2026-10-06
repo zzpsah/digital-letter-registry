@@ -67,3 +67,9 @@ Home now renders up to 100 archive documents latest-first instead of only the la
 - User-selectable page sizes: 50 / 100 / 200 / 500.
 - Backend API and search RPC accept up to 500 rows per page.
 - Pagination remains unlimited across pages.
+
+## Personal tab + persistent pagination — 2026-10-06
+
+- Personal remains a top-level tab alongside Important and Archive.
+- Home/Important/Archive remember the current page and selected page size in local browser storage.
+- Refreshing or switching tabs returns to the same page where possible, so later-page documents do not appear to disappear.

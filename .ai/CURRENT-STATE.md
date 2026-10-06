@@ -91,3 +91,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Expand document page size options
 - Date: 2026-10-06
 - Durable context synchronization: completed
+
+## Personal tab + persistent pagination — 2026-10-06
+
+Restored the Personal navigation tab after a parallel UI change removed only the nav button. Home/Important/Archive now persist current page and page-size preferences locally so page-2/3 documents remain easy to reach after refresh or tab switches.
