@@ -29,7 +29,7 @@ Pending:
 ## Account UI update
 
 The canonical Vercel UI now uses password-first authentication:
-- canonical alias: `https://umv-dlr.vercel.app`;
+- canonical alias: `https://eletters.vercel.app`;
 - simple Create Account form is visible;
 - primary Magic-Link UI is removed;
 - pending accounts are admin-approved from the access panel;
@@ -41,7 +41,7 @@ The Supabase `dlr-confirm-account` Edge Function is part of account approval and
 
 ## Current split after auth stabilization
 
-Canonical public URL: `https://umv-dlr.vercel.app`.
+Canonical public URL: `https://eletters.vercel.app`.
 
 Vercel currently owns:
 - UI;

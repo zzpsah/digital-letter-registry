@@ -158,7 +158,7 @@ This does not change archive roles or Google Drive permissions.
 
 The DLR web/auth/search control plane is now deployed on Vercel:
 
-`https://umv-dlr.vercel.app`
+`https://eletters.vercel.app`
 
 Verified production behavior:
 - home page returns HTTP 200;
@@ -176,7 +176,7 @@ Password-first login does not depend on the Supabase redirect allow-list. Adding
 
 DLR uses a password-first account workflow:
 
-1. Open `https://umv-dlr.vercel.app`.
+1. Open `https://eletters.vercel.app`.
 2. Choose **Create Account** and enter email + password.
 3. The account is created with archive access disabled.
 4. A DLR admin chooses the role and changes the account to Active.
