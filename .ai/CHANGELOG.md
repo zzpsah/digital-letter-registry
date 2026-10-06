@@ -1,3 +1,10 @@
+## 2026-10-06 — Trigger production deployment
+- Commit: d5fe8ea2b1568c6d6b6adfcf04739854a9bbb0a1
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-10-06 — Add Personal document workspace
 - Commit: 80e45e1a2a6b535196861b89cb813eb4b953628a
 - Author: development-os[bot]

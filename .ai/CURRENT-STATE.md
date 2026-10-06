@@ -87,7 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 80e45e1a2a6b535196861b89cb813eb4b953628a
-- Change: Add Personal document workspace
+- Commit: d5fe8ea2b1568c6d6b6adfcf04739854a9bbb0a1
+- Change: Trigger production deployment
 - Date: 2026-10-06
 - Durable context synchronization: completed
