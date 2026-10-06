@@ -1,3 +1,18 @@
+## 2026-10-06 — Add bulk year-month cold archive manager
+- Commit: 62337c9bbc8aeae2fa9e0800f845f482bf46d8f6
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/search.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261006181500_bulk_month_archive.sql`
+- `tests/test_api.py`
+- `tests/test_search.py`
+- `tests/test_web_shell.py`
+
 ## 2026-10-06 — Restore Personal tab and persist pagination
 - Commit: 9407b7513e8dadaea531665badce911ebf6e45f5
 - Author: development-os[bot]

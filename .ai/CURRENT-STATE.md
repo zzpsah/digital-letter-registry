@@ -87,11 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 9407b7513e8dadaea531665badce911ebf6e45f5
-- Change: Restore Personal tab and persist pagination
+- Commit: 62337c9bbc8aeae2fa9e0800f845f482bf46d8f6
+- Change: Add bulk year-month cold archive manager
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Cold archive bulk manager — 2026-10-06
-
-Archive now operates on existing documents: source Year/Month → Load files → Select all/individual → Archive selected. The direct Archive upload form was removed. `archive_month` and bulk archive/restore APIs back year/month cold storage.
