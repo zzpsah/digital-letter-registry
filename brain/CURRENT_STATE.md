@@ -1,230 +1,156 @@
 # Project Brain — Current State
 
-Last verified: 2026-10-02
+Last reconciled: 2026-10-06
+Canonical repository: `zzpsah/digital-letter-registry`
+Runtime repository HEAD verified on GitHub and Oracle: `bbcce5a81c71cd98e0dd3d272349b6b41489c292`
+
+> This file describes the **current truth only**. Historical checkpoints belong in `docs/HISTORY.md`, `.ai/CHANGELOG.md`, Git history, and enhancement-specific brain folders. Do not treat old synthetic-only checkpoints as current state.
+
+## Product baseline
+
+DLR / eLetters is the Official Letter Intelligence Archive for school/government PDF and image letters.
+
+Canonical document flow:
+
+```text
+WhatsApp / approved intake
+        ↓
+Preserve original document
+        ↓
+Extract native text or Hindi+English OCR
+        ↓
+Understand the document from source evidence
+        ↓
+Derive title / authority / reference / date / actions / audience
+        ↓
+Store searchable structured metadata
+        ↓
+Deliver/update email + WhatsApp summary
+        ↓
+Search / open original / reprocess when needed
+```
+
+The original PDF/image is authoritative and immutable as the logical source. OCR, category, title, summary, authority mapping, actions, embeddings, importance, relationships, and delivery text are derived data and may be reprocessed.
+
+## Current live architecture
+
+- Public user-facing control plane: Vercel eLetters web app.
+- Primary authentication: email + password through Supabase Auth.
+- Authorization: archive membership with admin/editor/viewer roles plus RLS/API checks.
+- Private runtime/worker: Oracle VPS.
+- Private original storage: explicitly authorized Google Drive archive.
+- Structured archive/search metadata: Supabase.
+- OCR: native PDF text first, then Hindi/English OCR fallback.
+- Private Drive credentials, runtime secrets, private identifiers, and real documents must never be committed to public Git.
+- GitHub is the durable source repository; Oracle is the live private runtime.
 
-## Working
+## Intake status
+
+- Public Vercel intake does not hold private Drive upload credentials.
+- A controlled real-document WhatsApp pilot is active on the private Oracle runtime for the dedicated approved official-letter group.
+- WhatsApp PDF/JPG/JPEG/PNG attachments use the same immutable Drive + Supabase + processing pipeline.
+- Exact duplicate content is detected before creating a second archive object.
+- Destructive or replacement choices remain explicit and guarded.
+- Do **not** infer that the live archive has zero real records from older synthetic cleanup checkpoints.
+
+## Intelligence contract
+
+Document meaning is **source-first**.
+
+- Category/subcategory is secondary taxonomy only.
+- A wrong category must never force a wrong title, summary, authority, action, audience, email subject, or WhatsApp explanation.
+- User-facing intelligence must be independently grounded in the current document.
+- Existing stronger structured facts should not be replaced by weaker reprocessing output.
+- Authority display prefers canonical short names when mapped, while raw extracted authority stays preserved.
+- Uncertain authority should remain unmatched for review rather than being force-mapped.
+
+## Reprocess contract
+
+Editor/Admin can reprocess an existing archived document when OCR/context/summary/authority/action output is missing or wrong.
+
+Reprocess must:
+- target the same archived original;
+- update derived data instead of creating a duplicate letter;
+- avoid a second active processing job for the same letter;
+- preserve stronger prior facts when new evidence is weaker;
+- update the same logical document across search/index/portal and delivery surfaces;
+- avoid resending mail for wording-only paraphrases;
+- use the existing correction/replacement delivery path for material corrections;
+- replace the prior generated WhatsApp reply when applicable.
+
+A weak derived result must not be blamed on a “poor PDF” unless the source itself is actually poor.
+
+## Delivery presentation
+
+Global WhatsApp presentation:
+- Headings remain in English, including **What this is** and **Action items**.
+- Their content is Hindi/Devanagari with useful official English terms preserved where helpful.
+- Email may contain fuller OCR/document context.
+- Delivery is idempotent: wording-only AI variation must not create duplicate notifications.
+
+## Search and document UI
+
+- Default document order: latest uploaded first.
+- Available sorting includes Important first, Issue date, Title A–Z, and Relevance.
+- Editor/Admin can mark a document Important and add an internal note.
+- Important state is shared in the authenticated archive.
+- Internal user comments/notes must not leak to public Drive index output.
+- Letter cards expose a compact document ID for troubleshooting, but normal portal actions do not require typing it.
+
+## Admin baseline
+
+Admin Console includes:
+- Overview/dashboard
+- Users and access approval
+- Roles/status management
+- Recipients and allowed-recipient summary
+- WhatsApp allowlist/group controls
+- Dynamic categories
+- Canonical authorities, aliases, merge/remove/restore/permanent-delete controls
+- Failed processing jobs and explicit Retry
+- Audit log
+- Configuration backup/restore preview
+- Bulk reversible actions
 
-- DevOS lifecycle is MANAGED and its local context-sync workflow is green.
-- Public-safe repository scaffold and domain package exist.
-- Private UMV Drive is selected for archive originals.
-- Archive structure exists: `originals/`, `quarantine/`, `exports/`; only synthetic integration data has been used.
-- Separate Supabase archive database exists with four core RLS-protected tables.
-- Archive-owner Supabase Auth identity exists and is confirmed.
-- Unicode-safe official naming and preview-only rename mapping are implemented.
-- Persistence, Supabase runtime, private storage contracts, and guarded synthetic ingestion are implemented.
-- Native PDF extraction, Hindi/English OCR fallback, structured AI context, embeddings, full-text/fuzzy/semantic/hybrid search are implemented.
-- Live Supabase search migrations and pgvector HNSW index are applied.
-- FastAPI + Hindi-first mobile PWA, filtered search, safe letter detail, and passwordless login-request endpoint are implemented.
-- Original-file access stays server-side; private Drive object IDs are not returned to the browser.
-- Google Drive server-side reader is implemented using runtime-only OAuth access token.
-- Application tests and DevOS context-sync are green. Oracle ARM64 runtime has a Python 3.12 virtual environment and passes the full synthetic suite (188/188). A localhost-only FastAPI smoke test verified health/PWA 200 responses and unauthenticated session/search 401 boundaries.
+Normal removal is reversible first. Permanent deletion is secondary, explicit, and confirmed.
 
-## Current gaps
+## Authority baseline
 
-- DB-level owner RLS insert/read and cross-user isolation are verified with synthetic request-JWT claim simulation. A final HTTP/PostgREST test using a short-lived real user bearer session is still pending. One synthetic verification row currently remains in `letters`; no real archive-letter row exists.
-- Passwordless auth now uses a server-side token-hash callback with Secure HttpOnly access/refresh cookies and refresh rotation. The PWA does not persist auth tokens in browser storage.
-- Google Drive OAuth refresh-token lifecycle is implemented with in-memory access-token caching; private-runtime secret-manager-backed refresh/list/stream and disposable synthetic upload/stream/delete verification passed.
-- Live original streaming through the API still needs runtime verification.
-- Oracle OCR runtime is verified using a user-local ARM64 Tesseract 5.3.4 install with `eng`, `hin`, and `osd`, plus OCRmyPDF 16.13.0 in the project virtualenv. Synthetic PNG and image-only PDF OCR smoke tests both passed.
-- No real archive letters have been ingested.
-- Approval-locked rename execution code exists, but no rename plan has been approved or executed.
+Authority represents the actual issuing/signing authority, not issuer + recipient + cited offices concatenated together.
 
-## Next action
+Canonical hierarchy may include school/headmaster, BEO, functional DPO, DEO, RDDE, and state Education Department. Canonical records retain aliases and jurisdiction. Admin-confirmed mappings may be reused later. Raw issuer text remains on the letter.
 
-Complete the authenticated synthetic HTTP/PostgREST vertical slice with a short-lived owner session, refreshable Drive OAuth credentials, and synthetic upload/read verification. OCR runtime is already verified through the user-local toolchain; no sudo package installation is required for that verified path.
+## UI governance
 
-## Safety
+The accepted eLetters interface is protected by:
+- `docs/UI-DESIGN-CONTRACT.md`
+- `brain/ui-governance/`
 
-Never commit real letters, Drive IDs/URLs, Supabase project references/keys, OAuth tokens, credentials, SSH keys, or server details. Do not rename existing Drive files without an approved preview mapping. No production deployment without explicit approval.
+Before UI/auth/search/admin/recipient/delete/restore changes, read those files. Do not wholesale redesign, recolor, or replace navigation unless explicitly requested.
 
+## Remote access
 
-## Intake + processing worker
+Canonical instructions: `docs/REMOTE-ACCESS.md`.
 
-Synthetic-first private intake is implemented end-to-end in code: authenticated owner lookup, duplicate SHA preflight, immutable Drive upload, source/processing rows, durable queued job, atomic RLS-aware claim, private original download, extraction/OCR, structured context, smart filename metadata, embeddings, and durable completed/failed job transition. Real intake remains disabled by default and no production deployment has occurred.
+For Oracle work:
+1. discover Desktop Commander devices;
+2. select online `oracle-server`;
+3. ping it;
+4. inspect `/home/prashant/projects/digital-letter-registry`;
+5. check Git status and repository context before changes.
 
-PDF and image paths are both represented: PDF uses native text then OCRmyPDF/Tesseract fallback; JPG/JPEG/PNG uses direct Tesseract Hindi+English OCR. The remaining milestone is live synthetic runtime verification with short-lived user/Drive credentials and locally available OCR binaries.
+GitHub access alone is not live Oracle access.
 
+## Current operational rule
 
-## 2026-10-02 — Schema sync and auth shell
+Before meaningful work:
+1. read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, `.ai/CURRENT-STATE.md`, this file, and relevant enhancement brain;
+2. inspect current source/Git state;
+3. for live-runtime work, verify Oracle separately;
+4. make the smallest scoped change;
+5. test;
+6. synchronize current-state/handoff documentation when behavior materially changes.
 
-- Applied the pending relationship-review migration to the empty archive database.
-- Live schema now includes processing jobs, search/semantic RPCs, summary/reference metadata, and reviewable relationship lifecycle.
-- Earlier rollback-only RLS checks were followed by a new synthetic DB-level claim-simulation check: owner insert/read passed, wrong-user read returned zero rows, and cross-owner insert was denied. One synthetic verification row is currently retained; no real archive row exists.
-- PWA uses the server-side token-hash magic-link callback with Secure HttpOnly session cookies and can open streamed original bytes.
-- No real letter ingestion, rename execution, or production deployment occurred.
+## Historical checkpoint warning
 
-
-## Relationship intelligence
-
-The worker now generates only conservative, reviewable relationship suggestions when explicit extension/correction/superseding language references a known prior letter number. Suggestions never change status automatically. Authenticated review endpoints confirm/reject them, and only confirmed supersedes links affect the older letter's status through an RLS-aware recalculation function.
-
-
-## Relationship + recursive reprocessing
-
-Relationship inference is deliberately conservative and reviewable: explicit relationship wording plus a referenced prior letter is required before a suggestion is created. Suggestions do not change status until confirmed by the authenticated owner.
-
-A live processing-version registry and reprocessing preview/enqueue flow now exist. Version changes can be previewed per letter/stage first; recursive reprocessing is queued only after explicit confirmation and is idempotent for the same target-version profile.
-
-
-## Rename execution
-
-A dormant Google Drive rename path now exists behind an approval-locked executor. It cannot run from an arbitrary proposed name: the exact reviewed mapping must match its deterministic digest, explicit confirmation is required, and the current stored filename is revalidated before any mutation. No rename mapping has been approved or executed.
-
-
-## Historical import
-
-Historical import is implemented as preview-first, approval-locked adoption. Local candidate files can be hashed in a non-mutating preview. Existing private Drive files can be listed read-only, classified as eligible/unsupported/already archived/real-document-blocked, and only after explicit confirmation are their bytes read for SHA-256 duplicate verification, source identity persisted against the existing Drive object, and a historical processing job queued. Real historical documents remain blocked by default and no real historical import has been executed.
-
-
-## Intake channels
-
-Provider-neutral adapters now normalize Telegram, WhatsApp, email, watched-folder, and web-style attachments into the canonical IntakeService. Owner-scoped source provenance is persisted in the live `letter_sources` schema without storing attachment bytes in provenance records. No live external connector has been activated yet; runtime connector wiring and synthetic end-to-end verification remain pending.
-
-
-## Oracle runtime verification
-
-- Oracle repository was fast-forwarded cleanly to the current main branch; no local source changes were present.
-- A project-local Python 3.12 virtual environment is installed and the full synthetic test suite passes: 188/188.
-- A temporary localhost-only FastAPI smoke run verified `/api/v1/health` = 200, Hindi PWA shell = 200, unauthenticated session = 401, and unauthenticated search = 401; the temporary process was stopped afterward.
-- ARM64 Ubuntu repositories provide Tesseract, Hindi/English language packs, and OCRmyPDF, but package installation is still pending because the `prashant` account requires interactive sudo authorization.
-- Supabase performance advisor no longer reports duplicate processing-profile RLS policies after cleanup. Remaining unused-index notices are informational while the archive is nearly empty.
-
-
-## Runtime readiness + secure browser auth
-
-The browser auth flow is now server-side and token-safe: Supabase token-hash magic links are verified at `/auth/confirm`, access/refresh sessions are stored in HttpOnly SameSite=Lax cookies, access expiry is refreshed server-side, and browser JavaScript never reads auth tokens. Cookie-authenticated mutations are protected by same-origin checks; explicit Bearer API clients remain supported.
-
-The owner PWA now includes authenticated synthetic-first upload and safe runtime readiness panels. Readiness checks report only boolean/status information for Supabase, auth callback, Drive OAuth/folder, Gemini, OCRmyPDF, Tesseract Hindi+English, and the synthetic-only safety flag. No secret values or private folder IDs are returned.
-
-Refresh-token Google Drive credentials now enable both upload and original streaming; a direct short-lived access token remains an optional fallback.
-
-Application CI is green with these changes included. The remaining blocker before a live browser synthetic vertical slice is hosted Supabase Auth configuration: copy `supabase/templates/magic-link.html` into the project Magic Link template and configure the Site URL/redirect for the app's `/auth/confirm` endpoint. The connected Supabase tool cannot mutate hosted Auth templates/settings, so this external dashboard step has not been claimed as complete.
-
-Real intake remains disabled by default. No real archive letter has been ingested or renamed and no production deployment has occurred.
-
-
-## 2026-10-02 — Runtime readiness follow-up
-
-- Oracle local runtime now passes the full synthetic suite (200/200 at this checkpoint).
-- Supabase runtime URL/publishable key/owner mapping is configured locally; anonymous Data API read returns an empty RLS-scoped result and anonymous insert is rejected with 401.
-- The private Drive archive folder and its `originals/`, `quarantine/`, and `exports/` children were verified through the connected Drive account; the expected private synthetic integration PDF is present in `originals/`.
-- Oracle local `.env` contains only runtime-only mappings and remains Git-ignored with restrictive permissions.
-- Auth callback is configured for localhost `/auth/confirm`.
-- OCR no longer requires sudo: Tesseract 5.3.4 and Hindi/English language data are installed under the user account; OCRmyPDF 16.13.0 is installed in the project virtualenv.
-- Current readiness blockers are only Google Drive runtime OAuth credentials and a Gemini API key. The authenticated owner-session test also still requires a user-approved/manual one-time login boundary because transferring a one-time email credential directly between connected tools is not permitted.
-
-## 2026-10-02 - Repository context reconciliation
-
-- Source and test configuration confirm that the project is no longer planning-only: the private API/PWA, guarded synthetic intake, worker, storage/persistence adapters, OCR contracts, structured analysis, search, historical-import preview, and approval-locked rename path are implemented.
-- Project-level AI scope and task records were reconciled to the implemented source.
-- This reconciliation does not verify external runtime credentials, hosted Supabase Auth settings, live provider behavior, real-letter ingestion, Drive rename execution, or production deployment.
-- The next safe runtime work remains synthetic-only: refreshable Drive OAuth verification, Gemini credential verification, and an authenticated owner-session HTTP/PostgREST vertical slice.
-
-
-## 2026-10-02 — DB-level RLS verification follow-up
-
-- Re-read project RULES, AGENTS, .ai state, root tasks/docs, and brain context before continuing.
-- Inspected the public archive RLS policies and confirmed owner-scoped authenticated access.
-- Synthetic owner-context insert/read passed.
-- Synthetic wrong-user read returned zero visible rows.
-- Synthetic cross-owner insert was rejected by RLS.
-- Test method used simulated database request JWT claims, so the real short-lived authenticated HTTP/PostgREST vertical slice remains pending.
-- Exactly one synthetic RLS verification row remains in `letters`; no real archive-letter row exists.
-- Destructive cleanup was not claimed because the connected cleanup action was blocked.
-- No secrets, private IDs, real letters, deployment, live import, or real rename were added.
-
-## 2026-10-05 — Admin controls and mobile web polish
-
-- Admin UI now exposes current delivery recipients and allowed WhatsApp users instead of providing add-only controls.
-- Admin can add/remove managed recipients/users and control the broader account/category workflow from the web console.
-- Mobile web CSS was refined for compact sticky navigation, responsive search/actions, one-column filters/forms, readable document cards, horizontal admin tabs and touch-friendly controls.
-- The full automated suite passed after the mobile change (308 tests).
-
-## 2026-10-05 — Admin dashboard/audit/group controls
-
-- Admin Overview summary cards are implemented.
-- Admin Audit pane reads the archive-scoped admin_audit_log.
-- Audit RLS permits admin-only SELECT/INSERT and verifies actor_user_id = auth.uid() on insert.
-- WhatsApp pane can load group status, edit plain-text description, send+pin a fresh guide for 30 days, and apply the canonical group photo through Oracle.
-- Supabase advisor found and the implementation fixed the new audit actor foreign-key index.
-- Existing 308-test suite remains green.
-
-## 2026-10-05 — Operations failures/retry
-
-- Admin Overview now includes Failed jobs.
-- Operations tab lists up to 100 failed processing jobs with title, reason, attempts, error and last update.
-- Retry is available only for failed jobs and safely returns the durable queue row to pending.
-- Retry clears claim/start/completion/error runtime fields but preserves attempt count/history.
-- Retry writes an admin audit event.
-- Live database verification found 2 failed jobs currently available for admin review; they were not automatically retried.
-
-## 2026-10-05 — Reversible removal baseline
-
-- Users expose clear Disable/Restore actions while retaining role/status controls.
-- Recipients now support Active/Removed sections, Restore, and separately confirmed permanent delete.
-- Recipient removal disables all delivery channels and cannot remain the default recipient.
-- Categories use Active/Removed sections with Restore; permanent delete is separate.
-- Soft remove/restore operations are audit logged.
-- 310 automated tests pass and recipient-registry soft-delete round-trip verification passes.
-
-## 2026-10-05 — Backup/restore + bulk controls
-
-- Admin Backup tab exports configuration as JSON without passwords/tokens/API keys/cookies.
-- Restore requires preview and same-archive validation.
-- A timestamped private pre-restore snapshot is created before applying any restore.
-- Member restore is safe/merge-based: existing user IDs are updated; missing historical users are skipped.
-- Category restore updates/creates backed-up categories without deleting newer unrelated categories.
-- Recipient registry and WhatsApp allowlist restore to backed-up state; group description is re-applied when possible.
-- Users, recipients and categories have checkbox-based bulk reversible actions.
-- Backup export/restore is audit logged.
-- 311 automated tests pass; isolated recipient backup/restore validation passes.
-
-## 2026-10-05 — Intelligence-first context baseline
-
-- All three context providers now treat category/subcategory and deterministic hints as secondary taxonomy.
-- User-facing title/summary/action/audience/WhatsApp content must be independently grounded in document evidence.
-- Category conflicts must not leak into user-facing meaning.
-- The ICT Lab/Smart Class misclassification incident is the regression case for this rule.
-- Full DLR suite remains green at 311 tests.
-
-## 2026-10-05 — Global WhatsApp language/presentation rule
-
-- English headings remain: What this is, Action items, Required documents, Applies to, Deadline, Important.
-- What this is content is Hindi (Devanagari), with useful official English terms preserved.
-- Action items content is Hindi (Devanagari), with useful official English terms preserved.
-- Category is secondary and cannot dictate meaning.
-- This applies to all future/reprocessed documents.
-- Full DLR suite passes 311 tests.
-
-## 2026-10-05 — Reprocess context and clutter-free delivery
-
-- Semantic title fallback is source-first; category is consulted only after document evidence fails.
-- Generic taxonomy titles such as UDISE Notice / School Fee Order are no longer trusted as document meaning.
-- Deterministic fallback avoids inventing generic summaries/titles and validates current-document reference/date more conservatively.
-- Reprocessing preserves stronger prior structured intelligence when a lower-confidence pass would degrade it.
-- Regression coverage verifies a wrongly categorized ICT Lab / Smart Class order still receives the correct semantic title.
-- WhatsApp delivery policy is: What this is heading with Hindi/Hinglish context, Action items heading with Hindi/Hinglish actions, Important may remain English.
-- Reprocessed documents replace the previous generated WhatsApp reply; only the latest generated reply should remain.
-
-## 2026-10-05 — Latest sort + important document notes
-
-- Default eLetters order: latest uploaded document first.
-- Search sort selector: Latest first / Important first / Issue date / Title A–Z / Relevance.
-- Editor/Admin can mark/unmark `★ Important` and add/edit an optional note.
-- Important portal cards are yellow highlighted.
-- Viewer can read highlight/note but cannot change it.
-- Importance/note persist in Supabase and are searchable.
-- Public Drive index receives the Important visual flag only; internal user comments stay private to authenticated portal users.
-- Search RPC now returns importance/note/upload timestamps.
-- Test suite passes 314 tests after the UI/API change.
-
-
-## UI/behavior governance baseline
-
-The live accepted UI/UX contract is recorded in `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/`. It locks the purple compact/mobile system, Hinglish default, Smart Search, Remember me, recipient single-channel handling, recoverable document Trash, failed-job controls, and no-wholesale-redesign rule.
-
-## Delivery quality recovery / duplicate suppression
-- Quality engine v2 marks low-context-confidence + no-clean-document-text results for bounded reprocessing even when the aggregate score is above the old threshold.
-- Low-quality first-pass results may still be delivered; they are not permanently held.
-- Later corrected context should use the existing same-thread correction path.
-- Reprocessing must not resend mail merely because AI paraphrased summary/action wording.
+Statements such as “no real letters”, “real intake disabled everywhere”, “short-lived bearer slice pending”, old test totals such as 188/188 or 212/212, or 2026-10-02 runtime blockers are **historical**, not current operational truth. Consult Git history and `docs/HISTORY.md` when those milestones matter.
