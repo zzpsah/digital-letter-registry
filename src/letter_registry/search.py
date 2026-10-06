@@ -61,17 +61,20 @@ class SupabaseSearchRepository:
         *,
         filters: SearchFilters | None = None,
         limit: int = 25,
+        offset: int = 0,
     ) -> list[SearchResult]:
         normalized = " ".join(query.split()).strip()
         if limit < 1 or limit > 100:
             raise ValueError("limit must be between 1 and 100")
+        if offset < 0:
+            raise ValueError("offset must be non-negative")
 
         filters = filters or SearchFilters()
         if filters.year is not None and (filters.year < 1900 or filters.year > 2100):
             raise ValueError("year must be between 1900 and 2100")
 
         rows = self.transport.rpc(
-            "search_letter_cards_v2",
+            "search_letter_cards_v3",
             {
                 "search_query": normalized or None,
                 "authority_filter": filters.authority,
@@ -80,6 +83,7 @@ class SupabaseSearchRepository:
                 "year_filter": filters.year,
                 "file_type_filter": filters.file_type,
                 "result_limit": limit,
+                "result_offset": offset,
             },
         )
 

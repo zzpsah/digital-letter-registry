@@ -27,3 +27,9 @@
 - Editor RLS + `search_letter_cards_v2` returns 28/28.
 - Public Drive index refresh publishes 28 documents.
 - Home source now requests `sort=latest&limit=100`.
+
+## Compact privacy + pagination tests
+
+- Supabase `search_letter_cards_v3` migration applied successfully.
+- Full suite: 327/327 passed.
+- Inline JavaScript syntax check passed before regression run.

@@ -312,3 +312,7 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 ### Personal workspace
 
 Top navigation includes **🔒 Personal**. It lists only Personal documents owned by the signed-in user, provides a lightweight search box, and keeps the same compact card actions. General Search includes a Visibility filter (`Any visibility`, `Public`, `Private`, `Personal`). Personal cards show a clear `🔒 Personal` badge.
+
+### Compact privacy control and archive pagination
+
+Document cards use a lock icon beside the Important star for Public/Private state instead of a dedicated visibility dropdown. `🔓` means Public and `🔒` means Private; tapping toggles the state. Personal remains a separate explicit action. The Home archive paginates at 20 documents per page using server-side offset pagination, allowing the collection to grow without a fixed 100-document UI cap.

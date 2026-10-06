@@ -397,6 +397,8 @@ class SearchResponse(BaseModel):
     count: int
     mode: str
     results: list[SearchCard]
+    offset: int = 0
+    has_more: bool = False
 
 
 @dataclass(slots=True)
@@ -3771,6 +3773,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         visibility: str | None = Query(default=None, pattern=r"^(public|private|personal)$"),
         sort: str = Query(default="latest", pattern=r"^(latest|important|issue_date|title|relevance)$"),
         limit: int = Query(default=25, ge=1, le=100),
+        offset: int = Query(default=0, ge=0),
         access_token: str = Depends(_access_token),
     ) -> SearchResponse:
         membership = _archive_membership(access_token)
@@ -3844,8 +3847,9 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             ]
             mode = "hybrid"
         else:
-            search_limit = 100 if sort != "relevance" else limit
-            text_results = text_repo.search(q, filters=filters, limit=search_limit)
+            paged_latest = (sort == "latest" and not q.strip())
+            search_limit = min(limit + 1, 100) if paged_latest else (100 if sort != "relevance" else limit)
+            text_results = text_repo.search(q, filters=filters, limit=search_limit, offset=(offset if paged_latest else 0))
             cards = [
                 SearchCard(
                     id=item.record_id,
@@ -3897,6 +3901,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             cards.sort(key=lambda x: (x.issue_date or "", x.uploaded_at or ""), reverse=True)
         elif sort == "title":
             cards.sort(key=lambda x: (x.title or "").casefold())
+        has_more = len(cards) > limit
         cards = cards[:limit]
 
         return SearchResponse(
@@ -3904,6 +3909,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             count=len(cards),
             mode=mode,
             results=cards,
+            offset=offset,
+            has_more=has_more,
         )
 
     @app.get("/api/v1/letters/{record_id}", response_model=LetterDetailResponse)

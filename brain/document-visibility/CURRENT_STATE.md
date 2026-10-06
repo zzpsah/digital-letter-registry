@@ -28,3 +28,11 @@ Implemented 2026-10-06.
 ## Portal all-documents visibility fix — 2026-10-06
 
 Home now renders up to 100 archive documents latest-first instead of only the latest 6. This prevents older Public documents from appearing to disappear as new files are uploaded. Search and Personal remain separate views.
+
+## Compact privacy control + pagination — 2026-10-06
+
+- Public/Private dropdown was removed from document cards.
+- A lock icon beside the Important star now toggles Public ↔ Private directly: 🔓 Public, 🔒 Private.
+- Personal remains a separate action/workspace.
+- Home archive uses server-side pagination, 20 documents per page, with Previous/Next controls.
+- Pagination uses an offset-aware Supabase RPC, so the archive is not capped at 100 documents.

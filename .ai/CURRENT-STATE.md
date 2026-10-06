@@ -91,3 +91,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Restore archive view and speed reprocessing
 - Date: 2026-10-06
 - Durable context synchronization: completed
+
+## Compact privacy + unbounded archive pagination — 2026-10-06
+
+Document cards now toggle Public/Private with a lock icon beside the star; the per-card visibility dropdown is removed. Personal remains separately controlled. Home uses 20-item server-side pages backed by `search_letter_cards_v3(result_offset)`, so older documents continue onto subsequent pages instead of hitting the former 100-result display ceiling.
