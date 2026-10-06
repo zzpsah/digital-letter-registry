@@ -4000,7 +4000,10 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         )
         if not rows or bool(rows[0].get("is_trashed")):
             raise HTTPException(status_code=404, detail="Letter not found")
-        owner_id = str(rows[0].get("owner_id") or membership.user_id)
+        # Manual reprocess jobs are created under the requesting user.
+        # processing_jobs RLS requires owner_id = auth.uid(), while the letter
+        # itself may have been uploaded by another editor/admin.
+        owner_id = membership.user_id
         active_jobs = [
             row for row in database.select(
                 "processing_jobs",

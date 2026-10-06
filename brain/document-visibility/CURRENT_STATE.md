@@ -88,3 +88,7 @@ Home now renders up to 100 archive documents latest-first instead of only the la
 - A single privacy icon beside the star cycles Public → Private → Personal → Public.
 - Icons: 🔓 Public, 🔒 Private, 👤 Personal.
 - Personal remains a top-level tab for browsing Personal documents.
+
+## Reprocess enqueue RLS fix — 2026-10-06
+
+Manual reprocess jobs now use the requesting editor/admin as `processing_jobs.owner_id`. This matches the RLS rule `owner_id = auth.uid()` and allows editors/admins to reprocess documents originally uploaded by another user.
