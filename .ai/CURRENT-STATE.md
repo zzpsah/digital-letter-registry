@@ -91,3 +91,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Add Important workspace and page size controls
 - Date: 2026-10-06
 - Durable context synchronization: completed
+
+## Dedicated Archive upload — 2026-10-06
+
+The per-document Archive action was removed from normal cards. The Archive tab now owns historical intake: choose a year, select multiple files, and upload them directly into that year-wise archive. Restore remains available only for already archived documents.

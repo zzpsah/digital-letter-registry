@@ -328,3 +328,7 @@ Archive is distinct from privacy and Trash. A document can be moved out of the m
 ### Page size and primary navigation
 
 Home, Important, and Archive default to **50 documents per page** and expose a compact **20 / 50 / 100 per page** selector beside pagination. The former Personal top-nav button is replaced by **★ Important** for faster access to starred documents. Personal remains a document state accessible through Search filters and the card Personal action.
+
+### Dedicated Archive upload
+
+Do not expose an Archive action on ordinary document cards. Historical records are added from the **Archive** workspace by selecting a year and uploading one or more PDF/Image files. These files are immediately marked archived and stay out of the main Home/Search/Personal lists. Archived cards may show **Restore**.

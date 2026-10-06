@@ -52,3 +52,11 @@ Home now renders up to 100 archive documents latest-first instead of only the la
 - Users can choose 20 / 50 / 100 per page from the pager controls.
 - The top-level Personal navigation button was replaced by `★ Important`. Personal documents remain available through the Search visibility filter and card Personal action.
 - Important uses server-side pagination with `important_only=true`, so starred documents scale beyond one page.
+
+## Dedicated archive upload workflow — 2026-10-06
+
+- Normal document cards no longer show an Archive action.
+- Archive is managed from the dedicated Archive tab.
+- Archive tab accepts an archive year plus multiple PDF/Image files and uploads them directly into that year.
+- Those uploads are immediately marked archived, so they do not enter normal Home/Search/Personal lists.
+- Archived cards expose Restore; Restore sends the document back to the main archive without changing visibility.
