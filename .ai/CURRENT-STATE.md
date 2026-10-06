@@ -87,18 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 12818cf057c62ec59f1476c1aa92f3b56cc314ba
-- Change: Add private and personal document visibility
+- Commit: 80e45e1a2a6b535196861b89cb813eb4b953628a
+- Change: Add Personal document workspace
 - Date: 2026-10-06
 - Durable context synchronization: completed
-## Document visibility — 2026-10-06
-
-Public / Private / Personal document visibility is implemented in Supabase schema/RLS and application code. Existing documents default to Public. Personal is marker-user/admin scoped while the original ingest owner retains worker continuity. Oracle public-index/Drive/WhatsApp publication paths have matching non-public suppression. Production Vercel deploy remains separately approval-gated.
-
-## Personal document collection UI — 2026-10-06
-
-The eLetters source now includes a Personal top-level tab backed by the same RLS-aware search endpoint with `visibility=personal`, plus a Visibility filter in Search. Visibility changes refresh Personal immediately. Source/test state is complete; production Vercel deployment remains separately approval-gated.
-
-## Personal workspace UI — 2026-10-06
-
-The portal source now includes a compact `🔒 Personal` top-level workspace, Personal-only search, and a general Search visibility filter. Personal API filtering additionally requires `personal_owner_id` to match the current signed-in user, so admin recovery access does not turn the Personal workspace into a global Personal-documents list.

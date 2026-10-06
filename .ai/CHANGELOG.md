@@ -1,3 +1,16 @@
+## 2026-10-06 — Add Personal document workspace
+- Commit: 80e45e1a2a6b535196861b89cb813eb4b953628a
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `brain/document-visibility/TESTS.md`
+- `brain/ui-governance/CURRENT_STATE.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-06 — Add private and personal document visibility
 - Commit: 12818cf057c62ec59f1476c1aa92f3b56cc314ba
 - Author: development-os[bot]
