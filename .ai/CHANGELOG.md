@@ -1,3 +1,11 @@
+## 2026-10-06 — Fix manual reprocess queue ownership
+- Commit: df21bccd48b9feb64db1fd797852d210f4d196bf
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `src/letter_registry/api.py`
+
 ## 2026-10-06 — Unify document privacy icon
 - Commit: f68d0be8450a9605d48391deffab511f56ad55d7
 - Author: development-os[bot]

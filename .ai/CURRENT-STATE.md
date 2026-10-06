@@ -87,15 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: f68d0be8450a9605d48391deffab511f56ad55d7
-- Change: Unify document privacy icon
+- Commit: df21bccd48b9feb64db1fd797852d210f4d196bf
+- Change: Fix manual reprocess queue ownership
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Unified privacy icon — 2026-10-06
-
-Card privacy control is now a single cycle icon: Public → Private → Personal → Public. Separate Personal card action removed; Personal navigation tab remains.
-
-## Reprocess enqueue RLS fix — 2026-10-06
-
-Fixed manual reprocess API failures caused by using the letter's original owner for `processing_jobs.owner_id`. The endpoint now queues under the requesting editor/admin, which satisfies processing_jobs RLS.
