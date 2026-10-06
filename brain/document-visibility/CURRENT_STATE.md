@@ -96,3 +96,7 @@ Manual reprocess jobs now use the requesting editor/admin as `processing_jobs.ow
 ## Reprocess live progress — 2026-10-06
 
 Reprocess jobs persist `progress_stage`, `progress_percent`, and `progress_detail`. The worker updates major stages from queue/start through text/OCR, AI analysis, metadata save, indexing, relationship checks, and completion/failure. The portal polls the job every 2 seconds and shows a live percentage/progress bar on the document card until terminal state. Job IDs are stored locally so progress resumes after a page refresh.
+
+## Reprocess derived-owner RLS fix — 2026-10-06
+
+Manual reprocess now separates queue ownership from document-derived-data ownership. `processing_jobs.owner_id` remains the requesting editor/admin to satisfy queue RLS, while `letter_processing`, embeddings, and relationship writes use the original letter owner so derived-table RLS remains valid.

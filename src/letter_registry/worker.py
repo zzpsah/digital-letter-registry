@@ -115,6 +115,20 @@ class DocumentProcessingWorker:
             if record is None:
                 raise RuntimeError("archived source record was not found")
 
+            document_owner_id = job.owner_id
+            select_rows = getattr(self.database, "select", None)
+            if callable(select_rows):
+                try:
+                    owner_rows = select_rows(
+                        "letters",
+                        filters={"id": record.record_id},
+                        columns="owner_id",
+                    )
+                    if owner_rows and owner_rows[0].get("owner_id"):
+                        document_owner_id = str(owner_rows[0]["owner_id"])
+                except Exception:
+                    document_owner_id = job.owner_id
+
             if not self.allow_real_documents:
                 name = record.original_filename.casefold()
                 if "synthetic" not in name and "test" not in name:
@@ -179,7 +193,7 @@ class DocumentProcessingWorker:
                 outcome: ProcessingOutcome = process_archived_document(
                     path,
                     record=record,
-                    owner_id=job.owner_id,
+                    owner_id=document_owner_id,
                     extractor=self.extractor,
                     context_provider=self.context_provider,
                     repository=self.repository,
@@ -194,7 +208,7 @@ class DocumentProcessingWorker:
                 if self.embeddings is not None:
                     self._progress(job, "indexing", 88, "Updating search index")
                     chunks = self.embeddings.embed_document_chunks(
-                        owner_id=job.owner_id,
+                        owner_id=document_owner_id,
                         letter_id=job.letter_id,
                         extracted_text=outcome.extraction.text,
                     )
@@ -203,7 +217,7 @@ class DocumentProcessingWorker:
                 self._progress(job, "relationships", 94, "Checking related documents")
                 candidate_rows = self.database.select(
                     "letters",
-                    filters={"owner_id": job.owner_id},
+                    filters={"owner_id": document_owner_id},
                     columns=(
                         "id,reference_number,authority,category,title,summary,issue_date"
                     ),
@@ -258,14 +272,14 @@ class DocumentProcessingWorker:
                 for suggestion in suggestions:
                     self.relationship_repository.save_suggestion(
                         suggestion,
-                        owner_id=job.owner_id,
+                        owner_id=document_owner_id,
                     )
 
             if self.embeddings is not None:
                 version = str(getattr(self.embeddings.provider, "version"))
                 self.repository.save_embedding_version(
                     record,
-                    owner_id=job.owner_id,
+                    owner_id=document_owner_id,
                     embedding_version=version,
                 )
             self._progress(job, "complete", 100, "Reprocess complete")
