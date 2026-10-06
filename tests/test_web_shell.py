@@ -75,6 +75,10 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('id="portalSyncStatus"', self.html)
         self.assertIn('setInterval(()=>', self.html)
         self.assertIn('document.addEventListener("visibilitychange"', self.html)
+        self.assertIn('data-visibility=', self.html)
+        self.assertIn('/visibility', self.html)
+        self.assertIn('>Personal</option>', self.html)
+        self.assertIn('>Private</option>', self.html)
         self.assertIn('Date.now()', self.html)
 
     def test_sorting_and_important_highlight_controls_are_exposed(self) -> None:

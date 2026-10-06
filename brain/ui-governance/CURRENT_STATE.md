@@ -17,6 +17,7 @@ The accepted live baseline includes:
 - Failed jobs have Retry/Retire/Delete.
 - Important documents use compact star + yellow highlight; internal comments are not public.
 - Default document ordering is latest upload first.
+- Document cards support Public / Private / Personal visibility without changing the compact purple baseline; non-public visibility is enforced server-side and excluded from public publication.
 
 Do not change these as cleanup/refactor side effects.
 - Search Authority filter is a dynamic dropdown populated from distinct active/non-trashed letter authorities; new authorities appear automatically.

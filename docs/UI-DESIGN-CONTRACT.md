@@ -192,6 +192,19 @@ Admin → Trash:
 
 Do not reintroduce direct hard-delete from ordinary document cards.
 
+
+## Document visibility contract
+
+Documents support **Public / Private / Personal** visibility.
+
+- Public: normal authenticated portal visibility and eligible for the public Drive index/original sharing.
+- Private: authenticated archive members only; exclude from public Drive index and remove anonymous Drive access.
+- Personal: the user who marked it Personal plus admins; the original ingest owner retains backend access so processing/reprocessing can continue.
+- Editor/Admin document cards expose a compact visibility control.
+- Visibility must be enforced by database RLS and original-file access, not only by UI hiding.
+- Private/Personal documents must not publish a generated WhatsApp receipt; previously generated receipts should be removed by the private runtime when possible.
+- Existing documents remain Public unless explicitly changed.
+
 ## Important/star contract
 
 Important document:

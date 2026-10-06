@@ -91,3 +91,6 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Harden Gemini reprocessing retries and model default
 - Date: 2026-10-06
 - Durable context synchronization: completed
+## Document visibility — 2026-10-06
+
+Public / Private / Personal document visibility is implemented in Supabase schema/RLS and application code. Existing documents default to Public. Personal is marker-user/admin scoped while the original ingest owner retains worker continuity. Oracle public-index/Drive/WhatsApp publication paths have matching non-public suppression. Production Vercel deploy remains separately approval-gated.

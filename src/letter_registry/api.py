@@ -73,6 +73,7 @@ class SearchCard(BaseModel):
     user_comment: str | None = None
     uploaded_at: str | None = None
     important_at: str | None = None
+    visibility: str = "public"
     open_original_path: str
 
 
@@ -81,6 +82,10 @@ class SearchCard(BaseModel):
 class LetterHighlightRequest(BaseModel):
     is_important: bool
     user_comment: str | None = Field(default=None, max_length=1000)
+
+
+class LetterVisibilityRequest(BaseModel):
+    visibility: str = Field(pattern=r"^(public|private|personal)$")
 
 class MagicLinkRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
@@ -3768,6 +3773,15 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         access_token: str = Depends(_access_token),
     ) -> SearchResponse:
         transport = _transport(access_token)
+        visible_letter_rows = (
+            transport.select("letters", columns="id,visibility")
+            if hasattr(transport, "select")
+            else []
+        )
+        visibility_by_id = {
+            str(row.get("id") or ""): str(row.get("visibility") or "public")
+            for row in visible_letter_rows
+        }
         text_repo = SupabaseSearchRepository(transport)
         filters = SearchFilters(
             authority=authority,
@@ -3817,6 +3831,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     user_comment=item.result.user_comment,
                     uploaded_at=item.result.uploaded_at,
                     important_at=item.result.important_at,
+                    visibility=visibility_by_id.get(item.result.record_id, "public"),
                     open_original_path=f"/api/v1/letters/{item.result.record_id}/original",
                 )
                 for item in hybrid_results
@@ -3846,6 +3861,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     user_comment=item.user_comment,
                     uploaded_at=item.uploaded_at,
                     important_at=item.important_at,
+                    visibility=visibility_by_id.get(item.record_id, "public"),
                     open_original_path=f"/api/v1/letters/{item.record_id}/original",
                 )
                 for item in text_results
@@ -4161,6 +4177,45 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 else "Important mark removed."
             )
         )
+
+    @app.patch(
+        "/api/v1/letters/{record_id}/visibility",
+        response_model=MessageResponse,
+    )
+    def update_letter_visibility(
+        record_id: str,
+        payload: LetterVisibilityRequest,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> MessageResponse:
+        membership = _archive_membership(
+            access_token, roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR}
+        )
+        database = _transport(
+            access_token, roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR}
+        )
+        rows = database.select(
+            "letters", filters={"id": record_id}, columns="id,visibility,personal_owner_id"
+        )
+        if not rows:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Letter not found")
+        visibility = payload.visibility
+        values: dict[str, object] = {
+            "visibility": visibility,
+            "personal_owner_id": membership.user_id if visibility == "personal" else None,
+            "visibility_changed_at": datetime.now(timezone.utc).isoformat(),
+            "visibility_changed_by": membership.user_id,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        updated = database.update("letters", values, filters={"id": record_id})
+        if not updated:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Visibility could not be updated")
+        _audit_admin_action(
+            access_token, action="letter_visibility_changed", target_type="letter", target_id=record_id,
+            detail={"visibility": visibility, "changed_by_role": membership.role.value},
+        )
+        label = {"public": "Public", "private": "Private", "personal": "Personal"}[visibility]
+        return MessageResponse(message=f"Document visibility set to {label}.")
 
     @app.get("/api/v1/admin/trash")
     def list_admin_trash(
