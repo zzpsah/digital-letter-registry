@@ -1,3 +1,13 @@
+## 2026-10-06 — Move archive intake to dedicated workspace
+- Commit: 2b69fb04df00053580b4196fa3eda9e959f92849
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-06 — Add Important workspace and page size controls
 - Commit: 815249302da6039d61d4a3d070c5490918a740d4
 - Author: development-os[bot]

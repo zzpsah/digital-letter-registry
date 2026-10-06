@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 815249302da6039d61d4a3d070c5490918a740d4
-- Last commit: Add Important workspace and page size controls
+- HEAD: 2b69fb04df00053580b4196fa3eda9e959f92849
+- Last commit: Move archive intake to dedicated workspace
 - Last commit date: 2026-10-06
 - Last commit author: development-os[bot]
 

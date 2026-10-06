@@ -87,11 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 815249302da6039d61d4a3d070c5490918a740d4
-- Change: Add Important workspace and page size controls
+- Commit: 2b69fb04df00053580b4196fa3eda9e959f92849
+- Change: Move archive intake to dedicated workspace
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Dedicated Archive upload — 2026-10-06
-
-The per-document Archive action was removed from normal cards. The Archive tab now owns historical intake: choose a year, select multiple files, and upload them directly into that year-wise archive. Restore remains available only for already archived documents.
