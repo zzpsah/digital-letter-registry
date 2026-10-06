@@ -1,3 +1,11 @@
+## 2026-10-06 — Fix canonical eLetters portal URL
+- Commit: 32cc4e64a04d45f91982009c5199ee577d5533d5
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `README.md`
+- `brain/vercel-hosting/CURRENT_STATE.md`
+
 ## 2026-10-06 — Avoid stale commit hashes in DLR handoff
 - Commit: 2160aeee8b4836027df8419d30c29fa7da68fe52
 - Author: PRASHANT KUMAR SAH
