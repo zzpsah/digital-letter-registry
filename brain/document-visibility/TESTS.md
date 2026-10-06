@@ -33,3 +33,10 @@
 - Supabase `search_letter_cards_v3` migration applied successfully.
 - Full suite: 327/327 passed.
 - Inline JavaScript syntax check passed before regression run.
+
+## Year-wise Archive tests
+
+- `search_letter_cards_v4` migration applied successfully.
+- Focused API/search/web tests passed.
+- Full suite: 327/327 passed.
+- Inline JavaScript syntax passed.

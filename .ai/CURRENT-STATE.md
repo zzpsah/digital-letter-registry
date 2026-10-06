@@ -91,3 +91,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Add year-wise document archive
 - Date: 2026-10-06
 - Durable context synchronization: completed
+
+## Year-wise Archive — 2026-10-06
+
+The portal supports a separate `is_archived/archive_year` state. Archived documents are excluded from normal search/home/personal results and shown in a dedicated Archive tab grouped by year with restore support. Public Drive publication also excludes archived documents.

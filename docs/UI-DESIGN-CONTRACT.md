@@ -320,3 +320,7 @@ Document cards use a lock icon beside the Important star for Public/Private stat
 ### Year-wise archive workspace
 
 The top navigation includes **🗄 Archive**. Archive is an organizational state separate from visibility and Trash. Editor/Admin document cards expose an `Archive` action that prompts for a year (defaulting from issue/upload year). Archived documents leave Home/Search/Personal and appear in Archive grouped by year, with a year filter, search, pagination, and `Restore`. Restoring preserves the document's Public/Private/Personal visibility.
+
+### Year-wise Archive
+
+Archive is distinct from privacy and Trash. A document can be moved out of the main list into **Archive**, assigned an archive year, and restored later without changing Public/Private/Personal visibility. The Archive tab groups records by year, supports year filtering/search, and paginates at 20 documents per page.
