@@ -1,3 +1,11 @@
+## 2026-10-06 — Document AI remote access workflow
+- Commit: bbcce5a81c71cd98e0dd3d272349b6b41489c292
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `AGENTS.md`
+- `docs/REMOTE-ACCESS.md`
+
 ## 2026-10-05 — Add authority merge and permanent delete
 - Commit: 17a9a16b6914519ca5819c66386ff40a35886c26
 - Author: Prashant
