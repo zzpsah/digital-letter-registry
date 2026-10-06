@@ -67,3 +67,5 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 
 - Normal authenticated navigation now includes Personal between Search and Upload. Personal is a focused collection of the current user’s authorized Personal documents.
 - Search More filters includes Visibility (Any/Public/Private/Personal).
+
+- Top navigation now includes a compact `🔒 Personal` workspace for the signed-in user's Personal documents; Search also has a Visibility filter.

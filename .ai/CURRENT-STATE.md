@@ -98,3 +98,7 @@ Public / Private / Personal document visibility is implemented in Supabase schem
 ## Personal document collection UI — 2026-10-06
 
 The eLetters source now includes a Personal top-level tab backed by the same RLS-aware search endpoint with `visibility=personal`, plus a Visibility filter in Search. Visibility changes refresh Personal immediately. Source/test state is complete; production Vercel deployment remains separately approval-gated.
+
+## Personal workspace UI — 2026-10-06
+
+The portal source now includes a compact `🔒 Personal` top-level workspace, Personal-only search, and a general Search visibility filter. Personal API filtering additionally requires `personal_owner_id` to match the current signed-in user, so admin recovery access does not turn the Personal workspace into a global Personal-documents list.

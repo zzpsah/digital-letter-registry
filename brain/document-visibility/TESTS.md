@@ -14,3 +14,9 @@
 - Web shell assertions cover Personal nav/page, Visibility filter, and Personal query.
 - Extracted inline JavaScript passed `node --check`.
 - `git diff --check` passed.
+
+## Personal workspace UI tests
+
+- Full Python suite after Personal tab/search/filter changes: 326/326 passed.
+- Inline JavaScript syntax check passed.
+- Web-shell regression asserts Personal nav/page/search controls and visibility filter.

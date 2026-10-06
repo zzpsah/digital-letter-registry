@@ -308,3 +308,7 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 - Authority rows show linked-letter counts before destructive actions.
 
 - Admin → Recipients shows a separate read-only `Allowed recipients` summary above management, with enabled Email/WhatsApp/Both channels and the current Default recipient clearly visible.
+
+### Personal workspace
+
+Top navigation includes **🔒 Personal**. It lists only Personal documents owned by the signed-in user, provides a lightweight search box, and keeps the same compact card actions. General Search includes a Visibility filter (`Any visibility`, `Public`, `Private`, `Personal`). Personal cards show a clear `🔒 Personal` badge.
