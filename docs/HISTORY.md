@@ -31,3 +31,12 @@
 - Application CI is green on the completed runtime/readiness baseline.
 - Hosted Supabase Magic Link template/Site URL configuration remains an external dashboard step before the live browser synthetic test.
 - No real archive letters were ingested or renamed and no production deployment was performed.
+
+## 2026-10-06 — Context/handoff reconciliation
+
+- Verified GitHub and Oracle runtime working copy at the same HEAD: `bbcce5a81c71cd98e0dd3d272349b6b41489c292`.
+- Reconciled `brain/CURRENT_STATE.md`, `brain/HANDOFF.md`, and `.ai/CURRENT-STATE.md` so current truth is presented first instead of being buried beneath 2026-10-02 synthetic-only checkpoints.
+- Explicitly separated current real WhatsApp pilot behavior from older synthetic cleanup milestones.
+- Locked the source-first intelligence and same-document reprocess contracts into the top-level handoff.
+- Historical checkpoints remain available in Git history, this file, `.ai/CHANGELOG.md`, and enhancement-specific brain folders.
+- Runtime application code was not changed by this reconciliation.
