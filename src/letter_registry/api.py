@@ -76,6 +76,7 @@ class SearchCard(BaseModel):
     visibility: str = "public"
     is_archived: bool = False
     archive_year: int | None = None
+    archive_month: int | None = None
     open_original_path: str
 
 
@@ -93,6 +94,17 @@ class LetterVisibilityRequest(BaseModel):
 class LetterArchiveRequest(BaseModel):
     archived: bool
     archive_year: int | None = Field(default=None, ge=1900, le=2100)
+    archive_month: int | None = Field(default=None, ge=1, le=12)
+
+
+class BulkArchiveRequest(BaseModel):
+    ids: list[str] = Field(min_length=1, max_length=500)
+    archive_year: int = Field(ge=1900, le=2100)
+    archive_month: int | None = Field(default=None, ge=1, le=12)
+
+
+class BulkRestoreRequest(BaseModel):
+    ids: list[str] = Field(min_length=1, max_length=500)
 
 class MagicLinkRequest(BaseModel):
     email: str = Field(min_length=3, max_length=320)
@@ -3776,10 +3788,12 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         category: str | None = Query(default=None, max_length=100),
         status_filter: str | None = Query(default=None, alias="status"),
         year: int | None = Query(default=None, ge=1900, le=2100),
+        month: int | None = Query(default=None, ge=1, le=12),
         file_type: str | None = Query(default=None, max_length=16),
         visibility: str | None = Query(default=None, pattern=r"^(public|private|personal)$"),
         archived: bool = Query(default=False),
         archive_year: int | None = Query(default=None, ge=1900, le=2100),
+        archive_month: int | None = Query(default=None, ge=1, le=12),
         important_only: bool = Query(default=False),
         sort: str = Query(default="latest", pattern=r"^(latest|important|issue_date|title|relevance)$"),
         limit: int = Query(default=25, ge=1, le=500),
@@ -3789,7 +3803,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         membership = _archive_membership(access_token)
         transport = _transport(access_token)
         visible_letter_rows = (
-            transport.select("letters", columns="id,visibility,personal_owner_id,is_archived,archive_year")
+            transport.select("letters", columns="id,visibility,personal_owner_id,is_archived,archive_year,archive_month")
             if hasattr(transport, "select")
             else []
         )
@@ -3800,12 +3814,14 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         personal_owner_by_id = {str(row.get("id") or ""): str(row.get("personal_owner_id") or "") for row in visible_letter_rows}
         archived_by_id = {str(row.get("id") or ""): bool(row.get("is_archived")) for row in visible_letter_rows}
         archive_year_by_id = {str(row.get("id") or ""): (int(row["archive_year"]) if row.get("archive_year") else None) for row in visible_letter_rows}
+        archive_month_by_id = {str(row.get("id") or ""): (int(row["archive_month"]) if row.get("archive_month") else None) for row in visible_letter_rows}
         text_repo = SupabaseSearchRepository(transport)
         filters = SearchFilters(
             authority=authority,
             category=category,
             status=status_filter,
             year=year,
+            month=month,
             file_type=file_type,
         )
 
@@ -3852,6 +3868,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     visibility=visibility_by_id.get(item.result.record_id, "public"),
                     is_archived=archived_by_id.get(item.result.record_id, False),
                     archive_year=archive_year_by_id.get(item.result.record_id),
+                    archive_month=archive_month_by_id.get(item.result.record_id),
                     open_original_path=f"/api/v1/letters/{item.result.record_id}/original",
                 )
                 for item in hybrid_results
@@ -3860,7 +3877,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         else:
             paged_latest = (sort == "latest" and not q.strip())
             search_limit = min(limit + 1, 100) if paged_latest else (100 if sort != "relevance" else limit)
-            text_results = text_repo.search(q, filters=filters, limit=search_limit, offset=(offset if paged_latest else 0), archived=archived, archive_year=archive_year, important_only=important_only)
+            text_results = text_repo.search(q, filters=filters, limit=search_limit, offset=(offset if paged_latest else 0), archived=archived, archive_year=archive_year, archive_month=archive_month, important_only=important_only)
             cards = [
                 SearchCard(
                     id=item.record_id,
@@ -3885,6 +3902,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     visibility=visibility_by_id.get(item.record_id, "public"),
                     is_archived=archived_by_id.get(item.record_id, False),
                     archive_year=archive_year_by_id.get(item.record_id),
+                    archive_month=archive_month_by_id.get(item.record_id),
                     open_original_path=f"/api/v1/letters/{item.record_id}/original",
                 )
                 for item in text_results
@@ -3896,6 +3914,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             cards = [card for card in cards if card.is_important]
         if archive_year is not None:
             cards = [card for card in cards if card.archive_year == archive_year]
+        if archive_month is not None:
+            cards = [card for card in cards if card.archive_month == archive_month]
 
         if visibility:
             cards = [card for card in cards if card.visibility == visibility]
@@ -4218,6 +4238,38 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             )
         )
 
+    @app.patch("/api/v1/archive/bulk", response_model=MessageResponse)
+    def bulk_archive_letters(payload: BulkArchiveRequest, access_token: str = Depends(_access_token), _: None = Depends(_require_same_origin)) -> MessageResponse:
+        membership = _archive_membership(access_token, roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR})
+        database = _transport(access_token, roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR})
+        now = datetime.now(timezone.utc).isoformat()
+        updated = 0
+        for record_id in dict.fromkeys(payload.ids):
+            source = database.select("letters", filters={"id": record_id, "is_trashed": False}, columns="id,issue_date,uploaded_at")
+            if not source:
+                continue
+            month = payload.archive_month
+            if month is None:
+                raw = str(source[0].get("issue_date") or source[0].get("uploaded_at") or "")
+                try:
+                    month = int(raw[5:7])
+                except Exception:
+                    month = datetime.now(timezone.utc).month
+            rows = database.update("letters", {"is_archived": True, "archive_year": payload.archive_year, "archive_month": month, "archived_at": now, "archived_by": membership.user_id, "updated_at": now}, filters={"id": record_id, "is_trashed": False})
+            if rows: updated += 1
+        _audit_admin_action(access_token, action="letters_bulk_archived", target_type="letter", target_id=None, detail={"count": updated, "archive_year": payload.archive_year, "archive_month": payload.archive_month})
+        return MessageResponse(message=f"{updated} document(s) archived.")
+
+    @app.patch("/api/v1/archive/bulk-restore", response_model=MessageResponse)
+    def bulk_restore_letters(payload: BulkRestoreRequest, access_token: str = Depends(_access_token), _: None = Depends(_require_same_origin)) -> MessageResponse:
+        _archive_membership(access_token, roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR})
+        database = _transport(access_token, roles={ArchiveRole.ADMIN, ArchiveRole.EDITOR})
+        now = datetime.now(timezone.utc).isoformat(); updated = 0
+        for record_id in dict.fromkeys(payload.ids):
+            rows = database.update("letters", {"is_archived": False, "archive_year": None, "archive_month": None, "archived_at": None, "archived_by": None, "updated_at": now}, filters={"id": record_id})
+            if rows: updated += 1
+        return MessageResponse(message=f"{updated} document(s) restored.")
+
     @app.get("/api/v1/archive/years")
     def archive_years(access_token: str = Depends(_access_token)) -> dict[str, object]:
         rows = _transport(access_token).select(
@@ -4244,6 +4296,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         values = {
             "is_archived": payload.archived,
             "archive_year": year if payload.archived else None,
+            "archive_month": payload.archive_month if payload.archived else None,
             "archived_at": now.isoformat() if payload.archived else None,
             "archived_by": membership.user_id if payload.archived else None,
             "updated_at": now.isoformat(),

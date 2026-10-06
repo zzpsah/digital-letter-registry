@@ -73,3 +73,11 @@ Home now renders up to 100 archive documents latest-first instead of only the la
 - Personal remains a top-level tab alongside Important and Archive.
 - Home/Important/Archive remember the current page and selected page size in local browser storage.
 - Refreshing or switching tabs returns to the same page where possible, so later-page documents do not appear to disappear.
+
+## Cold archive bulk manager — 2026-10-06
+
+- Archive means moving low-use older documents out of the main Home/Search/Personal views, not uploading a second copy.
+- Archive tab loads existing active documents by source year and optional source month.
+- Users can select individual files or Select all matching files, then bulk archive them.
+- When a month is chosen, selected files are archived under that year/month. When All months is chosen, each file is grouped under its own issue/upload month.
+- Archived documents are browsed year/month-wise and can be restored.

@@ -336,3 +336,7 @@ Do not expose an Archive action on ordinary document cards. Historical records a
 ### Page size controls
 
 Home, Important, and Archive use a user-selectable page size of **50 / 100 / 200 / 500**, defaulting to 50. The backend supports 500 rows per page; larger collections continue through pagination with no fixed total-document cap.
+
+### Cold Archive manager
+
+Archive is a bulk-management workspace for older, lower-use documents. It does not provide a separate historical upload path. Users filter existing main documents by year/month, load matching files, select individual or all matching documents, and move them to Archive. Archived documents are grouped by year/month and stay out of Home/Search/Personal until restored.
