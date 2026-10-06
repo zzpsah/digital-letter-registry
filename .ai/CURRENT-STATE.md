@@ -87,11 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 0d842627a80df216063e38a5ad072bc0783649cf
-- Change: Simplify privacy controls and paginate archive
+- Commit: d1be3918c7bad12b2f42f6b9f0b092e30fcbffad
+- Change: Add year-wise document archive
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Year-wise document Archive — 2026-10-06
-
-The portal now supports `is_archived`, `archive_year`, `archived_at`, and `archived_by`. Normal search defaults to non-archived rows through `search_letter_cards_v4`; Archive uses the same paginated RPC with `archived=true` and optional year filtering. UI has a dedicated Archive tab and Archive/Restore card action. Public Drive index publication excludes archived rows. Existing documents remain unarchived unless explicitly moved.

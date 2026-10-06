@@ -1,3 +1,18 @@
+## 2026-10-06 — Add year-wise document archive
+- Commit: d1be3918c7bad12b2f42f6b9f0b092e30fcbffad
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/search.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261006162500_add_yearwise_archive.sql`
+- `tests/test_api.py`
+- `tests/test_search.py`
+- `tests/test_web_shell.py`
+
 ## 2026-10-06 — Simplify privacy controls and paginate archive
 - Commit: 0d842627a80df216063e38a5ad072bc0783649cf
 - Author: development-os[bot]
