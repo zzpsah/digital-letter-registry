@@ -1,3 +1,12 @@
+## 2026-10-06 — Restore Personal tab and persist pagination
+- Commit: 9407b7513e8dadaea531665badce911ebf6e45f5
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-06 — Expand document page size options
 - Commit: bb3cc8fbd7c43d0bf1f4254d029da8058fa7345a
 - Author: development-os[bot]

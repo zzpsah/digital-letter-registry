@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: bb3cc8fbd7c43d0bf1f4254d029da8058fa7345a
-- Last commit: Expand document page size options
+- HEAD: 9407b7513e8dadaea531665badce911ebf6e45f5
+- Last commit: Restore Personal tab and persist pagination
 - Last commit date: 2026-10-06
 - Last commit author: development-os[bot]
 

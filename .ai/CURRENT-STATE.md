@@ -87,11 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: bb3cc8fbd7c43d0bf1f4254d029da8058fa7345a
-- Change: Expand document page size options
+- Commit: 9407b7513e8dadaea531665badce911ebf6e45f5
+- Change: Restore Personal tab and persist pagination
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Personal tab + persistent pagination — 2026-10-06
-
-Restored the Personal navigation tab after a parallel UI change removed only the nav button. Home/Important/Archive now persist current page and page-size preferences locally so page-2/3 documents remain easy to reach after refresh or tab switches.
