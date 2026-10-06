@@ -82,6 +82,62 @@ class ProcessingPipelineTests(unittest.TestCase):
         self.assertIn("deadline_extension", outcome.context.context.concepts)
 
 
+
+    def test_low_quality_primary_uses_stronger_fallback(self) -> None:
+        class WeakProvider:
+            version = "weak-v1"
+            def analyze(self, *, extracted_text: str, hints: ContextHints):
+                return StructuredDocumentContext(
+                    title="पंजीयन कार्यक्रम एवं अंतिम तिथि",
+                    authority="Education Department",
+                    category="registration",
+                    reference_number="(आरोप",
+                    confidence=0.45,
+                )
+
+        class StrongProvider:
+            version = "strong-v1"
+            def analyze(self, *, extracted_text: str, hints: ContextHints):
+                return StructuredDocumentContext(
+                    title="Intermediate Registration Schedule",
+                    authority="BSEB",
+                    category="registration",
+                    summary="Registration schedule and instructions for the intermediate session.",
+                    summary_hi="इंटरमीडिएट पंजीयन कार्यक्रम और आवश्यक निर्देश दिए गए हैं।",
+                    whatsapp_summary="इंटरमीडिएट registration schedule और instructions जारी किए गए हैं।",
+                    action_required="Complete registration within the notified schedule.",
+                    action_required_hi="निर्धारित समय के भीतर registration पूरा करें।",
+                    reference_number="123/2026",
+                    issue_date="2026-10-01",
+                    confidence=0.95,
+                    clean_document_text=extracted_text,
+                )
+
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "synthetic.pdf"
+            path.write_bytes(b"%PDF-synthetic")
+            record = DocumentRecord(
+                record_id="22222222-2222-4222-8222-222222222222",
+                original_filename="synthetic.pdf",
+                original_sha256="a" * 64,
+                original_storage_reference="synthetic-reference",
+                received_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
+            )
+            repository = FakeRepository()
+            outcome = process_archived_document(
+                path,
+                record=record,
+                owner_id=OWNER_ID,
+                extractor=VersionedTextExtractor(FakePdfBackend()),
+                context_provider=WeakProvider(),
+                fallback_context_provider=StrongProvider(),
+                repository=repository,
+            )
+
+        self.assertEqual(outcome.context.version, "strong-v1")
+        self.assertEqual(outcome.context.context.reference_number, "123/2026")
+        self.assertIsNotNone(outcome.context.context.summary_hi)
+
     def test_semantic_title_ignores_wrong_category_when_source_is_ict_order(self) -> None:
         title = _semantic_title(
             "UDISE Notice",

@@ -271,6 +271,39 @@ class WorkerTests(unittest.TestCase):
         self.assertIn("real document processing is disabled", result.error)
         self.assertEqual(queue.completed, [])
 
+    def test_manual_retry_uses_fallback_when_primary_context_fails(self):
+        class FailingContextProvider:
+            version = "failing-context-v1"
+
+            def analyze(self, *, extracted_text: str, hints: ContextHints):
+                raise RuntimeError("primary context unavailable")
+
+        retry_job = ProcessingJob(
+            job_id=JOB_ID,
+            letter_id=LETTER_ID,
+            owner_id=OWNER_ID,
+            created_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
+            reason="manual_retry:20261006T073609Z",
+        )
+        queue = FakeQueue(retry_job)
+        worker = DocumentProcessingWorker(
+            queue=queue,
+            source_loader=FakeSourceLoader(record()),
+            database=FakeDatabase(),
+            original_access=FakeOriginalAccess(),
+            repository=FakeRepository(),
+            extractor=VersionedTextExtractor(FakePdfBackend()),
+            context_provider=FailingContextProvider(),
+            fallback_context_provider=FakeContextProvider(),
+            embeddings=None,
+        )
+
+        result = worker.run_once()
+
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(queue.completed, [JOB_ID])
+        self.assertEqual(queue.failed, [])
+
     def test_worker_completes_without_embeddings(self):
         queue = FakeQueue(job())
         repository = FakeRepository()

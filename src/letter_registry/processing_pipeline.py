@@ -608,6 +608,7 @@ def process_archived_document(
             + intake_context
         )
 
+    used_fallback = False
     try:
         analyze_file = getattr(context_provider, "analyze_file", None)
         if callable(analyze_file):
@@ -641,38 +642,72 @@ def process_archived_document(
             analysis_text,
             provider=fallback_context_provider,
         )
+        used_fallback = True
 
-    context = ContextAnalysisResult(
-        context=_refine_context_from_strong_evidence(
-            context.context,
+    def _refine_and_score(candidate: ContextAnalysisResult):
+        refined = ContextAnalysisResult(
+            context=_refine_context_from_strong_evidence(
+                candidate.context,
+                extracted_text=extraction.text,
+                filename=record.original_filename,
+            ),
+            hints=candidate.hints,
+            version=candidate.version,
+        )
+        quality = assess_document_quality(
             extracted_text=extraction.text,
-            filename=record.original_filename,
-        ),
-        hints=context.hints,
-        version=context.version,
-    )
+            context_confidence=refined.context.confidence,
+            title=refined.context.title,
+            authority=refined.context.authority,
+            category=refined.context.category,
+            reference_number=refined.context.reference_number,
+            issue_date=refined.context.issue_date,
+            clean_document_text=refined.context.clean_document_text,
+        )
+        refined = ContextAnalysisResult(
+            context=replace(
+                refined.context,
+                quality_score=quality.score,
+                quality_flags=quality.flags,
+                needs_reprocessing=quality.needs_reprocessing,
+                quality_version=quality.version,
+            ),
+            hints=refined.hints,
+            version=refined.version,
+        )
+        return refined, quality
 
-    quality = assess_document_quality(
-        extracted_text=extraction.text,
-        context_confidence=context.context.confidence,
-        title=context.context.title,
-        authority=context.context.authority,
-        category=context.context.category,
-        reference_number=context.context.reference_number,
-        issue_date=context.context.issue_date,
-        clean_document_text=context.context.clean_document_text,
-    )
-    context = ContextAnalysisResult(
-        context=replace(
-            context.context,
-            quality_score=quality.score,
-            quality_flags=quality.flags,
-            needs_reprocessing=quality.needs_reprocessing,
-            quality_version=quality.version,
-        ),
-        hints=context.hints,
-        version=context.version,
-    )
+    context, quality = _refine_and_score(context)
+
+    # A provider can return syntactically valid JSON that is still semantically weak.
+    # Reprocess must not call that a success when a stronger fallback is available.
+    if quality.needs_reprocessing and fallback_context_provider is not None and not used_fallback:
+        try:
+            fallback_context = analyze_document_context(
+                analysis_text,
+                provider=fallback_context_provider,
+            )
+            fallback_context, fallback_quality = _refine_and_score(fallback_context)
+
+            def _completeness(value):
+                fields = (
+                    value.title, value.authority, value.summary, value.action_required,
+                    value.reference_number, value.issue_date, value.clean_document_text,
+                    value.whatsapp_summary, value.summary_hi, value.action_required_hi,
+                )
+                return sum(1 for field in fields if str(field or "").strip())
+
+            current_ctx = context.context
+            fallback_ctx = fallback_context.context
+            stronger = (
+                fallback_quality.score >= quality.score + 0.02
+                or float(fallback_ctx.confidence or 0.0) >= float(current_ctx.confidence or 0.0) + 0.08
+                or _completeness(fallback_ctx) >= _completeness(current_ctx) + 2
+            )
+            if stronger:
+                context, quality = fallback_context, fallback_quality
+        except Exception:
+            pass
 
     repository.save_context_result(
         record,
