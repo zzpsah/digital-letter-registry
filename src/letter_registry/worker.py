@@ -94,12 +94,23 @@ class DocumentProcessingWorker:
     relationship_repository: RelationshipSuggestionRepository | None = None
     allow_real_documents: bool = False
 
+    def _progress(self, job: ProcessingJob, stage: str, percent: int, detail: str) -> None:
+        try:
+            self.database.update(
+                "processing_jobs",
+                {"progress_stage": stage, "progress_percent": percent, "progress_detail": detail},
+                filters={"id": job.job_id},
+            )
+        except Exception:
+            pass
+
     def run_once(self) -> WorkerRunResult:
         job = self.queue.claim_next()
         if job is None:
             return WorkerRunResult(status="idle")
 
         try:
+            self._progress(job, "starting", 5, "Worker started")
             record = self.source_loader.load(job.letter_id)
             if record is None:
                 raise RuntimeError("archived source record was not found")
@@ -111,6 +122,7 @@ class DocumentProcessingWorker:
                         "real document processing is disabled by runtime safety policy"
                     )
 
+            self._progress(job, "source_ready", 12, "Loading original document")
             original = self.original_access.fetch(
                 record_id=record.record_id,
                 database=self.database,
@@ -175,10 +187,12 @@ class DocumentProcessingWorker:
                     intake_context=intake_context,
                     correction_memory=self.correction_memory,
                     extraction_override=extraction_override,
+                    progress_callback=lambda stage, percent, detail: self._progress(job, stage, percent, detail),
                 )
 
                 chunks = 0
                 if self.embeddings is not None:
+                    self._progress(job, "indexing", 88, "Updating search index")
                     chunks = self.embeddings.embed_document_chunks(
                         owner_id=job.owner_id,
                         letter_id=job.letter_id,
@@ -186,6 +200,7 @@ class DocumentProcessingWorker:
                     )
 
             if self.relationship_repository is not None:
+                self._progress(job, "relationships", 94, "Checking related documents")
                 candidate_rows = self.database.select(
                     "letters",
                     filters={"owner_id": job.owner_id},
@@ -253,6 +268,7 @@ class DocumentProcessingWorker:
                     owner_id=job.owner_id,
                     embedding_version=version,
                 )
+            self._progress(job, "complete", 100, "Reprocess complete")
             self.queue.complete(job)
             return WorkerRunResult(
                 status="completed",

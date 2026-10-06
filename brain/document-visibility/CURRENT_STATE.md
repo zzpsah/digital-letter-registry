@@ -92,3 +92,7 @@ Home now renders up to 100 archive documents latest-first instead of only the la
 ## Reprocess enqueue RLS fix — 2026-10-06
 
 Manual reprocess jobs now use the requesting editor/admin as `processing_jobs.owner_id`. This matches the RLS rule `owner_id = auth.uid()` and allows editors/admins to reprocess documents originally uploaded by another user.
+
+## Reprocess live progress — 2026-10-06
+
+Reprocess jobs persist `progress_stage`, `progress_percent`, and `progress_detail`. The worker updates major stages from queue/start through text/OCR, AI analysis, metadata save, indexing, relationship checks, and completion/failure. The portal polls the job every 2 seconds and shows a live percentage/progress bar on the document card until terminal state. Job IDs are stored locally so progress resumes after a page refresh.

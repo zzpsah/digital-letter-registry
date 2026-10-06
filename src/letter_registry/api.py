@@ -411,6 +411,22 @@ class IntakeResponse(BaseModel):
     synthetic_only: bool
 
 
+
+
+class ReprocessResponse(BaseModel):
+    message: str
+    job_id: str
+    status: str
+
+
+class ReprocessStatusResponse(BaseModel):
+    job_id: str
+    status: str
+    stage: str
+    percent: int
+    detail: str | None = None
+    error: str | None = None
+
 class SearchResponse(BaseModel):
     query: str
     count: int
@@ -3982,12 +3998,12 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             open_original_path=f"/api/v1/letters/{detail.record_id}/original",
         )
 
-    @app.post("/api/v1/letters/{record_id}/reprocess", response_model=MessageResponse)
+    @app.post("/api/v1/letters/{record_id}/reprocess", response_model=ReprocessResponse)
     def reprocess_letter(
         record_id: str,
         access_token: str = Depends(_access_token),
         _: None = Depends(_require_same_origin),
-    ) -> MessageResponse:
+    ) -> ReprocessResponse:
         membership = _archive_membership(
             access_token,
             roles={ArchiveRole.EDITOR, ArchiveRole.ADMIN},
@@ -4013,9 +4029,10 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             if str(row.get("status") or "") in {"pending", "processing"}
         ]
         if active_jobs:
-            return MessageResponse(message="Reprocess already queued or running.")
+            active = sorted(active_jobs, key=lambda row: str(row.get("updated_at") or ""), reverse=True)[0]
+            return ReprocessResponse(message="Reprocess already queued or running.", job_id=str(active["id"]), status=str(active.get("status") or "pending"))
         reason = "manual_reprocess:" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        SupabaseProcessingQueue(database).enqueue(
+        job = SupabaseProcessingQueue(database).enqueue(
             letter_id=record_id,
             owner_id=owner_id,
             reason=reason,
@@ -4027,7 +4044,35 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             target_id=record_id,
             detail={"reason": reason, "requested_by_role": membership.role.value},
         )
-        return MessageResponse(message="Reprocess requested.")
+        return ReprocessResponse(message="Reprocess requested.", job_id=job.job_id, status="pending")
+
+    @app.get("/api/v1/letters/{record_id}/reprocess-status", response_model=ReprocessStatusResponse)
+    def reprocess_status(
+        record_id: str,
+        job_id: str | None = Query(default=None, max_length=64),
+        access_token: str = Depends(_access_token),
+    ) -> ReprocessStatusResponse:
+        _archive_membership(access_token)
+        database = _transport(access_token)
+        filters = {"letter_id": record_id}
+        if job_id:
+            filters["id"] = job_id
+        rows = database.select(
+            "processing_jobs",
+            filters=filters,
+            columns="id,status,progress_stage,progress_percent,progress_detail,last_error,created_at,updated_at",
+        )
+        if not rows:
+            raise HTTPException(status_code=404, detail="Processing job not found")
+        row = sorted(rows, key=lambda item: str(item.get("created_at") or ""), reverse=True)[0]
+        return ReprocessStatusResponse(
+            job_id=str(row["id"]),
+            status=str(row.get("status") or "pending"),
+            stage=str(row.get("progress_stage") or "queued"),
+            percent=int(row.get("progress_percent") or 0),
+            detail=(str(row.get("progress_detail")) if row.get("progress_detail") else None),
+            error=(str(row.get("last_error")) if row.get("last_error") else None),
+        )
 
     @app.get(
         "/api/v1/letters/{record_id}/relationships",

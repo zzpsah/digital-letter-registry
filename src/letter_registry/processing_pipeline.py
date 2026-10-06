@@ -588,10 +588,15 @@ def process_archived_document(
     intake_context: str = "",
     correction_memory: AutonomousCorrectionMemory | None = None,
     extraction_override: ExtractionResult | None = None,
+    progress_callback=None,
 ) -> ProcessingOutcome:
     """Process one already-archived source without mutating the original."""
 
+    if progress_callback:
+        progress_callback("text_reuse" if extraction_override is not None else "text_extraction", 25, "Reusing existing OCR/text" if extraction_override is not None else "Extracting text / OCR")
     extraction = extraction_override or extractor.extract(path)
+    if progress_callback:
+        progress_callback("text_ready", 40, "Document text ready")
     if extraction_override is None:
         repository.save_extraction_result(
             record,
@@ -611,6 +616,8 @@ def process_archived_document(
         )
 
     used_fallback = False
+    if progress_callback:
+        progress_callback("ai_analysis", 55, "Analyzing document context")
     try:
         analyze_file = getattr(context_provider, "analyze_file", None)
         if callable(analyze_file):
@@ -711,6 +718,8 @@ def process_archived_document(
         except Exception:
             pass
 
+    if progress_callback:
+        progress_callback("metadata_save", 75, "Saving title, summary and metadata")
     repository.save_context_result(
         record,
         owner_id=owner_id,
@@ -727,6 +736,8 @@ def process_archived_document(
                 confidence=context.context.confidence,
             )
 
+    if progress_callback:
+        progress_callback("metadata_saved", 82, "Document intelligence saved")
     return ProcessingOutcome(
         extraction=extraction,
         context=context,

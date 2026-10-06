@@ -124,6 +124,9 @@ class SupabaseProcessingQueue:
                 "letter_id": letter_id,
                 "reason": reason,
                 "status": "pending",
+                "progress_stage": "queued",
+                "progress_percent": 0,
+                "progress_detail": "Waiting for worker",
             },
             on_conflict="letter_id,reason",
         )

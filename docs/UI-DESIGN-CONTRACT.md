@@ -344,3 +344,7 @@ Archive is a bulk-management workspace for older, lower-use documents. It does n
 ### Unified privacy icon
 
 Document cards use one compact privacy icon beside the Important star. Tapping cycles `🔓 Public → 🔒 Private → 👤 Personal → 🔓 Public`. Do not show a separate Personal action button on cards. The Personal top-level tab remains the dedicated view for Personal documents.
+
+### Reprocess progress
+
+After Reprocess is requested, the card must show persistent live progress rather than only `Queued…`. Show stage + percentage + compact progress bar until Complete or Failed. Persist the active job id locally so a browser refresh can resume polling.
