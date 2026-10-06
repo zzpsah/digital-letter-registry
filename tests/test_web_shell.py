@@ -85,6 +85,8 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('All documents', self.html)
         self.assertIn('data-lock=', self.html)
         self.assertIn('homePageSize=50', self.html)
+        self.assertIn('500/page', self.html)
+        self.assertIn('200/page', self.html)
         self.assertIn('data-home-next', self.html)
         self.assertIn('50/page', self.html)
         self.assertIn('100/page', self.html)

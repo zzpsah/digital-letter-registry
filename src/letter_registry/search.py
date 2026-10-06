@@ -67,8 +67,8 @@ class SupabaseSearchRepository:
         important_only: bool = False,
     ) -> list[SearchResult]:
         normalized = " ".join(query.split()).strip()
-        if limit < 1 or limit > 100:
-            raise ValueError("limit must be between 1 and 100")
+        if limit < 1 or limit > 500:
+            raise ValueError("limit must be between 1 and 500")
         if offset < 0:
             raise ValueError("offset must be non-negative")
 
@@ -77,7 +77,7 @@ class SupabaseSearchRepository:
             raise ValueError("year must be between 1900 and 2100")
 
         rows = self.transport.rpc(
-            "search_letter_cards_v5",
+            "search_letter_cards_v6",
             {
                 "search_query": normalized or None,
                 "authority_filter": filters.authority,

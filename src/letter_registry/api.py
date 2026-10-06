@@ -3782,7 +3782,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         archive_year: int | None = Query(default=None, ge=1900, le=2100),
         important_only: bool = Query(default=False),
         sort: str = Query(default="latest", pattern=r"^(latest|important|issue_date|title|relevance)$"),
-        limit: int = Query(default=25, ge=1, le=100),
+        limit: int = Query(default=25, ge=1, le=500),
         offset: int = Query(default=0, ge=0),
         access_token: str = Depends(_access_token),
     ) -> SearchResponse:

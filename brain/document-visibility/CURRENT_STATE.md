@@ -60,3 +60,10 @@ Home now renders up to 100 archive documents latest-first instead of only the la
 - Archive tab accepts an archive year plus multiple PDF/Image files and uploads them directly into that year.
 - Those uploads are immediately marked archived, so they do not enter normal Home/Search/Personal lists.
 - Archived cards expose Restore; Restore sends the document back to the main archive without changing visibility.
+
+## Large page-size selector — 2026-10-06
+
+- Home, Important, and Archive default to 50 documents per page.
+- User-selectable page sizes: 50 / 100 / 200 / 500.
+- Backend API and search RPC accept up to 500 rows per page.
+- Pagination remains unlimited across pages.

@@ -332,3 +332,7 @@ Home, Important, and Archive default to **50 documents per page** and expose a c
 ### Dedicated Archive upload
 
 Do not expose an Archive action on ordinary document cards. Historical records are added from the **Archive** workspace by selecting a year and uploading one or more PDF/Image files. These files are immediately marked archived and stay out of the main Home/Search/Personal lists. Archived cards may show **Restore**.
+
+### Page size controls
+
+Home, Important, and Archive use a user-selectable page size of **50 / 100 / 200 / 500**, defaulting to 50. The backend supports 500 rows per page; larger collections continue through pagination with no fixed total-document cap.

@@ -91,3 +91,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Move archive intake to dedicated workspace
 - Date: 2026-10-06
 - Durable context synchronization: completed
+
+## Large page-size selector — 2026-10-06
+
+Archive/list pagination now defaults to 50 and supports 50/100/200/500 per page. API/search RPC cap is 500 per page, with unlimited continuation across pages.
