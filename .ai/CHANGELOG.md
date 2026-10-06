@@ -1,3 +1,17 @@
+## 2026-10-06 — Show live reprocess progress
+- Commit: 29d081f4db9a700a1bee7c532d98e63e8077e775
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/jobs.py`
+- `src/letter_registry/processing_pipeline.py`
+- `src/letter_registry/web/index.html`
+- `src/letter_registry/worker.py`
+- `supabase/migrations/20261006184500_add_processing_progress.sql`
+
 ## 2026-10-06 — Fix manual reprocess queue ownership
 - Commit: df21bccd48b9feb64db1fd797852d210f4d196bf
 - Author: development-os[bot]

@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: df21bccd48b9feb64db1fd797852d210f4d196bf
-- Last commit: Fix manual reprocess queue ownership
+- HEAD: 29d081f4db9a700a1bee7c532d98e63e8077e775
+- Last commit: Show live reprocess progress
 - Last commit date: 2026-10-06
 - Last commit author: development-os[bot]
 

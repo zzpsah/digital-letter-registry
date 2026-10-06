@@ -87,11 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: df21bccd48b9feb64db1fd797852d210f4d196bf
-- Change: Fix manual reprocess queue ownership
+- Commit: 29d081f4db9a700a1bee7c532d98e63e8077e775
+- Change: Show live reprocess progress
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Reprocess live progress — 2026-10-06
-
-Manual reprocess is now observable end-to-end. `processing_jobs` stores stage/percent/detail, worker writes progress milestones, API exposes `/api/v1/letters/{id}/reprocess-status`, and card UI polls every 2s with a progress bar. Active job IDs are persisted in localStorage to resume status display after refresh.
