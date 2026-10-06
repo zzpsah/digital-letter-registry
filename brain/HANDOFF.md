@@ -17,9 +17,7 @@ Repository evidence is authoritative over chat memory. Current-state files descr
 
 ## Canonical current handoff
 
-DLR/eLetters is live as a web control plane with a private Oracle worker and private Drive archive. The current repository/runtime HEAD was verified on 2026-10-06 as:
-
-`bbcce5a81c71cd98e0dd3d272349b6b41489c292`
+DLR/eLetters is live as a web control plane with a private Oracle worker and private Drive archive. GitHub and Oracle were reconciled on 2026-10-06. Before runtime work, verify the current GitHub and Oracle HEADs rather than relying on a hash copied into this handoff.
 
 The normal document flow is:
 
