@@ -7,7 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Protocol
 
-from .extraction import VersionedTextExtractor
+from .extraction import ExtractionResult, VersionedTextExtractor
 from .jobs import ProcessingJob
 from .models import DocumentRecord
 from .original_access import SupabaseOriginalAccessService
@@ -122,6 +122,27 @@ class DocumentProcessingWorker:
             if not safe_name:
                 raise RuntimeError("private original has no valid filename")
 
+            extraction_override = None
+            if job.reason.startswith(("manual_retry:", "manual_reprocess:", "quality-upgrade:")):
+                try:
+                    processing_rows = self.database.select(
+                        "letter_processing",
+                        filters={"letter_id": record.record_id},
+                        columns="extracted_text,ocr_version",
+                    )
+                    if processing_rows:
+                        existing_text = str(processing_rows[0].get("extracted_text") or "").strip()
+                        existing_version = str(processing_rows[0].get("ocr_version") or "").strip()
+                        if existing_text:
+                            extraction_override = ExtractionResult(
+                                text=existing_text,
+                                method="reused_existing_extraction",
+                                version=existing_version or record.processing.extraction,
+                                needs_ocr=False,
+                            )
+                except Exception:
+                    extraction_override = None
+
             intake_context = ""
             try:
                 source_rows = self.database.select(
@@ -153,6 +174,7 @@ class DocumentProcessingWorker:
                     fallback_context_provider=self.fallback_context_provider,
                     intake_context=intake_context,
                     correction_memory=self.correction_memory,
+                    extraction_override=extraction_override,
                 )
 
                 chunks = 0

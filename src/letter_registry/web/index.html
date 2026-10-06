@@ -112,7 +112,7 @@ details{padding:7px 9px;margin-top:7px}summary{font-size:.9rem}
       <section id="page-dashboard" class="page active">
         <div class="page-head"><div><h1>Find a letter</h1><p>Search by title, reference number, authority or topic.</p></div><button id="refreshDashboard" class="btn" type="button">Refresh</button></div>
         <div class="panel"><div class="toolbar"><input id="quickQ" class="input" placeholder="Search letters…"><button id="quickSearch" class="btn primary">Smart Search</button></div></div>
-        <div class="panel"><h2>Recent documents</h2><div id="recentResults"></div></div>
+        <div class="panel"><div class="results-head"><h2 style="margin:0">All documents</h2><span id="homeDocumentCount" class="sub"></span></div><div id="recentResults"></div></div>
       </section>
 
       <section id="page-library" class="page">
@@ -327,7 +327,7 @@ async function deleteLetter(id,title){if(!confirm('Move "'+title+'" to Trash?'))
 async function searchDocuments(){$("status").textContent="Searching…";const r=await fetch("/api/v1/search?"+params()+"&_="+Date.now(),{cache:"no-store"});if(!r.ok){$("status").textContent="Search failed.";return}const d=await r.json();$("status").textContent=d.count+" result"+(d.count===1?"":"s");$("resultMode").textContent="";$("results").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No matching documents.</div>';bindDocActions($("results"));markPortalSynced()}
 async function loadPersonal(){const p=new URLSearchParams({visibility:"personal",sort:"latest",limit:"100"}),q=($("personalQ")?.value||"").trim();if(q)p.set("q",q);$("personalStatus").textContent="Loading…";const r=await fetch("/api/v1/search?"+p+"&_="+Date.now(),{cache:"no-store"});if(!r.ok){$("personalStatus").textContent="Could not load Personal documents.";return}const d=await r.json();$("personalStatus").textContent=d.count+" Personal document"+(d.count===1?"":"s");$("personalResults").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No Personal documents yet.</div>';bindDocActions($("personalResults"))}
 function markPortalSynced(){const el=$("portalSyncStatus");if(el)el.textContent="Updated "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}
-async function loadDashboard(){const r=await fetch("/api/v1/search?limit=6&_="+Date.now(),{cache:"no-store"});if(!r.ok)return;const d=await r.json();$("recentResults").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No documents yet.</div>';bindDocActions($("recentResults"));markPortalSynced()}
+async function loadDashboard(){const r=await fetch("/api/v1/search?sort=latest&limit=100&_="+Date.now(),{cache:"no-store"});if(!r.ok)return;const d=await r.json();const count=$("homeDocumentCount");if(count)count.textContent=d.count+" document"+(d.count===1?"":"s");$("recentResults").innerHTML=d.results.length?d.results.map(docCard).join(""):'<div class="empty">No documents yet.</div>';bindDocActions($("recentResults"));markPortalSynced()}
 
 async function refreshAdminDashboard(){
   const r=await fetch("/api/v1/admin/dashboard",{cache:"no-store"});

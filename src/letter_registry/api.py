@@ -3882,9 +3882,6 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     if personal_owner_by_id.get(card.id) == membership.user_id
                 ]
 
-        if visibility:
-            cards = [card for card in cards if card.visibility == visibility]
-
         if sort == "latest":
             cards.sort(key=lambda x: x.uploaded_at or "", reverse=True)
         elif sort == "important":

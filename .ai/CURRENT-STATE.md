@@ -91,3 +91,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Trigger production deployment
 - Date: 2026-10-06
 - Durable context synchronization: completed
+
+## Portal archive visibility + reprocess speed — 2026-10-06
+
+Home was showing only the latest 6 documents, which made older documents appear missing after more uploads. Database/RLS/index validation confirmed all 28 active documents were intact and Public. Home now loads up to 100 latest-first. Manual reprocess and quality-upgrade jobs now reuse existing `letter_processing.extracted_text` when available instead of repeating full OCR; initial processing still performs OCR when required.

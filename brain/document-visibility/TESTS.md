@@ -20,3 +20,10 @@
 - Full Python suite after Personal tab/search/filter changes: 326/326 passed.
 - Inline JavaScript syntax check passed.
 - Web-shell regression asserts Personal nav/page/search controls and visibility filter.
+
+## All-documents regression
+
+- Supabase active archive count: 28; all 28 remain Public.
+- Editor RLS + `search_letter_cards_v2` returns 28/28.
+- Public Drive index refresh publishes 28 documents.
+- Home source now requests `sort=latest&limit=100`.

@@ -587,15 +587,17 @@ def process_archived_document(
     fallback_context_provider: DocumentContextProvider | None = None,
     intake_context: str = "",
     correction_memory: AutonomousCorrectionMemory | None = None,
+    extraction_override: ExtractionResult | None = None,
 ) -> ProcessingOutcome:
     """Process one already-archived source without mutating the original."""
 
-    extraction = extractor.extract(path)
-    repository.save_extraction_result(
-        record,
-        owner_id=owner_id,
-        result=extraction,
-    )
+    extraction = extraction_override or extractor.extract(path)
+    if extraction_override is None:
+        repository.save_extraction_result(
+            record,
+            owner_id=owner_id,
+            result=extraction,
+        )
 
     if not extraction.text.strip():
         raise RuntimeError("cannot analyze document context without extracted text")

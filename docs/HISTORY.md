@@ -40,3 +40,10 @@
 - Locked the source-first intelligence and same-document reprocess contracts into the top-level handoff.
 - Historical checkpoints remain available in Git history, this file, `.ai/CHANGELOG.md`, and enhancement-specific brain folders.
 - Runtime application code was not changed by this reconciliation.
+
+## 2026-10-06 — Restore full archive visibility and speed up reprocess
+
+- Home archive view now loads up to 100 documents latest-first instead of only six recent cards.
+- Verified 28 active database documents, all Public, and 28/28 visible through editor RLS/search.
+- Public Drive index was refreshed successfully with 28 documents.
+- Manual/quality reprocess reuses existing extracted OCR text when available, avoiding expensive repeat OCR. Initial processing still OCRs documents when required.

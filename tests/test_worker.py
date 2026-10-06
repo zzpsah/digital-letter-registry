@@ -304,6 +304,51 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(queue.completed, [JOB_ID])
         self.assertEqual(queue.failed, [])
 
+    def test_manual_reprocess_reuses_existing_extracted_text(self):
+        class ReuseDatabase:
+            def select(self, table, *, filters=None, columns="*"):
+                if table == "letter_processing":
+                    return [{
+                        "extracted_text": (
+                            "बिहार विद्यालय परीक्षा समिति के निर्देश के अनुसार "
+                            "यह पहले से निकाला गया पर्याप्त पाठ है। "
+                            "Existing extracted text should be reused during manual reprocess."
+                        ),
+                        "ocr_version": "ocr-pdf-hi-en-v1",
+                    }]
+                return []
+
+        class ExplodingPdfBackend:
+            def extract_text(self, path):
+                raise AssertionError("OCR/native extraction must not run for manual reprocess")
+
+        retry_job = ProcessingJob(
+            job_id=JOB_ID,
+            letter_id=LETTER_ID,
+            owner_id=OWNER_ID,
+            created_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
+            reason="manual_reprocess:20261006T151605Z",
+        )
+        queue = FakeQueue(retry_job)
+        repository = FakeRepository()
+        worker = DocumentProcessingWorker(
+            queue=queue,
+            source_loader=FakeSourceLoader(record()),
+            database=ReuseDatabase(),
+            original_access=FakeOriginalAccess(),
+            repository=repository,
+            extractor=VersionedTextExtractor(ExplodingPdfBackend()),
+            context_provider=FakeContextProvider(),
+            embeddings=None,
+        )
+
+        result = worker.run_once()
+
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(queue.completed, [JOB_ID])
+        self.assertIsNone(repository.extraction)
+        self.assertIsNotNone(repository.context)
+
     def test_worker_completes_without_embeddings(self):
         queue = FakeQueue(job())
         repository = FakeRepository()

@@ -81,6 +81,8 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('>Private</option>', self.html)
         self.assertIn('data-page="personal"', self.html)
         self.assertIn('id="page-personal"', self.html)
+        self.assertIn('All documents', self.html)
+        self.assertIn('limit=100', self.html)
         self.assertIn('id="visibilityFilter"', self.html)
         self.assertIn('visibility:"personal"', self.html)
         self.assertIn('function loadPersonal()', self.html)

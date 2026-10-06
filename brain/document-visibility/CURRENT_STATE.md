@@ -24,3 +24,7 @@ Implemented 2026-10-06.
 - Personal page has its own quick search box and refresh.
 - General Search includes Visibility filter: Any / Public / Private / Personal.
 - Personal cards show a `🔒 Personal` badge and can be changed back to Public/Private from the same card.
+
+## Portal all-documents visibility fix — 2026-10-06
+
+Home now renders up to 100 archive documents latest-first instead of only the latest 6. This prevents older Public documents from appearing to disappear as new files are uploaded. Search and Personal remain separate views.
