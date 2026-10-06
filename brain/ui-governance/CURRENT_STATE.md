@@ -64,3 +64,6 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 - Authority rows show linked-letter counts before destructive actions.
 
 - Admin → Recipients shows a separate read-only `Allowed recipients` summary above management, with enabled Email/WhatsApp/Both channels and the current Default recipient clearly visible.
+
+- Normal authenticated navigation now includes Personal between Search and Upload. Personal is a focused collection of the current user’s authorized Personal documents.
+- Search More filters includes Visibility (Any/Public/Private/Personal).

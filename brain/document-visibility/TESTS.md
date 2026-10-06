@@ -7,3 +7,10 @@
 - Oracle index isolated test: Public retained; Private/Personal excluded.
 - Oracle private-WhatsApp suppression helper isolated test passed.
 - Python compile and `git diff --check` passed for changed runtime scripts.
+
+## Personal collection UI tests
+
+- Full Python test suite: 326/326 passed.
+- Web shell assertions cover Personal nav/page, Visibility filter, and Personal query.
+- Extracted inline JavaScript passed `node --check`.
+- `git diff --check` passed.

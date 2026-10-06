@@ -9,3 +9,10 @@ Implemented 2026-10-06.
 - UI exposes compact visibility selector on document cards for editor/admin.
 - Public Drive index must only include Public documents.
 - Oracle runtime revokes anonymous Drive sharing for non-public documents and suppresses/removes generated WhatsApp receipts for non-public documents.
+
+## Personal collection UI
+
+- Top navigation includes Personal.
+- Personal page loads `/api/v1/search?visibility=personal` and therefore reuses authenticated/RLS-filtered search.
+- Search advanced filters include Any/Public/Private/Personal visibility.
+- Visibility changes refresh the Personal page so moving a document out of Personal removes it immediately.

@@ -3768,18 +3768,24 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         status_filter: str | None = Query(default=None, alias="status"),
         year: int | None = Query(default=None, ge=1900, le=2100),
         file_type: str | None = Query(default=None, max_length=16),
+        visibility: str | None = Query(default=None, pattern=r"^(public|private|personal)$"),
         sort: str = Query(default="latest", pattern=r"^(latest|important|issue_date|title|relevance)$"),
         limit: int = Query(default=25, ge=1, le=100),
         access_token: str = Depends(_access_token),
     ) -> SearchResponse:
+        membership = _archive_membership(access_token)
         transport = _transport(access_token)
         visible_letter_rows = (
-            transport.select("letters", columns="id,visibility")
+            transport.select("letters", columns="id,visibility,personal_owner_id")
             if hasattr(transport, "select")
             else []
         )
         visibility_by_id = {
             str(row.get("id") or ""): str(row.get("visibility") or "public")
+            for row in visible_letter_rows
+        }
+        personal_owner_by_id = {
+            str(row.get("id") or ""): str(row.get("personal_owner_id") or "")
             for row in visible_letter_rows
         }
         text_repo = SupabaseSearchRepository(transport)
@@ -3867,6 +3873,17 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 for item in text_results
             ]
             mode = "text"
+
+        if visibility:
+            cards = [card for card in cards if card.visibility == visibility]
+            if visibility == "personal":
+                cards = [
+                    card for card in cards
+                    if personal_owner_by_id.get(card.id) == membership.user_id
+                ]
+
+        if visibility:
+            cards = [card for card in cards if card.visibility == visibility]
 
         if sort == "latest":
             cards.sort(key=lambda x: x.uploaded_at or "", reverse=True)

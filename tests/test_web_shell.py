@@ -79,6 +79,11 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('/visibility', self.html)
         self.assertIn('>Personal</option>', self.html)
         self.assertIn('>Private</option>', self.html)
+        self.assertIn('data-page="personal"', self.html)
+        self.assertIn('id="page-personal"', self.html)
+        self.assertIn('id="visibilityFilter"', self.html)
+        self.assertIn('visibility=personal', self.html)
+        self.assertIn('function loadPersonal()', self.html)
         self.assertIn('Date.now()', self.html)
 
     def test_sorting_and_important_highlight_controls_are_exposed(self) -> None:

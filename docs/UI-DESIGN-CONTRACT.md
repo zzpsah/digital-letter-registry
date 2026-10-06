@@ -55,6 +55,7 @@ Do not:
 Normal authenticated navigation:
 - Home
 - Search
+- Personal
 - Upload (write roles)
 - Admin (admin only)
 - Account
@@ -204,6 +205,9 @@ Documents support **Public / Private / Personal** visibility.
 - Visibility must be enforced by database RLS and original-file access, not only by UI hiding.
 - Private/Personal documents must not publish a generated WhatsApp receipt; previously generated receipts should be removed by the private runtime when possible.
 - Existing documents remain Public unless explicitly changed.
+- Personal has its own top-level tab listing only the current user’s authorized Personal documents.
+- Search → More filters includes Visibility: Any / Public / Private / Personal.
+- Personal cards show a clear Personal badge and keep the same View/Download/visibility controls as normal document cards.
 
 ## Important/star contract
 

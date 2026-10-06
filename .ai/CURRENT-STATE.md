@@ -91,3 +91,10 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Add private and personal document visibility
 - Date: 2026-10-06
 - Durable context synchronization: completed
+## Document visibility — 2026-10-06
+
+Public / Private / Personal document visibility is implemented in Supabase schema/RLS and application code. Existing documents default to Public. Personal is marker-user/admin scoped while the original ingest owner retains worker continuity. Oracle public-index/Drive/WhatsApp publication paths have matching non-public suppression. Production Vercel deploy remains separately approval-gated.
+
+## Personal document collection UI — 2026-10-06
+
+The eLetters source now includes a Personal top-level tab backed by the same RLS-aware search endpoint with `visibility=personal`, plus a Visibility filter in Search. Visibility changes refresh Personal immediately. Source/test state is complete; production Vercel deployment remains separately approval-gated.
