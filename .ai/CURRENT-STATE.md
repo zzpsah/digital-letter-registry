@@ -5,7 +5,7 @@ Canonical repository: `zzpsah/digital-letter-registry`
 
 ## Repository/runtime evidence
 
-- GitHub and Oracle live working copy were verified at HEAD `bbcce5a81c71cd98e0dd3d272349b6b41489c292` on 2026-10-06.
+- GitHub and Oracle live working copies were reconciled on 2026-10-06. Always verify the current HEAD from Git before runtime work; semantic context must not pin itself to a commit hash that becomes stale after documentation commits.
 - GitHub is the durable source repository.
 - Oracle VPS is the private live worker/runtime and must be verified separately through Desktop Commander before runtime changes.
 - Canonical remote-access procedure: `docs/REMOTE-ACCESS.md`.
