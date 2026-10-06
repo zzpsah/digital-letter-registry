@@ -1,95 +1,121 @@
 # Project Brain — Handoff
 
-Before meaningful work, read `AGENTS.md`, `RULES.md`, README/PRD, `.ai/manifest.yaml`, `.ai/STATE-INDEX.md`, `.ai/PROJECT.md`, `.ai/CURRENT-STATE.md`, root `TASKS.md`, `brain/README.md`, and the relevant enhancement brain.
+Last reconciled: 2026-10-06
 
-Repository evidence is authoritative over chat memory. After meaningful work, synchronize source evidence plus all affected README/docs, root tasks, `.ai/`, and relevant `brain/` records.
+## Read order
 
-Current runtime checkpoint:
-- DB-level synthetic owner RLS insert/read and wrong-user denial are verified using simulated request JWT claims.
-- Checked-in magic-link template uses the server-side token-hash callback, but hosted Supabase email templates cannot be edited on the current default mailer without custom SMTP. This is no longer a blocker: the app now supports Supabase's default fragment callback, validates the owner server-side, converts the session to HttpOnly cookies, and clears fragment tokens. The Management API helper remains available for an optional future custom-SMTP path.
-- VPS auth/API tests pass 29/29; full synthetic suite passes 212/212; Supabase Management Auth-config helper tests pass 4/4.
-- DLR has a dedicated tailnet-only HTTPS runtime origin; Supabase Site URL/redirect configuration is aligned to it. Do not publish the private hostname/port in Git.
-- A real short-lived authenticated HTTP/PostgREST vertical slice is still pending. The current blocker is Supabase email-send throttling; magic-link throttles now return HTTP 429 rather than 500.
-- Dedicated DLR Google OAuth is configured through secret-manager-injected refresh credentials with a write-capable Drive grant; refresh/list/stream and disposable synthetic upload/stream/delete verification passed.
-- The existing `phone_drive` rclone credential remains separate and unused by DLR.
-- Current runtime readiness has Drive configured; Gemini is the only failing readiness check.
-- Gemini runtime key remains unavailable.
-- The synthetic DB verification row was removed through controlled cleanup; no archive-letter rows exist.
+Before meaningful work, read:
+1. `AGENTS.md`
+2. `RULES.md`
+3. `.ai/STATE-INDEX.md`
+4. `.ai/CURRENT-STATE.md`
+5. `brain/CURRENT_STATE.md`
+6. `docs/UI-DESIGN-CONTRACT.md` for UI/auth/search/admin work
+7. the relevant enhancement brain folder
 
-Do not deploy, ingest real documents, activate live connectors, rename real Drive files, configure or expose secrets, or perform destructive live-data actions without the required explicit authorization.
+Repository evidence is authoritative over chat memory. Current-state files describe present behavior; old checkpoints belong to history and must not override current source/runtime evidence.
 
+## Canonical current handoff
 
-## Drive account handoff
+DLR/eLetters is live as a web control plane with a private Oracle worker and private Drive archive. The current repository/runtime HEAD was verified on 2026-10-06 as:
 
-- Current private deployment is single archive-owner/single archive tree.
-- DLR code itself is not tied to that account.
-- To use another Google Drive, authorize that account separately and configure separate secret-manager OAuth keys plus archive folder references.
-- Never silently reuse another deployment's refresh token or switch its target folders.
+`bbcce5a81c71cd98e0dd3d272349b6b41489c292`
 
+The normal document flow is:
 
-## Auth boundary
+```text
+approved intake
+→ preserve original
+→ text extraction / Hindi+English OCR
+→ source-grounded intelligence
+→ structured archive/search
+→ email + WhatsApp delivery
+→ search/open/reprocess
+```
 
-Magic Link/passwordless email authentication is an identity/session layer only. It exists so Supabase RLS can enforce owner-scoped database access and so future users/schools can remain isolated. It does not replace Tailscale, does not grant Google Drive access, and does not authorize real ingestion/rename/delete actions by itself.
+### Never regress these rules
 
+- Original document remains the logical source of truth.
+- Category is secondary taxonomy, never document meaning.
+- User-facing title/summary/action/audience/authority must come from document evidence.
+- Reprocess updates the same logical document; it must not create a duplicate letter.
+- Reprocessing must not resend delivery for wording-only paraphrases.
+- Material corrections use the existing email-thread / WhatsApp replacement path.
+- A prior generated WhatsApp reply should be replaced when a corrected one is posted.
+- Default portal sorting remains latest-uploaded-first.
+- Internal notes/comments remain private to authenticated users.
+- Normal Remove actions are reversible; permanent delete is explicit and confirmed.
+- Preserve the accepted responsive eLetters UI contract.
 
-## Google Sign-In handoff
+## Intake boundary
 
-Application support is complete and 220/220 synthetic tests pass. Supabase currently reports Google provider disabled. Resume from `brain/google-signin/`. Create a separate Google Web OAuth client, configure Supabase Google provider, then prove the existing archive-owner user id is preserved through automatic identity linking before running the real authenticated synthetic RLS vertical slice.
+The public Vercel app is the user-facing control plane and does not carry private Drive upload credentials.
 
+The private Oracle runtime supports the controlled approved WhatsApp real-document pilot. Do not use older “zero real letters / no live connector” checkpoints as the current state.
 
-## Multi-user authorization handoff
+Do not broaden intake, bulk-import historical documents, rename/delete originals, or expose private storage/runtime identifiers without the appropriate explicit authorization and safeguards.
 
-The hosted archive now uses membership/role authorization rather than a configured single-owner check.
+## Reprocess handoff
 
-- Authentication providers are interchangeable; Gmail/Google is not required.
-- Email/password and Magic Link work under the same membership model; Google Sign-In is optional.
-- Registration is invite-only.
-- Roles are admin/editor/viewer and are enforced by RLS plus API checks.
-- The bootstrap owner is currently the sole active admin.
-- The database prevents loss of the last active admin; live disable test passed.
-- Admin invite/member management is implemented.
-- Invite links use fragments rather than query parameters.
-- Full synthetic suite passes 249/249.
-- Supabase leaked-password protection is still disabled and should be enabled when Auth configuration access is available.
-- Resume from `brain/multi-user-authz/`.
+Use manual Reprocess for wrong or missing derived intelligence.
 
-## Latest web UI handoff — 2026-10-05
+Reprocess must:
+- use the existing original;
+- stay single-flight per document;
+- preserve stronger prior facts over weaker new output;
+- update derived OCR/context/title/summary/authority/action as appropriate;
+- keep stable document identity;
+- avoid duplicate mail/WhatsApp caused only by AI wording variation.
 
-Treat the current responsive eLetters shell as the UI baseline. Preserve the compact English-default navigation and mobile breakpoints. Do not regress Admin back to add-only recipient/WhatsApp controls: current entries must remain visible and manageable.
+If output is weak, diagnose extraction/context/provider behavior before claiming the PDF itself is poor.
 
-## Admin operations handoff — 2026-10-05
+## Authority handoff
 
-Preserve the Overview and Audit tabs and route WhatsApp group actions through the Oracle proxy when running on Vercel. Keep group descriptions plain text. Never convert send+pin into editing an assumed stale message ID: create a fresh message, pin it, then update runtime state. Audit persistence is best-effort after external side effects so a temporary audit write failure does not falsely report an already-completed WhatsApp/recipient action as rolled back.
+- Keep raw authority text on the letter.
+- Prefer canonical short authority names in user-facing UI.
+- Unmatched/null authority mappings must remain visible for review.
+- Admin can edit aliases/names, merge duplicates, soft-remove/restore, or permanently delete with explicit confirmation.
+- Merge must preserve letter mappings and aliases.
+- Search authority labels should stay concise.
 
-## Processing recovery handoff — 2026-10-05
+## Admin/UI handoff
 
-Use Admin > Operations for manual failed-job recovery. Do not turn this into automatic bulk retry without a separate policy: repeated provider/OCR/config failures could otherwise loop. A retry should preserve attempts, clear the worker claim and last error, set availability to now, and let the normal worker claim path process it.
+Preserve:
+- Overview + Audit
+- Operations failed-job review and explicit Retry
+- Users/access approval/roles
+- recipients + allowed-recipient summary
+- WhatsApp allowlist/group controls
+- categories
+- authorities
+- backup/restore preview
+- reversible bulk actions
+- Important flag and note
+- compact mobile layout and existing navigation
 
-## Reversible admin-state handoff — 2026-10-05
+Before changing any of these, read `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/`.
 
-Do not make normal Remove buttons destructive. User removal means disabled membership; recipient removal means is_active=false with delivery disabled; category removal means is_active=false. Restore must be available from the same Admin area. Permanent delete should remain secondary, explicit, and confirmed.
+## Remote Oracle handoff
 
-## Backup/bulk handoff — 2026-10-05
+Read `docs/REMOTE-ACCESS.md`.
 
-Preserve the no-secrets backup contract. Never add passwords, Supabase keys, access/refresh tokens, cookies, invite codes or approval tokens to admin backups. Always run restore preview and create a private pre-restore snapshot first. Keep Supabase member/category restore conservative and local recipient/allowlist restore explicit. Bulk UI must continue to call guarded normal APIs rather than bypassing role/last-admin protections.
+A new AI chat must:
+1. call Desktop Commander device discovery;
+2. select online `oracle-server`;
+3. ping it;
+4. inspect `/home/prashant/projects/digital-letter-registry`;
+5. run `git status --short` and compare live HEAD with origin before runtime work.
 
-## Intelligence handoff — 2026-10-05
+Never pretend GitHub access equals VPS access.
 
-Never restore category-first title/summary templates. Taxonomy is secondary. A wrong category must not force a wrong email subject or WhatsApp summary. Keep source-grounded title/summary/action/audience as the primary contract across Gemini, Supabase-Gemini, Hermes fallback, delivery email and WhatsApp.
+## Documentation discipline
 
-## Global delivery language handoff — 2026-10-05
+After a meaningful behavior change:
+- update source/tests;
+- update README when user-facing behavior changed;
+- update `brain/CURRENT_STATE.md`;
+- update `brain/HANDOFF.md` only when the next-agent handoff changed;
+- update `.ai/CURRENT-STATE.md`;
+- put chronological milestone detail in `docs/HISTORY.md` or `.ai/CHANGELOG.md`, not in the current-state header.
 
-Do not translate WhatsApp headings. Keep What this is and Action items in English; write their content in Hindi. Preserve official English terms where they improve clarity. Apply this to every document, not per-document exceptions.
-
-## Reprocess intelligence handoff — 2026-10-05
-
-Keep document meaning source-first. Category is secondary taxonomy and must never override stronger document evidence. A reprocess should update the same logical document everywhere (email thread, WhatsApp generated reply, index and portal). For WhatsApp, delete the previous generated reply for everyone before posting the replacement, and persist the new message id for the next replacement.
-
-## Importance/sorting handoff — 2026-10-05
-
-Keep default portal sorting by `uploaded_at desc`. Do not silently switch the default to issue_date. Preserve the distinction between shared importance state and internal comment privacy: authenticated portal can display `user_comment`; public Drive index must not publish it. Editor/Admin writes must continue through guarded API/RLS.
-
-
-## UI/behavior governance baseline
-
-`docs/UI-DESIGN-CONTRACT.md` + `brain/ui-governance/` are mandatory context for UI/auth/search/admin/recipient/trash changes. Do not wholesale redesign or recolor eLetters.
+Do not append stale checkpoints above newer truth. Current files must remain concise and present-tense.
