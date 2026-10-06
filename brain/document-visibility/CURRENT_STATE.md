@@ -81,3 +81,10 @@ Home now renders up to 100 archive documents latest-first instead of only the la
 - Users can select individual files or Select all matching files, then bulk archive them.
 - When a month is chosen, selected files are archived under that year/month. When All months is chosen, each file is grouped under its own issue/upload month.
 - Archived documents are browsed year/month-wise and can be restored.
+
+## Unified privacy icon — 2026-10-06
+
+- Removed the separate Personal action button from document cards.
+- A single privacy icon beside the star cycles Public → Private → Personal → Public.
+- Icons: 🔓 Public, 🔒 Private, 👤 Personal.
+- Personal remains a top-level tab for browsing Personal documents.

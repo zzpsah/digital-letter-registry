@@ -340,3 +340,7 @@ Home, Important, and Archive use a user-selectable page size of **50 / 100 / 200
 ### Cold Archive manager
 
 Archive is a bulk-management workspace for older, lower-use documents. It does not provide a separate historical upload path. Users filter existing main documents by year/month, load matching files, select individual or all matching documents, and move them to Archive. Archived documents are grouped by year/month and stay out of Home/Search/Personal until restored.
+
+### Unified privacy icon
+
+Document cards use one compact privacy icon beside the Important star. Tapping cycles `🔓 Public → 🔒 Private → 👤 Personal → 🔓 Public`. Do not show a separate Personal action button on cards. The Personal top-level tab remains the dedicated view for Personal documents.

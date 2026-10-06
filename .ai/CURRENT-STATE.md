@@ -91,3 +91,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Change: Add bulk year-month cold archive manager
 - Date: 2026-10-06
 - Durable context synchronization: completed
+
+## Unified privacy icon — 2026-10-06
+
+Card privacy control is now a single cycle icon: Public → Private → Personal → Public. Separate Personal card action removed; Personal navigation tab remains.
