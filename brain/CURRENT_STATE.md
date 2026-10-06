@@ -2,7 +2,7 @@
 
 Last reconciled: 2026-10-06
 Canonical repository: `zzpsah/digital-letter-registry`
-Runtime repository HEAD verified on GitHub and Oracle: `bbcce5a81c71cd98e0dd3d272349b6b41489c292`
+GitHub and Oracle were reconciled on 2026-10-06. Always verify the current HEAD from Git/`.ai/STATE-INDEX.md` before acting; do not hard-code a semantic handoff to one commit hash.
 
 > This file describes the **current truth only**. Historical checkpoints belong in `docs/HISTORY.md`, `.ai/CHANGELOG.md`, Git history, and enhancement-specific brain folders. Do not treat old synthetic-only checkpoints as current state.
 
