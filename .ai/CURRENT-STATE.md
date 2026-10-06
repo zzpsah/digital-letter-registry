@@ -95,3 +95,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 ## Year-wise Archive — 2026-10-06
 
 The portal supports a separate `is_archived/archive_year` state. Archived documents are excluded from normal search/home/personal results and shown in a dedicated Archive tab grouped by year with restore support. Public Drive publication also excludes archived documents.
+
+## Navigation and pagination refinement — 2026-10-06
+
+The primary nav now uses `★ Important` instead of Personal. Personal state is preserved and remains reachable from Search visibility filtering/card actions. Home, Important, and Archive default to 50/page with user-selectable 20/50/100 page sizes. `search_letter_cards_v5` adds `important_only` for unbounded server-side Important pagination.

@@ -45,3 +45,10 @@ Home now renders up to 100 archive documents latest-first instead of only the la
 - Archive has its own top-level tab, year filter, search, 20-item pagination, and year-grouped cards.
 - Restore returns the document to the main archive without changing its visibility.
 - Archived documents are excluded from the generated public Drive index.
+
+## Page-size selector + Important workspace — 2026-10-06
+
+- Home, Important, and Archive pagination default to 50 documents per page.
+- Users can choose 20 / 50 / 100 per page from the pager controls.
+- The top-level Personal navigation button was replaced by `★ Important`. Personal documents remain available through the Search visibility filter and card Personal action.
+- Important uses server-side pagination with `important_only=true`, so starred documents scale beyond one page.

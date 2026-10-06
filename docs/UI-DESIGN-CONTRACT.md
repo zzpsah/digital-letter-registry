@@ -324,3 +324,7 @@ The top navigation includes **🗄 Archive**. Archive is an organizational state
 ### Year-wise Archive
 
 Archive is distinct from privacy and Trash. A document can be moved out of the main list into **Archive**, assigned an archive year, and restored later without changing Public/Private/Personal visibility. The Archive tab groups records by year, supports year filtering/search, and paginates at 20 documents per page.
+
+### Page size and primary navigation
+
+Home, Important, and Archive default to **50 documents per page** and expose a compact **20 / 50 / 100 per page** selector beside pagination. The former Personal top-nav button is replaced by **★ Important** for faster access to starred documents. Personal remains a document state accessible through Search filters and the card Personal action.

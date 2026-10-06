@@ -3780,6 +3780,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         visibility: str | None = Query(default=None, pattern=r"^(public|private|personal)$"),
         archived: bool = Query(default=False),
         archive_year: int | None = Query(default=None, ge=1900, le=2100),
+        important_only: bool = Query(default=False),
         sort: str = Query(default="latest", pattern=r"^(latest|important|issue_date|title|relevance)$"),
         limit: int = Query(default=25, ge=1, le=100),
         offset: int = Query(default=0, ge=0),
@@ -3859,7 +3860,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         else:
             paged_latest = (sort == "latest" and not q.strip())
             search_limit = min(limit + 1, 100) if paged_latest else (100 if sort != "relevance" else limit)
-            text_results = text_repo.search(q, filters=filters, limit=search_limit, offset=(offset if paged_latest else 0), archived=archived, archive_year=archive_year)
+            text_results = text_repo.search(q, filters=filters, limit=search_limit, offset=(offset if paged_latest else 0), archived=archived, archive_year=archive_year, important_only=important_only)
             cards = [
                 SearchCard(
                     id=item.record_id,
@@ -3891,6 +3892,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             mode = "text"
 
         cards = [card for card in cards if card.is_archived == archived]
+        if important_only:
+            cards = [card for card in cards if card.is_important]
         if archive_year is not None:
             cards = [card for card in cards if card.archive_year == archive_year]
 
