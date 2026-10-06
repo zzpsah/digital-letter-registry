@@ -6,6 +6,7 @@ import base64
 import json
 import os
 import re
+import time
 from dataclasses import dataclass
 from urllib import error, request
 
@@ -33,7 +34,7 @@ def _json_from_output(raw: str) -> dict[str, object]:
 @dataclass(slots=True)
 class SupabaseGeminiFileContextProvider:
     gateway_url: str
-    model: str = "gemini-3.6-flash"
+    model: str = "gemini-3.5-flash-lite"
     timeout_seconds: int = 90
 
     @property
@@ -49,7 +50,7 @@ class SupabaseGeminiFileContextProvider:
                 url = project_url + "/functions/v1/gemini-ai-gateway"
         if not url:
             raise ValueError("SUPABASE_GEMINI_GATEWAY_URL or SUPABASE_GEMINI_PROJECT_URL is required")
-        model = os.environ.get("AI_MODEL", "gemini-3.6-flash").strip() or "gemini-3.6-flash"
+        model = os.environ.get("AI_MODEL", "gemini-3.5-flash-lite").strip() or "gemini-3.5-flash-lite"
         return cls(gateway_url=url, model=model)
 
     def analyze(self, *, extracted_text: str, hints: ContextHints) -> StructuredDocumentContext:
@@ -116,15 +117,34 @@ class SupabaseGeminiFileContextProvider:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        try:
-            with request.urlopen(req, timeout=self.timeout_seconds) as response:
-                status = response.status
-                raw = response.read().decode("utf-8")
-        except error.HTTPError as exc:
-            body = exc.read().decode("utf-8", errors="replace")
-            raise GeminiProviderError(f"Supabase Gemini gateway HTTP {exc.code}: {body[:500]}") from exc
-        except error.URLError as exc:
-            raise GeminiProviderError(f"Supabase Gemini gateway unavailable: {exc.reason}") from exc
+        raw = ""
+        status = 0
+        last_error: Exception | None = None
+        for attempt, delay in enumerate((0, 2, 6), start=1):
+            if delay:
+                time.sleep(delay)
+            try:
+                with request.urlopen(req, timeout=self.timeout_seconds) as response:
+                    status = response.status
+                    raw = response.read().decode("utf-8")
+                last_error = None
+                break
+            except error.HTTPError as exc:
+                body = exc.read().decode("utf-8", errors="replace")
+                last_error = GeminiProviderError(
+                    f"Supabase Gemini gateway HTTP {exc.code}: {body[:500]}"
+                )
+                quota_exhausted = "quota exceeded" in body.casefold() or "current quota" in body.casefold()
+                if quota_exhausted or exc.code not in {429, 500, 502, 503, 504} or attempt == 3:
+                    raise last_error from exc
+            except error.URLError as exc:
+                last_error = GeminiProviderError(
+                    f"Supabase Gemini gateway unavailable: {exc.reason}"
+                )
+                if attempt == 3:
+                    raise last_error from exc
+        if last_error is not None:
+            raise last_error
 
         if status < 200 or status >= 300:
             raise GeminiProviderError(f"unexpected Supabase Gemini gateway HTTP status: {status}")
