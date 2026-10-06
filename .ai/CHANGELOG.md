@@ -1,3 +1,18 @@
+## 2026-10-06 — Expand document page size options
+- Commit: bb3cc8fbd7c43d0bf1f4254d029da8058fa7345a
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/CURRENT_STATE.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/search.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261006173000_expand_archive_page_size.sql`
+- `tests/test_api.py`
+- `tests/test_search.py`
+- `tests/test_web_shell.py`
+
 ## 2026-10-06 — Move archive intake to dedicated workspace
 - Commit: 2b69fb04df00053580b4196fa3eda9e959f92849
 - Author: development-os[bot]

@@ -87,11 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 2b69fb04df00053580b4196fa3eda9e959f92849
-- Change: Move archive intake to dedicated workspace
+- Commit: bb3cc8fbd7c43d0bf1f4254d029da8058fa7345a
+- Change: Expand document page size options
 - Date: 2026-10-06
 - Durable context synchronization: completed
-
-## Large page-size selector — 2026-10-06
-
-Archive/list pagination now defaults to 50 and supports 50/100/200/500 per page. API/search RPC cap is 500 per page, with unlimited continuation across pages.
