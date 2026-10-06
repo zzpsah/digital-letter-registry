@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 32cc4e64a04d45f91982009c5199ee577d5533d5
-- Last commit: Fix canonical eLetters portal URL
+- HEAD: 4d9659a38202b55b1c0aa07c91f16a78026420fb
+- Last commit: Use stronger fallback for weak document reprocessing
 - Last commit date: 2026-10-06
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

@@ -1,3 +1,12 @@
+## 2026-10-06 — Use stronger fallback for weak document reprocessing
+- Commit: 4d9659a38202b55b1c0aa07c91f16a78026420fb
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/processing_pipeline.py`
+- `tests/test_processing_pipeline.py`
+- `tests/test_worker.py`
+
 ## 2026-10-06 — Fix canonical eLetters portal URL
 - Commit: 32cc4e64a04d45f91982009c5199ee577d5533d5
 - Author: development-os[bot]
