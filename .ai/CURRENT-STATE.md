@@ -107,3 +107,8 @@ Public Vercel hosting is authorized and live. Real-letter ingestion, historical 
 - Authority rows show linked-letter counts before destructive actions.
 
 - Admin → Recipients shows a separate read-only `Allowed recipients` summary above management, with enabled Email/WhatsApp/Both channels and the current Default recipient clearly visible.
+
+## Remote access handoff
+- Canonical access instructions: `docs/REMOTE-ACCESS.md`.
+- New AI chats must discover the current Desktop Commander device with `list_devices`, choose the online `oracle-server`, and verify it with `ping` before touching live runtime state.
+- GitHub access alone does not provide Oracle VPS control.
