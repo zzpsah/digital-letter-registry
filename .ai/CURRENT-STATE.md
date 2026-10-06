@@ -87,10 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 6460e9a1f9597e271a79ff2bd04c9e7541fc8428
-- Change: Harden Gemini reprocessing retries and model default
+- Commit: 12818cf057c62ec59f1476c1aa92f3b56cc314ba
+- Change: Add private and personal document visibility
 - Date: 2026-10-06
 - Durable context synchronization: completed
-## Document visibility — 2026-10-06
-
-Public / Private / Personal document visibility is implemented in Supabase schema/RLS and application code. Existing documents default to Public. Personal is marker-user/admin scoped while the original ingest owner retains worker continuity. Oracle public-index/Drive/WhatsApp publication paths have matching non-public suppression. Production Vercel deploy remains separately approval-gated.

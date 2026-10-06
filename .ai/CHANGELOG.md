@@ -1,3 +1,23 @@
+## 2026-10-06 — Add private and personal document visibility
+- Commit: 12818cf057c62ec59f1476c1aa92f3b56cc314ba
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/document-visibility/ARCHITECTURE.md`
+- `brain/document-visibility/CURRENT_STATE.md`
+- `brain/document-visibility/DECISIONS.md`
+- `brain/document-visibility/HANDOFF.md`
+- `brain/document-visibility/PROJECT.md`
+- `brain/document-visibility/SECURITY.md`
+- `brain/document-visibility/TASKS.md`
+- `brain/document-visibility/TESTS.md`
+- `brain/ui-governance/CURRENT_STATE.md`
+- `docs/UI-DESIGN-CONTRACT.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `supabase/migrations/20261006130000_add_letter_visibility.sql`
+- `tests/test_web_shell.py`
+
 ## 2026-10-06 — Harden Gemini reprocessing retries and model default
 - Commit: 6460e9a1f9597e271a79ff2bd04c9e7541fc8428
 - Author: development-os[bot]

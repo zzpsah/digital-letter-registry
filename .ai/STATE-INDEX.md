@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 6460e9a1f9597e271a79ff2bd04c9e7541fc8428
-- Last commit: Harden Gemini reprocessing retries and model default
+- HEAD: 12818cf057c62ec59f1476c1aa92f3b56cc314ba
+- Last commit: Add private and personal document visibility
 - Last commit date: 2026-10-06
 - Last commit author: development-os[bot]
 
