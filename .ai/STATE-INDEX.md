@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 4d9659a38202b55b1c0aa07c91f16a78026420fb
-- Last commit: Use stronger fallback for weak document reprocessing
+- HEAD: 6460e9a1f9597e271a79ff2bd04c9e7541fc8428
+- Last commit: Harden Gemini reprocessing retries and model default
 - Last commit date: 2026-10-06
 - Last commit author: development-os[bot]
 

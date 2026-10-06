@@ -1,3 +1,10 @@
+## 2026-10-06 — Harden Gemini reprocessing retries and model default
+- Commit: 6460e9a1f9597e271a79ff2bd04c9e7541fc8428
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/supabase_gemini_gateway.py`
+
 ## 2026-10-06 — Use stronger fallback for weak document reprocessing
 - Commit: 4d9659a38202b55b1c0aa07c91f16a78026420fb
 - Author: development-os[bot]

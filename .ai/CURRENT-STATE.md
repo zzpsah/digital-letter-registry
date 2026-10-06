@@ -87,7 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 4d9659a38202b55b1c0aa07c91f16a78026420fb
-- Change: Use stronger fallback for weak document reprocessing
+- Commit: 6460e9a1f9597e271a79ff2bd04c9e7541fc8428
+- Change: Harden Gemini reprocessing retries and model default
 - Date: 2026-10-06
 - Durable context synchronization: completed
