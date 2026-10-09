@@ -1,3 +1,11 @@
+## 2026-10-10 — feat: add public eLetters privacy policy
+- Commit: 23d528ef679c1ca665a526037bfbef8b07db0961
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `tests/test_api.py`
+
 ## 2026-10-10 — docs: publish DLR privacy policy
 - Commit: 4dfaee20ad4ab86b0b6663c4088627d9778162ee
 - Author: PRASHANT KUMAR SAH
