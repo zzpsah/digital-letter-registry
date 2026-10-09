@@ -270,3 +270,18 @@ The accepted eLetters interface and workflows are protected by `docs/UI-DESIGN-C
 Authority is exactly one actual issuing/signing authority, never a concatenation of issuer + recipient + cited offices. The classification hierarchy is **Headmaster/School → BEO (Block Education Officer / प्रखंड शिक्षा पदाधिकारी) → DPO (functional district programme authority such as Establishment) → DEO (one canonical DEO per district) → RDDE (division) → Education Department (state)**.
 
 Canonical authority records store designation, jurisdiction and level. DPO posts may be distinct by function, for example DPO Establishment vs another DPO branch. Raw document authority text stays preserved on the letter, while `canonical_authority_id` links it to the clean authority master. Admin-confirmed aliases are learned permanently; future matching issuer strings auto-map through normalized aliases. Uncertain or multi-office strings remain unmatched for review rather than being force-mapped. Search authority dropdown shows canonical authorities, not every raw spelling variant.
+
+## UI/UX preservation — mandatory project-wide rule
+
+Unless the user explicitly requests a specific UI change, preserve the existing UI/UX exactly. This is a project-wide constraint for every feature, bug fix, refactor, and deployment update.
+
+- Do not redesign, replace, or broadly restyle existing screens.
+- Keep the established layout, colors, typography, spacing, navigation, components, responsive behavior, and user workflows unchanged.
+- Implement only the smallest targeted changes required for the explicitly requested functionality; reuse existing components and patterns.
+- Preserve existing features, interactions, accessibility, and backward compatibility.
+- Before completion, run relevant tests and inspect the changed screens/flows for visual regressions, layout breakage, and functional regressions.
+- Document what changed, what was tested, and whether UI/UX preservation was verified. If a visual change is genuinely required, explain it and obtain explicit user authorization before proceeding.
+- Follow the project workflow: READ → UNDERSTAND → PLAN → IMPLEMENT → TEST → REVIEW → FIX → COMMIT → UPDATE DOCUMENTATION.
+
+Acceptance criterion: requested functionality works, existing behavior remains intact, and the UI/UX is unchanged except for a specific visual change the user explicitly authorized.
+
