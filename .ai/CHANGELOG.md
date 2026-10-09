@@ -1,3 +1,12 @@
+## 2026-10-10 — Fix OAuth homepage verification requirements (#3)
+- Commit: 025c752c0726992c0c3d4bef67c561a1c4d2b614
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `public-homepage.html`
+- `src/letter_registry/api.py`
+- `tests/test_api.py`
+
 ## 2026-10-10 — feat: add public eLetters privacy policy
 - Commit: 23d528ef679c1ca665a526037bfbef8b07db0961
 - Author: PRASHANT KUMAR SAH
