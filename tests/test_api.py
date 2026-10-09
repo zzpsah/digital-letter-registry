@@ -1315,13 +1315,21 @@ class ApiTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 501)
 
-    def test_home_serves_simple_english_default_interface(self):
+    def test_home_serves_public_oauth_review_homepage(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("Find a letter", response.text)
         self.assertIn("Search letters", response.text)
-        self.assertIn("uploadForm", response.text)
+        self.assertIn("/privacy-policy", response.text)
+        self.assertIn("/app", response.text)
+        self.assertIn("UMV Storage Automation", response.text)
+        self.assertNotIn("uploadForm", response.text)
         self.assertNotIn("UMV Tetahali", response.text)
+
+    def test_app_route_serves_the_existing_eletters_interface(self):
+        response = self.client.get("/app")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("uploadForm", response.text)
 
 
 if __name__ == "__main__":
