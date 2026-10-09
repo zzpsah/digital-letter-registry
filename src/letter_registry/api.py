@@ -1339,6 +1339,13 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
 
     @app.get("/", include_in_schema=False)
     def home() -> FileResponse:
+        """Public product information page for OAuth consent-screen review."""
+        homepage_path = Path(__file__).resolve().parents[2] / "public-homepage.html"
+        return FileResponse(homepage_path, media_type="text/html; charset=utf-8")
+
+    @app.get("/app", include_in_schema=False)
+    def app_home() -> FileResponse:
+        """Authenticated eLetters interface."""
         return FileResponse(Path(__file__).with_name("web") / "index.html")
 
     @app.get("/privacy-policy", include_in_schema=False)
