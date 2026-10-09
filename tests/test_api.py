@@ -52,6 +52,13 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "ok")
 
+    def test_privacy_policy_is_public_html(self):
+        response = self.client.get("/privacy-policy")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("text/html", response.headers["content-type"])
+        self.assertIn("Privacy Policy", response.text)
+        self.assertIn("Google Drive", response.text)
+
     def test_auth_providers_reports_invite_only_password_login(self):
         with patch(
             "letter_registry.api.SupabasePasswordlessAuth.from_environment"
