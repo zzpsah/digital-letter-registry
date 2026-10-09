@@ -1,6 +1,7 @@
 import json
 import os
 import tempfile
+import google.auth.transport.requests
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -8,6 +9,7 @@ from unittest.mock import patch
 from letter_registry.google_drive_auth import (
     GoogleAuthorizedUserFileProvider,
     GoogleRefreshTokenProvider,
+    GoogleServiceAccountProvider,
     StaticAccessTokenProvider,
     drive_token_provider_from_environment,
 )
@@ -123,6 +125,57 @@ class DriveAuthTests(unittest.TestCase):
                 provider = drive_token_provider_from_environment()
 
         self.assertIsInstance(provider, GoogleRefreshTokenProvider)
+
+    def test_environment_prefers_service_account_file_over_refresh_token(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "service-account.json"
+            path.write_text("{}", encoding="utf-8")
+            with patch.dict(
+                os.environ,
+                {
+                    "GOOGLE_SERVICE_ACCOUNT_FILE": str(path),
+                    "GOOGLE_OAUTH_CLIENT_ID": "legacy-client",
+                    "GOOGLE_OAUTH_CLIENT_SECRET": "legacy-secret",
+                    "GOOGLE_DRIVE_REFRESH_TOKEN": "legacy-refresh",
+                },
+                clear=True,
+            ):
+                provider = drive_token_provider_from_environment()
+        self.assertIsInstance(provider, GoogleServiceAccountProvider)
+
+    def test_service_account_provider_mints_short_lived_access_token(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "service-account.json"
+            path.write_text("synthetic-only", encoding="utf-8")
+            class Credentials:
+                valid = False
+                token = None
+                def refresh(self, request):
+                    self.token = "synthetic-service-account-access"
+                    self.valid = True
+            credentials = Credentials()
+            provider = GoogleServiceAccountProvider(str(path))
+            with patch(
+                "google.oauth2.service_account.Credentials.from_service_account_file",
+                return_value=credentials,
+            ) as load_credentials, patch(
+                "google.auth.transport.requests.Request",
+                return_value=object(),
+            ):
+                token = provider.get_access_token()
+        self.assertEqual(token, "synthetic-service-account-access")
+        load_credentials.assert_called_once_with(
+            str(path), scopes=["https://www.googleapis.com/auth/drive"]
+        )
+
+    def test_service_account_provider_requires_existing_file(self):
+        with patch.dict(
+            os.environ,
+            {"GOOGLE_SERVICE_ACCOUNT_FILE": "/missing/service-account.json"},
+            clear=True,
+        ):
+            with self.assertRaisesRegex(ValueError, "file is missing"):
+                GoogleServiceAccountProvider.from_environment()
 
     def test_environment_can_fallback_to_static_token(self):
         with patch.dict(

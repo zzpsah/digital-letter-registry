@@ -43,6 +43,9 @@ def _present(name: str) -> bool:
 
 
 def _drive_credentials_ready() -> bool:
+    service_account_file = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip()
+    if service_account_file and os.path.isfile(service_account_file):
+        return True
     credentials_file = os.environ.get("GOOGLE_OAUTH_CREDENTIALS_FILE", "").strip()
     if credentials_file and os.path.isfile(credentials_file):
         return True
@@ -131,7 +134,7 @@ def check_runtime_readiness() -> RuntimeReadiness:
             "drive_credentials",
             _drive_credentials_ready(),
             "configured" if _drive_credentials_ready()
-            else "missing Drive access token or OAuth refresh credentials",
+            else "missing service-account credentials or legacy Drive credentials",
         ),
         ReadinessCheck(
             "drive_originals_folder",

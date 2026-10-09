@@ -48,6 +48,27 @@ class RuntimeReadinessTests(unittest.TestCase):
         ):
             self.assertNotIn(secret, serialized)
 
+    def test_service_account_file_counts_as_configured(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "service-account.json"
+            path.write_text("{}", encoding="utf-8")
+            with patch.dict(
+                os.environ,
+                {
+                    "SUPABASE_URL": "https://example.supabase.co",
+                    "SUPABASE_PUBLISHABLE_KEY": "key",
+                    "AUTH_REDIRECT_URL": "http://localhost:8000/auth/confirm",
+                    "GOOGLE_SERVICE_ACCOUNT_FILE": str(path),
+                    "DRIVE_ORIGINALS_FOLDER_REFERENCE": "folder",
+                },
+                clear=True,
+            ):
+                with patch("letter_registry.runtime_readiness.shutil.which", return_value=None):
+                    readiness = check_runtime_readiness()
+            checks = {item.name: item for item in readiness.checks}
+            self.assertTrue(checks["drive_credentials"].ready)
+            self.assertNotIn(str(path), str(readiness.as_dict()))
+
     def test_drive_credentials_file_counts_as_configured(self):
         with tempfile.TemporaryDirectory() as td:
             credentials = Path(td) / "authorized-user.json"

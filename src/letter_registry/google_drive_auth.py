@@ -87,6 +87,56 @@ class StaticAccessTokenProvider:
         return token
 
 
+
+@dataclass(slots=True)
+class GoogleServiceAccountProvider:
+    """Mint short-lived Drive access tokens from a service-account key file.
+
+    The private key remains in a root/user-readable runtime file; access tokens
+    are cached only in memory. Uploads require a folder accessible to the service
+    account (normally a Google Workspace Shared Drive).
+    """
+
+    credentials_path: str
+    _credentials: object | None = field(default=None, init=False)
+    _request_factory: object | None = field(default=None, init=False)
+
+    @classmethod
+    def from_environment(cls) -> "GoogleServiceAccountProvider":
+        path = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip()
+        if not path:
+            raise ValueError("Google service-account credentials file is required")
+        if not os.path.isfile(path):
+            raise ValueError("Google service-account credentials file is missing")
+        return cls(credentials_path=path)
+
+    def get_access_token(self) -> str:
+        if self._credentials is None:
+            try:
+                from google.oauth2 import service_account
+                from google.auth.transport.requests import Request
+            except ImportError as exc:
+                raise RuntimeError("google-auth is required for service-account Drive auth") from exc
+            try:
+                self._credentials = service_account.Credentials.from_service_account_file(
+                    self.credentials_path,
+                    scopes=["https://www.googleapis.com/auth/drive"],
+                )
+            except (OSError, ValueError, KeyError) as exc:
+                raise ValueError("Google service-account credentials file is invalid") from exc
+            self._request_factory = Request
+        credentials = self._credentials
+        if not getattr(credentials, "valid", False):
+            try:
+                credentials.refresh(self._request_factory())
+            except Exception as exc:
+                # Never include credential material or provider response bodies.
+                raise GoogleOAuthError("Google service-account token refresh failed") from exc
+        token = str(getattr(credentials, "token", "") or "").strip()
+        if not token:
+            raise GoogleOAuthError("Google service-account returned an empty access token")
+        return token
+
 @dataclass(slots=True)
 class GoogleRefreshTokenProvider:
     client_id: str
@@ -174,6 +224,10 @@ class GoogleRefreshTokenProvider:
 
 
 def drive_token_provider_from_environment() -> DriveAccessTokenProvider:
+    service_account_file = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip()
+    if service_account_file:
+        return GoogleServiceAccountProvider.from_environment()
+
     refresh_token = os.environ.get(
         "GOOGLE_DRIVE_REFRESH_TOKEN", ""
     ).strip()
