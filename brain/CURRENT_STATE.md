@@ -136,6 +136,24 @@ The accepted eLetters interface is protected by:
 
 Before UI/auth/search/admin/recipient/delete/restore changes, read those files. Do not wholesale redesign, recolor, or replace navigation unless explicitly requested.
 
+## Delivery credential — 2026-10-09
+
+Gmail outbox delivery authenticates with a Gmail app password over `smtp.gmail.com:465`, injected from
+Bitwarden Secrets Manager as `DLR_GMAIL_APP_PASSWORD`. The previous OAuth refresh token expired 2026-10-09
+14:29 UTC under the OAuth client's 7-day Testing-mode lifetime and silently halted outbox draining.
+
+The OAuth app was published from Testing to In production and the archive-owner Drive token was re-consented and
+rotated into the secret manager, so the Drive path no longer carries a 7-day expiry. Details live in
+`brain/post-processing-delivery/` and `brain/drive-oauth-secret-manager/`.
+
+## Search index state — 2026-10-09
+
+Keyword search is live and covers `extracted_text` in full plus title, summary, reference, authority, concepts,
+related terms, a Hindi/English alias dictionary and trigram fuzzy matching. Vector/semantic search is **not**
+active: `letter_chunks` is empty because the worker's embedding stage is gated on `GEMINI_API_KEY`, which is not
+provisioned. Document understanding itself does use Gemini through the Supabase `gemini-ai-gateway`, which keeps
+its key server-side and exposes no embedding action.
+
 ## Remote access
 
 Canonical instructions: `docs/REMOTE-ACCESS.md`.

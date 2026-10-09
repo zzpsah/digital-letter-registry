@@ -5,11 +5,23 @@
 - [x] Add idempotent post-processing delivery dispatcher.
 - [x] Send same-chat WhatsApp reply after completed processing.
 - [x] Prepare queued email transcript + attachment package.
-- [ ] Add Gmail sender authorization and live email send.
+- [x] Add Gmail sender authorization and live email send.
 - [ ] Add Telegram reply parity.
 
 - [x] Gmail sender implementation + dry-run MIME validation.
-- [ ] One-time Gmail `gmail.send` OAuth authorization and live email send verification.
+- [x] One-time Gmail `gmail.send` authorization and live email send verification.
+- [x] Remove the 7-day OAuth refresh-token expiry dependency by switching delivery to a Gmail app password.
+- [ ] If the sender account's Google password is ever changed, regenerate the app password and re-store
+      `DLR_GMAIL_APP_PASSWORD` in Bitwarden Secrets Manager.
+
+## Delivery credential migration — 2026-10-09
+
+- Gmail delivery now authenticates with a Gmail app password over SMTP, not an OAuth refresh token.
+- The previous OAuth refresh token expired 2026-10-09 14:29 UTC (7-day Testing-mode TTL) and silently halted
+  outbox draining; three intake documents were stuck behind it.
+- `DLR_GMAIL_APP_PASSWORD` is the only new credential and lives in Bitwarden Secrets Manager.
+- The OAuth handoff file and temporary consent tooling were retired. The wrapper keeps an OAuth fallback so
+  removing the app password degrades rather than breaks delivery.
 
 
 ## Sender account verification — 2026-10-03

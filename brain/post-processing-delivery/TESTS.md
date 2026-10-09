@@ -3,7 +3,21 @@
 Planned: source metadata captured without public leakage; pending jobs do not reply; completed jobs reply once; repeat dispatcher runs do not duplicate replies; email package contains query/reply/logical Drive path/original; missing Gmail sender leaves email queued without losing the WhatsApp reply.
 
 
-## Live synthetic E2E — 2026-10-03
+## SMTP app-password delivery — 2026-10-09
+
+Passed:
+- SMTP authentication through `secret-run-scoped` with the Bitwarden-injected app password.
+- Live test message sent and confirmed present in the sender's Sent Mail over IMAP.
+- Production `_smtp_send()` called directly with the injected credential; returned `smtp-sent`, and the message
+  was confirmed in Sent Mail.
+- `dlr-gmail-outbox.service` runs to `result=success`; `dlr-gmail-outbox.timer` active.
+- Wrapper branch selection verified: `secret-exists DLR_GMAIL_APP_PASSWORD` succeeds, so the SMTP branch is taken.
+
+Not yet covered:
+- A send that fails because the app password was revoked (account password change). The OAuth fallback path
+  should be exercised at that point.
+
+## Prior: live synthetic E2E — 2026-10-03
 
 Passed:
 - WhatsApp test document + caption staged and processed.
