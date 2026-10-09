@@ -1,3 +1,16 @@
+## 2026-10-09 — feat: add service account auth for Drive
+- Commit: 84c764a658236b1d6c6f71e951d3f51712a86188
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `docs/GOOGLE_DRIVE_SERVICE_ACCOUNT_MIGRATION.md`
+- `pyproject.toml`
+- `src/letter_registry/api.py`
+- `src/letter_registry/google_drive_auth.py`
+- `src/letter_registry/runtime_readiness.py`
+- `tests/test_google_drive_auth.py`
+- `tests/test_runtime_readiness.py`
+
 ## 2026-10-10 — Fix OAuth homepage verification requirements (#3)
 - Commit: 025c752c0726992c0c3d4bef67c561a1c4d2b614
 - Author: PRASHANT KUMAR SAH

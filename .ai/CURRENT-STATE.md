@@ -87,7 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 025c752c0726992c0c3d4bef67c561a1c4d2b614
-- Change: Fix OAuth homepage verification requirements (#3)
-- Date: 2026-10-10
+- Commit: 84c764a658236b1d6c6f71e951d3f51712a86188
+- Change: feat: add service account auth for Drive
+- Date: 2026-10-09
 - Durable context synchronization: completed
