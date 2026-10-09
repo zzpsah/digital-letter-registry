@@ -87,7 +87,7 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
 ## Last automated change
-- Commit: 73d214d51a4e0ca00d9499983c8ebda58f7957b1
-- Change: Fix reprocess derived data ownership
-- Date: 2026-10-06
+- Commit: 4dfaee20ad4ab86b0b6663c4088627d9778162ee
+- Change: docs: publish DLR privacy policy
+- Date: 2026-10-10
 - Durable context synchronization: completed

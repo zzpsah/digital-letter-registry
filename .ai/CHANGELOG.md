@@ -1,3 +1,11 @@
+## 2026-10-10 — docs: publish DLR privacy policy
+- Commit: 4dfaee20ad4ab86b0b6663c4088627d9778162ee
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `.github/workflows/deploy-privacy-policy.yml`
+- `privacy-policy.html`
+
 ## 2026-10-06 — Fix reprocess derived data ownership
 - Commit: 73d214d51a4e0ca00d9499983c8ebda58f7957b1
 - Author: development-os[bot]
