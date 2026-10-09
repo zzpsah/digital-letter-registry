@@ -1341,6 +1341,12 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     def home() -> FileResponse:
         return FileResponse(Path(__file__).with_name("web") / "index.html")
 
+    @app.get("/privacy-policy", include_in_schema=False)
+    def privacy_policy() -> FileResponse:
+        """Serve the public privacy policy required by OAuth app branding."""
+        policy_path = Path(__file__).resolve().parents[2] / "privacy-policy.html"
+        return FileResponse(policy_path, media_type="text/html; charset=utf-8")
+
     @app.get("/api/v1/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
