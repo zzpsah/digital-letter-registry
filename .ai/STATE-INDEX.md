@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 84c764a658236b1d6c6f71e951d3f51712a86188
-- Last commit: feat: add service account auth for Drive
+- HEAD: 82a7b6a7ceb1a216b7611da8db6eec4bd4eb022d
+- Last commit: docs: document public Vercel homepage routes
 - Last commit date: 2026-10-09
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

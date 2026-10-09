@@ -1,3 +1,15 @@
+## 2026-10-09 — docs: document public Vercel homepage routes
+- Commit: 82a7b6a7ceb1a216b7611da8db6eec4bd4eb022d
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `brain/vercel-hosting/CURRENT_STATE.md`
+- `brain/vercel-hosting/HANDOFF.md`
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-09 — feat: add service account auth for Drive
 - Commit: 84c764a658236b1d6c6f71e951d3f51712a86188
 - Author: development-os[bot]
