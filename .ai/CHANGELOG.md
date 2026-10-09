@@ -1,3 +1,10 @@
+## 2026-10-10 — docs: preserve UI/UX constraints in project handoff
+- Commit: 019da1d5f3dd071e025f3db22c715b376c9e6583
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-09 — docs: document public Vercel homepage routes
 - Commit: 82a7b6a7ceb1a216b7611da8db6eec4bd4eb022d
 - Author: development-os[bot]
