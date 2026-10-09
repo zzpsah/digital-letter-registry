@@ -1,6 +1,6 @@
 # Project Brain — Current State
 
-Last reconciled: 2026-10-06
+Last reconciled: 2026-10-10
 Canonical repository: `zzpsah/digital-letter-registry`
 GitHub and Oracle were reconciled on 2026-10-06. Always verify the current HEAD from Git/`.ai/STATE-INDEX.md` before acting; do not hard-code a semantic handoff to one commit hash.
 
@@ -43,6 +43,14 @@ The original PDF/image is authoritative and immutable as the logical source. OCR
 - OCR: native PDF text first, then Hindi/English OCR fallback.
 - Private Drive credentials, runtime secrets, private identifiers, and real documents must never be committed to public Git.
 - GitHub is the durable source repository; Oracle is the live private runtime.
+
+## Public Vercel entry points — 2026-10-10
+
+- `https://eletters.vercel.app/` is a public product-information homepage for UMV Storage Automation / eLetters, added to support OAuth consent-screen website-information requirements.
+- `https://eletters.vercel.app/app` serves the existing eLetters sign-in/application UI.
+- `https://eletters.vercel.app/privacy-policy` serves the public privacy policy.
+- `https://eletters.vercel.app/api/v1/health` is the health endpoint.
+- All four routes returned HTTP 200 in a live HTTPS check on 2026-10-10. This is route availability evidence, not proof that Google OAuth verification is approved.
 
 ## Intake status
 

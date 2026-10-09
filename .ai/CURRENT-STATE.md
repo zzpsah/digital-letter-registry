@@ -1,6 +1,6 @@
 # Current State
 
-Last reconciled: 2026-10-06
+Last reconciled: 2026-10-10
 Canonical repository: `zzpsah/digital-letter-registry`
 
 ## Repository/runtime evidence
@@ -24,6 +24,8 @@ DLR/eLetters is an operational Official Letter Intelligence Archive with:
 - email and WhatsApp delivery/update workflows;
 - manual document reprocessing;
 - admin operations, authorities, recipients, categories, audit, backup/restore, and failed-job recovery.
+
+The canonical production URL is `https://eletters.vercel.app`. The root `/` now serves a public product-information homepage, `/app` serves the eLetters sign-in/application UI, `/privacy-policy` serves the public privacy policy, and `/api/v1/health` serves health status. All four routes returned HTTP 200 on 2026-10-10. The root-page change supports OAuth homepage information requirements but is not proof of Google OAuth verification approval.
 
 The public Vercel app does not carry private Drive upload credentials. A controlled approved WhatsApp real-document pilot runs through the private Oracle side. Older synthetic-cleanup statements must not be interpreted as proof that the current archive has zero real records.
 
@@ -86,8 +88,13 @@ Historical test counts, 2026-10-02 blockers, “no real intake” statements, an
 
 Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_STATE.md`, and the relevant enhancement brain. For Oracle work, discover/ping `oracle-server` and compare its Git state before acting.
 
-## Last automated change
+## Last automated code change
 - Commit: 84c764a658236b1d6c6f71e951d3f51712a86188
 - Change: feat: add service account auth for Drive
 - Date: 2026-10-09
 - Durable context synchronization: completed
+
+## Latest public homepage change
+- Commit: 025c752c0726992c0c3d4bef67c561a1c4d2b614
+- Change: Fix OAuth homepage verification requirements (#3)
+- Outcome: public product homepage at `/`, app UI at `/app`, public policy at `/privacy-policy`, with live route verification recorded above.

@@ -1,6 +1,6 @@
 # Project Brain — Handoff
 
-Last reconciled: 2026-10-06
+Last reconciled: 2026-10-10
 
 ## Read order
 
@@ -17,7 +17,9 @@ Repository evidence is authoritative over chat memory. Current-state files descr
 
 ## Canonical current handoff
 
-DLR/eLetters is live as a web control plane with a private Oracle worker and private Drive archive. GitHub and Oracle were reconciled on 2026-10-06. Before runtime work, verify the current GitHub and Oracle HEADs rather than relying on a hash copied into this handoff.
+DLR/eLetters is live as a web control plane with a private Oracle worker and private Drive archive. Before runtime work, verify current GitHub and Oracle HEADs rather than relying on a hash copied into this handoff.
+
+The canonical public URL is `https://eletters.vercel.app`. The root `/` is now the public product-information homepage; `/app` is the actual sign-in/application UI; `/privacy-policy` is the public policy; `/api/v1/health` is the health endpoint. All four returned HTTP 200 on 2026-10-10. The public homepage update supports OAuth homepage information requirements but does not prove OAuth app approval. Private Drive credentials and worker duties remain on Oracle.
 
 The normal document flow is:
 

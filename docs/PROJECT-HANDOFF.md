@@ -229,20 +229,28 @@ Live verification:
 
 ## Vercel hosting checkpoint
 
-A production DLR control plane is live at `https://digital-letter-registry.vercel.app`.
+Canonical production URL: `https://eletters.vercel.app`.
 
-Architecture at this checkpoint:
-- Vercel: browser UI, auth/session endpoints, search/admin control plane;
+As of 2026-10-10, production routes were verified over HTTPS:
+- `/` — public UMV Storage Automation / eLetters product-information homepage;
+- `/app` — eLetters sign-in/application UI;
+- `/privacy-policy` — public privacy policy;
+- `/api/v1/health` — health endpoint.
+
+All four routes returned HTTP 200. The public homepage was introduced in commit `025c752c0726992c0c3d4bef67c561a1c4d2b614` to make the service purpose, document use, privacy link, and app sign-in link publicly discoverable for OAuth homepage-information review. This does not by itself mean Google has approved the OAuth app.
+
+Architecture:
+- Vercel: public product homepage, browser UI, auth/session endpoints, search/admin control plane;
 - Supabase: Auth, RLS and archive data authorization;
 - Oracle/private runtime: Google Drive OAuth/original access, OCR/system binaries, and private-worker responsibilities;
-- real intake remains disabled on Vercel.
+- the Vercel deployment does not hold private Drive upload credentials; preserve its real-intake safety gate.
 
-Production verification passed for the home page, health endpoint, and auth provider discovery. Vercel Authentication was disabled because DLR already enforces its own Supabase-backed identity and archive membership.
+Vercel Authentication is disabled because DLR enforces Supabase-backed identity and archive membership itself.
 
-Remaining portability tasks:
-1. add the Vercel production origin to the Supabase Auth redirect allow-list;
-2. grant Vercel GitHub integration access if automatic `main` deployments are desired;
-3. explicitly decide which Drive/original-access operations, if any, should migrate from Oracle to Vercel.
+Portability follow-ups to verify before enabling or relying on them:
+- optional Magic Link or Google Sign-In flows need the Vercel origin configured in Supabase Auth redirects;
+- verify Vercel automatic-deployment status independently before assuming a Git push has deployed;
+- any proposal to move Drive/original-access operations off Oracle requires an explicit architecture and security decision.
 
 
 ## Deterministic processing fallback

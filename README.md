@@ -76,7 +76,7 @@ The main interface is one search box plus optional filters such as date/year, au
 
 ## Status
 
-The DLR baseline is complete and live. The database and Drive archive contain no real archive records. Password-first multi-user auth, role-aware RLS, private Drive storage, OCR/context processing, search, original streaming, and the dedicated Oracle worker have all been verified with disposable synthetic data. A real short-lived Supabase bearer session passed insert/read + RLS-denial verification, and the live HTTP intake → Drive → queue → worker → search → original-stream path passed end-to-end. All disposable artifacts were removed afterward. Real document intake/migration remains disabled until explicitly approved.
+The initial DLR baseline passed end-to-end verification with disposable synthetic data, including password-first multi-user auth, role-aware RLS, private Drive storage, OCR/context processing, search, original streaming, and the dedicated Oracle worker. A real short-lived Supabase bearer session passed insert/read + RLS-denial verification. This was a historical baseline checkpoint, not a statement that the current archive is empty: a controlled approved WhatsApp real-document pilot now runs on the private Oracle side. Public Vercel intake remains without private Drive upload credentials; historical bulk import/migration remains gated by explicit approval.
 
 See:
 - `PRD.md`
@@ -160,11 +160,13 @@ The DLR web/auth/search control plane is now deployed on Vercel:
 
 `https://eletters.vercel.app`
 
-Verified production behavior:
-- home page returns HTTP 200;
+Verified production behavior (2026-10-10):
+- `/` serves the public UMV Storage Automation / eLetters product-information homepage (HTTP 200), intended to make the service and its purpose publicly understandable for OAuth consent-screen review;
+- `/app` serves the existing eLetters authentication/application interface (HTTP 200);
+- `/privacy-policy` serves the public privacy policy (HTTP 200);
 - `/api/v1/health` returns HTTP 200;
-- password-first sign-in and self-service account creation are available; new memberships start disabled until admin approval;
-- Vercel Authentication protection is disabled so DLR's own Supabase authentication is the user-facing gate;
+- password-first sign-in and self-service account creation are available at `/app`; new memberships start disabled until admin approval;
+- redundant Vercel Authentication protection is disabled so DLR's own Supabase authentication remains the user-facing access gate;
 - real intake remains disabled on the Vercel deployment.
 
 The current Vercel deployment does not receive the private Google Drive OAuth credentials. Original-file streaming, Drive writes, OCR/system-binary processing, and other private-worker responsibilities remain on the Oracle deployment until explicitly migrated.
@@ -172,11 +174,22 @@ The current Vercel deployment does not receive the private Google Drive OAuth cr
 Password-first login does not depend on the Supabase redirect allow-list. Adding the Vercel origin remains a future hardening/portability task only for optional Magic Link or Google Sign-In flows.
 
 
+## Public homepage and app routes — 2026-10-10
+
+The public root route is intentionally a product-information page, not the authenticated archive UI. It describes UMV Storage Automation (eLetters), how the service helps authorized school staff preserve, organize, and search official school/government letters, and provides public links to sign in and read the privacy policy. This was added to support the public website information needed for Google OAuth consent-screen review; it does not itself mean Google has approved the OAuth app.
+
+- Public information homepage: `https://eletters.vercel.app/`
+- eLetters sign-in/application: `https://eletters.vercel.app/app`
+- Public privacy policy: `https://eletters.vercel.app/privacy-policy`
+- Health endpoint: `https://eletters.vercel.app/api/v1/health`
+
+The old interactive app shell is served at `/app`; do not instruct users to find the sign-in form directly on `/`. The Oracle deployment remains responsible for private Google Drive/OCR/worker capabilities, and the public Vercel deployment must not receive private Drive credentials as part of this homepage change.
+
 ## Account creation
 
 DLR uses a password-first account workflow:
 
-1. Open `https://eletters.vercel.app`.
+1. Open `https://eletters.vercel.app/app`.
 2. Choose **Create Account** and enter email + password.
 3. The account is created with archive access disabled.
 4. A DLR admin chooses the role and changes the account to Active.

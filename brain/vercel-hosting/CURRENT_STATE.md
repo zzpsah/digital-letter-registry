@@ -1,62 +1,39 @@
 # Vercel Hosting — Current State
 
-Work started after explicit user approval to host DLR on Vercel. No production deployment has been completed yet.
+Last reconciled: 2026-10-10
 
+## Production deployment
 
-## Production deployed
+Canonical production URL: `https://eletters.vercel.app`.
 
-Production URL: `https://digital-letter-registry.vercel.app`
+Production has been deployed and verified over HTTPS. The public app/control plane uses Vercel and Supabase; private Google Drive storage authorization, original-file access, OCR binaries, and background worker responsibilities remain on the Oracle runtime.
 
-Status:
-- Vercel project created and linked;
-- FastAPI production deployment READY;
-- required Supabase public/runtime configuration stored in Vercel environments;
-- real intake explicitly disabled;
-- redundant Vercel Authentication disabled;
-- home, health and auth-provider endpoints verified HTTP 200;
-- recent production error scan clean.
+## Public entry points — 2026-10-10
 
-Not yet migrated:
-- Google Drive OAuth/private original access;
-- OCR/system-binary worker functions;
-- other Oracle-only worker responsibilities.
+The root route was changed from the interactive app shell to a public product-information homepage as part of the OAuth homepage-verification work (commit `025c752c0726992c0c3d4bef67c561a1c4d2b614`).
 
-Pending:
-- Supabase Auth redirect allow-list for the Vercel origin;
-- Vercel GitHub integration authorization for automatic deployments.
+- `/` — public UMV Storage Automation / eLetters product-information homepage; explains document preservation, organization, and search for authorized school staff, and links to sign-in and the Privacy Policy.
+- `/app` — existing eLetters application/authentication interface.
+- `/privacy-policy` — public privacy policy.
+- `/api/v1/health` — public health endpoint.
 
+Live HTTP checks on 2026-10-10 returned 200 for `/`, `/app`, `/privacy-policy`, and `/api/v1/health`. The root page is intended to support public website information required for OAuth consent-screen review. This route change alone does not establish Google OAuth app approval or generate/renew a Google Drive refresh token.
 
-## Account UI update
+## Authentication and access
 
-The canonical Vercel UI now uses password-first authentication:
-- canonical alias: `https://eletters.vercel.app`;
-- simple Create Account form is visible;
-- primary Magic-Link UI is removed;
-- pending accounts are admin-approved from the access panel;
-- health and home return HTTP 200;
-- latest test suite is 257/257 PASS.
+- The normal DLR login is email + password through Supabase Auth.
+- Account creation is available at `/app`; newly registered members remain disabled until an admin approves the account and assigns the appropriate role.
+- The redundant Vercel Authentication gate is disabled; DLR Supabase authentication and archive-membership/RLS/API controls govern protected app access.
+- Password-first login does not depend on Supabase redirect allow-list entries. Such entries remain relevant only if optional Magic Link or Google Sign-In flows are enabled again.
 
-The Supabase `dlr-confirm-account` Edge Function is part of account approval and runs outside Vercel. It confirms the target Auth identity only after verifying an active archive-admin caller.
+## Deployment boundary and safety
 
+Vercel currently owns the public homepage, application UI, password authentication/session, self-registration/admin approval UI, and Supabase-backed search/admin control plane.
 
-## Current split after auth stabilization
+Oracle currently owns private Google Drive OAuth, original-file access, OCR/system binaries and language packs, and private document-worker responsibilities. Do not copy private Drive OAuth credentials into Vercel just to support the public homepage. The homepage is informational; it does not make private archive documents public.
 
-Canonical public URL: `https://eletters.vercel.app`.
+The controlled approved WhatsApp real-document pilot remains on the private Oracle side. Preserve the existing intake authorization and mutation gates; the Vercel deployment does not receive private Drive upload credentials as part of this change.
 
-Vercel currently owns:
-- UI;
-- password auth/session;
-- self-registration/admin approval;
-- Supabase-backed search/admin control plane.
+## Verification boundary
 
-Oracle currently owns:
-- private Google Drive OAuth;
-- original-file access;
-- OCR binaries and Hindi/English OCR language packs;
-- document worker responsibilities.
-
-The attempt to automatically copy private Drive OAuth secrets from Oracle into Vercel was blocked by the execution safety boundary and was not bypassed. Therefore Vercel still has no Drive secrets and real intake remains off.
-
-Public security verification passed: unauthenticated search, admin, session, readiness, capabilities and valid multipart upload requests are rejected with 401. Health remains public.
-
-Oracle now supports deterministic OCR/full-text processing without Gemini. Full tests: 261/261.
+Verified production route availability is not the same as approval by Google OAuth verification. Re-check Google Cloud OAuth consent-screen/publishing status separately if an OAuth warning or token-lifetime issue occurs. Check current source/runtime evidence before claiming automatic Vercel deployment or OAuth verification has completed.
