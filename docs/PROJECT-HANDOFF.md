@@ -422,3 +422,18 @@ Canonical authority records store designation, jurisdiction and level. DPO posts
 - Merge moves all linked letter mappings and aliases to the selected target, updates child-parent references, then deletes the duplicate source authority.
 - Permanent Delete removes the authority master; linked letters keep their raw authority text but become unmatched for later review/remapping.
 - Authority rows show linked-letter counts before destructive actions.
+
+## UI/UX preservation — mandatory project-wide rule
+
+Unless the user explicitly requests a specific UI change, preserve the existing UI/UX exactly. This is a project-wide constraint for every feature, bug fix, refactor, and deployment update.
+
+- Do not redesign, replace, or broadly restyle existing screens.
+- Keep the established layout, colors, typography, spacing, navigation, components, responsive behavior, and user workflows unchanged.
+- Implement only the smallest targeted changes required for the explicitly requested functionality; reuse existing components and patterns.
+- Preserve existing features, interactions, accessibility, and backward compatibility.
+- Before completion, run relevant tests and inspect the changed screens/flows for visual regressions, layout breakage, and functional regressions.
+- Document what changed, what was tested, and whether UI/UX preservation was verified. If a visual change is genuinely required, explain it and obtain explicit user authorization before proceeding.
+- Follow the project workflow: READ → UNDERSTAND → PLAN → IMPLEMENT → TEST → REVIEW → FIX → COMMIT → UPDATE DOCUMENTATION.
+
+Acceptance criterion: requested functionality works, existing behavior remains intact, and the UI/UX is unchanged except for a specific visual change the user explicitly authorized.
+
