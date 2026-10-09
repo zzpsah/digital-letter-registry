@@ -52,6 +52,21 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "ok")
 
+    def test_homepage_is_public_and_explains_app(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("text/html", response.headers["content-type"])
+        self.assertIn("UMV Storage Automation", response.text)
+        self.assertIn("official school and government letters", response.text)
+        self.assertIn('href="/privacy-policy"', response.text)
+        self.assertIn('href="/app"', response.text)
+
+    def test_app_login_remains_available_at_app_route(self):
+        response = self.client.get("/app")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("eLetters", response.text)
+        self.assertIn("passwordLoginForm", response.text)
+
     def test_privacy_policy_is_public_html(self):
         response = self.client.get("/privacy-policy")
         self.assertEqual(response.status_code, 200)
