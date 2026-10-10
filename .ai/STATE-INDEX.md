@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 6a69c3369a3098c01b9e35f864db1db233ef1202
-- Last commit: docs: add full technical architecture flowchart
+- HEAD: fe2ae8137a45a24db21f99e953a9f3024b868e58
+- Last commit: docs: add flowchart to project handoff references
 - Last commit date: 2026-10-10
 - Last commit author: PRASHANT KUMAR SAH
 

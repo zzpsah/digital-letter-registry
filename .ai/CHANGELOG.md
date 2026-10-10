@@ -1,3 +1,10 @@
+## 2026-10-10 — docs: add flowchart to project handoff references
+- Commit: fe2ae8137a45a24db21f99e953a9f3024b868e58
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-10 — docs: add full technical architecture flowchart
 - Commit: 6a69c3369a3098c01b9e35f864db1db233ef1202
 - Author: PRASHANT KUMAR SAH
