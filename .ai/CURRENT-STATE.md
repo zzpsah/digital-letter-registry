@@ -25,6 +25,8 @@ DLR/eLetters is an operational Official Letter Intelligence Archive with:
 - manual document reprocessing;
 - admin operations, authorities, recipients, categories, audit, backup/restore, and failed-job recovery.
 
+Technical architecture references: `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md` is the detailed text inventory; `docs/TECHNICAL-FLOWCHART.html` is the browser-openable algorithmic flowchart with URLs, ports, services/timers, integrations, and failure conditions. Keep both synchronized with any architecture/runtime changes in the same change. Its audit snapshot is 2026-10-10 and must be re-verified before production operations.
+
 The canonical production URL is `https://eletters.vercel.app`. The root `/` now serves a public product-information homepage, `/app` serves the eLetters sign-in/application UI, `/privacy-policy` serves the public privacy policy, and `/api/v1/health` serves health status. All four routes returned HTTP 200 on 2026-10-10. The root-page change supports OAuth homepage information requirements but is not proof of Google OAuth verification approval.
 
 The public Vercel app does not carry private Drive upload credentials. A controlled approved WhatsApp real-document pilot runs through the private Oracle side. Older synthetic-cleanup statements must not be interpreted as proof that the current archive has zero real records.
