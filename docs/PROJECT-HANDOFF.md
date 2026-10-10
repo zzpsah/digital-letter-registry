@@ -1,5 +1,11 @@
 # Project Handoff — Digital Letter Registry
 
+## Technical architecture references
+
+- `docs/TECHNICAL-FLOWCHART.html` — visual algorithm flowchart and operational technical inventory (URLs, ports, services/timers, integrations, decision/error branches).
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md` — evidence-labelled information flow and deployment inventory.
+- Keep both synchronized with relevant source/configuration changes in the same change. Re-verify live runtime facts before operational changes; do not expose secrets or private hostnames.
+
 ## Mission
 
 Build a private, mobile-first searchable memory for official school/government PDFs, scans, and images. The user should be able to find the correct historical letter from remembered meaning even when the memo number, exact date, original filename, and exact wording are forgotten.
