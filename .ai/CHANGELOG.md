@@ -1,3 +1,18 @@
+## 2026-10-10 — Make the public eLetters homepage professional and simple
+- Commit: c4d9304ca6320f1a845f2c38ce4551a92804d0c8
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `brain/public-homepage-refresh/ARCHITECTURE.md`
+- `brain/public-homepage-refresh/CURRENT_STATE.md`
+- `brain/public-homepage-refresh/DECISIONS.md`
+- `brain/public-homepage-refresh/HANDOFF.md`
+- `brain/public-homepage-refresh/PROJECT.md`
+- `brain/public-homepage-refresh/SECURITY.md`
+- `brain/public-homepage-refresh/TASKS.md`
+- `brain/public-homepage-refresh/TESTS.md`
+- `public-homepage.html`
+
 ## 2026-10-10 — docs: add flowchart to project handoff references
 - Commit: fe2ae8137a45a24db21f99e953a9f3024b868e58
 - Author: PRASHANT KUMAR SAH
