@@ -1,3 +1,12 @@
+## 2026-10-10 — Support service account JSON in serverless Drive auth
+- Commit: 14b8f33f8a01ef2aef6090490c37d8eb89884fd5
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `src/letter_registry/google_drive_auth.py`
+- `tests/test_google_drive_auth.py`
+
 ## 2026-10-10 — Update homepage tests for minimal eLetters design
 - Commit: 2a767b6fc2ce255f95cd6dbc54ea73228aea2a71
 - Author: PRASHANT KUMAR SAH
