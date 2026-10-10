@@ -56,10 +56,11 @@ class ApiTests(unittest.TestCase):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("text/html", response.headers["content-type"])
-        self.assertIn("UMV Storage Automation", response.text)
-        self.assertIn("official school and government letters", response.text)
+        self.assertIn("eLetters", response.text)
+        self.assertIn("Official letters, all in one place.", response.text)
         self.assertIn('href="/privacy-policy"', response.text)
         self.assertIn('href="/app"', response.text)
+        self.assertNotIn('class="button button-secondary" href="/privacy-policy"', response.text)
 
     def test_app_login_remains_available_at_app_route(self):
         response = self.client.get("/app")
@@ -1318,11 +1319,12 @@ class ApiTests(unittest.TestCase):
     def test_home_serves_public_oauth_review_homepage(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Find a letter", response.text)
-        self.assertIn("Search letters", response.text)
+        self.assertIn("Official letters, all in one place.", response.text)
+        self.assertIn("eLetters", response.text)
         self.assertIn("/privacy-policy", response.text)
         self.assertIn("/app", response.text)
-        self.assertIn("UMV Storage Automation", response.text)
+        self.assertNotIn("UMV Storage Automation", response.text)
+        self.assertNotIn('class="button button-secondary" href="/privacy-policy"', response.text)
         self.assertNotIn("uploadForm", response.text)
         self.assertNotIn("UMV Tetahali", response.text)
 
