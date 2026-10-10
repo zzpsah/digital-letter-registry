@@ -866,6 +866,8 @@ def _drive_credentials_configured() -> bool:
     service_account_file = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip()
     if service_account_file and os.path.isfile(service_account_file):
         return True
+    if os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip():
+        return True
     if os.environ.get("GOOGLE_DRIVE_ACCESS_TOKEN", "").strip():
         return True
     return all(

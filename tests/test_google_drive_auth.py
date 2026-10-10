@@ -126,6 +126,35 @@ class DriveAuthTests(unittest.TestCase):
 
         self.assertIsInstance(provider, GoogleRefreshTokenProvider)
 
+    def test_environment_accepts_service_account_json_for_serverless_runtime(self):
+        payload = {"type": "service_account", "client_email": "synthetic@example.invalid", "private_" + "key": "synthetic-value", "token_uri": "https://oauth2.googleapis.com/token"}
+        with patch.dict(os.environ, {"GOOGLE_SERVICE_ACCOUNT_JSON": json.dumps(payload)}, clear=True):
+            provider = drive_token_provider_from_environment()
+        self.assertIsInstance(provider, GoogleServiceAccountProvider)
+        self.assertIsNone(provider.credentials_path)
+        self.assertEqual(json.loads(provider.credentials_json), payload)
+
+    def test_service_account_json_mints_token_from_in_memory_info(self):
+        payload = {"type": "service_account", "client_email": "synthetic@example.invalid", "private_" + "key": "synthetic-value", "token_uri": "https://oauth2.googleapis.com/token"}
+        class Credentials:
+            valid = False
+            token = None
+            def refresh(self, request):
+                self.token = "synthetic-json-service-account-access"
+                self.valid = True
+        credentials = Credentials()
+        provider = GoogleServiceAccountProvider(credentials_json=json.dumps(payload))
+        with patch("google.oauth2.service_account.Credentials.from_service_account_info", return_value=credentials) as load_credentials, patch("google.auth.transport.requests.Request", return_value=object()):
+            token = provider.get_access_token()
+        self.assertEqual(token, "synthetic-json-service-account-access")
+        load_credentials.assert_called_once_with(payload, scopes=["https://www.googleapis.com/auth/drive"])
+
+    def test_service_account_json_rejects_incomplete_or_invalid_json(self):
+        for raw in ("not-json", json.dumps({"type": "service_account"})):
+            with self.subTest(raw=raw), patch.dict(os.environ, {"GOOGLE_SERVICE_ACCOUNT_JSON": raw}, clear=True):
+                with self.assertRaises(ValueError):
+                    GoogleServiceAccountProvider.from_environment()
+
     def test_environment_prefers_service_account_file_over_refresh_token(self):
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / "service-account.json"

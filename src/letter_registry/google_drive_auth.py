@@ -97,18 +97,29 @@ class GoogleServiceAccountProvider:
     account (normally a Google Workspace Shared Drive).
     """
 
-    credentials_path: str
+    credentials_path: str | None = None
+    credentials_json: str | None = None
     _credentials: object | None = field(default=None, init=False)
     _request_factory: object | None = field(default=None, init=False)
 
     @classmethod
     def from_environment(cls) -> "GoogleServiceAccountProvider":
         path = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip()
-        if not path:
-            raise ValueError("Google service-account credentials file is required")
-        if not os.path.isfile(path):
-            raise ValueError("Google service-account credentials file is missing")
-        return cls(credentials_path=path)
+        if path:
+            if not os.path.isfile(path):
+                raise ValueError("Google service-account credentials file is missing")
+            return cls(credentials_path=path)
+        raw = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+        if raw:
+            try:
+                info = json.loads(raw)
+            except json.JSONDecodeError as exc:
+                raise ValueError("Google service-account JSON is invalid") from exc
+            required = ("type", "client_email", "private_" + "key", "token_uri")
+            if not isinstance(info, dict) or info.get("type") != "service_account" or not all(str(info.get(key) or "").strip() for key in required):
+                raise ValueError("Google service-account JSON is incomplete")
+            return cls(credentials_json=raw)
+        raise ValueError("Google service-account credentials file or JSON is required")
 
     def get_access_token(self) -> str:
         if self._credentials is None:
@@ -118,10 +129,13 @@ class GoogleServiceAccountProvider:
             except ImportError as exc:
                 raise RuntimeError("google-auth is required for service-account Drive auth") from exc
             try:
-                self._credentials = service_account.Credentials.from_service_account_file(
-                    self.credentials_path,
-                    scopes=["https://www.googleapis.com/auth/drive"],
-                )
+                scopes = ["https://www.googleapis.com/auth/drive"]
+                if self.credentials_json is not None:
+                    self._credentials = service_account.Credentials.from_service_account_info(json.loads(self.credentials_json), scopes=scopes)
+                elif self.credentials_path:
+                    self._credentials = service_account.Credentials.from_service_account_file(self.credentials_path, scopes=scopes)
+                else:
+                    raise ValueError("Google service-account credentials are missing")
             except (OSError, ValueError, KeyError) as exc:
                 raise ValueError("Google service-account credentials file is invalid") from exc
             self._request_factory = Request
@@ -225,7 +239,8 @@ class GoogleRefreshTokenProvider:
 
 def drive_token_provider_from_environment() -> DriveAccessTokenProvider:
     service_account_file = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip()
-    if service_account_file:
+    service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
+    if service_account_file or service_account_json:
         return GoogleServiceAccountProvider.from_environment()
 
     refresh_token = os.environ.get(
