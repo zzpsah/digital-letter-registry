@@ -1,3 +1,10 @@
+## 2026-10-10 — Remove duplicate privacy policy button from homepage
+- Commit: 61949154f9551d4645a4745388344f87d37207d0
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `public-homepage.html`
+
 ## 2026-10-10 — Make the public eLetters homepage professional and simple
 - Commit: c4d9304ca6320f1a845f2c38ce4551a92804d0c8
 - Author: PRASHANT KUMAR SAH
