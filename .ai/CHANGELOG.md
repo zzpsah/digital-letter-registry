@@ -1,3 +1,12 @@
+## 2026-10-10 — docs: record Google Drive OAuth incident and recovery
+- Commit: 965abdef991d2726ca79d2395b1ec804cd9e902c
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `docs/GOOGLE_DRIVE_OAUTH_INCIDENT_2026-10-10.md`
+- `docs/HISTORY.md`
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-10 — Support service account JSON in serverless Drive auth
 - Commit: 14b8f33f8a01ef2aef6090490c37d8eb89884fd5
 - Author: development-os[bot]

@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 14b8f33f8a01ef2aef6090490c37d8eb89884fd5
-- Last commit: Support service account JSON in serverless Drive auth
+- HEAD: 965abdef991d2726ca79d2395b1ec804cd9e902c
+- Last commit: docs: record Google Drive OAuth incident and recovery
 - Last commit date: 2026-10-10
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
