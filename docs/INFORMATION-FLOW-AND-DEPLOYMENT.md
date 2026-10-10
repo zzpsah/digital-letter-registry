@@ -4,6 +4,8 @@
 **Scope:** documentation-only architecture inventory. No migration, backup, production configuration change, or application deployment was performed.  
 **Evidence labels:** **Verified** means observed in repository source or a read-only live-runtime inspection; **Documented** means recorded in existing project documentation; **Unconfirmed** means current evidence does not prove a component's purpose or health.
 
+**Visual reference:** [Open the full technical algorithm flowchart](TECHNICAL-FLOWCHART.html). The HTML includes decision branches, public routes, observed port mappings, service/timer inventory, integrations, failure conditions, and the documentation maintenance rule.
+
 ## 1. System at a glance
 
 DLR (Digital Letter Registry; product name eLetters / Official Letter Intelligence Archive) is a searchable archive for official school/government PDFs and images. The original document is authoritative and immutable. OCR, extracted text, title, summary, authority, category, actions, relationships, and search metadata are derived and reprocessable.
@@ -156,3 +158,8 @@ This document does **not** migrate Supabase, establish database replication, cre
 - [ ] Confirm current state and schedules of each DLR user-systemd service and timer.
 - [ ] Verify OCR binaries/language packs and runtime readiness from the actual Oracle environment.
 - [ ] Reconcile Oracle Git checkout with GitHub **main** before deploying documentation or application changes.
+
+
+## 8. Keep the flowchart synchronized
+
+Whenever a code or infrastructure change affects routes, URLs, ports, services/timers, integrations, AI/OCR/translation behavior, storage boundaries, security exposure, or failure handling, update `docs/TECHNICAL-FLOWCHART.html` and this inventory in the same change. Update README and current-state/brain handoff records when architecture or operating status changes. Distinguish verified observations from unconfirmed assumptions; never document secrets, private Tailscale hostnames, private Drive identifiers, or credentials. Live runtime claims require a separate read-only check. Documentation updates do not imply deployment or VPS changes.
