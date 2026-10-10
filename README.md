@@ -82,6 +82,7 @@ See:
 - `PRD.md`
 - `docs/PROJECT-HANDOFF.md`
 - `docs/ARCHITECTURE.md`
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md` — verified live information flow, site routes, runtime ports, exposure classes, and component boundaries
 - `docs/NAMING-SPEC.md`
 - `docs/SECURITY.md`
 - `TASKS.md`

@@ -437,3 +437,8 @@ Unless the user explicitly requests a specific UI change, preserve the existing 
 
 Acceptance criterion: requested functionality works, existing behavior remains intact, and the UI/UX is unchanged except for a specific visual change the user explicitly authorized.
 
+
+
+## Verified information-flow and deployment inventory — 2026-10-10
+
+Before planning infrastructure migration, replication or backups, consult [INFORMATION-FLOW-AND-DEPLOYMENT.md](INFORMATION-FLOW-AND-DEPLOYMENT.md). It records the source-grounded Mermaid data-flow diagram, Vercel routes, observed Oracle port mappings and exposure classes, service boundaries, known current-search limitations, and unresolved listener ownerships. It is an inventory only; no migration, backup or production change was made. Keep the public Vercel control plane, private Drive OAuth, Supabase authorization and Oracle worker as separate trust boundaries.

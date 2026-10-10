@@ -180,3 +180,7 @@ Before meaningful work:
 ## Historical checkpoint warning
 
 Statements such as “no real letters”, “real intake disabled everywhere”, “short-lived bearer slice pending”, old test totals such as 188/188 or 212/212, or 2026-10-02 runtime blockers are **historical**, not current operational truth. Consult Git history and `docs/HISTORY.md` when those milestones matter.
+
+## Information-flow inventory — 2026-10-10
+
+Use [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md) as the canonical site, port, component and data-flow inventory. It distinguishes observed live mappings from unresolved service ownership. Tailscale Funnel ports 10000, 10001 and 8443 were publicly reachable at audit time; port 10001 routes to the DLR API on loopback 8877. The Oracle working tree was clean but behind GitHub main during the audit; this documentation change was not deployed. Do not begin migration or backup work until the diagram and unresolved port ownerships have been reviewed.

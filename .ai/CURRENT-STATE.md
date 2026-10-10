@@ -98,3 +98,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 - Commit: 025c752c0726992c0c3d4bef67c561a1c4d2b614
 - Change: Fix OAuth homepage verification requirements (#3)
 - Outcome: public product homepage at `/`, app UI at `/app`, public policy at `/privacy-policy`, with live route verification recorded above.
+
+## Information-flow and deployment inventory — 2026-10-10
+
+Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md). The audit confirmed the Vercel routes, Oracle DLR API listener on loopback port 8877, Tailscale/Funnel mappings and key data boundaries. Funnel ports 10000, 10001 and 8443 were publicly exposed at audit time; port 10001 maps to the DLR API and must be treated as public despite its proxy role. Some other upstream listener purposes remain unconfirmed. The Oracle checkout was clean but behind GitHub main at audit time. The documentation update is not deployed to Oracle. No migration, backup, service restart or production configuration change was performed.

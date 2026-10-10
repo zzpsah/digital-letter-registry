@@ -95,6 +95,10 @@ Preserve:
 
 Before changing any of these, read `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-governance/`.
 
+## Information-flow / infrastructure handoff
+
+Before discussing Supabase migration, replication or backup design, read **docs/INFORMATION-FLOW-AND-DEPLOYMENT.md**. It contains the Mermaid architecture diagram, public site routes, observed Oracle listeners, Tailscale/Funnel exposure classes, service boundaries and unresolved port ownerships. Treat Funnel ports 10000, 10001 and 8443 as publicly reachable. Do not assume other upstream ports are DLR-owned until verified. The 2026-10-10 documentation update was not deployed to Oracle; reconcile the live checkout with GitHub before any deployment.
+
 ## Remote Oracle handoff
 
 Read `docs/REMOTE-ACCESS.md`.
