@@ -32,6 +32,12 @@ Search / open original / reprocess when needed
 
 The original PDF/image is authoritative and immutable as the logical source. OCR, category, title, summary, authority mapping, actions, embeddings, importance, relationships, and delivery text are derived data and may be reprocessed.
 
+## Technical flow references
+
+- `docs/TECHNICAL-FLOWCHART.html`: visual algorithm flowchart plus deployment URLs, port/exposure map, service/timer inventory, tools/integrations, and failure conditions.
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`: detailed evidence-labelled information-flow and deployment inventory.
+- Update both files in the same change whenever architecture/runtime routes, ports, services, integrations, processing branches, translation, storage, security exposure, or failure handling changes. The HTML is a documentation snapshot, not proof every logical branch is deployed.
+
 ## Current live architecture
 
 - Public user-facing control plane: Vercel eLetters web app.
