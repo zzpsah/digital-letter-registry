@@ -83,6 +83,7 @@ See:
 - `docs/PROJECT-HANDOFF.md`
 - `docs/ARCHITECTURE.md`
 - `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md` — verified live information flow, site routes, runtime ports, exposure classes, and component boundaries
+- `docs/TECHNICAL-FLOWCHART.html` — browser-openable algorithmic flowchart plus technical URLs, ports, routes, services/timers, integrations, conditions, and maintenance rules
 - `docs/NAMING-SPEC.md`
 - `docs/SECURITY.md`
 - `TASKS.md`
