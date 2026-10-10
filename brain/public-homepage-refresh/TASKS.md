@@ -1,7 +1,7 @@
 # Tasks
 
 - [x] Review existing public homepage and UI design contract.
-- [x] Simplify headline, body copy, feature descriptions, and privacy note.
+- [x] Replace the incorrect visible brand with eLetters / Official Letter Registry.\n- [x] Reduce homepage to objective, sign-in, privacy link, and short authorised-use note; remove feature/how-it-works content.
 - [x] Keep sign-in and privacy routes unchanged.
 - [x] Preserve mobile layout and purple visual identity.
 - [x] Run static HTML/content checks on the proposed branch.
