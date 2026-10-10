@@ -1,3 +1,10 @@
+## 2026-10-10 — docs: add full technical architecture flowchart
+- Commit: 6a69c3369a3098c01b9e35f864db1db233ef1202
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/TECHNICAL-FLOWCHART.html`
+
 ## 2026-10-10 — docs: map eLetters information flow and live deployment ports
 - Commit: 0a5d0f2869f02f64de0ea03d8872bfe11ed34719
 - Author: PRASHANT KUMAR SAH

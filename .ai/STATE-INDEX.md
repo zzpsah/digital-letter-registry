@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 0a5d0f2869f02f64de0ea03d8872bfe11ed34719
-- Last commit: docs: map eLetters information flow and live deployment ports
+- HEAD: 6a69c3369a3098c01b9e35f864db1db233ef1202
+- Last commit: docs: add full technical architecture flowchart
 - Last commit date: 2026-10-10
 - Last commit author: PRASHANT KUMAR SAH
 
