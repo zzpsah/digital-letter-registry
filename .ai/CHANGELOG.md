@@ -1,3 +1,10 @@
+## 2026-10-10 — Update homepage tests for minimal eLetters design
+- Commit: 2a767b6fc2ce255f95cd6dbc54ea73228aea2a71
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `tests/test_api.py`
+
 ## 2026-10-10 — Remove duplicate privacy policy button from homepage
 - Commit: 61949154f9551d4645a4745388344f87d37207d0
 - Author: PRASHANT KUMAR SAH
