@@ -4,48 +4,127 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#4c1d95">
-  <meta name="description" content="UMV Storage Automation helps authorized school staff preserve, organize, and search official school and government letters.">
+  <meta name="description" content="eLetters helps authorized school staff organize and find official school and government letters.">
   <title>UMV Storage Automation — eLetters</title>
   <style>
-    :root{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#241b35;background:#f7f4ff;line-height:1.6}
-    *{box-sizing:border-box}body{margin:0}a{color:#5b21b6}header{background:#4c1d95;color:#fff;padding:18px 22px}
-    .brand{max-width:1000px;margin:auto;display:flex;align-items:center;gap:12px}.mark{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#7c3aed;font-weight:850}
-    main{max-width:1000px;margin:0 auto;padding:42px 22px 56px}.eyebrow{font-weight:750;color:#6d28d9;letter-spacing:.04em;text-transform:uppercase;font-size:.82rem}
-    h1{font-size:clamp(2rem,5vw,3.3rem);line-height:1.12;margin:.4rem 0 1rem;color:#251342}h2{line-height:1.25}p{max-width:760px}
-    .lead{font-size:1.15rem;color:#514565}.actions{display:flex;flex-wrap:wrap;gap:12px;margin:26px 0 34px}
-    .button{display:inline-block;padding:11px 17px;border-radius:10px;text-decoration:none;font-weight:750;border:1px solid #6d28d9}
-    .primary{background:#6d28d9;color:white}.secondary{background:white;color:#5b21b6}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}.card{background:#fff;border:1px solid #e4dcf3;border-radius:14px;padding:18px}.card h3{margin:.1rem 0 .5rem}
-    .notice{margin-top:26px;padding:15px 18px;border-left:4px solid #7c3aed;background:#eee7ff;border-radius:8px}
-    footer{border-top:1px solid #e1d8f0;background:#fff;padding:20px 22px;color:#665b76}footer div{max-width:1000px;margin:auto;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between}
-    @media(max-width:700px){main{padding:30px 17px 40px}.grid{grid-template-columns:1fr}.actions{display:grid}.button{text-align:center}header{padding:14px 17px}}
+    :root {
+      color-scheme: light;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #241b35;
+      background: #f7f4ff;
+      line-height: 1.6;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { color: #5b21b6; }
+    .site-header { background: #4c1d95; color: #fff; }
+    .header-inner, main, .footer-inner { width: min(100% - 40px, 960px); margin-inline: auto; }
+    .header-inner { min-height: 76px; display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      display: grid; place-items: center; flex: 0 0 42px; height: 42px;
+      border: 1px solid #a78bfa; border-radius: 10px; background: #6d28d9;
+      color: #fff; font-size: 1rem; font-weight: 800; letter-spacing: -.04em;
+    }
+    .brand-name { display: block; font-size: 1rem; font-weight: 750; line-height: 1.3; }
+    .brand-subtitle { color: #e9ddff; font-size: .86rem; }
+    main { padding-block: 58px 48px; }
+    .intro { max-width: 720px; }
+    .eyebrow { margin: 0 0 10px; color: #6d28d9; font-size: .78rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    h1 { max-width: 680px; margin: 0; color: #251342; font-size: clamp(2rem, 5vw, 3.1rem); line-height: 1.12; letter-spacing: -.035em; }
+    .lead { max-width: 680px; margin: 18px 0 0; color: #514565; font-size: 1.08rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+    .button {
+      display: inline-flex; min-height: 46px; align-items: center; justify-content: center;
+      padding: 10px 17px; border: 1px solid #6d28d9; border-radius: 9px;
+      font-weight: 750; text-decoration: none; transition: background-color .15s ease;
+    }
+    .button-primary { background: #6d28d9; color: #fff; }
+    .button-primary:hover { background: #5521a8; }
+    .button-secondary { background: #fff; color: #5521a8; }
+    .button-secondary:hover { background: #eee7ff; }
+    .section { margin-top: 46px; }
+    h2 { margin: 0; color: #251342; font-size: 1.3rem; line-height: 1.3; }
+    .features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+    .feature { padding: 18px; border: 1px solid #ded6ee; border-radius: 12px; background: #fff; }
+    .feature h3 { margin: 0 0 6px; font-size: 1rem; line-height: 1.4; }
+    .feature p { margin: 0; color: #625771; font-size: .94rem; }
+    .privacy-note { margin-top: 24px; padding: 16px 18px; border: 1px solid #ded6ee; border-radius: 10px; background: #eee7ff; color: #514565; font-size: .94rem; }
+    .privacy-note strong { color: #352052; }
+    footer { border-top: 1px solid #e1d8f0; background: #fff; color: #665b76; }
+    .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 20px; padding-block: 18px; font-size: .9rem; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 16px; }
+    :focus-visible { outline: 3px solid #a78bfa; outline-offset: 3px; }
+    @media (max-width: 680px) {
+      .header-inner, main, .footer-inner { width: min(100% - 32px, 960px); }
+      .header-inner { min-height: 68px; }
+      main { padding-block: 40px 36px; }
+      .features { grid-template-columns: 1fr; gap: 10px; }
+      .feature { padding: 16px; }
+      .section { margin-top: 36px; }
+      .actions { display: grid; grid-template-columns: 1fr; }
+      .button { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
   </style>
 </head>
 <body>
-<header>
-  <div class="brand"><div class="mark">eL</div><div><strong>UMV Storage Automation</strong><div style="font-size:.9rem;color:#e9ddff">eLetters document registry</div></div></div>
-</header>
-<main>
-  <div class="eyebrow">Official document management</div>
-  <h1>Keep important school letters easy to find.</h1>
-  <p><strong>Search letters.</strong> <strong>Find a letter</strong> by its subject, date, issuing authority, or remembered topic.</p>
-  <p class="lead">UMV Storage Automation (eLetters) is a document registry for authorized school staff to preserve, organize, and search official school and government letters, circulars, orders, PDFs, and scanned images.</p>
-  <div class="actions">
-    <a class="button primary" href="/app">Open eLetters sign in</a>
-    <a class="button secondary" href="/privacy-policy">Read our Privacy Policy</a>
-  </div>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand-mark" aria-hidden="true">eL</div>
+      <div>
+        <span class="brand-name">UMV Storage Automation</span>
+        <span class="brand-subtitle">eLetters · Official Letter Registry</span>
+      </div>
+    </div>
+  </header>
 
-  <h2>What the service does</h2>
-  <div class="grid">
-    <section class="card"><h3>Preserve originals</h3><p>Keep submitted documents in the configured private archive so staff can return to the source record.</p></section>
-    <section class="card"><h3>Organize records</h3><p>Use document titles, dates, issuing authorities, categories, and related details to make records easier to manage.</p></section>
-    <section class="card"><h3>Search by context</h3><p>Find documents using words or remembered topics instead of relying only on the original filename.</p></section>
-  </div>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Official school documents</p>
+      <h1>Important letters. Easy to organise. Easy to find.</h1>
+      <p class="lead">eLetters helps authorised school staff keep official letters, circulars, orders and notices organised — and find them later by subject, date, issuing authority or topic.</p>
+      <div class="actions">
+        <a class="button button-primary" href="/app">Sign in to eLetters</a>
+        <a class="button button-secondary" href="/privacy-policy">Privacy policy</a>
+      </div>
+    </section>
 
-  <h2 style="margin-top:32px">Privacy and access</h2>
-  <p>eLetters is intended for private, access-controlled administrative use, not public sharing of school records. Depending on the enabled configuration, authorized workflows may use Google Drive for file storage and may process document text with OCR or an AI provider to support search and organization. Please review the <a href="/privacy-policy">Privacy Policy</a> for details.</p>
-  <div class="notice"><strong>Authorized use only.</strong> Documents may contain personal or confidential information. Users should submit only records they are authorized to handle, and archive access should be limited to approved users.</div>
-</main>
-<footer><div><span>© UMV Storage Automation · eLetters</span><span><a href="/privacy-policy">Privacy Policy</a> · <a href="/app">Sign in</a></span></div></footer>
+    <section class="section" aria-labelledby="features-title">
+      <h2 id="features-title">A simpler way to manage letters</h2>
+      <div class="features">
+        <article class="feature">
+          <h3>Keep the original</h3>
+          <p>Return to the source PDF or scanned document when you need to check the details.</p>
+        </article>
+        <article class="feature">
+          <h3>Find it by topic</h3>
+          <p>Search with words you remember, even when the original filename is not helpful.</p>
+        </article>
+        <article class="feature">
+          <h3>Keep records organised</h3>
+          <p>Use titles, dates, issuing authorities and categories to make records easier to manage.</p>
+        </article>
+      </div>
+    </section>
+
+    <aside class="privacy-note">
+      <strong>Private, authorised use.</strong>
+      eLetters is intended for approved users, not public sharing of school records. Documents may contain confidential information. Submit only records you are authorised to handle. See the <a href="/privacy-policy">Privacy Policy</a> for information about document storage and processing.
+    </aside>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>© UMV Storage Automation · eLetters</span>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="/privacy-policy">Privacy policy</a>
+        <a href="/app">Sign in</a>
+      </nav>
+    </div>
+  </footer>
 </body>
 </html>
