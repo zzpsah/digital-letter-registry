@@ -26,6 +26,14 @@
   stage is gated on an unprovisioned `GEMINI_API_KEY`. Keyword search is unaffected and covers full extracted
   text. Left as-is at the user's direction.
 
+## 2026-10-10 — Google Drive OAuth View/Download incident
+
+- Recorded the production symptom and evidence: Google OAuth refresh returned HTTP 401 `invalid_client` with an invalid-client-secret message; Bitwarden's saved OAuth Client ID was also found not to match the Vercel Production Client ID.
+- The user later confirmed authenticated View and Download both worked.
+- Documented the accurate boundary: recovery is user-verified, but the exact environment-variable change was not independently captured; do not claim a particular credential rotation without evidence.
+- Added a safe recurrence checklist and explicitly prohibited logging/committing secrets or making private originals public.
+
+
 ## 2026-10-01 — Foundation
 
 - Created public repository zzpsah/digital-letter-registry.

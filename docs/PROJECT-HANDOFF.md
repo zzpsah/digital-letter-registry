@@ -445,6 +445,10 @@ Acceptance criterion: requested functionality works, existing behavior remains i
 
 
 
+## Google Drive View/Download OAuth incident — 2026-10-10
+
+The incident record is [GOOGLE_DRIVE_OAUTH_INCIDENT_2026-10-10.md](GOOGLE_DRIVE_OAUTH_INCIDENT_2026-10-10.md). Production logs previously showed HTTP 401 `invalid_client` during Google OAuth refresh, and a Client ID mismatch was observed between Bitwarden and Vercel Production. The user subsequently confirmed both View and Download work. The service is user-verified working, but the exact credential change was not independently recorded; do not claim a confirmed secret rotation until the current matching OAuth configuration is verified.
+
 ## Verified information-flow and deployment inventory — 2026-10-10
 
 Before planning infrastructure migration, replication or backups, consult [INFORMATION-FLOW-AND-DEPLOYMENT.md](INFORMATION-FLOW-AND-DEPLOYMENT.md). It records the source-grounded Mermaid data-flow diagram, Vercel routes, observed Oracle port mappings and exposure classes, service boundaries, known current-search limitations, and unresolved listener ownerships. It is an inventory only; no migration, backup or production change was made. Keep the public Vercel control plane, private Drive OAuth, Supabase authorization and Oracle worker as separate trust boundaries.

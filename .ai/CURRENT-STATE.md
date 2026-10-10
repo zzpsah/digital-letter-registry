@@ -110,3 +110,8 @@ Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-
 - Change: Support service account JSON in serverless Drive auth
 - Date: 2026-10-10
 - Durable context synchronization: completed
+
+
+## Google Drive View/Download OAuth status — 2026-10-10
+
+User confirmed authenticated View and Download work. Prior production logs showed OAuth refresh HTTP 401 `invalid_client`; Bitwarden's stored Client ID did not match the Vercel Production Client ID at the time checked. The exact configuration change that restored service was not independently recorded. See `docs/GOOGLE_DRIVE_OAUTH_INCIDENT_2026-10-10.md`; treat the user-facing workflow as working, while credential-pair/log-cleanliness verification remains unconfirmed. Never copy credential values into docs or Git.
