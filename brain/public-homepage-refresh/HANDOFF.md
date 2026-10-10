@@ -1,5 +1,5 @@
 # Handoff
 
-The source change updates only `public-homepage.html` on `ui/simple-professional-homepage`. It simplifies the headline and copy, clarifies three core benefits, keeps the privacy note short, and preserves the sign-in/privacy routes and OAuth-facing product name.
+The source change updates only `public-homepage.html` on `ui/simple-professional-homepage`. The homepage now uses **eLetters — Official Letter Registry**, states its objective in one short paragraph, and has no feature cards or how-it-works/technical explanation. Sign-in and privacy routes remain unchanged. The old visible label “UMV Storage Automation” is removed. The separate OAuth consent-screen app name was not changed by this source edit.
 
 Do not claim production is updated until the branch is reviewed/merged and the Vercel deployment plus live routes are verified.
