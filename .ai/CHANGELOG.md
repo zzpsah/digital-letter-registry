@@ -1,3 +1,14 @@
+## 2026-10-10 — docs: map eLetters information flow and live deployment ports
+- Commit: 0a5d0f2869f02f64de0ea03d8872bfe11ed34719
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-10-10 — docs: preserve UI/UX constraints in project handoff
 - Commit: 019da1d5f3dd071e025f3db22c715b376c9e6583
 - Author: PRASHANT KUMAR SAH
