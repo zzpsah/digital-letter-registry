@@ -106,12 +106,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md). The audit confirmed the Vercel routes, Oracle DLR API listener on loopback port 8877, Tailscale/Funnel mappings and key data boundaries. Funnel ports 10000, 10001 and 8443 were publicly exposed at audit time; port 10001 maps to the DLR API and must be treated as public despite its proxy role. Some other upstream listener purposes remain unconfirmed. The Oracle checkout was clean but behind GitHub main at audit time. The documentation update is not deployed to Oracle. No migration, backup, service restart or production configuration change was performed.
 
 ## Last automated change
-- Commit: 14b8f33f8a01ef2aef6090490c37d8eb89884fd5
-- Change: Support service account JSON in serverless Drive auth
-- Date: 2026-10-10
+- Commit: 578feb0f28d3a5b2fc1170f2d3e61f9992395915
+- Change: fix(api): serve originals with non-ASCII filenames
+- Date: 2026-10-12
 - Durable context synchronization: completed
-
-
-## Google Drive View/Download OAuth status — 2026-10-10
-
-User confirmed authenticated View and Download work. Prior production logs showed OAuth refresh HTTP 401 `invalid_client`; Bitwarden's stored Client ID did not match the Vercel Production Client ID at the time checked. The exact configuration change that restored service was not independently recorded. See `docs/GOOGLE_DRIVE_OAUTH_INCIDENT_2026-10-10.md`; treat the user-facing workflow as working, while credential-pair/log-cleanliness verification remains unconfirmed. Never copy credential values into docs or Git.

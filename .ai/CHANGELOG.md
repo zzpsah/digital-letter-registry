@@ -1,3 +1,11 @@
+## 2026-10-12 — fix(api): serve originals with non-ASCII filenames
+- Commit: 578feb0f28d3a5b2fc1170f2d3e61f9992395915
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `tests/test_api.py`
+
 ## 2026-10-10 — docs: record Google Drive OAuth incident and recovery
 - Commit: 965abdef991d2726ca79d2395b1ec804cd9e902c
 - Author: development-os[bot]
