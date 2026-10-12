@@ -1,3 +1,11 @@
+## 2026-10-12 — fix(ocr): make the OCRmyPDF ceiling configurable and raise its default
+- Commit: 6c4ce5eb178796d419cfde519aa3c5245f0d99ab
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/extraction_backends.py`
+- `tests/test_extraction_backends.py`
+
 ## 2026-10-12 — docs: record independent Supabase session reuse verification
 - Commit: ec02ba64b3afb7657ea37796c4357a7d75fdff49
 - Author: PRASHANT KUMAR SAH

@@ -6,10 +6,10 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: ec02ba64b3afb7657ea37796c4357a7d75fdff49
-- Last commit: docs: record independent Supabase session reuse verification
+- HEAD: 6c4ce5eb178796d419cfde519aa3c5245f0d99ab
+- Last commit: fix(ocr): make the OCRmyPDF ceiling configurable and raise its default
 - Last commit date: 2026-10-12
-- Last commit author: PRASHANT KUMAR SAH
+- Last commit author: development-os[bot]
 
 ## Context health
 - Overall: healthy
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
