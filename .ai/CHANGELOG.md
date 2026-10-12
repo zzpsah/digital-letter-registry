@@ -1,3 +1,10 @@
+## 2026-10-12 — docs(dlr): record the worker session-reuse root cause and verification
+- Commit: 708471f70895a024ea6647af1848958ee92953ab
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `brain/runtime-verification/WORKER_SESSION_REUSE_2026-10-12.md`
+
 ## 2026-10-12 — fix(auth): reuse the worker session instead of a password grant per run
 - Commit: 8ad5d2d97444e4c9e02a2da28a5f1741655c4707
 - Author: development-os[bot]
