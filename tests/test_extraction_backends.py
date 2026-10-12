@@ -120,6 +120,26 @@ class OcrmypdfBackendTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             backend.extract_text(Path("synthetic.pdf"), languages=())
 
+    def test_ocr_timeout_is_configurable_and_has_a_generous_default(self) -> None:
+        """A long scan must not be discarded by an over-tight fixed ceiling."""
+        import os
+        from unittest.mock import patch
+
+        # Default must clear the measured 328s for a 43-page Hindi scan.
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("DLR_OCR_TIMEOUT_SECONDS", None)
+            self.assertGreaterEqual(OcrmypdfTesseractBackend().timeout_seconds, 600)
+
+        with patch.dict(os.environ, {"DLR_OCR_TIMEOUT_SECONDS": "1200"}, clear=False):
+            self.assertEqual(OcrmypdfTesseractBackend().timeout_seconds, 1200)
+
+        # A malformed or non-positive value must fall back, not disable OCR.
+        for bad in ("", "abc", "0", "-5"):
+            with patch.dict(os.environ, {"DLR_OCR_TIMEOUT_SECONDS": bad}, clear=False):
+                self.assertGreaterEqual(
+                    OcrmypdfTesseractBackend().timeout_seconds, 600, bad
+                )
+
 
     def test_runtime_executable_overrides(self):
         import os

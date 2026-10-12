@@ -35,6 +35,19 @@ def _resolve_command(env_name: str, command: str) -> str:
     return command
 
 
+def _resolve_timeout(env_name: str, default: int) -> int:
+    """Read a positive integer timeout from config, else the default."""
+    raw = os.environ.get(env_name, "").strip()
+    if raw:
+        try:
+            value = int(raw)
+            if value > 0:
+                return value
+        except ValueError:
+            pass
+    return default
+
+
 @dataclass(slots=True)
 class PypdfTextBackend:
     """Extract embedded/native PDF text with pypdf."""
@@ -59,7 +72,13 @@ class OcrmypdfTesseractBackend:
     """OCR PDFs with OCRmyPDF and read the generated sidecar text."""
 
     executable: str = field(default_factory=lambda: _resolve_command("OCRMY_PDF_CMD", "ocrmypdf"))
-    timeout_seconds: int = 180
+    # --force-ocr re-OCRs every page, so runtime scales with page count. A
+    # 43-page Hindi scan measured 328s against the old 180s ceiling and was
+    # discarded as "OCRmyPDF timed out" despite producing usable text. The
+    # ceiling is configurable so it can be tuned without a code change.
+    timeout_seconds: int = field(
+        default_factory=lambda: _resolve_timeout("DLR_OCR_TIMEOUT_SECONDS", 900)
+    )
 
     def extract_text(self, path: Path, *, languages: tuple[str, ...]) -> str:
         if not languages:
