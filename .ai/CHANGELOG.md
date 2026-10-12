@@ -1,3 +1,13 @@
+## 2026-10-12 — fix(auth): reuse the worker session instead of a password grant per run
+- Commit: 8ad5d2d97444e4c9e02a2da28a5f1741655c4707
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/supabase_runtime.py`
+- `src/letter_registry/worker_session.py`
+- `tests/test_supabase_runtime.py`
+- `tests/test_worker_session.py`
+
 ## 2026-10-12 — fix(api): serve originals with non-ASCII filenames
 - Commit: 578feb0f28d3a5b2fc1170f2d3e61f9992395915
 - Author: development-os[bot]

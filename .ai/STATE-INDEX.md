@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 578feb0f28d3a5b2fc1170f2d3e61f9992395915
-- Last commit: fix(api): serve originals with non-ASCII filenames
+- HEAD: 8ad5d2d97444e4c9e02a2da28a5f1741655c4707
+- Last commit: fix(auth): reuse the worker session instead of a password grant per run
 - Last commit date: 2026-10-12
 - Last commit author: development-os[bot]
 

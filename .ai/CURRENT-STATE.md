@@ -106,7 +106,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md). The audit confirmed the Vercel routes, Oracle DLR API listener on loopback port 8877, Tailscale/Funnel mappings and key data boundaries. Funnel ports 10000, 10001 and 8443 were publicly exposed at audit time; port 10001 maps to the DLR API and must be treated as public despite its proxy role. Some other upstream listener purposes remain unconfirmed. The Oracle checkout was clean but behind GitHub main at audit time. The documentation update is not deployed to Oracle. No migration, backup, service restart or production configuration change was performed.
 
 ## Last automated change
-- Commit: 578feb0f28d3a5b2fc1170f2d3e61f9992395915
-- Change: fix(api): serve originals with non-ASCII filenames
+- Commit: 8ad5d2d97444e4c9e02a2da28a5f1741655c4707
+- Change: fix(auth): reuse the worker session instead of a password grant per run
 - Date: 2026-10-12
 - Durable context synchronization: completed
