@@ -862,6 +862,33 @@ def _runtime_intake(access_token: str) -> tuple[str, ChannelIntakeService]:
     return owner_id, service
 
 
+def _content_disposition(disposition: str, filename: str) -> str:
+    """Build an RFC 6266/5987 safe Content-Disposition value.
+
+    HTTP headers are latin-1 only, so a Hindi/Devanagari filename placed in a
+    bare ``filename="..."`` parameter raises UnicodeEncodeError and turns a
+    working download into an HTTP 500. Keep an ASCII-only fallback for legacy
+    clients and carry the real name in the RFC 5987 ``filename*`` parameter.
+    """
+    name = str(filename or "document").replace('"', "").replace("\\", "").replace("/", "")
+    name = " ".join(name.split()) or "document"
+    extension = ""
+    if "." in name:
+        candidate = name.rsplit(".", 1)[1].encode("ascii", "ignore").decode("ascii").strip()
+        if candidate:
+            extension = "." + candidate
+    stem = name.rsplit(".", 1)[0] if "." in name else name
+    ascii_stem = stem.encode("ascii", "ignore").decode("ascii")
+    ascii_stem = " ".join(ascii_stem.split()).strip(". ")
+    if not any(ch.isalpha() for ch in ascii_stem):
+        # A fully non-ASCII name (e.g. Devanagari) leaves no meaningful ASCII
+        # stem. Use a generic name; modern clients read the real one from
+        # filename*, so the Hindi name is still preserved.
+        ascii_stem = "document"
+    ascii_name = f"{ascii_stem}{extension}"
+    return f"{disposition}; filename=\"{ascii_name}\"; filename*=UTF-8''{quote(name, safe='')}"
+
+
 def _drive_credentials_configured() -> bool:
     service_account_file = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip()
     if service_account_file and os.path.isfile(service_account_file):
@@ -4205,7 +4232,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             content=original.content,
             media_type=original.content_type,
             headers={
-                "Content-Disposition": f'inline; filename="{safe_name}"',
+                "Content-Disposition": _content_disposition("inline", safe_name),
                 "Cache-Control": "private, no-store",
             },
         )
@@ -4241,7 +4268,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             content=original.content,
             media_type=original.content_type,
             headers={
-                "Content-Disposition": f'attachment; filename="{safe_name}"',
+                "Content-Disposition": _content_disposition("attachment", safe_name),
                 "Cache-Control": "private, no-store",
             },
         )

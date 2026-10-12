@@ -1309,6 +1309,49 @@ class ApiTests(unittest.TestCase):
         self.assertNotIn("private-object-reference", str(response.headers))
         self.assertNotIn(b"private-object-reference", response.content)
 
+    def test_original_endpoint_handles_devanagari_filename(self):
+        """A Hindi filename must not break the header (latin-1 only) -> no 500."""
+        from letter_registry.original_access import OriginalFile, SupabaseOriginalAccessService
+
+        hindi_name = "जुम्मे की नमाज से संबंधित पत्र-1.pdf"
+
+        class Database:
+            def select(self, table, *, filters=None, columns="*"):
+                return [{
+                    "original_filename": hindi_name,
+                    "storage_provider": "gdrive",
+                    "storage_object_id": "private-object-reference",
+                }]
+
+        class Storage:
+            def download(self, *, provider, object_reference, filename):
+                return OriginalFile(
+                    filename=filename,
+                    content_type="application/pdf",
+                    content=b"%PDF-hindi",
+                )
+
+        app = create_app(
+            ApiDependencies(
+                original_access=SupabaseOriginalAccessService(Storage())
+            )
+        )
+        client = TestClient(app)
+        with patch("letter_registry.api._transport", return_value=Database()):
+            for suffix in ("original", "download"):
+                response = client.get(
+                    f"/api/v1/letters/33333333-3333-4333-8333-333333333333/{suffix}",
+                    headers={"Authorization": "Bearer synthetic-user-token"},
+                )
+                self.assertEqual(response.status_code, 200, f"{suffix} returned {response.status_code}")
+                self.assertEqual(response.content, b"%PDF-hindi")
+                disposition = response.headers["content-disposition"]
+                self.assertIn("filename*=UTF-8''", disposition)
+                self.assertIn("%E0%A4%9C", disposition)  # encoded Devanagari
+                self.assertNotIn("private-object-reference", str(response.headers))
+                # Header must be latin-1 encodable, which is what broke before.
+                disposition.encode("latin-1")
+
     def test_original_endpoint_is_closed_until_private_resolver_exists(self):
         response = self.client.get(
             "/api/v1/letters/22222222-2222-4222-8222-222222222222/original",
