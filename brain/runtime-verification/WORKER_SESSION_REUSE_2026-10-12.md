@@ -102,3 +102,25 @@ No jobs, records, or sessions were deleted.
 
 The two 403s predate this work and point at an RLS/insert path for
 `manual_reprocess`, unrelated to authentication volume. Not addressed here.
+
+## Independent Supabase log follow-up — 2026-10-12
+
+A separate read-only check of the project's Supabase edge logs was performed
+after the deployment report. This verifies observed Auth API traffic; it does
+not independently verify the worker filesystem or source revision.
+
+Window checked: **2026-10-12 06:00–08:15 UTC**.
+
+- `POST /auth/v1/token?grant_type=password`: **0** requests.
+- `POST /auth/v1/token?grant_type=refresh_token`: **3** requests, all HTTP
+  200.
+- In an earlier transition window (04:00–06:00 UTC), password-grant requests
+  were still present. This may reflect pre-fix/older invocations or another
+  caller; the logs alone do not identify the process responsible.
+- Therefore the latest window supports that session reuse is operating, but
+  a full 24-hour post-deployment observation is still needed before declaring
+  the regression permanently resolved.
+
+No database rows, sessions, users, or Auth settings were modified during this
+check. The two pre-existing manual-reprocess HTTP 403/RLS failures and the
+OCRmyPDF timeout remain separate unresolved items.
