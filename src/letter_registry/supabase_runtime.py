@@ -47,9 +47,14 @@ class SupabasePostgrestTransport:
         """Build a worker transport from a dedicated non-human Auth account.
 
         A directly supplied SUPABASE_ACCESS_TOKEN remains supported for
-        one-shot/manual integration tests. Normal background workers should use
-        SUPABASE_WORKER_EMAIL + SUPABASE_WORKER_PASSWORD so each run obtains a
-        fresh short-lived user session and continues to respect RLS.
+        one-shot/manual integration tests.
+
+        Background workers run as short-lived `oneshot` units once a minute, so
+        signing in with a password on every start produced thousands of grants
+        and sessions per day for one identity. The session is now cached on disk
+        and reused until it is close to expiring, then refreshed with the
+        rotating refresh token under a cross-process lock. A password grant is
+        the last resort rather than the per-run default.
         """
 
         access_token = os.environ.get("SUPABASE_ACCESS_TOKEN", "").strip()
@@ -64,9 +69,9 @@ class SupabasePostgrestTransport:
                 "SUPABASE_WORKER_EMAIL and SUPABASE_WORKER_PASSWORD"
             )
 
-        from .auth import SupabasePasswordlessAuth
+        from .worker_session import load_worker_session
 
-        session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
+        session = load_worker_session(
             email=worker_email,
             password=worker_password,
         )

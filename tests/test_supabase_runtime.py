@@ -1,5 +1,6 @@
 import json
 import os
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -29,6 +30,7 @@ class SupabaseRuntimeTransportTests(unittest.TestCase):
         self.assertEqual(transport.access_token, "synthetic-access")
 
     def test_worker_environment_signs_in_dedicated_account(self) -> None:
+        """A cold cache falls back to a password grant for the worker identity."""
         from letter_registry.auth import SupabaseAuthSession
 
         env = {
@@ -37,24 +39,69 @@ class SupabaseRuntimeTransportTests(unittest.TestCase):
             "SUPABASE_WORKER_EMAIL": "worker@example.com",
             "SUPABASE_WORKER_PASSWORD": "synthetic-password",
         }
-        with patch.dict(os.environ, env, clear=True):
-            with patch(
-                "letter_registry.auth.SupabasePasswordlessAuth.from_environment"
-            ) as factory:
-                factory.return_value.sign_in_with_password.return_value = (
-                    SupabaseAuthSession(
-                        access_token="fresh-worker-access",
-                        refresh_token="rotating-refresh",
-                        expires_in=3600,
+        with tempfile.TemporaryDirectory() as tmp:
+            state = os.path.join(tmp, "worker-session.json")
+            with patch.dict(os.environ, env, clear=True), patch.dict(
+                os.environ,
+                {
+                    "DLR_WORKER_SESSION_FILE": state,
+                    "DLR_WORKER_SESSION_LOCK": os.path.join(tmp, "worker-session.lock"),
+                },
+            ):
+                with patch(
+                    "letter_registry.auth.SupabasePasswordlessAuth.from_environment"
+                ) as factory:
+                    factory.return_value.sign_in_with_password.return_value = (
+                        SupabaseAuthSession(
+                            access_token="fresh-worker-access",
+                            refresh_token="rotating-refresh",
+                            expires_in=3600,
+                        )
                     )
-                )
-                transport = SupabasePostgrestTransport.from_worker_environment()
+                    transport = SupabasePostgrestTransport.from_worker_environment()
 
-        self.assertEqual(transport.access_token, "fresh-worker-access")
-        factory.return_value.sign_in_with_password.assert_called_once_with(
-            email="worker@example.com",
-            password="synthetic-password",
-        )
+            self.assertEqual(transport.access_token, "fresh-worker-access")
+            factory.return_value.sign_in_with_password.assert_called_once_with(
+                email="worker@example.com",
+                password="synthetic-password",
+            )
+
+    def test_worker_environment_reuses_cached_session_without_password(self) -> None:
+        """The reported defect: a valid cached session must not re-authenticate."""
+        from letter_registry.auth import SupabaseAuthSession
+
+        env = {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_PUBLISHABLE_KEY": "synthetic-key",
+            "SUPABASE_WORKER_EMAIL": "worker@example.com",
+            "SUPABASE_WORKER_PASSWORD": "synthetic-password",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            state = os.path.join(tmp, "worker-session.json")
+            with patch.dict(os.environ, env, clear=True), patch.dict(
+                os.environ,
+                {
+                    "DLR_WORKER_SESSION_FILE": state,
+                    "DLR_WORKER_SESSION_LOCK": os.path.join(tmp, "worker-session.lock"),
+                },
+            ):
+                with patch(
+                    "letter_registry.auth.SupabasePasswordlessAuth.from_environment"
+                ) as factory:
+                    factory.return_value.sign_in_with_password.return_value = (
+                        SupabaseAuthSession(
+                            access_token="first-access",
+                            refresh_token="first-refresh",
+                            expires_in=3600,
+                        )
+                    )
+                    first = SupabasePostgrestTransport.from_worker_environment()
+                    # A second run must reuse the cache, not sign in again.
+                    second = SupabasePostgrestTransport.from_worker_environment()
+
+            self.assertEqual(first.access_token, "first-access")
+            self.assertEqual(second.access_token, "first-access")
+            factory.return_value.sign_in_with_password.assert_called_once()
 
     def test_worker_environment_requires_dedicated_credentials(self) -> None:
         env = {
