@@ -1,3 +1,11 @@
+## 2026-10-14 — fix: preserve invitation-backed local signup
+- Commit: 3ca072ecd8bc5d0c64572c9095ff4bef43dd87e2
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/local_supabase.py`
+- `tests/test_local_supabase.py`
+
 ## 2026-10-14 — feat: add local Supabase-compatible database bridge
 - Commit: 7688d23bbbac51500552531fad65f32e226f2a90
 - Author: development-os[bot]

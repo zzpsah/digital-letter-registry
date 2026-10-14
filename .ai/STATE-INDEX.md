@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 7688d23bbbac51500552531fad65f32e226f2a90
-- Last commit: feat: add local Supabase-compatible database bridge
+- HEAD: 3ca072ecd8bc5d0c64572c9095ff4bef43dd87e2
+- Last commit: fix: preserve invitation-backed local signup
 - Last commit date: 2026-10-14
 - Last commit author: development-os[bot]
 
