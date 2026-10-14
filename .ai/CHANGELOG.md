@@ -1,3 +1,14 @@
+## 2026-10-14 — feat: add local Supabase-compatible database bridge
+- Commit: 7688d23bbbac51500552531fad65f32e226f2a90
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `src/letter_registry/local_supabase.py`
+- `src/letter_registry/supabase_management.py`
+- `supabase/migrations/20261014163501_restore_osint_rpc_access.sql`
+- `tests/test_local_supabase.py`
+
 ## 2026-10-14 — fix: terminate importance migration function statement
 - Commit: 3888345a96f7e84a5e130f6566b15a3a9da5225c
 - Author: development-os[bot]
