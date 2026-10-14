@@ -1,3 +1,10 @@
+## 2026-10-14 — fix: harden privileged Supabase RPC access
+- Commit: c1214a7cd3369c75c5ed1adf3b89af22f35fa02b
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261014182000_harden_security_definer_rpc_access.sql`
+
 ## 2026-10-14 — Document PostgreSQL Services repository boundary
 - Commit: b1a75248456829f9c67def7a0a590c0d21db0911
 - Author: PRASHANT KUMAR SAH

@@ -6,10 +6,10 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: b1a75248456829f9c67def7a0a590c0d21db0911
-- Last commit: Document PostgreSQL Services repository boundary
+- HEAD: c1214a7cd3369c75c5ed1adf3b89af22f35fa02b
+- Last commit: fix: harden privileged Supabase RPC access
 - Last commit date: 2026-10-14
-- Last commit author: PRASHANT KUMAR SAH
+- Last commit author: development-os[bot]
 
 ## Context health
 - Overall: healthy
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
