@@ -57,8 +57,11 @@ class SupabasePostgrestTransport:
         the last resort rather than the per-run default.
         """
 
+        local_primary = os.environ.get("DLR_LOCAL_SUPABASE_PROXY_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
         access_token = os.environ.get("SUPABASE_ACCESS_TOKEN", "").strip()
-        if access_token:
+        # A token issued by hosted Supabase is signed with a different JWT
+        # secret and must never be sent to the local PostgREST primary.
+        if access_token and not local_primary:
             return cls.from_environment()
 
         worker_email = os.environ.get("SUPABASE_WORKER_EMAIL", "").strip()

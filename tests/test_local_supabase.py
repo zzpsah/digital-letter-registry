@@ -17,6 +17,8 @@ from letter_registry.local_supabase import (
     _service_role_token,
     register_local_supabase_routes,
 )
+from letter_registry.supabase_runtime import SupabasePostgrestTransport
+from letter_registry.worker_session import WorkerSession, _state_paths
 
 
 class LocalSupabaseBridgeTests(unittest.TestCase):
@@ -55,6 +57,39 @@ class LocalSupabaseBridgeTests(unittest.TestCase):
         with patch.dict(os.environ, {"DLR_LOCAL_CORS_ORIGINS": ""}, clear=False):
             self.assertEqual(_cors_headers(allowed_request)["Access-Control-Allow-Origin"], "https://eletters.vercel.app")
             self.assertEqual(_cors_headers(blocked_request), {})
+
+    def test_local_primary_uses_separate_worker_session_cache(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_cache = str(Path(temp_dir) / "hosted-session.json")
+            with patch.dict(os.environ, {
+                "DLR_LOCAL_SUPABASE_PROXY_ENABLED": "true",
+                "DLR_WORKER_SESSION_FILE": old_cache,
+            }, clear=False):
+                path, lock = _state_paths(None)
+            self.assertNotEqual(str(path), old_cache)
+            self.assertEqual(path.name, "worker-session.json")
+            self.assertEqual(lock.name, "worker-session.lock")
+
+    def test_local_primary_ignores_hosted_worker_access_token(self):
+        session = WorkerSession(
+            access_token="local-issued-access-token",
+            refresh_token="local-issued-refresh-token",
+            expires_at=time.time() + 3600,
+            source="password",
+        )
+        with patch.dict(os.environ, {
+            "DLR_LOCAL_SUPABASE_PROXY_ENABLED": "true",
+            "SUPABASE_ACCESS_TOKEN": "hosted-project-token-must-not-be-used",
+            "SUPABASE_WORKER_EMAIL": "worker@example.invalid",
+            "SUPABASE_WORKER_PASSWORD": "test-only-password",
+            "SUPABASE_URL": "http://127.0.0.1:8877",
+            "SUPABASE_PUBLISHABLE_KEY": "local-public-key",
+        }, clear=False):
+            with patch("letter_registry.worker_session.load_worker_session", return_value=session) as load:
+                transport = SupabasePostgrestTransport.from_worker_environment()
+        load.assert_called_once_with(email="worker@example.invalid", password="test-only-password")
+        self.assertEqual(transport.access_token, "local-issued-access-token")
+        self.assertEqual(transport.base_url, "http://127.0.0.1:8877")
 
     def test_routes_are_registered_only_when_enabled(self):
         disabled = FastAPI()
