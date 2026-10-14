@@ -163,7 +163,7 @@ class WorkerSessionTests(unittest.TestCase):
         self.load(auth)
         raw = json.loads(open(self.state, encoding="utf-8").read())
         raw["written_at"] = time.time() - 7200
-        raw["expires_at"] = time.time() - 3600
+        raw["expires_at"] = raw["written_at"] + 3600 - 1
         with open(self.state, "w", encoding="utf-8") as handle:
             json.dump(raw, handle)
 
