@@ -1,3 +1,10 @@
+## 2026-10-14 — Document PostgreSQL Services repository boundary
+- Commit: b1a75248456829f9c67def7a0a590c0d21db0911
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `README.md`
+
 ## 2026-10-12 — fix(ocr): make the OCRmyPDF ceiling configurable and raise its default
 - Commit: 6c4ce5eb178796d419cfde519aa3c5245f0d99ab
 - Author: development-os[bot]
