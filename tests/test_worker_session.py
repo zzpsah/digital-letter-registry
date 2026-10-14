@@ -158,6 +158,46 @@ class WorkerSessionTests(unittest.TestCase):
         mode = os.stat(os.path.dirname(self.state)).st_mode & 0o777
         self.assertEqual(mode, 0o700, f"expected 0700, got {oct(mode)}")
 
+    def test_old_expired_cache_keeps_refresh_token(self) -> None:
+        auth = FakeAuth()
+        self.load(auth)
+        raw = json.loads(open(self.state, encoding="utf-8").read())
+        raw["written_at"] = time.time() - 7200
+        raw["expires_at"] = time.time() - 3600
+        with open(self.state, "w", encoding="utf-8") as handle:
+            json.dump(raw, handle)
+
+        refreshed = self.load(auth)
+        self.assertEqual(refreshed.source, "refresh")
+        self.assertEqual(auth.refresh_calls, ["refresh-1"])
+        self.assertEqual(len(auth.password_calls), 1)
+
+    def test_quota_402_pauses_auth_and_does_not_fall_back_to_password(self) -> None:
+        class QuotaAuth(FakeAuth):
+            def refresh_session(self, *, refresh_token: str):
+                self.refresh_calls.append(refresh_token)
+                raise RuntimeError(
+                    "Supabase Auth failed with HTTP 402: exceed_egress_quota"
+                )
+
+        seed_auth = FakeAuth()
+        self.load(seed_auth)
+        raw = json.loads(open(self.state, encoding="utf-8").read())
+        raw["expires_at"] = time.time() - 60
+        with open(self.state, "w", encoding="utf-8") as handle:
+            json.dump(raw, handle)
+
+        auth = QuotaAuth()
+        with self.assertRaisesRegex(WorkerSessionError, "HTTP 402"):
+            self.load(auth)
+        self.assertEqual(len(auth.refresh_calls), 1)
+        self.assertEqual(auth.password_calls, [])
+
+        with self.assertRaisesRegex(WorkerSessionError, "retry paused"):
+            self.load(auth)
+        self.assertEqual(len(auth.refresh_calls), 1)
+        self.assertEqual(auth.password_calls, [])
+
     def test_stale_cache_beyond_max_lifetime_is_not_trusted(self) -> None:
         """A tampered/edited cache must not pin a token forever."""
         auth = FakeAuth()
