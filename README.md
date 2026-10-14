@@ -287,3 +287,9 @@ Unless the user explicitly requests a specific UI change, preserve the existing 
 
 Acceptance criterion: requested functionality works, existing behavior remains intact, and the UI/UX is unchanged except for a specific visual change the user explicitly authorized.
 
+
+## Database management documentation
+
+Database-service operations are documented separately from this application's source and product development in the private [PostgreSQL Services repository](https://github.com/zzpsah/postgresql-services), under `projects/official-letter-intelligence/`. That project folder is limited to DLR/eLetters database schema, migrations, compatibility, backup/restore, integration, and cutover. Host/OS operations remain in the private [Oracle VPS repository](https://github.com/zzpsah/oracle-server).
+
+The current PostgreSQL work is staging only. No production DLR records have been imported and the application has not been cut over from Supabase Auth/REST/RPC. PostgreSQL alone is not a drop-in replacement for those Supabase APIs. This link is a documentation pointer, not a claim of production migration.
