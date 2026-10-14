@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 3ca072ecd8bc5d0c64572c9095ff4bef43dd87e2
-- Last commit: fix: preserve invitation-backed local signup
+- HEAD: 1192bacf49c59ca76005a59fec85ea2069ec6f63
+- Last commit: fix: isolate local-primary worker auth sessions
 - Last commit date: 2026-10-14
 - Last commit author: development-os[bot]
 

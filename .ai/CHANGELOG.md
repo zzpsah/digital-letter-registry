@@ -1,3 +1,13 @@
+## 2026-10-14 — fix: isolate local-primary worker auth sessions
+- Commit: 1192bacf49c59ca76005a59fec85ea2069ec6f63
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/supabase_runtime.py`
+- `src/letter_registry/worker_session.py`
+- `tests/test_local_supabase.py`
+- `tests/test_worker_session.py`
+
 ## 2026-10-14 — fix: preserve invitation-backed local signup
 - Commit: 3ca072ecd8bc5d0c64572c9095ff4bef43dd87e2
 - Author: development-os[bot]
