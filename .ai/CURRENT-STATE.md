@@ -106,7 +106,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md). The audit confirmed the Vercel routes, Oracle DLR API listener on loopback port 8877, Tailscale/Funnel mappings and key data boundaries. Funnel ports 10000, 10001 and 8443 were publicly exposed at audit time; port 10001 maps to the DLR API and must be treated as public despite its proxy role. Some other upstream listener purposes remain unconfirmed. The Oracle checkout was clean but behind GitHub main at audit time. The documentation update is not deployed to Oracle. No migration, backup, service restart or production configuration change was performed.
 
 ## Last automated change
-- Commit: ce8a69953aed96fedfdf08af2c949bd22482fcf0
-- Change: chore: align migration version with Supabase history
+- Commit: 3888345a96f7e84a5e130f6566b15a3a9da5225c
+- Change: fix: terminate importance migration function statement
 - Date: 2026-10-14
 - Durable context synchronization: completed

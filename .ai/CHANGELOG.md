@@ -1,3 +1,10 @@
+## 2026-10-14 — fix: terminate importance migration function statement
+- Commit: 3888345a96f7e84a5e130f6566b15a3a9da5225c
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261005195000_add_letter_importance_and_notes.sql`
+
 ## 2026-10-14 — chore: align migration version with Supabase history
 - Commit: ce8a69953aed96fedfdf08af2c949bd22482fcf0
 - Author: development-os[bot]

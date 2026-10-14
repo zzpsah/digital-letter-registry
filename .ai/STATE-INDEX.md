@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: ce8a69953aed96fedfdf08af2c949bd22482fcf0
-- Last commit: chore: align migration version with Supabase history
+- HEAD: 3888345a96f7e84a5e130f6566b15a3a9da5225c
+- Last commit: fix: terminate importance migration function statement
 - Last commit date: 2026-10-14
 - Last commit author: development-os[bot]
 
