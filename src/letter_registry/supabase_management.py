@@ -82,7 +82,7 @@ class SupabaseAuthConfigManager:
         template_path: Path = Path("supabase/templates/magic-link.html"),
     ) -> "SupabaseAuthConfigManager":
         token = os.environ.get("SUPABASE_MANAGEMENT_ACCESS_TOKEN", "").strip()
-        base_url = os.environ.get("SUPABASE_URL", "").strip()
+        base_url = os.environ.get("SUPABASE_MANAGEMENT_URL", "").strip() or os.environ.get("SUPABASE_URL", "").strip()
         redirect = os.environ.get("AUTH_REDIRECT_URL", "").strip()
         app_origin = os.environ.get("AUTH_APP_ORIGIN", "").strip()
         google_client_id = os.environ.get(

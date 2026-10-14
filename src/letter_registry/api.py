@@ -30,6 +30,7 @@ from .google_drive_reader import GoogleDrivePrivateTransport
 from .google_drive_writer import GoogleDrivePrivateWriter
 from .hybrid_search import HybridSearchRepository
 from .intake import DuplicateSourceError, IntakePolicy, IntakeService
+from .local_supabase import register_local_supabase_routes
 from .jobs import SupabaseProcessingQueue
 from .original_access import SupabaseOriginalAccessService
 from .relationships import RelationshipReviewStatus, SupabaseRelationshipRepository
@@ -1368,6 +1369,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         docs_url="/api/docs",
         redoc_url=None,
     )
+    register_local_supabase_routes(app)
 
     @app.get("/", include_in_schema=False)
     def home() -> FileResponse:
