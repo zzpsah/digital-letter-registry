@@ -50,6 +50,7 @@ DEFAULT_EXPIRY_MARGIN_SECONDS = 300
 # An access token is only trusted for this long even if the server-reported
 # expiry is further out, so a stale/edited cache cannot pin a dead token.
 MAX_TOKEN_LIFETIME_SECONDS = 3600
+AUTH_QUOTA_RETRY_COOLDOWN_SECONDS = 900
 
 _SESSION_FILE_MODE = 0o600
 _DIR_MODE = 0o700
@@ -132,8 +133,10 @@ def _read_cached(path: Path) -> WorkerSession | None:
     written_at = float(raw.get("written_at") or expires_at)
     if not access or not refresh or expires_at <= 0:
         return None
-    # Never trust a token claimed to be valid far beyond its real lifetime.
-    if written_at + MAX_TOKEN_LIFETIME_SECONDS < time.time():
+    # Bound the claimed access-token lifetime relative to when it was written,
+    # but do not discard an old cache just because its access token expired.
+    # The refresh token can remain valid well beyond the access-token lifetime.
+    if expires_at > written_at + MAX_TOKEN_LIFETIME_SECONDS:
         return None
     return WorkerSession(
         access_token=access,
@@ -169,6 +172,57 @@ def _write_cached(path: Path, session: WorkerSession) -> None:
         raise
 
 
+def _quota_cooldown_path(path: Path) -> Path:
+    return path.with_name(path.name + ".cooldown.json")
+
+
+def _read_quota_cooldown(path: Path) -> tuple[int, str] | None:
+    cooldown_path = _quota_cooldown_path(path)
+    try:
+        raw = json.loads(cooldown_path.read_text(encoding="utf-8"))
+        retry_after = float(raw.get("retry_after") or 0)
+        reason = str(raw.get("reason") or "Supabase Auth temporarily unavailable")
+    except (OSError, json.JSONDecodeError, TypeError, ValueError, AttributeError):
+        return None
+    remaining = int(retry_after - time.time())
+    if remaining <= 0:
+        try:
+            cooldown_path.unlink()
+        except OSError:
+            pass
+        return None
+    return remaining, reason
+
+
+def _write_quota_cooldown(path: Path, *, reason: str) -> None:
+    cooldown_path = _quota_cooldown_path(path)
+    _ensure_parent(cooldown_path)
+    payload = {
+        "retry_after": time.time() + AUTH_QUOTA_RETRY_COOLDOWN_SECONDS,
+        "reason": reason,
+    }
+    fd, temp_name = tempfile.mkstemp(dir=str(cooldown_path.parent), prefix=".worker-cooldown-")
+    try:
+        os.fchmod(fd, _SESSION_FILE_MODE)
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(payload, handle, ensure_ascii=False)
+        os.replace(temp_name, cooldown_path)
+        os.chmod(cooldown_path, _SESSION_FILE_MODE)
+    except BaseException:
+        try:
+            os.unlink(temp_name)
+        except OSError:
+            pass
+        raise
+
+
+def _is_quota_restriction(exc: BaseException) -> bool:
+    # Supabase currently returns HTTP 402 with exceed_egress_quota for this
+    # project. Treat 402 as non-retryable for a short cooldown, not as a reason
+    # to immediately try a second password grant.
+    return "http 402" in str(exc).casefold()
+
+
 def _session_from_auth_result(result: object, *, source: str) -> WorkerSession:
     access = str(getattr(result, "access_token", "") or "").strip()
     refresh = str(getattr(result, "refresh_token", "") or "").strip()
@@ -198,6 +252,10 @@ def _password_grant(auth: _AuthLike, *, email: str, password: str) -> object:
         raise
     except Exception as exc:
         # Never include the password or any token in the message.
+        if _is_quota_restriction(exc):
+            raise WorkerSessionError(
+                "worker password sign-in rejected with HTTP 402 (Supabase quota restriction)"
+            ) from exc
         raise WorkerSessionError(
             f"worker password sign-in failed: {type(exc).__name__}"
         ) from exc
@@ -233,6 +291,14 @@ def load_worker_session(
         if cached is not None and cached.is_usable():
             return cached
 
+        cooldown = _read_quota_cooldown(path)
+        if cooldown is not None:
+            remaining, reason = cooldown
+            raise WorkerSessionError(
+                f"Supabase Auth retry paused for {remaining}s after {reason}; "
+                "this avoids repeated requests while the project restriction persists"
+            )
+
         auth = (auth_factory or _default_auth_factory)()
         refresh_token = cached.refresh_token if cached is not None else ""
 
@@ -244,15 +310,20 @@ def load_worker_session(
                 )
                 _write_cached(path, refreshed)
                 return refreshed
-            except Exception:
+            except Exception as exc:
+                if _is_quota_restriction(exc):
+                    _write_quota_cooldown(path, reason="Supabase HTTP 402 quota restriction")
+                    raise WorkerSessionError(
+                        "Supabase Auth returned HTTP 402; retries paused for 15 minutes "
+                        "to avoid repeated requests while the project quota restriction persists"
+                    ) from exc
                 # An expired or already-rotated refresh token is expected
-                # occasionally; fall through to a password grant. The reason is
-                # not logged with any token material.
+                # occasionally; fall through to a password grant.
                 if refresh_only:
                     raise WorkerSessionError(
                         "worker session refresh failed and password sign-in is not "
                         "permitted for this caller"
-                    )
+                    ) from exc
 
         if refresh_only:
             raise WorkerSessionError(
@@ -260,10 +331,19 @@ def load_worker_session(
                 "permitted for this caller"
             )
 
-        signed_in = _session_from_auth_result(
-            _password_grant(auth, email=email, password=password),
-            source="password",
-        )
+        try:
+            signed_in = _session_from_auth_result(
+                _password_grant(auth, email=email, password=password),
+                source="password",
+            )
+        except WorkerSessionError as exc:
+            if _is_quota_restriction(exc):
+                _write_quota_cooldown(path, reason="Supabase HTTP 402 quota restriction")
+                raise WorkerSessionError(
+                    "Supabase Auth returned HTTP 402; retries paused for 15 minutes "
+                    "to avoid repeated requests while the project quota restriction persists"
+                ) from exc
+            raise
         # Record how this session was obtained without leaking any token value.
         _write_cached(
             path,
