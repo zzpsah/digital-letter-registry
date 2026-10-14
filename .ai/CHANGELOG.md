@@ -1,3 +1,10 @@
+## 2026-10-14 — chore: align migration version with Supabase history
+- Commit: ce8a69953aed96fedfdf08af2c949bd22482fcf0
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261014162212_harden_security_definer_rpc_access.sql`
+
 ## 2026-10-14 — fix: harden privileged Supabase RPC access
 - Commit: c1214a7cd3369c75c5ed1adf3b89af22f35fa02b
 - Author: development-os[bot]

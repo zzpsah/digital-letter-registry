@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: c1214a7cd3369c75c5ed1adf3b89af22f35fa02b
-- Last commit: fix: harden privileged Supabase RPC access
+- HEAD: ce8a69953aed96fedfdf08af2c949bd22482fcf0
+- Last commit: chore: align migration version with Supabase history
 - Last commit date: 2026-10-14
 - Last commit author: development-os[bot]
 
