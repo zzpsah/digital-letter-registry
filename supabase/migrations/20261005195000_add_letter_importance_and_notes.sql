@@ -124,7 +124,7 @@ AS $function$
              (r.text_rank_value*0.50 + r.fuzzy_rank_value*0.20 + r.alias_rank_value*0.15 + r.exact_rank_value*0.15) desc,
              r.uploaded_at desc
            limit greatest(1,least(coalesce(result_limit,25),100));
-         $function$
+         $function$;
 
 
 grant execute on function public.search_letter_cards(text,text,text,letter_status,integer,text,integer) to authenticated;
