@@ -317,6 +317,80 @@ async def _local_complete_approved_account(request: Request) -> Response:
                     headers={"Cache-Control": "no-store", **_cors_headers(request)})
 
 
+
+async def _local_signup(request: Request) -> Response:
+    """Allow only invitation-backed password signup while GoTrue public signup is disabled."""
+    try:
+        body = await request.json()
+    except Exception:
+        return _error("invalid request", 400, request)
+    email = str(body.get("email") or "").strip().lower()
+    password = str(body.get("password") or "")
+    metadata = body.get("data") or body.get("user_metadata") or {}
+    invite_code = str(metadata.get("dlr_invite_code") or "").strip() if isinstance(metadata, dict) else ""
+    if not email or "@" not in email or len(email) > 320 or not 8 <= len(password) <= 256 or not invite_code:
+        return _error("a valid email, password, and invitation are required", 400, request)
+    try:
+        invite_code = str(UUID(invite_code))
+    except ValueError:
+        return _error("a valid DLR invitation is required", 403, request)
+    validation_code, validation, _ = _service_rest("POST", "/rpc/dlr_validate_archive_invite", {
+        "target_email": email,
+        "target_invite_code": invite_code,
+    })
+    if validation_code != 200 or validation is not True:
+        return _error("a valid DLR invitation is required", 403, request)
+    create_code, created, _ = _auth_admin("POST", "/admin/users", {
+        "email": email,
+        "password": password,
+        "email_confirm": True,
+        "user_metadata": {"dlr_invite_code": invite_code},
+    })
+    user_id = str(created.get("id") or (created.get("user") or {}).get("id") or "") if isinstance(created, dict) else ""
+    if create_code not in {200, 201} or not user_id:
+        if create_code in {409, 422}:
+            return _error("an account already exists for this email", 409, request)
+        return _error("account registration failed", 400, request)
+    login_code, session_raw, _ = _http_call(
+        _AUTH_ORIGIN,
+        "/token?grant_type=password",
+        method="POST",
+        body={"email": email, "password": password},
+        extra_headers={"apikey": os.environ.get("SUPABASE_PUBLISHABLE_KEY", "")},
+    )
+    if login_code != 200 or not isinstance(_json_body(session_raw), dict) or not _json_body(session_raw).get("access_token"):
+        _auth_admin("DELETE", "/admin/users/" + user_id)
+        return _error("account registration could not start a session", 502, request)
+    return Response(content=session_raw, status_code=200, media_type="application/json",
+                    headers={"Cache-Control": "no-store", **_cors_headers(request)})
+
+
+def _local_confirm_account(request: Request) -> Response:
+    bearer = _bearer(request)
+    if not bearer:
+        return _error("authentication required", 401, request)
+    try:
+        body = json.loads(request._body.decode("utf-8"))
+        target_id = str(UUID(str(body.get("target_user_id") or "")))
+        archive_id = str(UUID(os.environ.get("DLR_ARCHIVE_ID", "").strip()))
+    except Exception:
+        return _error("invalid request", 400, request)
+    caller_code, caller, _ = _http_call(_AUTH_ORIGIN, "/user", bearer=bearer)
+    caller_id = str(caller.get("id") or "") if caller_code == 200 and isinstance(caller, dict) else ""
+    if not caller_id:
+        return _error("invalid session", 401, request)
+    admin_code, admin_rows = _membership_rows(archive_id, user_id=caller_id, role="admin", status="active")
+    if admin_code != 200 or not admin_rows:
+        return _error("admin access required", 403, request)
+    target_code, target_rows = _membership_rows(archive_id, user_id=target_id)
+    if target_code != 200 or not target_rows:
+        return _error("user not found", 404, request)
+    confirm_code, _, _ = _auth_admin("PUT", "/admin/users/" + target_id, {"email_confirm": True})
+    if confirm_code not in {200, 204}:
+        return _error("account confirmation failed", 500, request)
+    return Response(content='{"success":true}', media_type="application/json",
+                    headers={"Cache-Control": "no-store", **_cors_headers(request)})
+
 def register_local_supabase_routes(app: FastAPI) -> None:
     """Register the compatibility surface only on the private Oracle API process."""
     enabled = os.environ.get("DLR_LOCAL_SUPABASE_PROXY_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
@@ -327,11 +401,20 @@ def register_local_supabase_routes(app: FastAPI) -> None:
 
     @app.api_route("/auth/v1/{path:path}", methods=methods, include_in_schema=False)
     async def local_auth_proxy(request: Request, path: str) -> Response:
+        if path == "signup" and request.method == "POST":
+            return await _local_signup(request)
         return await _forward(request, _AUTH_ORIGIN, path)
 
     @app.api_route("/rest/v1/{path:path}", methods=methods, include_in_schema=False)
     async def local_rest_proxy(request: Request, path: str) -> Response:
         return await _forward(request, _REST_ORIGIN, path)
+
+    @app.api_route("/functions/v1/dlr-confirm-account", methods=["POST", "OPTIONS"], include_in_schema=False)
+    async def local_confirm_account(request: Request) -> Response:
+        if request.method == "OPTIONS":
+            return Response(status_code=204, headers={**_cors_headers(request), "Cache-Control": "no-store"})
+        request._body = await request.body()
+        return await run_in_threadpool(_local_confirm_account, request)
 
     @app.api_route("/functions/v1/dlr-admin-user-account", methods=["POST", "OPTIONS"], include_in_schema=False)
     async def local_admin_user_account(request: Request) -> Response:

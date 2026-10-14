@@ -69,6 +69,7 @@ class LocalSupabaseBridgeTests(unittest.TestCase):
         self.assertIn("/auth/v1/{path:path}", paths)
         self.assertIn("/rest/v1/{path:path}", paths)
         self.assertIn("/functions/v1/dlr-admin-user-account", paths)
+        self.assertIn("/functions/v1/dlr-confirm-account", paths)
         self.assertIn("/functions/v1/dlr-complete-approved-account", paths)
 
 
