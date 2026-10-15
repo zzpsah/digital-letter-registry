@@ -5,5 +5,8 @@
       "maxDuration": 60,
       "excludeFiles": "{tests/**,supabase/**,brain/**,docs/**,.ai/**,.github/**,scripts/**}"
     }
-  }
+  },
+  "regions": [
+    "bom1"
+  ]
 }
