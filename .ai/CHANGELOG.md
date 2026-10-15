@@ -1,3 +1,11 @@
+## 2026-10-15 — fix: translate opaque publishable key for local anon RPCs
+- Commit: 070bae7ac82ae7bcc5c494a9760caca44f6b449f
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/local_supabase.py`
+- `tests/test_local_supabase.py`
+
 ## 2026-10-14 — fix: isolate local-primary worker auth sessions
 - Commit: 1192bacf49c59ca76005a59fec85ea2069ec6f63
 - Author: development-os[bot]
