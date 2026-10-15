@@ -1,3 +1,10 @@
+## 2026-10-15 — perf: place production API in Mumbai region
+- Commit: 58085c01c0880013bb5a763fa6fe9f8f370021db
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `vercel.json`
+
 ## 2026-10-15 — fix: translate opaque publishable key for local anon RPCs
 - Commit: 070bae7ac82ae7bcc5c494a9760caca44f6b449f
 - Author: development-os[bot]

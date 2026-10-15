@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 070bae7ac82ae7bcc5c494a9760caca44f6b449f
-- Last commit: fix: translate opaque publishable key for local anon RPCs
+- HEAD: 58085c01c0880013bb5a763fa6fe9f8f370021db
+- Last commit: perf: place production API in Mumbai region
 - Last commit date: 2026-10-15
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
