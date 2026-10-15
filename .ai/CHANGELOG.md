@@ -1,3 +1,17 @@
+## 2026-10-15 — fix archive list recovery and prepare direct Gemini processing
+- Commit: 85fdf8e6c739b041c22b4b22829c695589faf8fb
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/CURRENT_STATE.md`
+- `docs/HISTORY.md`
+- `scripts/run_worker_once.py`
+- `src/letter_registry/gemini_provider.py`
+- `src/letter_registry/web/index.html`
+- `src/letter_registry/web/sw.js`
+- `tests/test_gemini_provider.py`
+- `tests/test_web_shell.py`
+
 ## 2026-10-15 — fix authenticated archive authority reads
 - Commit: 7eb538a1ac4189f9c31462c3dbdafade099c5af0
 - Author: development-os[bot]

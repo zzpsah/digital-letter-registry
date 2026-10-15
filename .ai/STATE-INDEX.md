@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 7eb538a1ac4189f9c31462c3dbdafade099c5af0
-- Last commit: fix authenticated archive authority reads
+- HEAD: 85fdf8e6c739b041c22b4b22829c695589faf8fb
+- Last commit: fix archive list recovery and prepare direct Gemini processing
 - Last commit date: 2026-10-15
 - Last commit author: development-os[bot]
 
