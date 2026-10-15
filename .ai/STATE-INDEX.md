@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 58085c01c0880013bb5a763fa6fe9f8f370021db
-- Last commit: perf: place production API in Mumbai region
+- HEAD: 7eb538a1ac4189f9c31462c3dbdafade099c5af0
+- Last commit: fix authenticated archive authority reads
 - Last commit date: 2026-10-15
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

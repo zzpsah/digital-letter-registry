@@ -1,3 +1,10 @@
+## 2026-10-15 — fix authenticated archive authority reads
+- Commit: 7eb538a1ac4189f9c31462c3dbdafade099c5af0
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261015181000_grant_archive_authority_read.sql`
+
 ## 2026-10-15 — perf: place production API in Mumbai region
 - Commit: 58085c01c0880013bb5a763fa6fe9f8f370021db
 - Author: development-os[bot]
