@@ -39,7 +39,9 @@ def _b64url(value: bytes) -> str:
     return base64.urlsafe_b64encode(value).rstrip(b"=").decode("ascii")
 
 
-def _service_role_token() -> str:
+def _role_token(role: str) -> str:
+    if role not in {"anon", "service_role"}:
+        raise ValueError("unsupported local API role")
     secret_path = Path(os.environ.get(
         "DLR_LOCAL_JWT_SECRET_FILE",
         "/home/prashant/.config/dlr/local-platform/jwt-secret",
@@ -52,7 +54,7 @@ def _service_role_token() -> str:
     claims = _b64url(json.dumps({
         "iss": "supabase",
         "aud": "authenticated",
-        "role": "service_role",
+        "role": role,
         "sub": "00000000-0000-0000-0000-000000000000",
         "iat": now,
         "exp": now + 300,
@@ -60,6 +62,14 @@ def _service_role_token() -> str:
     unsigned = f"{header}.{claims}"
     signature = _b64url(hmac.new(secret, unsigned.encode("ascii"), hashlib.sha256).digest())
     return f"{unsigned}.{signature}"
+
+
+def _service_role_token() -> str:
+    return _role_token("service_role")
+
+
+def _anon_role_token() -> str:
+    return _role_token("anon")
 
 
 def _http_call(
@@ -153,6 +163,17 @@ async def _forward(request: Request, backend: str, path: str) -> Response:
     target = backend.rstrip("/") + target_path + ("?" + query if query else "")
     body = await request.body()
     headers = {k: v for k, v in request.headers.items() if k.lower() not in _HOP_HEADERS}
+    # New Supabase publishable keys are opaque, not JWTs. The server-side
+    # transport uses the public key as its bearer for anonymous RPCs; mint a
+    # short-lived local anon JWT only when both incoming credentials match the
+    # configured public key. Real user access tokens are passed through intact.
+    if backend == _REST_ORIGIN:
+        configured_key = os.environ.get("SUPABASE_PUBLISHABLE_KEY", "").strip()
+        incoming_key = headers.get("apikey", "").strip()
+        authorization = headers.get("authorization", headers.get("Authorization", "")).strip()
+        if configured_key and incoming_key == configured_key and authorization == f"Bearer {configured_key}":
+            headers.pop("Authorization", None)
+            headers["authorization"] = f"Bearer {_anon_role_token()}"
     method = request.method.upper()
     if method in {"GET", "HEAD"}:
         body = b""

@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import hashlib
 import hmac
@@ -14,6 +15,9 @@ from starlette.requests import Request
 
 from letter_registry.local_supabase import (
     _cors_headers,
+    _forward,
+    _REST_ORIGIN,
+    _anon_role_token,
     _service_role_token,
     register_local_supabase_routes,
 )
@@ -40,6 +44,54 @@ class LocalSupabaseBridgeTests(unittest.TestCase):
             self.assertEqual(claims["iss"], "supabase")
             self.assertGreater(claims["exp"], int(time.time()))
             self.assertLessEqual(claims["exp"] - claims["iat"], 300)
+
+    def test_anon_role_token_is_short_lived_and_signed(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            secret = b"test-only-local-jwt-secret-value-32-bytes-minimum"
+            secret_path = Path(temp_dir) / "jwt-secret"
+            secret_path.write_bytes(secret)
+            with patch.dict(os.environ, {"DLR_LOCAL_JWT_SECRET_FILE": str(secret_path)}):
+                token = _anon_role_token()
+            header_part, claims_part, signature_part = token.split(".")
+            unsigned = f"{header_part}.{claims_part}"
+            expected = base64.urlsafe_b64encode(
+                hmac.new(secret, unsigned.encode("ascii"), hashlib.sha256).digest()
+            ).rstrip(b"=").decode("ascii")
+            self.assertEqual(signature_part, expected)
+            claims = json.loads(base64.urlsafe_b64decode(claims_part + "==="))
+            self.assertEqual(claims["role"], "anon")
+            self.assertLessEqual(claims["exp"] - claims["iat"], 300)
+
+    def test_opaque_publishable_key_is_translated_only_for_matching_anon_bearer(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            secret_path = Path(temp_dir) / "jwt-secret"
+            secret_path.write_bytes(b"test-only-local-jwt-secret-value-32-bytes-minimum")
+            scope = {
+                "type": "http", "asgi": {"version": "3.0"}, "http_version": "1.1",
+                "method": "GET", "scheme": "http", "path": "/rest/v1/rpc/normalize_authority_key",
+                "raw_path": b"/rest/v1/rpc/normalize_authority_key", "query_string": b"value=test",
+                "root_path": "", "headers": [(b"apikey", b"sb_publishable_test"),
+                    (b"authorization", b"Bearer sb_publishable_test")], "client": ("127.0.0.1", 1),
+                "server": ("127.0.0.1", 8877),
+            }
+            async def receive():
+                return {"type": "http.request", "body": b"", "more_body": False}
+            request = Request(scope, receive=receive)
+            captured = {}
+            def fake_http(target, method, body, headers):
+                captured.update(headers)
+                return 200, b'"test"', {"content-type": "application/json"}
+            with patch.dict(os.environ, {
+                "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_test",
+                "DLR_LOCAL_JWT_SECRET_FILE": str(secret_path),
+                "DLR_LOCAL_CORS_ORIGINS": "",
+            }, clear=False), patch("letter_registry.local_supabase._http_raw", side_effect=fake_http):
+                response = asyncio.run(_forward(request, _REST_ORIGIN, "rpc/normalize_authority_key"))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(captured["apikey"], "sb_publishable_test")
+            self.assertTrue(captured["authorization"].startswith("Bearer eyJ"))
+            claims = json.loads(base64.urlsafe_b64decode(captured["authorization"].split(".")[1] + "==="))
+            self.assertEqual(claims["role"], "anon")
 
     def test_cors_allows_only_known_application_origin(self):
         allowed_request = Request({
