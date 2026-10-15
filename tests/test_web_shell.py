@@ -212,7 +212,13 @@ class WebShellTests(unittest.TestCase):
         self.assertIn("pilot_limit", self.html)
 
     def test_service_worker_registration_bypasses_http_cache(self):
-        self.assertIn('register("/sw.js?v=2",{updateViaCache:"none"})', self.html)
+        self.assertIn('register("/sw.js?v=3",{updateViaCache:"none"})', self.html)
+
+    def test_dashboard_recovers_stale_pagination_and_surfaces_load_errors(self):
+        self.assertIn('homePage=0;localStorage.setItem("elettersHomePage","0");return loadDashboard(0)', self.html)
+        self.assertIn('Could not load documents. Check your connection and tap Refresh to try again.', self.html)
+        self.assertIn('The document list response was invalid. Tap Refresh to try again.', self.html)
+        self.assertIn('homePage=0;localStorage.setItem("elettersHomePage","0");$("passwordLoginStatus").textContent="Signed in. Loading your documents…"', self.html)
 
 if __name__ == "__main__":
     unittest.main()

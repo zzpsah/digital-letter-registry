@@ -160,6 +160,15 @@ active: `letter_chunks` is empty because the worker's embedding stage is gated o
 provisioned. Document understanding itself does use Gemini through the Supabase `gemini-ai-gateway`, which keeps
 its key server-side and exposes no embedding action.
 
+## Gemini processing outage and Oracle fallback — 2026-10-15
+
+- Live `POST /functions/v1/gemini-ai-gateway` smoke test returned HTTP 402 with `exceed_egress_quota`; Supabase is blocking the request before Gemini is called. This is a platform/project restriction, not proof of an invalid Gemini key. The function is deployed on `umv-db` (project ref `sxfnrwugsyfypqgfglzc`, version 10).
+- The worker's existing gateway URL points to that restricted project, so Gemini-backed document understanding cannot be relied on until the gateway is restored or moved.
+- Oracle worker code now supports sending original document bytes directly to Gemini through `GeminiDocumentContextProvider.analyze_file`, and direct Gemini takes priority when `GEMINI_API_KEY` is provisioned. Unit tests cover inline file bytes and structured context mapping.
+- Bitwarden Secrets Manager does not currently contain `DLR_GEMINI_API_KEY`. The worker wrapper now treats that secret as optional so existing queue execution is not blocked; once the owner adds it, the next worker run will use direct Gemini without relying on the restricted Edge Function.
+- To avoid surprise API costs, document analysis does not automatically enable vector embeddings. `DLR_GEMINI_EMBEDDINGS_ENABLED` must be explicitly enabled before embedding/backfill work runs.
+- Until the key is added, the Gemini outage remains unresolved; deterministic fallback and keyword search remain available.
+
 ## Remote access
 
 Canonical instructions: `docs/REMOTE-ACCESS.md`.
@@ -190,3 +199,9 @@ Statements such as “no real letters”, “real intake disabled everywhere”,
 ## Information-flow inventory — 2026-10-10
 
 Use [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md) as the canonical site, port, component and data-flow inventory. It distinguishes observed live mappings from unresolved service ownership. Tailscale Funnel ports 10000, 10001 and 8443 were publicly reachable at audit time; port 10001 routes to the DLR API on loopback 8877. The Oracle working tree was clean but behind GitHub main during the audit; this documentation change was not deployed. Do not begin migration or backup work until the diagram and unresolved port ownerships have been reviewed.
+
+## eLetters archive visibility recovery — 2026-10-15
+
+- The primary local archive has 68 letter records: 67 not trashed, 1 already in Trash. All 68 Drive object references returned metadata successfully; a read-only Drive original download succeeded. No files were deleted, restored, or re-uploaded during diagnosis.
+- Search's `403 Forbidden` was caused by missing authenticated `SELECT` grants on `public.authorities` and `public.authority_aliases`, which the search RPC joins. Both grants are now applied in the live database and persisted in migration `supabase/migrations/20261015181000_grant_archive_authority_read.sql`; RLS policies remain enabled.
+- Frontend Home list was hardened to reset stale pagination on login/empty pages and show explicit errors instead of silently returning on failed list requests. Service worker cache version bumped to v3. Focused web-shell tests: 24 passed. Awaiting live user confirmation after refresh.

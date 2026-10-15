@@ -57,18 +57,24 @@ def main() -> int:
         os.environ.get("SUPABASE_GEMINI_GATEWAY_URL", "").strip()
         or os.environ.get("SUPABASE_GEMINI_PROJECT_URL", "").strip()
     )
-    if gateway_configured:
-        context_provider = SupabaseGeminiFileContextProvider.from_environment()
-    elif gemini_key:
+    # Prefer direct Gemini from the Oracle worker when its key is provisioned.
+    # The Supabase gateway remains a compatibility fallback, but a restricted
+    # Supabase project must not block the local-primary processing path.
+    if gemini_key:
         context_provider = GeminiDocumentContextProvider.from_environment()
+    elif gateway_configured:
+        context_provider = SupabaseGeminiFileContextProvider.from_environment()
     else:
         context_provider = DeterministicDocumentContextProvider()
+    # Document understanding and vector indexing are separate cost-bearing
+    # capabilities. Do not enable semantic embeddings merely because the
+    # document-analysis key is provisioned; require explicit opt-in.
     embeddings = (
         SupabaseEmbeddingRepository(
             transport=transport,
             provider=GeminiEmbeddingProvider.from_environment(),
         )
-        if gemini_key
+        if gemini_key and _truthy("DLR_GEMINI_EMBEDDINGS_ENABLED")
         else None
     )
 

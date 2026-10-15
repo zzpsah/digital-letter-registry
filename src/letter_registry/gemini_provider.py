@@ -6,6 +6,7 @@ runtime configuration; the archive schema remains provider-neutral.
 
 from __future__ import annotations
 
+import base64
 import json
 import os
 from dataclasses import dataclass
@@ -212,6 +213,65 @@ class GeminiDocumentContextProvider:
         except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
             raise GeminiProviderError("Gemini returned an invalid structured response") from exc
 
+        return self._to_context(data)
+
+    def analyze_file(
+        self,
+        *,
+        file_bytes: bytes,
+        mime_type: str,
+        filename: str,
+        extracted_text: str,
+        hints: ContextHints,
+    ) -> StructuredDocumentContext:
+        """Analyze the original file directly through Gemini, without an Edge gateway."""
+        prompt = (
+            f"Original filename: {filename}\n"
+            "Read the attached original document as the source of truth, including all pages, "
+            "tables and annexures. Use the extracted text only as supporting evidence.\n\n"
+            + self._build_prompt(extracted_text=extracted_text, hints=hints)
+        )
+        payload = {
+            "contents": [{
+                "parts": [
+                    {"text": prompt},
+                    {"inlineData": {
+                        "mimeType": mime_type or "application/octet-stream",
+                        "data": base64.b64encode(file_bytes).decode("ascii"),
+                    }},
+                ],
+            }],
+            "generationConfig": {
+                "temperature": 0.0,
+                "responseFormat": {
+                    "text": {
+                        "mimeType": "application/json",
+                        "schema": _CONTEXT_SCHEMA,
+                    }
+                },
+            },
+        }
+        req = request.Request(
+            (
+                "https://generativelanguage.googleapis.com/v1beta/models/"
+                f"{self.model}:generateContent"
+            ),
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "x-goog-api-key": self.api_key,
+            },
+            method="POST",
+        )
+        status, raw = self.http_executor(req)
+        if status < 200 or status >= 300:
+            raise GeminiProviderError(f"unexpected Gemini HTTP status: {status}")
+        try:
+            response = json.loads(raw)
+            text = response["candidates"][0]["content"]["parts"][0]["text"]
+            data = json.loads(text)
+        except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
+            raise GeminiProviderError("Gemini returned an invalid structured response") from exc
         return self._to_context(data)
 
     @staticmethod

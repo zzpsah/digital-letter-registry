@@ -86,6 +86,54 @@ class GeminiProviderTests(unittest.TestCase):
             seen["payload"]["generationConfig"],
         )
 
+    def test_file_analysis_sends_original_bytes_to_gemini(self) -> None:
+        seen = {}
+
+        def executor(req):
+            seen["url"] = req.full_url
+            payload = json.loads(req.data.decode("utf-8"))
+            seen["parts"] = payload["contents"][0]["parts"]
+            data = {
+                "title": "Synthetic file test",
+                "authority": None,
+                "category": None,
+                "subcategory": None,
+                "summary": "Synthetic summary",
+                "summary_hi": "सिंथेटिक सारांश",
+                "whatsapp_summary": "सिंथेटिक सारांश",
+                "action_required": None,
+                "action_required_hi": None,
+                "issue_date": None,
+                "reference_number": None,
+                "concepts": [],
+                "important_dates": [],
+                "deadline": None,
+                "applies_to": [],
+                "important_amounts": [],
+                "page_references": [],
+                "page_count": None,
+                "related_terms_hi": [],
+                "related_terms_en": [],
+                "confidence": 0.8,
+                "key_points": [],
+                "clean_document_text": "Synthetic file content",
+            }
+            response = {"candidates": [{"content": {"parts": [{"text": json.dumps(data, ensure_ascii=False)}]}}]}
+            return 200, json.dumps(response, ensure_ascii=False)
+
+        provider = GeminiDocumentContextProvider(api_key="synthetic-key", http_executor=executor)
+        context = provider.analyze_file(
+            file_bytes=b"synthetic original file bytes",
+            mime_type="application/pdf",
+            filename="synthetic.pdf",
+            extracted_text="Synthetic extracted text",
+            hints=ContextHints((), (), ()),
+        )
+        self.assertEqual(context.title, "Synthetic file test")
+        self.assertEqual(seen["parts"][1]["inlineData"]["mimeType"], "application/pdf")
+        self.assertEqual(seen["parts"][1]["inlineData"]["data"], "c3ludGhldGljIG9yaWdpbmFsIGZpbGUgYnl0ZXM=")
+        self.assertIn("Original filename: synthetic.pdf", seen["parts"][0]["text"])
+
     def test_invalid_response_raises_clean_error(self) -> None:
         provider = GeminiDocumentContextProvider(
             api_key="synthetic-key",

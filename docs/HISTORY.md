@@ -1,5 +1,7 @@
 # History
 
+- 2026-10-15: Gemini Edge gateway smoke test confirmed Supabase HTTP 402 `exceed_egress_quota`. Added Oracle-side direct-file Gemini provider support and made the worker prefer a provisioned direct key; Bitwarden `DLR_GEMINI_API_KEY` is not yet present, so the direct path is prepared but not active. Embeddings remain separately opt-in to avoid unexpected spend.
+
 ## 2026-10-09 — Restore DLR delivery and remove the 7-day credential expiry
 
 - Diagnosed the DLR intake stall: the Google Drive OAuth refresh token had expired at 2026-10-09 14:29 UTC,
@@ -81,3 +83,12 @@
 - Verified 28 active database documents, all Public, and 28/28 visible through editor RLS/search.
 - Public Drive index was refreshed successfully with 28 documents.
 - Manual/quality reprocess reuses existing extracted OCR text when available, avoiding expensive repeat OCR. Initial processing still OCRs documents when required.
+
+## 2026-10-15 — Restore eLetters search visibility after auth recovery
+
+- Diagnosed a live `403 Forbidden` from `search_letter_cards_v7`: the authenticated role lacked `SELECT` on the canonical authority reference tables used by the search function. Granted authenticated read access to `authorities` and `authority_aliases`; row-level security policies remain enabled and continue to scope rows to archive membership.
+- Added migration `20261015181000_grant_archive_authority_read.sql` and committed it on `main` (`7eb538a`).
+- Verified live search RPC and authority-list requests now return HTTP 200. The primary archive contains 68 letter rows (67 not trashed); all 68 stored Google Drive object references resolve through Drive metadata, and a read-only original download succeeded. One row is already in Trash; no originals were moved, deleted, or re-uploaded.
+- Hardened the Home list against stale persisted pagination and silent fetch/JSON failures. Login now starts Home at page zero, invalid stale pages reset directly to page zero, and list failures display an actionable status rather than leaving an empty-looking panel.
+- Bumped the service-worker cache version so the updated shell registration is picked up. Existing UI layout and styling were preserved.
+- Verified the focused web-shell suite (24 tests). Production browser-level confirmation after deployment remains pending a user refresh/session check.
