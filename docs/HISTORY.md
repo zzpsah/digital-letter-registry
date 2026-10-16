@@ -1,6 +1,6 @@
 # History
 
-- 2026-10-15: Gemini Edge gateway smoke test confirmed Supabase HTTP 402 `exceed_egress_quota`. Added Oracle-side direct-file Gemini provider support and made the worker prefer a provisioned direct key; Bitwarden `DLR_GEMINI_API_KEY` is not yet present, so the direct path is prepared but not active. Embeddings remain separately opt-in to avoid unexpected spend.
+- 2026-10-16: Verified `DLR_GEMINI_API_KEY` exists in Bitwarden Secrets Manager and the Oracle scoped runner injects it without exposing the value. Live synthetic text and original-file calls succeeded on the configured `gemini-3.5-flash-lite` model. Root cause of the direct API failure was invalid structured-output request syntax: changed to `responseMimeType` plus Gemini-compatible `responseSchema` conversion (including nullable fields). Supabase gateway remains blocked by HTTP 402 `exceed_egress_quota`; direct Gemini is the worker's preferred path. All 365 unit tests pass. Embeddings remain separately opt-in.
 
 ## 2026-10-09 — Restore DLR delivery and remove the 7-day credential expiry
 

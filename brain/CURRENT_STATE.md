@@ -152,22 +152,23 @@ The OAuth app was published from Testing to In production and the archive-owner 
 rotated into the secret manager, so the Drive path no longer carries a 7-day expiry. Details live in
 `brain/post-processing-delivery/` and `brain/drive-oauth-secret-manager/`.
 
-## Search index state — 2026-10-09
+## Search index state — 2026-10-16
 
 Keyword search is live and covers `extracted_text` in full plus title, summary, reference, authority, concepts,
 related terms, a Hindi/English alias dictionary and trigram fuzzy matching. Vector/semantic search is **not**
-active: `letter_chunks` is empty because the worker's embedding stage is gated on `GEMINI_API_KEY`, which is not
-provisioned. Document understanding itself does use Gemini through the Supabase `gemini-ai-gateway`, which keeps
-its key server-side and exposes no embedding action.
+active: `letter_chunks` remains empty because embedding generation is separately gated by
+`DLR_GEMINI_EMBEDDINGS_ENABLED`, which is intentionally not enabled. Direct Gemini document understanding is
+live from the Oracle worker; the Supabase `gemini-ai-gateway` remains quota-blocked and is only a fallback.
 
-## Gemini processing outage and Oracle fallback — 2026-10-15
+## Gemini processing recovery — 2026-10-16
 
-- Live `POST /functions/v1/gemini-ai-gateway` smoke test returned HTTP 402 with `exceed_egress_quota`; Supabase is blocking the request before Gemini is called. This is a platform/project restriction, not proof of an invalid Gemini key. The function is deployed on `umv-db` (project ref `sxfnrwugsyfypqgfglzc`, version 10).
-- The worker's existing gateway URL points to that restricted project, so Gemini-backed document understanding cannot be relied on until the gateway is restored or moved.
-- Oracle worker code now supports sending original document bytes directly to Gemini through `GeminiDocumentContextProvider.analyze_file`, and direct Gemini takes priority when `GEMINI_API_KEY` is provisioned. Unit tests cover inline file bytes and structured context mapping.
-- Bitwarden Secrets Manager does not currently contain `DLR_GEMINI_API_KEY`. The worker wrapper now treats that secret as optional so existing queue execution is not blocked; once the owner adds it, the next worker run will use direct Gemini without relying on the restricted Edge Function.
-- To avoid surprise API costs, document analysis does not automatically enable vector embeddings. `DLR_GEMINI_EMBEDDINGS_ENABLED` must be explicitly enabled before embedding/backfill work runs.
-- Until the key is added, the Gemini outage remains unresolved; deterministic fallback and keyword search remain available.
+- The Supabase `gemini-ai-gateway` still returns HTTP 402 `exceed_egress_quota`; this remains an external gateway/project restriction.
+- `DLR_GEMINI_API_KEY` is present in Bitwarden Secrets Manager. The Oracle worker wrapper maps it to `GEMINI_API_KEY` without printing the value.
+- A live synthetic text-analysis request and a live synthetic original-file request both succeeded against Google's Gemini API using the production-configured `gemini-3.5-flash-lite` model. Both returned structured document fields including title, authority, reference number and summary.
+- The direct provider's previous `responseFormat.text.mimeType/schema` payload was rejected by Gemini. It now uses `generationConfig.responseMimeType` and Gemini REST-compatible `responseSchema`; JSON-schema nullable unions are translated into Gemini `type` plus `nullable` fields.
+- The worker selects direct Gemini whenever the injected key is present, before considering the Supabase gateway. Its runtime wrapper loads `.env`, so `AI_MODEL=gemini-3.5-flash-lite` is the configured production model.
+- Full unit suite: 365 tests passed. Existing `ResourceWarning`s in worker-session tests are unrelated.
+- Vector embeddings remain disabled unless `DLR_GEMINI_EMBEDDINGS_ENABLED` is explicitly enabled. Do not enable embeddings/backfill as part of document-analysis recovery.
 
 ## Remote access
 

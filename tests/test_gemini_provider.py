@@ -81,9 +81,13 @@ class GeminiProviderTests(unittest.TestCase):
         self.assertEqual(context.related_terms_hi[0], "परीक्षा प्रपत्र")
         self.assertIn("gemini-3.8-flash:generateContent", seen["url"])
         self.assertEqual(seen["api_key"], "synthetic-key")
-        self.assertIn(
-            "responseFormat",
-            seen["payload"]["generationConfig"],
+        self.assertEqual(
+            seen["payload"]["generationConfig"]["responseMimeType"],
+            "application/json",
+        )
+        self.assertEqual(
+            seen["payload"]["generationConfig"]["responseSchema"]["type"],
+            "OBJECT",
         )
 
     def test_file_analysis_sends_original_bytes_to_gemini(self) -> None:

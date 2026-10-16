@@ -144,6 +144,40 @@ _CONTEXT_SCHEMA = {
 }
 
 
+def _gemini_schema(schema: dict[str, object]) -> dict[str, object]:
+    """Translate JSON-Schema-like definitions to Gemini REST Schema fields."""
+    raw_type = schema.get("type")
+    nullable = isinstance(raw_type, list) and "null" in raw_type
+    if isinstance(raw_type, list):
+        raw_type = next((item for item in raw_type if item != "null"), "string")
+    type_map = {
+        "object": "OBJECT",
+        "array": "ARRAY",
+        "string": "STRING",
+        "integer": "INTEGER",
+        "number": "NUMBER",
+        "boolean": "BOOLEAN",
+    }
+    result: dict[str, object] = {}
+    if raw_type in type_map:
+        result["type"] = type_map[raw_type]
+    if nullable:
+        result["nullable"] = True
+    if isinstance(schema.get("properties"), dict):
+        result["properties"] = {
+            key: _gemini_schema(value)
+            for key, value in schema["properties"].items()
+            if isinstance(value, dict)
+        }
+    if isinstance(schema.get("items"), dict):
+        result["items"] = _gemini_schema(schema["items"])
+    if isinstance(schema.get("required"), list):
+        result["required"] = schema["required"]
+    if isinstance(schema.get("enum"), list):
+        result["enum"] = schema["enum"]
+    return result
+
+
 @dataclass(slots=True)
 class GeminiDocumentContextProvider:
     api_key: str
@@ -181,12 +215,8 @@ class GeminiDocumentContextProvider:
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {
                 "temperature": 0.0,
-                "responseFormat": {
-                    "text": {
-                        "mimeType": "application/json",
-                        "schema": _CONTEXT_SCHEMA,
-                    }
-                },
+                "responseMimeType": "application/json",
+                "responseSchema": _gemini_schema(_CONTEXT_SCHEMA),
             },
         }
 
@@ -243,12 +273,8 @@ class GeminiDocumentContextProvider:
             }],
             "generationConfig": {
                 "temperature": 0.0,
-                "responseFormat": {
-                    "text": {
-                        "mimeType": "application/json",
-                        "schema": _CONTEXT_SCHEMA,
-                    }
-                },
+                "responseMimeType": "application/json",
+                "responseSchema": _gemini_schema(_CONTEXT_SCHEMA),
             },
         }
         req = request.Request(
