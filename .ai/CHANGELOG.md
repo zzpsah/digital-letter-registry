@@ -1,3 +1,15 @@
+## 2026-10-16 — docs: record phase six production deployment
+- Commit: 6c62ae38195a0a3e10ea2379cb6bacaf2201a49f
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `brain/CURRENT_STATE.md`
+- `brain/postgres-primary-integration/CURRENT_STATE.md`
+- `brain/postgres-primary-integration/TASKS.md`
+- `docs/HISTORY.md`
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`
+- `docs/TECHNICAL-FLOWCHART.html`
+
 ## 2026-10-16 — docs: record phase six acceptance and parser guard
 - Commit: 917b2a5a8420e804e7f7a0e2ffaf83c8a621cedf
 - Author: development-os[bot]
