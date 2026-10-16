@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 6aa2d9509acb659a81eb063ec9b489bf17640212
-- Last commit: docs: record PostgreSQL primary integration status
+- HEAD: a5443b0ca6d382b09037ee9591344bd408515b18
+- Last commit: docs: align architecture diagrams with Oracle PostgreSQL primary
 - Last commit date: 2026-10-16
 - Last commit author: development-os[bot]
 

@@ -1,3 +1,11 @@
+## 2026-10-16 — docs: align architecture diagrams with Oracle PostgreSQL primary
+- Commit: a5443b0ca6d382b09037ee9591344bd408515b18
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`
+- `docs/TECHNICAL-FLOWCHART.html`
+
 ## 2026-10-16 — docs: record PostgreSQL primary integration status
 - Commit: 6aa2d9509acb659a81eb063ec9b489bf17640212
 - Author: development-os[bot]
