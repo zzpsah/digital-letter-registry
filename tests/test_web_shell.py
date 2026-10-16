@@ -52,6 +52,16 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('fetch("/api/v1/admin/operations"', self.html)
         self.assertIn('data-retry-job', self.html)
 
+    def test_admin_quality_review_queue_is_exposed(self) -> None:
+        self.assertIn('id="reviewQueueList"', self.html)
+        self.assertIn('id="refreshReviewQueue"', self.html)
+        self.assertIn('fetch("/api/v1/admin/review-queue"', self.html)
+        self.assertIn('data-review-view', self.html)
+        self.assertIn('data-review-download', self.html)
+        self.assertIn('data-review-reprocess', self.html)
+        self.assertIn('data-review-accept', self.html)
+        self.assertIn('Have you opened the original and verified', self.html)
+
     def test_admin_soft_delete_restore_controls_are_exposed(self) -> None:
         self.assertIn("data-restore-recipient", self.html)
         self.assertIn("data-purge-recipient", self.html)

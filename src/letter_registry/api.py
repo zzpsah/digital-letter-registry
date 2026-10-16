@@ -2786,6 +2786,150 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         return {"items": items, "count": len(items)}
 
 
+    @app.get("/api/v1/admin/review-queue")
+    def admin_quality_review_queue(
+        access_token: str = Depends(_access_token),
+    ) -> dict[str, object]:
+        """List only unresolved, human-review-required documents for archive admins."""
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        processing_rows = database.select(
+            "letter_processing",
+            columns="letter_id,structured_context,reviewed_at,updated_at",
+        )
+        flag_labels = {
+            "source_content_conflict": "The document heading and body may refer to different topics.",
+            "missing_reference_and_date": "The reference number and issue date are missing or uncertain.",
+            "no_clean_document_text": "Text extraction was not reliable enough.",
+            "low_confidence": "The extracted metadata has low confidence.",
+        }
+        items: list[dict[str, object]] = []
+        for row in processing_rows:
+            context = row.get("structured_context")
+            if not isinstance(context, dict):
+                continue
+            needs_review = context.get("needs_reprocessing") is True or str(
+                context.get("needs_reprocessing") or ""
+            ).strip().casefold() in {"true", "1", "yes"}
+            if not needs_review or row.get("reviewed_at"):
+                continue
+            letter_id = str(row.get("letter_id") or "").strip()
+            try:
+                letter_id = str(UUID(letter_id))
+            except ValueError:
+                continue
+            letters = database.select(
+                "letters",
+                filters={"id": letter_id},
+                columns=(
+                    "id,title,original_filename,authority,category,issue_date,"
+                    "reference_number,summary,is_trashed,is_archived"
+                ),
+            )
+            if not letters or bool(letters[0].get("is_trashed")):
+                continue
+            letter = letters[0]
+            raw_flags = context.get("quality_flags")
+            flags = [str(flag) for flag in raw_flags if isinstance(flag, str)] if isinstance(raw_flags, list) else []
+            reasons = [flag_labels.get(flag, flag.replace("_", " ").capitalize()) for flag in flags]
+            if not reasons:
+                reasons = ["Processing quality needs a human check."]
+            summary = str(letter.get("summary") or context.get("summary") or "").strip()
+            confidence = context.get("confidence")
+            try:
+                confidence = float(confidence) if confidence is not None else None
+            except (TypeError, ValueError):
+                confidence = None
+            items.append({
+                "letter_id": letter_id,
+                "title": str(letter.get("title") or context.get("title") or letter.get("original_filename") or "Document"),
+                "original_filename": str(letter.get("original_filename") or ""),
+                "authority": str(letter.get("authority") or context.get("authority") or ""),
+                "category": str(letter.get("category") or context.get("category") or ""),
+                "issue_date": str(letter.get("issue_date") or context.get("issue_date") or ""),
+                "reference_number": str(letter.get("reference_number") or context.get("reference_number") or ""),
+                "summary": summary,
+                "quality_flags": flags,
+                "review_reasons": reasons,
+                "confidence": confidence,
+                "updated_at": str(row.get("updated_at") or ""),
+                "is_archived": bool(letter.get("is_archived")),
+            })
+        items.sort(key=lambda item: str(item.get("updated_at") or ""), reverse=True)
+        items = items[:100]
+        return {"items": items, "count": len(items)}
+
+
+    @app.post("/api/v1/admin/review-queue/{letter_id}/accept")
+    def accept_quality_review(
+        letter_id: str,
+        access_token: str = Depends(_access_token),
+        _: None = Depends(_require_same_origin),
+    ) -> dict[str, object]:
+        """Record an explicit human decision that the current metadata is acceptable."""
+        database = _transport(access_token, roles={ArchiveRole.ADMIN})
+        try:
+            normalized_id = str(UUID(letter_id))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid letter id",
+            ) from exc
+        rows = database.select(
+            "letter_processing",
+            filters={"letter_id": normalized_id},
+            columns="letter_id,structured_context,reviewed_at",
+        )
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Document processing record not found",
+            )
+        row = rows[0]
+        context = row.get("structured_context")
+        if not isinstance(context, dict):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Document has no reviewable structured metadata",
+            )
+        if row.get("reviewed_at"):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Document has already been reviewed",
+            )
+        needs_review = context.get("needs_reprocessing") is True or str(
+            context.get("needs_reprocessing") or ""
+        ).strip().casefold() in {"true", "1", "yes"}
+        if not needs_review:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Document is not flagged for quality review",
+            )
+        now = datetime.now(timezone.utc).isoformat()
+        updated_context = dict(context)
+        updated_context["needs_reprocessing"] = False
+        updated_context["human_review"] = {"status": "accepted_as_is", "reviewed_at": now}
+        updated = database.update(
+            "letter_processing",
+            {"structured_context": updated_context, "reviewed_at": now, "updated_at": now},
+            filters={"letter_id": normalized_id},
+        )
+        if not updated:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Review decision could not be saved",
+            )
+        raw_flags = context.get("quality_flags")
+        flags = [str(flag) for flag in raw_flags if isinstance(flag, str)] if isinstance(raw_flags, list) else []
+        _audit_admin_action(
+            access_token,
+            action="document_quality_review_accepted",
+            target_type="letter",
+            target_id=normalized_id,
+            detail={"decision": "accepted_as_is", "quality_flags": flags},
+        )
+        return {"success": True, "letter_id": normalized_id, "status": "reviewed"}
+
+
     @app.post("/api/v1/admin/operations/{job_id}/retry")
     def retry_admin_operation(
         job_id: str,
