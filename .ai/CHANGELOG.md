@@ -1,3 +1,24 @@
+## 2026-10-16 — docs: record PostgreSQL primary integration status
+- Commit: 6aa2d9509acb659a81eb063ec9b489bf17640212
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `brain/README.md`
+- `brain/TASKS.md`
+- `brain/TESTS.md`
+- `brain/postgres-primary-integration/ARCHITECTURE.md`
+- `brain/postgres-primary-integration/CURRENT_STATE.md`
+- `brain/postgres-primary-integration/DECISIONS.md`
+- `brain/postgres-primary-integration/HANDOFF.md`
+- `brain/postgres-primary-integration/PROJECT.md`
+- `brain/postgres-primary-integration/SECURITY.md`
+- `brain/postgres-primary-integration/TASKS.md`
+- `brain/postgres-primary-integration/TESTS.md`
+- `docs/HISTORY.md`
+
 ## 2026-10-16 — fix Gemini structured output API schema
 - Commit: b47d1acebee249843b6132a163f2cd23063f60c7
 - Author: development-os[bot]

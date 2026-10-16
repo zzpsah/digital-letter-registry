@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: b47d1acebee249843b6132a163f2cd23063f60c7
-- Last commit: fix Gemini structured output API schema
+- HEAD: 6aa2d9509acb659a81eb063ec9b489bf17640212
+- Last commit: docs: record PostgreSQL primary integration status
 - Last commit date: 2026-10-16
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
