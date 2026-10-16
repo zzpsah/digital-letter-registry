@@ -1,3 +1,19 @@
+## 2026-10-16 — docs: record verified DLR primary deployment
+- Commit: 6404e1f5ed6c9ab7212ef73728587620b068969d
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `README.md`
+- `brain/CURRENT_STATE.md`
+- `brain/HANDOFF.md`
+- `brain/TESTS.md`
+- `brain/postgres-primary-integration/CURRENT_STATE.md`
+- `brain/postgres-primary-integration/TASKS.md`
+- `brain/postgres-primary-integration/TESTS.md`
+- `docs/HISTORY.md`
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`
+- `docs/TECHNICAL-FLOWCHART.html`
+
 ## 2026-10-16 — fix: harden letter processing quality and queue scope
 - Commit: aa2c54d9cb32fc06cdefa6bf42c2f159b7086b60
 - Author: development-os[bot]
