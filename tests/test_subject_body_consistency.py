@@ -1,6 +1,6 @@
 import unittest
 
-from letter_registry.subject_body_consistency import detect_subject_body_conflict
+from letter_registry.subject_body_consistency import detect_subject_body_conflict, extract_source_subject
 
 
 class SubjectBodyConsistencyTests(unittest.TestCase):
@@ -24,6 +24,16 @@ class SubjectBodyConsistencyTests(unittest.TestCase):
             "महोदय,\n"
             "ई-शिक्षाकोष Leave Module के माध्यम से अवकाश आवेदन ऑनलाइन जमा करें।\n"
         )
+        self.assertIsNone(detect_subject_body_conflict(text))
+
+    def test_subject_extraction_does_not_absorb_body_when_transition_heading_is_missing(self):
+        text = (
+            "विषय :- राज्य के विद्यालय अध्यापकों के बकाया की स्वीकृति के संबंध में।\n"
+            "शिक्षकों के अवकाश की स्वीकृति के संबंध में निर्देश।\n"
+            "महोदय,\n"
+            "ई-शिक्षाकोष Leave Module से leave applications जमा करें।\n"
+        )
+        self.assertIsNone(extract_source_subject(text))
         self.assertIsNone(detect_subject_body_conflict(text))
 
     def test_missing_subject_heading_is_not_guessed(self):

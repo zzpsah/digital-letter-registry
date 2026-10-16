@@ -34,7 +34,7 @@ def extract_source_subject(extracted_text: str) -> str | None:
     subject_match = re.search(
         r"(?:विषय|subject)\s*[:：\-–]?\s*(.*?)(?=\n\s*(?:प्रसंग|संदर्भ|महोदय|reference|ref\.?\s*:|dear\s+sir))",
         text,
-        flags=re.IGNORECASE | re.DOTALL,
+        flags=re.IGNORECASE,
     )
     if not subject_match:
         return None
@@ -48,7 +48,7 @@ def detect_subject_body_conflict(extracted_text: str) -> SourceContentConflict |
     subject_match = re.search(
         r"(?:विषय|subject)\s*[:：\-–]?\s*(.*?)(?=\n\s*(?:प्रसंग|संदर्भ|महोदय|reference|ref\.?\s*:|dear\s+sir))",
         text,
-        flags=re.IGNORECASE | re.DOTALL,
+        flags=re.IGNORECASE,
     )
     if not subject_match:
         return None
