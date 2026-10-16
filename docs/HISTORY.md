@@ -120,3 +120,11 @@
 - Added a regression case for a subject followed by ordinary body lines before the formal salutation. Focused tests passed 4/4; the full DLR suite passed 385/385.
 - Live authenticated read-only smoke checks passed for search, detail, and original streaming; unauthenticated search returned HTTP 401. A temporary synthetic Oracle row passed authenticated archive/restore and important-mark/clear mutations, then was deleted and verified absent. No real letter was changed.
 - The guarded Ansible deployment and post-deploy checks are the next release gate for this source commit.
+
+
+## 2026-10-16 — Phase 6 guarded release completed
+
+- The canonical DLR `main` containing source fix `1470fe1` was deployed through `official-letter-intelligence.yml` with `run_backup=true` and `deploy_application=true`. Fresh encrypted local and off-site backups completed successfully.
+- Ansible recap: 19 tasks OK, 4 changed, 0 failed. The playbook ran the full regression suite before restarting the API; 385 tests passed. One post-restart health probe retried once, then passed.
+- Post-deploy API/Auth/REST, n8n health, DLR job bridge, public Vercel health/application, authenticated search/detail/original and unauthenticated rejection checks all passed. Oracle checkout was clean and synchronized to `40b03d1` at the time of verification.
+- Hosted Supabase remains a separate unresolved DR gate because schema/data differ from Oracle and no safe, scoped hosted Storage upload credential is available. No schema/data synchronization or promotion was attempted.

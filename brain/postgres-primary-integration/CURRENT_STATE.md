@@ -25,14 +25,14 @@ Observed on Oracle VPS, 2026-10-16.
 - Embeddings remain disabled; no vector backfill was started.
 
 ## Release and repository state
-- Previous release baseline: implementation commit `aa2c54d` is included in deployed Oracle revision `b16c899` (automated project-context sync commit). The newer subject-boundary guard is pushed as `1470fe1`; its guarded Ansible deployment is pending at the pre-deploy checkpoint below.
+- Previous release baseline: implementation commit `aa2c54d` is included in deployed Oracle revision `b16c899` (automated project-context sync commit). The newer subject-boundary guard (`1470fe1`) was deployed from canonical `main` through guarded Ansible on 2026-10-16; post-deploy API/Auth/REST and authenticated smoke checks passed.
 - Guarded Ansible deployment completed successfully: 17 tasks OK, 2 changes, 0 failures; the full regression suite passed before API restart. Post-deploy API/Auth/REST health checks returned HTTP 200.
 - A worker timer run overlapped the API restart and failed once with connection refused; the next scheduled run returned `status=idle`, and the worker timer remains active. No job was active during this transient.
 - PostgreSQL Services has a separate, unrelated untracked migration `20261014163501_restore_osint_rpc_access.sql`; preserve it.
 - At the earlier queue snapshot, four jobs were failed (two prior RLS/archive-scope and two network/timeout). The latest authenticated API read reports 99 jobs (98 completed, 1 retired, 0 pending/processing/running, 0 failed). The difference was not reconstructed; do not recreate or retry jobs from memory or backups.
 
 ## Remaining release/DR gates
-- At this pre-deploy checkpoint, the subject-boundary change is committed/pushed and the full suite has passed 385/385; run the guarded Ansible deployment and repeat post-deploy smoke checks.
+- [x] The subject-boundary change is committed/pushed and deployed; full suite 385/385, fresh local/off-site backup tasks, and post-deploy authenticated smoke checks passed.
 - Keep the conflict-marked low-confidence record and the other reprocessing candidate in human-review state; do not treat `completed` as semantic acceptance.
 - Reconcile the live Oracle schema against migration/bootstrap history before any schema migration. Do not blindly replay the DLR migration directory.
 - Hosted Supabase remains a DR candidate, not a replica. One-way synchronization, freshness/lag alerts, RPO/RTO, and tested failover/failback remain future work.

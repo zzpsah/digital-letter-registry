@@ -18,6 +18,7 @@
 - [x] Review and commit/push the DLR implementation changes (`aa2c54d`, included in deployed revision `b16c899`). DLR `main` matches `origin/main`; working tree is clean.
 - [x] Deploy the committed `main` revision through the guarded Ansible application-deploy path; all 17 Ansible tasks passed with 2 expected changes and 0 failures.
 - [x] Repeat live health/Auth/REST checks, authenticated search/detail/original access, unauthenticated rejection, queue integrity, and synthetic direct-Gemini text/file checks after deployment.
+- [x] Deploy source-subject boundary guard `1470fe1` through Ansible with fresh local/off-site backups; full suite 385/385 and post-deploy smoke checks passed.
 - [x] Confirm the worker timer recovered after one transient connection-refused run during API restart; next scheduled run was idle, no active job, timer active. No new real document was queued for this verification.
 - [ ] Keep the low-confidence source-conflict record and second reprocessing candidate flagged for human review.
 - [ ] Review historical network-timeout failures individually if recovery is needed; do not bulk-retry real letters.
