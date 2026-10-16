@@ -1,21 +1,27 @@
-# Tasks
+# Tasks — PostgreSQL Primary Integration
 
-## Completed / observed
-- [x] Record live Oracle PostgreSQL catalog counts: 19 public tables, 28 public functions, 18 RLS-enabled public tables.
-- [x] Verify local and off-site backup timers report active.
-- [x] Verify one controlled reprocess completed through the direct Gemini worker path.
-- [x] Identify missing `archive_id` on processing-job enqueue as an RLS failure cause.
-- [x] Add target-letter archive lookup to DLR queue enqueue and focused regression coverage in the working tree.
+## Verified complete on 2026-10-16
+- [x] Record live Oracle PostgreSQL catalog and data counts; verify job `archive_id`/letter consistency and duplicate-job invariants.
+- [x] Resolve the two self-healing test failures by making test quality-version expectations explicit.
+- [x] Add a guard so low-confidence direct-Gemini output does not overwrite stronger unreviewed metadata unless it explicitly flags a source conflict; add regression tests for both paths.
+- [x] Add subject/body conflict detection and human-review regression coverage.
+- [x] Run the full DLR suite: 377 passed, 0 failures; Python compile and whitespace checks passed.
+- [x] Verify direct Gemini text and synthetic-file analysis using the configured model.
+- [x] Run authenticated login, search, detail and original-file smoke checks; verify private storage references stay out of detail JSON and unauthenticated access is rejected.
+- [x] Run Ansible syntax and live validation checks without deployment/restart.
+- [x] Create fresh encrypted local/off-site backups and restore both to disposable databases; both restore checks report 19 tables and 28 functions.
+- [x] Confirm no active jobs and no missing/mismatched archive IDs; classify the four historical failed jobs without retrying them.
+- [x] Document the actual PostgreSQL creation path and a future-project onboarding contract in PostgreSQL Services.
 
-## Required next
-- [ ] Resolve two failing full-suite tests in `test_self_healing.py`; current working-tree `QUALITY_VERSION=document-quality-v3` changed the expected recovery behavior.
-- [ ] Review the full DLR working-tree diff; distinguish prior user work from the queue fix; do not commit unrelated edits together.
-- [ ] Verify the completed document's source-grounded fields and low-confidence handling with privacy-safe assertions; confidence 0.45 and `needs_reprocessing=true` remain a quality warning.
-- [ ] Run authenticated RLS/job lifecycle tests with an archive editor and verify the job includes the correct `archive_id`.
-- [ ] Verify keyword search/detail/original access after reprocess; confirm no unintended mail/WhatsApp delivery.
-- [ ] Run Ansible syntax check and validation playbook; deploy only from reviewed, committed `main`.
-- [ ] Reconcile schema migration count/drift and root README/current-state contradictions in PostgreSQL Services.
-- [ ] Implement and test one-way Oracle-to-Supabase recovery sync, lag/freshness monitoring, restore and manual failover/failback.
-- [ ] Define measured RPO/RTO and alerts; retain immutable encrypted snapshots.
-- [ ] Remove the remaining Gemini Edge Function dependency from normal worker operation; gateway is still quota-blocked.
-- [ ] Re-run full suite and production smoke checks after fixes; update both repositories.
+## Remaining before release sign-off
+- [ ] Final review of all DLR implementation changes and ensure no unrelated work is included; commit/push reviewed changes.
+- [ ] Deploy the committed `main` revision using the guarded Ansible application-deploy path; repeat live health, authenticated search/detail/original, and queue checks.
+- [ ] Verify worker/timer behavior after deployment without queuing any additional real documents; confirm notification side effects remain unchanged.
+- [ ] Keep the low-confidence source-conflict record and second reprocessing candidate flagged for human review.
+- [ ] Review historical network-timeout failures individually if recovery is needed; do not bulk-retry real letters.
+
+## Longer-term database/DR work
+- [ ] Reconcile live Oracle schema, migration lineage, bootstrap compatibility SQL, and grants/RLS before the next schema change.
+- [ ] Implement a generic, least-privilege project database provisioning procedure and extend scheduled local/off-site backups to all approved project databases.
+- [ ] Implement one-way Oracle-to-Supabase recovery synchronization, freshness alerts, measured RPO/RTO, and manual failover/failback drills.
+- [ ] Design the n8n workflow only after the database onboarding procedure is repeatable, auditable, and tested.

@@ -40,7 +40,7 @@ def _project_ref_from_url(base_url: str) -> str:
     host = parse.urlsplit(base_url).hostname or ""
     suffix = ".supabase.co"
     if not host.endswith(suffix):
-        raise ValueError("SUPABASE_URL must be a hosted supabase.co project URL")
+        raise ValueError("SUPABASE_MANAGEMENT_URL (or fallback SUPABASE_URL) must be a hosted supabase.co project URL")
     ref = host[: -len(suffix)].strip()
     if not ref:
         raise ValueError("could not derive Supabase project ref")
@@ -98,7 +98,7 @@ class SupabaseAuthConfigManager:
         if not token:
             raise ValueError("SUPABASE_MANAGEMENT_ACCESS_TOKEN is required")
         if not base_url:
-            raise ValueError("SUPABASE_URL is required")
+            raise ValueError("SUPABASE_MANAGEMENT_URL (or fallback SUPABASE_URL) is required")
         if not redirect:
             raise ValueError("AUTH_REDIRECT_URL is required")
         if not template_path.is_file():

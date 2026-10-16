@@ -23,7 +23,11 @@ One synthetic RLS verification row remains in the archive database because the c
 
 ## 2026-10-16 PostgreSQL/Gemini checkpoint
 
-- Focused `tests.test_jobs` + `tests.test_gemini_provider`: 7 passed after queue enqueue began resolving the target letter's `archive_id`.
-- Full suite: 374 tests, 2 failures in `test_self_healing.py`; see `brain/postgres-primary-integration/TESTS.md`.
-- A controlled real reprocess completed, but its output remained confidence 0.45 with `needs_reprocessing=true`; do not treat completion as semantic correctness.
-- Local PostgreSQL catalog: 19 public tables, 28 public functions, 18 RLS-enabled tables. Backup timers active at check time.
+- Full DLR suite: **377 tests passed, 0 failures** after making the self-healing test target quality versions explicit and adding low-confidence/source-conflict merge coverage.
+- Python compile check and `git diff --check` passed.
+- Live authenticated worker login, search, detail and original-file retrieval passed; detail response omitted private storage references. Unauthenticated search/original access returned HTTP 401.
+- Fresh local and off-site encrypted backups were created and restored to disposable databases; each restore reported 19 public tables and 28 public functions. Ansible syntax and validation passed without deployment/restart.
+- Direct Gemini synthetic text and synthetic-file analysis passed with `gemini-3.5-flash-lite`.
+- Live queue integrity passed: no active jobs, missing `archive_id`, orphaned jobs, archive mismatches or duplicate letter/reason pairs.
+- One low-confidence source-conflict record and a second record remain flagged for review. Four historical jobs remain failed (two prior RLS/archive-scope failures, two network/timeouts); no bulk retry was performed.
+- The reviewed implementation is not yet deployed. See `brain/postgres-primary-integration/TESTS.md` and `TASKS.md` for release gates.

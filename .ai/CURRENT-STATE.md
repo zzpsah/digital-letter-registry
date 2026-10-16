@@ -110,3 +110,14 @@ Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-
 - Change: fix: flag subject and body conflicts during processing
 - Date: 2026-10-16
 - Durable context synchronization: completed
+
+
+## PostgreSQL primary and Gemini checkpoint — 2026-10-16
+
+Oracle PostgreSQL 16 + pgvector database `dlr_primary` is the primary for the migrated DLR workload. Local GoTrue and PostgREST are behind the FastAPI compatibility bridge; the application retains Supabase-compatible Auth/REST/RPC contracts. Live catalog: 19 public tables, 28 public functions, 18 RLS-enabled tables. Live snapshot: 68 letters, 102 processing jobs, 4 failed, 0 active. Both daily backup timers reported active; hosted Supabase is not a verified replica.
+
+Direct Gemini synthetic text/file calls passed. Full DLR suite is green: 377 tests passed. Live authenticated login/search/detail/original and unauthenticated rejection checks passed. Fresh local/off-site encrypted backups both restored to disposable databases with 19 tables and 28 functions; Ansible validation passed without deployment/restart. Queue integrity is clean with no active jobs.
+
+One low-confidence source-conflict result (0.45) and a second record remain flagged for review; embeddings remain disabled. Four historical jobs remain failed (two prior RLS/archive-scope failures and two network/timeouts). The queue code now resolves target-letter `archive_id` and fails closed if the letter is not visible. Implementation changes remain uncommitted and not deployed; review/commit/push before the guarded Ansible deployment and repeat post-deploy smoke checks. Hosted Supabase is not a verified replica and schema drift/DR remain separate gates.
+
+Read `brain/postgres-primary-integration/` and the PostgreSQL Services status record before database or worker changes. Preserve all unrelated dirty/untracked files.
