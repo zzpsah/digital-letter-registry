@@ -150,6 +150,12 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('/reprocess', self.html)
         self.assertIn('Reprocess this document and regenerate its context?', self.html)
 
+    def test_reprocess_refreshes_the_visible_list_after_completion(self) -> None:
+        self.assertIn('async function refreshVisibleDocumentLists()', self.html)
+        self.assertIn('await refreshVisibleDocumentLists();return}if(d.status==="failed")', self.html)
+        self.assertIn('Could not check status. Refresh the page to resume.', self.html)
+        self.assertIn('btn.textContent="Check status"', self.html)
+
     def test_authority_admin_merge_and_delete_are_exposed(self) -> None:
         self.assertIn('data-merge-authority', self.html)
         self.assertIn('data-merge-authority-btn', self.html)
