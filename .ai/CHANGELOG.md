@@ -1,3 +1,13 @@
+## 2026-10-16 — fix Gemini structured output API schema
+- Commit: b47d1acebee249843b6132a163f2cd23063f60c7
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/CURRENT_STATE.md`
+- `docs/HISTORY.md`
+- `src/letter_registry/gemini_provider.py`
+- `tests/test_gemini_provider.py`
+
 ## 2026-10-15 — fix archive list recovery and prepare direct Gemini processing
 - Commit: 85fdf8e6c739b041c22b4b22829c695589faf8fb
 - Author: development-os[bot]

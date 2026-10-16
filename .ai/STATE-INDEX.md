@@ -6,9 +6,9 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 85fdf8e6c739b041c22b4b22829c695589faf8fb
-- Last commit: fix archive list recovery and prepare direct Gemini processing
-- Last commit date: 2026-10-15
+- HEAD: b47d1acebee249843b6132a163f2cd23063f60c7
+- Last commit: fix Gemini structured output API schema
+- Last commit date: 2026-10-16
 - Last commit author: development-os[bot]
 
 ## Context health
