@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 6404e1f5ed6c9ab7212ef73728587620b068969d
-- Last commit: docs: record verified DLR primary deployment
+- HEAD: 32424796428550cb894f2930ac720515e14b6d42
+- Last commit: docs: align DLR handoff with verified database onboarding
 - Last commit date: 2026-10-16
 - Last commit author: development-os[bot]
 

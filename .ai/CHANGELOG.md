@@ -1,3 +1,12 @@
+## 2026-10-16 — docs: align DLR handoff with verified database onboarding
+- Commit: 32424796428550cb894f2930ac720515e14b6d42
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `brain/postgres-primary-integration/CURRENT_STATE.md`
+- `brain/postgres-primary-integration/HANDOFF.md`
+- `brain/postgres-primary-integration/TASKS.md`
+
 ## 2026-10-16 — docs: record verified DLR primary deployment
 - Commit: 6404e1f5ed6c9ab7212ef73728587620b068969d
 - Author: development-os[bot]
