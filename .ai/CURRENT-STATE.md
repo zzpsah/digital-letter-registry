@@ -103,10 +103,19 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 
 ## Information-flow and deployment inventory — 2026-10-10
 
-Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md). The audit confirmed the Vercel routes, Oracle DLR API listener on loopback port 8877, Tailscale/Funnel mappings and key data boundaries. Funnel ports 10000, 10001 and 8443 were publicly exposed at audit time; port 10001 maps to the DLR API and must be treated as public despite its proxy role. Some other upstream listener purposes remain unconfirmed. The Oracle checkout was clean but behind GitHub main at audit time. The documentation update is not deployed to Oracle. No migration, backup, service restart or production configuration change was performed.
+Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md). The audit confirmed the Vercel routes, Oracle DLR API listener on loopback port 8877, Tailscale/Funnel mappings and key data boundaries. Funnel ports 10000, 10001 and 8443 were publicly exposed at audit time; port 10001 maps to the DLR API and must be treated as public despite its proxy role. Some other upstream listener purposes remain unconfirmed. The Oracle checkout was clean but behind GitHub main at audit time. At that historical audit checkpoint, the documentation update had not yet been deployed and no service/configuration change had been performed. The later 2026-10-16 release checkpoint supersedes that state.
 
 ## Last automated change
 - Commit: aa2c54d9cb32fc06cdefa6bf42c2f159b7086b60
 - Change: fix: harden letter processing quality and queue scope
 - Date: 2026-10-16
 - Durable context synchronization: completed
+
+
+## Current PostgreSQL/DLR release checkpoint — 2026-10-16
+
+Oracle PostgreSQL 16 + pgvector database `dlr_primary` is the primary for the migrated DLR workload. Live catalog: 19 public tables, 28 public functions, 18 RLS-enabled tables. Current data snapshot: 68 letters, 68 processing rows and 103 jobs (99 completed, 4 failed, 0 active). Both daily backup timers are active; hosted Supabase is not a verified replica.
+
+Implementation commit `aa2c54d` is deployed on Oracle as revision `b16c899`. Guarded Ansible deployment passed; the full 377-test suite passed before API restart. Post-deploy API/Auth/REST health, authenticated search/detail/original, unauthenticated rejection, queue-integrity, and synthetic direct-Gemini text/file checks passed. Fresh encrypted local/off-site backups both restored to disposable databases with 19 tables and 28 functions. DLR `main` matches `origin/main` and the working tree is clean.
+
+One low-confidence source-conflict result (0.45) and a second record remain flagged for review; embeddings remain disabled. Four historical jobs remain failed (two prior RLS/archive-scope failures and two network/timeouts). One worker timer run overlapped API restart and failed once with connection refused; the next scheduled run returned idle and the timer remains active. Hosted Supabase is not a verified replica and schema drift/DR remain separate gates.

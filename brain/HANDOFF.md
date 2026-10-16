@@ -97,7 +97,7 @@ Before changing any of these, read `docs/UI-DESIGN-CONTRACT.md` and `brain/ui-go
 
 ## Information-flow / infrastructure handoff
 
-Before discussing Supabase migration, replication or backup design, read **docs/INFORMATION-FLOW-AND-DEPLOYMENT.md**. It contains the Mermaid architecture diagram, public site routes, observed Oracle listeners, Tailscale/Funnel exposure classes, service boundaries and unresolved port ownerships. Treat Funnel ports 10000, 10001 and 8443 as publicly reachable. Do not assume other upstream ports are DLR-owned until verified. The 2026-10-10 documentation update was not deployed to Oracle; reconcile the live checkout with GitHub before any deployment.
+Before discussing Supabase migration, replication or backup design, read **docs/INFORMATION-FLOW-AND-DEPLOYMENT.md**. It contains the Mermaid architecture diagram, public site routes, observed Oracle listeners, Tailscale/Funnel exposure classes, service boundaries and unresolved port ownerships. Treat Funnel ports 10000, 10001 and 8443 as publicly reachable. Do not assume other upstream ports are DLR-owned until verified. The 2026-10-10 note records the state at that historical checkpoint. The 2026-10-16 guarded deployment has since synchronized the application checkout to `main`.
 
 ## Remote Oracle handoff
 
@@ -127,4 +127,4 @@ Do not append stale checkpoints above newer truth. Current files must remain con
 
 ## PostgreSQL primary / Gemini handoff — 2026-10-16
 
-Read `brain/postgres-primary-integration/HANDOFF.md` and the cross-repository status record in PostgreSQL Services before further DB/worker changes. Oracle PostgreSQL is the primary for the migrated workload; hosted Supabase is not a verified replica. Direct Gemini synthetic calls pass, but the one controlled real reprocess is low-confidence (0.45, `needs_reprocessing=true`). Embeddings stay disabled. The queue archive_id fix is in an uncommitted working tree. Full tests have two self-healing failures; resolve those and review the dirty tree before any deploy. Do not bulk reprocess.
+Read `brain/postgres-primary-integration/HANDOFF.md` and the cross-repository status record in PostgreSQL Services before further DB/worker changes. Oracle PostgreSQL is the primary for the migrated workload; hosted Supabase is not a verified replica. Direct Gemini synthetic text/file calls pass. The 377-test suite is green; implementation commit `aa2c54d` is deployed as Oracle revision `b16c899`. Post-deploy auth/search/detail/original and queue-integrity checks passed. One real source-conflict record is low-confidence (0.45, `needs_reprocessing=true`), a second record remains flagged, and embeddings stay disabled. Four historical jobs remain failed; do not bulk-reprocess.

@@ -15,7 +15,8 @@ Observed on Oracle VPS, 2026-10-16.
 - Live service health: FastAPI, GoTrue and PostgREST returned HTTP 200.
 
 ## Remaining caveats
-- The code changes are not yet deployed; production smoke checks above exercise the currently running deployment, while the 377 tests exercise the current working tree.
+- One worker timer run overlapped the API restart and failed once with connection refused; the next scheduled run returned `status=idle`, with no active job and the timer still active.
+- Reviewed implementation commit `aa2c54d` is deployed on Oracle as revision `b16c899`; Ansible ran the full regression suite before restarting the API. Post-deploy health and authenticated/unauthenticated smoke checks passed.
 - One real record is low-confidence (0.45), explicitly source-conflict marked and still needs human review; a second record remains flagged for reprocessing. No additional real documents were queued.
 - Four historical jobs remain failed: two prior RLS/archive-scope failures and two network/timeout failures. No active jobs remain; no bulk retry was performed.
 - Embeddings remain disabled and no vector backfill was performed.

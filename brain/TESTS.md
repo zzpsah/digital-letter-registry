@@ -30,4 +30,4 @@ One synthetic RLS verification row remains in the archive database because the c
 - Direct Gemini synthetic text and synthetic-file analysis passed with `gemini-3.5-flash-lite`.
 - Live queue integrity passed: no active jobs, missing `archive_id`, orphaned jobs, archive mismatches or duplicate letter/reason pairs.
 - One low-confidence source-conflict record and a second record remain flagged for review. Four historical jobs remain failed (two prior RLS/archive-scope failures, two network/timeouts); no bulk retry was performed.
-- The reviewed implementation is not yet deployed. See `brain/postgres-primary-integration/TESTS.md` and `TASKS.md` for release gates.
+- The reviewed implementation is deployed as Oracle revision `b16c899` (implementation commit `aa2c54d`); Ansible regression and post-deploy smoke checks passed. Remaining caveats are listed in `brain/postgres-primary-integration/TESTS.md` and `TASKS.md`.

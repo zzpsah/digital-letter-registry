@@ -5,7 +5,7 @@ Observed on Oracle VPS, 2026-10-16.
 ## Database plane
 - PostgreSQL 16 + pgvector runs in Docker container `dlr-postgres`; database `dlr_primary`; listener is loopback-only at `127.0.0.1:5432`.
 - Live catalog: 19 public base tables, 28 public functions, 18 public tables with RLS enabled; 53 public RLS policies.
-- Data snapshot: 68 letters, 68 `letter_processing` rows, 102 processing jobs (98 completed, 4 failed, 0 active). These are point-in-time counts.
+- Data snapshot: 68 letters, 68 `letter_processing` rows, 103 processing jobs (99 completed, 4 failed, 0 active). These are point-in-time counts.
 - Integrity checks passed: no job missing `archive_id`, no orphan job, no job/letter archive mismatch, and no duplicate `(letter_id, reason)` job pairs.
 - Local GoTrue and PostgREST are behind the FastAPI compatibility bridge. PostgreSQL port 5432 remains private.
 
@@ -25,9 +25,11 @@ Observed on Oracle VPS, 2026-10-16.
 - Embeddings remain disabled; no vector backfill was started.
 
 ## Release and repository state
-- The reviewed implementation is still in the DLR working tree and has not been deployed in this validation pass. Keep the changes uncommitted until the final diff review and then commit/push before the guarded Ansible deployment.
+- Reviewed code and regression changes are committed/pushed; implementation commit `aa2c54d` is included in deployed Oracle revision `b16c899` (the latter is an automated project-context sync commit). DLR `main` matches `origin/main` and the working tree is clean.
+- Guarded Ansible deployment completed successfully: 17 tasks OK, 2 changes, 0 failures; the full regression suite passed before API restart. Post-deploy API/Auth/REST health checks returned HTTP 200.
+- A worker timer run overlapped the API restart and failed once with connection refused; the next scheduled run returned `status=idle`, and the worker timer remains active. No job was active during this transient.
 - PostgreSQL Services has a separate, unrelated untracked migration `20261014163501_restore_osint_rpc_access.sql`; preserve it.
-- Four historical jobs remain failed: two classified as prior RLS/archive-scope failures and two as network/timeout failures. There are no active jobs. Do not bulk-retry them; review any real-document retry separately.
+- Four historical jobs remain failed: two classified as prior RLS/archive-scope failures and two as network/timeout failures. The live queue now has 103 jobs (99 completed, 4 failed, 0 active). There are no active jobs. Do not bulk-retry them; review any real-document retry separately.
 
 ## Remaining release/DR gates
 - Review the exact DLR diff, run the full suite again, commit/push reviewed changes, deploy from canonical `main`, and repeat production smoke checks.

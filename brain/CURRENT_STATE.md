@@ -199,7 +199,7 @@ Statements such as “no real letters”, “real intake disabled everywhere”,
 
 ## Information-flow inventory — 2026-10-10
 
-Use [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md) as the canonical site, port, component and data-flow inventory. It distinguishes observed live mappings from unresolved service ownership. Tailscale Funnel ports 10000, 10001 and 8443 were publicly reachable at audit time; port 10001 routes to the DLR API on loopback 8877. The Oracle working tree was clean but behind GitHub main during the audit; this documentation change was not deployed. Do not begin migration or backup work until the diagram and unresolved port ownerships have been reviewed.
+Use [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md) as the canonical site, port, component and data-flow inventory. It distinguishes observed live mappings from unresolved service ownership. Tailscale Funnel ports 10000, 10001 and 8443 were publicly reachable at audit time; port 10001 routes to the DLR API on loopback 8877. The Oracle working tree was clean but behind GitHub main during that historical audit. The subsequent 2026-10-16 guarded deployment is recorded below; unresolved port ownerships remain a separate infrastructure review item.
 
 ## eLetters archive visibility recovery — 2026-10-15
 
@@ -212,12 +212,12 @@ Use [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLO
 
 Oracle PostgreSQL 16 + pgvector `dlr_primary` is the primary data plane for the migrated DLR workload. Local GoTrue/PostgREST remain behind the FastAPI compatibility bridge; PostgreSQL is loopback-only. Canonical database operations are in `zzpsah/postgresql-services/projects/official-letter-intelligence/database-operations/`; the former standalone database repository was consolidated/deleted.
 
-Live snapshot: 19 public tables, 28 public functions, 18 RLS-enabled tables, 53 public RLS policies; 68 letters, 68 processing rows and 102 jobs (98 completed, 4 failed, 0 active). Queue integrity checks passed: no missing `archive_id`, orphan job, archive mismatch or duplicate letter/reason pair. Four historical failed jobs remain (two prior RLS/archive-scope failures, two network/timeout failures); no bulk retry was performed.
+Live snapshot: 19 public tables, 28 public functions, 18 RLS-enabled tables, 53 public RLS policies; 68 letters, 68 processing rows and 103 jobs (99 completed, 4 failed, 0 active). Queue integrity checks passed: no missing `archive_id`, orphan job, archive mismatch or duplicate letter/reason pair. Four historical failed jobs remain (two prior RLS/archive-scope failures, two network/timeout failures); no bulk retry was performed.
 
 Full DLR suite: **377 tests passed, 0 failures**. Direct Gemini synthetic text/file checks passed. Live authenticated login/search/detail/original checks passed; private storage references stayed out of detail JSON and unauthenticated search/original access was rejected. Fresh encrypted local/off-site backups both restored to disposable databases with 19 public tables and 28 public functions. Ansible syntax and validation passed without deployment/restart.
 
 One low-confidence source-conflict result (0.45) and a second record remain flagged for review; processing completion is not semantic acceptance. Embeddings remain disabled. Hosted Supabase is not a verified replica; schema drift and DR sync/failover remain separate work.
 
-Implementation changes are in the DLR working tree and have not yet been deployed. Review/commit/push the exact changes, then use the guarded Ansible deployment and repeat live smoke checks. Preserve unrelated changes and the unrelated untracked OSINT migration in PostgreSQL Services.
+Reviewed implementation commit `aa2c54d` is deployed on Oracle as revision `b16c899`; DLR main is synchronized and clean. The guarded Ansible deployment and post-deploy API/Auth/REST, authenticated search/detail/original, unauthenticated rejection, queue-integrity and synthetic Gemini checks passed. One worker timer run failed transiently during API restart with connection refused; the next scheduled run returned idle and the timer remains active. Preserve the unrelated untracked OSINT migration in PostgreSQL Services.
 
 Read `brain/postgres-primary-integration/` and PostgreSQL Services `docs/DLR-POSTGRES-INTEGRATION-STATUS-2026-10-16.md` before database or worker changes.

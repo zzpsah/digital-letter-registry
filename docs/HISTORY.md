@@ -103,3 +103,12 @@
 - Diagnosed processing-job insert RLS failure: the job payload omitted target `archive_id`. DLR working tree now resolves the archive from the target letter and fails closed if unavailable; focused queue/Gemini tests passed 7/7.
 - Full DLR suite ran 374 tests and had 2 self-healing failures after an uncommitted `document-quality-v3` version change. No production release is claimed; review/fix is required.
 - No bulk reprocessing, embeddings backfill, RLS relaxation, or replication activation was performed.
+
+
+## 2026-10-16 — DLR primary release verification
+
+- Reviewed and pushed implementation commit `aa2c54d`; deployed Oracle checkout revision `b16c899` using the guarded Ansible path. The playbook completed 17 successful tasks, 2 expected changes, 0 failures and ran the full regression suite before restarting the API.
+- Full DLR suite: 377 tests passed, 0 failures. Post-deploy API/Auth/REST health, authenticated search/detail/original access, unauthenticated rejection, queue-integrity checks and synthetic direct-Gemini text/file checks passed.
+- Live queue snapshot: 103 jobs (99 completed, 4 failed, 0 active); no missing/mismatched archive IDs, orphan jobs or duplicate letter/reason jobs.
+- One worker timer invocation overlapped the API restart and failed once with connection refused; the next scheduled run returned idle and the timer remained active.
+- One low-confidence source-conflict record and a second reprocessing candidate remain flagged for human review. Hosted Supabase remains an unverified DR candidate, not a replica.
