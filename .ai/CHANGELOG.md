@@ -1,3 +1,11 @@
+## 2026-10-16 — fix: refresh document cards after reprocessing
+- Commit: 8b1339e74a1bd740111f656ae90c2e2b8b52788c
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+- `tests/test_web_shell.py`
+
 ## 2026-10-16 — docs: align architecture diagrams with Oracle PostgreSQL primary
 - Commit: a5443b0ca6d382b09037ee9591344bd408515b18
 - Author: development-os[bot]

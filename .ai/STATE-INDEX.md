@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: a5443b0ca6d382b09037ee9591344bd408515b18
-- Last commit: docs: align architecture diagrams with Oracle PostgreSQL primary
+- HEAD: 8b1339e74a1bd740111f656ae90c2e2b8b52788c
+- Last commit: fix: refresh document cards after reprocessing
 - Last commit date: 2026-10-16
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
