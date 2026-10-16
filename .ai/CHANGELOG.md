@@ -1,3 +1,15 @@
+## 2026-10-16 — docs: record phase six acceptance and parser guard
+- Commit: 917b2a5a8420e804e7f7a0e2ffaf83c8a621cedf
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `brain/CURRENT_STATE.md`
+- `brain/postgres-primary-integration/CURRENT_STATE.md`
+- `brain/postgres-primary-integration/TASKS.md`
+- `docs/HISTORY.md`
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`
+- `docs/TECHNICAL-FLOWCHART.html`
+
 ## 2026-10-16 — fix: bound source subject extraction to its line
 - Commit: 1470fe17683dfc1b571e5cf526f376d907a9a4ad
 - Author: development-os[bot]
