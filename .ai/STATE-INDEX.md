@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 441004b7d418dd14504272ac7cc6fba6ec4e82c8
-- Last commit: docs: clarify release follow-ups and database onboarding
+- HEAD: af759508aab985814a00653f8dcf9c0597a0db7f
+- Last commit: feat: add admin document quality review queue
 - Last commit date: 2026-10-16
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

@@ -1,3 +1,15 @@
+## 2026-10-16 — feat: add admin document quality review queue
+- Commit: af759508aab985814a00653f8dcf9c0597a0db7f
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `docs/QUALITY-REVIEW.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_quality_review_queue.py`
+- `tests/test_web_shell.py`
+
 ## 2026-10-16 — docs: clarify release follow-ups and database onboarding
 - Commit: 441004b7d418dd14504272ac7cc6fba6ec4e82c8
 - Author: development-os[bot]
