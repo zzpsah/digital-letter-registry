@@ -11,8 +11,8 @@ Last reconciled: 2026-10-16.
 ## Verified checkpoint
 - PostgreSQL primary and compatibility APIs are healthy; authenticated login/search/detail/original and unauthenticated access rejection were tested.
 - Full DLR test suite is green: 377 passed.
-- Fresh local and off-site encrypted backups both restored successfully to disposable databases with 19 tables and 28 functions.
-- Ansible validation passed without deploying or restarting services.
+- Fresh local and off-site encrypted backups both restored successfully to disposable databases with 19 tables and 28 functions. Generic project provisioning and registry-driven local/off-site backups were also tested with a disposable project DB; the test DB/roles were removed and registry returned to DLR-only.
+- Guarded Ansible deployment passed; post-deploy API/Auth/REST and authenticated/unauthenticated smoke checks passed.
 - Queue integrity is clean and no active jobs remain.
 - Direct Gemini synthetic text/file analysis passed. One real source-conflict result remains low-confidence and flagged for human review; do not treat processing completion as semantic acceptance.
 

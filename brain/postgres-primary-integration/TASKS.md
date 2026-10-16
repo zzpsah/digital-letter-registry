@@ -13,7 +13,7 @@
 - [x] Confirm no active jobs and no missing/mismatched archive IDs; classify the four historical failed jobs without retrying them.
 - [x] Document the actual PostgreSQL creation path and a future-project onboarding contract in PostgreSQL Services.
 
-## Remaining before release sign-off
+## Release verification completed; remaining quality/operational follow-ups
 - [x] Review and commit/push the DLR implementation changes (`aa2c54d`, included in deployed revision `b16c899`). DLR `main` matches `origin/main`; working tree is clean.
 - [x] Deploy the committed `main` revision through the guarded Ansible application-deploy path; all 17 Ansible tasks passed with 2 expected changes and 0 failures.
 - [x] Repeat live health/Auth/REST checks, authenticated search/detail/original access, unauthenticated rejection, queue integrity, and synthetic direct-Gemini text/file checks after deployment.
