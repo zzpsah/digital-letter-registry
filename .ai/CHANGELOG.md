@@ -1,3 +1,18 @@
+## 2026-10-16 — fix: harden letter processing quality and queue scope
+- Commit: aa2c54d9cb32fc06cdefa6bf42c2f159b7086b60
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `brain/CURRENT_STATE.md`
+- `brain/TESTS.md`
+- `brain/postgres-primary-integration/CURRENT_STATE.md`
+- `brain/postgres-primary-integration/HANDOFF.md`
+- `brain/postgres-primary-integration/TASKS.md`
+- `brain/postgres-primary-integration/TESTS.md`
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`
+- `src/letter_registry/supabase_management.py`
+- `tests/test_supabase_repository.py`
+
 ## 2026-10-16 — fix: flag subject and body conflicts during processing
 - Commit: 6dd72dfa959067ef25517eda15c50e23ab78e2f0
 - Author: development-os[bot]
