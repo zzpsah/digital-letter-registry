@@ -1,7 +1,7 @@
 # eLetters / Digital Letter Registry — Information Flow & Deployment Inventory
 
-**Audit date:** 2026-10-10  
-**Scope:** documentation-only architecture inventory. No migration, backup, production configuration change, or application deployment was performed.  
+**Audit date:** 2026-10-16
+**Scope:** architecture inventory reconciled with the Oracle PostgreSQL primary and DLR worker state. This documentation update did not migrate data, change production configuration, or deploy the application.
 **Evidence labels:** **Verified** means observed in repository source or a read-only live-runtime inspection; **Documented** means recorded in existing project documentation; **Unconfirmed** means current evidence does not prove a component's purpose or health.
 
 **Visual reference:** [Open the full technical algorithm flowchart](TECHNICAL-FLOWCHART.html). The HTML includes decision branches, public routes, observed port mappings, service/timer inventory, integrations, failure conditions, and the documentation maintenance rule.
@@ -14,26 +14,28 @@ DLR (Digital Letter Registry; product name eLetters / Official Letter Intelligen
 flowchart TB
   U[Authorized user: mobile or desktop browser] --> SITE[Public Vercel site: eletters.vercel.app]
   SITE --> APP[Python FastAPI control plane: app.py → letter_registry.api]
-  APP --> AUTH[Supabase Auth]
-  APP --> DB[(Supabase Postgres: archive metadata, RLS, search, provenance, job queue)]
+  APP --> BRIDGE[Oracle FastAPI compatibility bridge]
+  BRIDGE --> AUTH[Local GoTrue Auth: Supabase-compatible]
+  BRIDGE --> REST[Local PostgREST: Supabase-compatible Data API]
+  REST --> DB[(Oracle PostgreSQL dlr_primary: metadata, RLS, search, provenance, job queue)]
   APP -->|Server-side file operations proxy; port 10001| FUNNEL[Oracle Tailscale Funnel]
   FUNNEL --> API[Oracle DLR FastAPI: loopback port 8877]
-  API --> DB
+  API --> REST
   API --> DRIVE[(Private Google Drive: original files)]
-  APP -->|Document-understanding request| GEM[Supabase Edge Function: gemini-ai-gateway]
-  GEM --> MODEL[Gemini document-understanding model]
-  MODEL --> GEM
-  GEM --> APP
+  WORKER -->|Direct Gemini when Bitwarden key is injected| MODEL[Google Gemini document-understanding model]
+  WORKER -.->|Legacy fallback only when direct key is absent| GEM[Supabase Edge Function: gemini-ai-gateway]
+  GEM --> MODEL
+  MODEL --> WORKER
   WA[Approved WhatsApp archive group] --> HERMES[Existing Hermes WhatsApp bridge / allowlisted intake hook]
   HERMES --> STAGE[Protected local staging queue]
   STAGE --> INTAKE[DLR intake consumer / worker]
   INTAKE --> DRIVE
-  INTAKE --> DB
-  WORKER[DLR processing worker + queue timer] <--> DB
+  INTAKE --> REST
+  WORKER[DLR processing worker + queue timer] <--> REST
   WORKER -->|Fetch immutable original| DRIVE
   WORKER --> EXTRACT[Native PDF text; Hindi/English OCR fallback]
-  EXTRACT -->|Source evidence| GEM
-  WORKER --> DB
+  EXTRACT -->|Source evidence| MODEL
+  WORKER --> REST
   DB --> SEARCH[Authenticated search and document metadata]
   SEARCH --> APP
   API -->|Original-file read/stream| DRIVE
@@ -44,13 +46,14 @@ flowchart TB
 ### Flow notes
 
 1. The browser uses the Vercel-hosted web/control plane. The root page is informational; the actual application/login UI is at **/app**.
-2. Supabase Auth establishes user identity. Active archive membership and database Row Level Security (RLS), together with API checks, control archive permissions. Authentication alone does not grant archive access.
-3. Original bytes live in the configured private Google Drive archive. Supabase stores structured letter records, source/provenance records, processing state/jobs, authorization, and searchable derived metadata.
+2. Local GoTrue establishes user identity through the Supabase-compatible Auth API. Active archive membership and PostgreSQL Row Level Security (RLS), together with API checks, control archive permissions. Authentication alone does not grant archive access.
+3. Original bytes live in the configured private Google Drive archive. Oracle PostgreSQL `dlr_primary` stores structured letter records, source/provenance records, processing state/jobs, authorization, and searchable derived metadata for the migrated workload.
 4. Oracle handles private file operations and background processing that are not carried by the public Vercel deployment.
 5. Approved WhatsApp intake enters through the existing Hermes session and a narrowly allowlisted connector. It stages supported media locally before the DLR intake path stores the original and creates provenance/processing records.
-6. Processing prefers native PDF text and falls back to Hindi/English OCR. Document interpretation currently goes through the Supabase **gemini-ai-gateway**, keeping the Gemini key server-side.
-7. The worker writes processing/search metadata and downstream delivery state back to Supabase. Gmail and WhatsApp are delivery channels, not the archive's system of record.
-8. Search is currently keyword/full-text based with title, metadata, OCR text and fuzzy matching. **Semantic/vector search is not active** in the current-state record because the embedding stage is not provisioned; do not depict semantic search as production-live.
+6. Processing prefers native PDF text and falls back to Hindi/English OCR. The Oracle worker now prefers direct Google Gemini when the Bitwarden-managed `DLR_GEMINI_API_KEY` is injected. On 2026-10-16, both a live synthetic text request and a live synthetic original-file request succeeded using `gemini-3.5-flash-lite`; one controlled real archive reprocess reached `complete/100%` and changed context version to `gemini:gemini-3.5-flash-lite:context-v3`. However, confidence remained 0.45 and `needs_reprocessing=true`, so semantic correctness is not verified. The legacy Supabase **gemini-ai-gateway** returned HTTP 402 `exceed_egress_quota` and is not the active primary route.
+7. Processing-job creation must read the target letter's `archive_id` and include it in the insert. The local-primary `processing_jobs` table requires this field and RLS checks active archive membership against it; omitting it caused HTTP 403/42501 and blocked manual reprocessing. The queue now resolves the archive from the visible target letter before inserting.
+8. The worker writes processing/search metadata and downstream delivery state back through the local Supabase-compatible Data API to Oracle PostgreSQL. Gmail and WhatsApp are delivery channels, not the archive's system of record. Embeddings remain opt-in and were not enabled during Gemini recovery.
+9. Search is currently keyword/full-text based with title, metadata, OCR text and fuzzy matching. **Semantic/vector search is not active**; `letter_chunks` remains empty because embedding generation is intentionally disabled.
 
 ## 2. Public website and application routes
 
@@ -116,22 +119,22 @@ The WhatsApp connector architecture documents a one-minute consumer for the prot
 | Component | Responsibility | Boundary |
 |---|---|---|
 | Vercel | Public website, login/application UI, HTTP API/control plane | No private Drive upload credentials |
-| Supabase Auth | User identity and session authentication | Separate from Drive OAuth |
-| Supabase Postgres / PostgREST / RLS | Archive metadata, source provenance, roles/membership, search projection, processing jobs and status | Archive access must remain membership/role-scoped |
-| Supabase Edge Function **gemini-ai-gateway** | Server-side document understanding using Gemini | Gemini credential stays server-side |
+| Local GoTrue / Oracle PostgREST / PostgreSQL RLS | User identity, archive metadata, source provenance, roles/membership, search projection, processing jobs and status through Supabase-compatible routes | Oracle `dlr_primary` is primary; access remains membership/role-scoped |
+| Oracle direct Gemini provider | Primary worker document understanding using Bitwarden-injected `DLR_GEMINI_API_KEY`; live synthetic and one-real-letter checks passed 2026-10-16 | Key is injected only at runtime; embeddings remain separately opt-in |
+| Supabase Edge Function **gemini-ai-gateway** | Legacy compatibility path when no direct key is configured | Observed HTTP 402 `exceed_egress_quota` on 2026-10-15; not the active primary route |
 | Google Drive API | Private original PDF/image bytes | Server-side OAuth only; never expose Drive object IDs/tokens to browser |
 | Oracle DLR FastAPI + worker | Private file operations, intake and background processing | Exposed through the observed Tailscale/Funnel mappings above |
 | Hermes WhatsApp runtime | Existing WhatsApp connection, allowlisted inbound group and outbound messaging | Reuse existing session; do not create a parallel client |
 | Gmail SMTP | Outbound email delivery | **smtp.gmail.com:465**; app password is injected from the approved secret manager |
 | Ollama | Optional local model endpoint | Local loopback listener; not a required production document-understanding path |
 
-Authentication and storage authorization are separate: Supabase membership controls archive access; server-side Google OAuth controls Drive operations; Tailscale controls network reachability but does not replace application authorization.
+Authentication and storage authorization are separate: local GoTrue identity plus archive membership/RLS control archive access; server-side Google OAuth controls Drive operations; Tailscale controls network reachability but does not replace application authorization. Hosted Supabase is a recovery/replication candidate, not a verified replica.
 
 ## 6. Current search and processing facts
 
 - Native PDF text extraction is preferred when usable; Hindi/English OCR is a fallback for scanned/image content.
 - The original is the authority for exact dates, memo numbers, names, amounts and official wording.
-- Document understanding uses the Supabase **gemini-ai-gateway**.
+- Document understanding in the Oracle worker uses direct Gemini when the Bitwarden-managed key is present. The direct provider and original-file request were live-tested on 2026-10-16; the worker successfully reprocessed one real letter and saved `gemini:gemini-3.5-flash-lite:context-v3`. The Supabase gateway remains a legacy path and is currently quota-blocked (HTTP 402).
 - Keyword/full-text search includes extracted text plus title, summary, reference, authority, concepts, related terms, language aliases and fuzzy matching.
 - Vector/semantic search is **not active** according to the current-state documentation because embeddings are not provisioned and **letter_chunks** is empty.
 - A failed processing job is recoverable through the Admin Operations flow; retry must preserve job/attempt history and must not duplicate the original document.
@@ -141,7 +144,7 @@ Authentication and storage authorization are separate: Supabase membership contr
 
 - Canonical Git repository: **zzpsah/digital-letter-registry**, default branch **main**.
 - Canonical source repository is GitHub; Oracle is the live private runtime. They must be inspected independently.
-- At the 2026-10-10 live audit, the Oracle working tree was clean but its checked-out commit was behind GitHub **main**. This documentation update is **not** deployed to Oracle. Before any runtime change or deployment, reconcile the checkout with the canonical branch and inspect the diff.
+- Historical note: the 2026-10-10 audit found the Oracle checkout behind GitHub **main**. On 2026-10-16, the Oracle checkout was fast-forwarded to the then-current remote `main`. At this documentation checkpoint, multiple application/test changes remain uncommitted in the Oracle worktree, including the queue archive_id correction, processing-quality changes, subject/body consistency work, and a pre-existing `src/letter_registry/supabase_management.py` edit. Review them file-by-file; do not deploy or stage them as a single batch.
 - Schema changes must be tracked through **supabase/migrations/**; do not make ad-hoc schema changes during this inventory.
 - Real letters, extracted private text, Drive object IDs/URLs, Supabase credentials, OAuth tokens, passwords, cookies, SSH keys, private runtime identifiers and personal-data logs must not be committed.
 - Preserve the accepted UI/UX exactly. This task changes documentation only.
@@ -163,3 +166,10 @@ This document does **not** migrate Supabase, establish database replication, cre
 ## 8. Keep the flowchart synchronized
 
 Whenever a code or infrastructure change affects routes, URLs, ports, services/timers, integrations, AI/OCR/translation behavior, storage boundaries, security exposure, or failure handling, update `docs/TECHNICAL-FLOWCHART.html` and this inventory in the same change. Update README and current-state/brain handoff records when architecture or operating status changes. Distinguish verified observations from unconfirmed assumptions; never document secrets, private Tailscale hostnames, private Drive identifiers, or credentials. Live runtime claims require a separate read-only check. Documentation updates do not imply deployment or VPS changes.
+
+
+## 7. PostgreSQL primary dependency checkpoint — 2026-10-16
+
+The migrated DLR workload now uses Oracle PostgreSQL `dlr_primary` as the primary data plane. The compatibility boundary is local GoTrue (Auth), local PostgREST (Data API), and the FastAPI bridge; PostgreSQL listens only on loopback. Current database ownership, schema/queue contract, backup timers, Ansible validation, and the planned DR workflow are documented in the private PostgreSQL Services repository at `projects/official-letter-intelligence/database-operations/docs/DLR-POSTGRES-INTEGRATION-STATUS-2026-10-16.md`. DLR application/worker ownership and release gates are documented in `brain/postgres-primary-integration/`.
+
+**Observed checkpoint:** 19 public tables, 28 public functions, 18 RLS-enabled tables; 68 letters and 102 jobs. Both local and off-site backup timers reported active. Hosted Supabase is not a verified replica. The one real Gemini reprocess completed but its context confidence was 0.45 and `needs_reprocessing=true`; do not mark it semantically accepted. Embeddings remain disabled. Full DLR tests had two failures, so this checkpoint is not a production-release sign-off.
