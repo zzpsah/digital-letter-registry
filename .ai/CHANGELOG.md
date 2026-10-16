@@ -1,3 +1,11 @@
+## 2026-10-16 — fix: bound source subject extraction to its line
+- Commit: 1470fe17683dfc1b571e5cf526f376d907a9a4ad
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/subject_body_consistency.py`
+- `tests/test_subject_body_consistency.py`
+
 ## 2026-10-16 — feat: add admin document quality review queue
 - Commit: af759508aab985814a00653f8dcf9c0597a0db7f
 - Author: development-os[bot]

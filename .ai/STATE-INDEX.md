@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: af759508aab985814a00653f8dcf9c0597a0db7f
-- Last commit: feat: add admin document quality review queue
+- HEAD: 1470fe17683dfc1b571e5cf526f376d907a9a4ad
+- Last commit: fix: bound source subject extraction to its line
 - Last commit date: 2026-10-16
 - Last commit author: development-os[bot]
 
