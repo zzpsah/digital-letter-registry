@@ -10,6 +10,7 @@ import re
 from .extraction import ExtractionResult, VersionedTextExtractor
 from .models import DocumentRecord
 from .quality_assessment import assess_document_quality
+from .subject_body_consistency import detect_subject_body_conflict
 from .autonomous_learning import AutonomousCorrectionMemory
 from .structured_analysis import (
     ContextAnalysisResult,
@@ -654,12 +655,59 @@ def process_archived_document(
         used_fallback = True
 
     def _refine_and_score(candidate: ContextAnalysisResult):
+        refined_context = _refine_context_from_strong_evidence(
+            candidate.context,
+            extracted_text=extraction.text,
+            filename=record.original_filename,
+        )
+        source_conflict = detect_subject_body_conflict(extraction.text)
+        if source_conflict is not None:
+            if source_conflict.subject_topic == "arrears approval":
+                title = "विषय/मुख्य पाठ में विरोधाभास: बकाया बनाम अवकाश"
+                summary = (
+                    "Source conflict: the subject line refers to approval of arrears for teachers, "
+                    "but the body gives instructions about online leave approval through e-Shikshakosh. "
+                    "Verify the intended subject with the issuing department before acting."
+                )
+                summary_hi = (
+                    "विषय में शिक्षकों के बकाया की स्वीकृति का उल्लेख है, जबकि मुख्य पाठ "
+                    "ई-शिक्षाकोष पर ऑनलाइन अवकाश स्वीकृति के निर्देश देता है। कार्रवाई से पहले "
+                    "जारीकर्ता विभाग से पुष्टि करें।"
+                )
+                whatsapp_summary = (
+                    "इस पत्र का विषय बकाया स्वीकृति है, लेकिन मुख्य पाठ ऑनलाइन अवकाश स्वीकृति के बारे में है। "
+                    "कार्रवाई से पहले विभाग से पुष्टि आवश्यक है।"
+                )
+            else:
+                title = "विषय/मुख्य पाठ में विरोधाभास: अवकाश बनाम बकाया"
+                summary = (
+                    "Source conflict: the subject line refers to leave approval, but the body discusses "
+                    "approval of arrears. Verify the intended subject with the issuing department before acting."
+                )
+                summary_hi = (
+                    "विषय में अवकाश स्वीकृति का उल्लेख है, जबकि मुख्य पाठ बकाया की स्वीकृति के बारे में है। "
+                    "कार्रवाई से पहले जारीकर्ता विभाग से पुष्टि करें।"
+                )
+                whatsapp_summary = (
+                    "इस पत्र का विषय अवकाश स्वीकृति है, लेकिन मुख्य पाठ बकाया स्वीकृति के बारे में है। "
+                    "कार्रवाई से पहले विभाग से पुष्टि आवश्यक है।"
+                )
+            refined_context = replace(
+                refined_context,
+                title=title,
+                summary=summary,
+                summary_hi=summary_hi,
+                whatsapp_summary=whatsapp_summary,
+                action_required="Verify the conflicting subject and body with the issuing department before acting.",
+                action_required_hi="कार्रवाई से पहले विषय और मुख्य पाठ के विरोधाभास की जारीकर्ता विभाग से पुष्टि करें।",
+                confidence=min(float(refined_context.confidence or 0.45), 0.45),
+                key_points=(
+                    "The document subject and operative body refer to different topics; human review is required.",
+                    *refined_context.key_points,
+                ),
+            )
         refined = ContextAnalysisResult(
-            context=_refine_context_from_strong_evidence(
-                candidate.context,
-                extracted_text=extraction.text,
-                filename=record.original_filename,
-            ),
+            context=refined_context,
             hints=candidate.hints,
             version=candidate.version,
         )
@@ -672,6 +720,7 @@ def process_archived_document(
             reference_number=refined.context.reference_number,
             issue_date=refined.context.issue_date,
             clean_document_text=refined.context.clean_document_text,
+            summary=refined.context.summary,
         )
         refined = ContextAnalysisResult(
             context=replace(

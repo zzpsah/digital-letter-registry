@@ -83,6 +83,43 @@ class ProcessingPipelineTests(unittest.TestCase):
 
 
 
+    def test_subject_body_conflict_is_persisted_for_human_review(self) -> None:
+        class ConflictingPdfBackend:
+            def extract_text(self, path: Path) -> str:
+                return (
+                    "विषय :- विद्यालय अध्यापकों के बकाया की स्वीकृति के संबंध में।\n"
+                    "प्रसंगः- पूर्व ज्ञापांक\nमहोदय,\n"
+                    "शिक्षकों के अवकाश की स्वीकृति के संबंध में निर्देश। ई-शिक्षाकोष Leave Module "
+                    "से leave applications ऑनलाइन जमा और स्वीकृत किए जाएँ। "
+                )
+
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "conflicting.pdf"
+            path.write_bytes(b"%PDF-synthetic")
+            record = DocumentRecord(
+                record_id="22222222-2222-4222-8222-222222222222",
+                original_filename="conflicting.pdf",
+                original_sha256="a" * 64,
+                original_storage_reference="synthetic-reference",
+                received_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
+            )
+            repository = FakeRepository()
+            outcome = process_archived_document(
+                path,
+                record=record,
+                owner_id=OWNER_ID,
+                extractor=VersionedTextExtractor(ConflictingPdfBackend()),
+                context_provider=FakeContextProvider(),
+                repository=repository,
+            )
+
+        context = outcome.context.context
+        self.assertIn("विरोधाभास", context.title)
+        self.assertTrue(context.summary.startswith("Source conflict:"))
+        self.assertTrue(context.needs_reprocessing)
+        self.assertIn("source_content_conflict", context.quality_flags)
+        self.assertLessEqual(context.confidence, 0.45)
+
     def test_low_quality_primary_uses_stronger_fallback(self) -> None:
         class WeakProvider:
             version = "weak-v1"

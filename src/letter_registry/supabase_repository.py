@@ -182,24 +182,48 @@ class SupabaseLetterRepository:
             select_existing(
                 "letter_processing",
                 filters={"letter_id": record.record_id},
-                columns="structured_context",
+                columns="structured_context,context_version,reviewed_at",
             )
             if callable(select_existing)
             else []
         )
+        previous_processing = processing_rows[0] if processing_rows else {}
         previous_structured = (
-            processing_rows[0].get("structured_context")
-            if processing_rows and isinstance(processing_rows[0].get("structured_context"), dict)
+            previous_processing.get("structured_context")
+            if isinstance(previous_processing.get("structured_context"), dict)
             else {}
         )
         previous_confidence = float(previous_structured.get("confidence") or 0.0)
+        previous_version = str(previous_processing.get("context_version") or "")
+        result_version = str(getattr(result, "version", "") or "")
+        human_reviewed = bool(previous_processing.get("reviewed_at"))
         result_context = getattr(result, "context", None)
         incoming_confidence = float(getattr(result_context, "confidence", None) or 0.0)
+        incoming_summary = str(getattr(result_context, "summary", "") or "").strip().casefold()
+        explicit_source_conflict = incoming_summary.startswith("source conflict:")
+        # Direct Gemini reads the original file, so a fresh, credible result can
+        # replace stale unreviewed gateway metadata even when the provider label
+        # is unchanged. Do not let a low-confidence non-conflict result erase
+        # stronger existing AI fields. An explicit source-conflict result is a
+        # safety exception: preserve the conflict warning even at low confidence.
+        # Verified metadata and human-reviewed rows remain protected.
+        direct_gemini_refresh = bool(
+            not human_reviewed
+            and result_version.startswith("gemini:")
+            and not previous_version.startswith(("verified-metadata:", "visual-verified:"))
+            and (
+                not previous_structured
+                or incoming_confidence + 0.08 >= previous_confidence
+                or explicit_source_conflict
+            )
+        )
         confidence_downgrade = bool(
             result_context is not None
             and previous_structured
             and previous_confidence >= 0.55
             and incoming_confidence + 0.08 < previous_confidence
+            and not direct_gemini_refresh
+            and not human_reviewed
         )
 
         if existing_rows:
@@ -230,20 +254,25 @@ class SupabaseLetterRepository:
                 stronger_identity_evidence = bool(
                     incoming_confidence >= max(0.80, previous_confidence + 0.10)
                 )
-                preserve_previous = (
-                    not str(current or "").strip()
-                    or (
-                        confidence_downgrade
-                        and str(previous or "").strip()
-                    )
-                    or (
-                        identity_changed
-                        and not stronger_identity_evidence
+                preserve_previous = bool(
+                    human_reviewed and str(previous or "").strip()
+                ) or (
+                    not direct_gemini_refresh
+                    and (
+                        not str(current or "").strip()
+                        or (
+                            confidence_downgrade
+                            and str(previous or "").strip()
+                        )
+                        or (
+                            identity_changed
+                            and not stronger_identity_evidence
+                        )
                     )
                 )
                 if preserve_previous and str(previous or "").strip():
                     merged[field_name] = str(previous)
-            if confidence_downgrade:
+            if human_reviewed or confidence_downgrade:
                 for field_name in (
                     "summary_hi",
                     "whatsapp_summary",

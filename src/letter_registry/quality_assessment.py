@@ -10,7 +10,7 @@ class DocumentQualityAssessment:
     score: float
     needs_reprocessing: bool
     flags: tuple[str, ...]
-    version: str = "document-quality-v2"
+    version: str = "document-quality-v3"
 
 
 def _readability_score(text: str) -> float:
@@ -80,6 +80,7 @@ def assess_document_quality(
     reference_number: str | None,
     issue_date: str | None,
     clean_document_text: str | None,
+    summary: str | None = None,
     threshold: float = 0.72,
 ) -> DocumentQualityAssessment:
     flags: list[str] = []
@@ -108,6 +109,20 @@ def assess_document_quality(
     if not clean_bonus:
         flags.append("no_clean_document_text")
 
+    summary_folded = str(summary or "").casefold()
+    source_conflict_markers = (
+        "source conflict:",
+        "subject/body conflict",
+        "material contradiction",
+        "विषय और मुख्य पाठ में विरोधाभास",
+        "विषय/मुख्य पाठ में विसंगति",
+    )
+    source_content_conflict = any(
+        marker in summary_folded for marker in source_conflict_markers
+    )
+    if source_content_conflict:
+        flags.append("source_content_conflict")
+
     score = (
         0.35 * readability
         + 0.35 * confidence
@@ -123,6 +138,10 @@ def assess_document_quality(
     )
     return DocumentQualityAssessment(
         score=score,
-        needs_reprocessing=(score < threshold or weak_context_without_clean_text),
+        needs_reprocessing=(
+            score < threshold
+            or weak_context_without_clean_text
+            or source_content_conflict
+        ),
         flags=tuple(flags),
     )

@@ -126,6 +126,152 @@ class SupabaseRepositoryTests(unittest.TestCase):
         self.assertEqual(transport.calls[1][1], "letters")
         self.assertIn(LETTER_ID, transport.calls[1][3])
 
+    def test_direct_gemini_migration_replaces_unreviewed_gateway_metadata(self) -> None:
+        from unittest.mock import patch
+        from letter_registry.context_hints import detect_context_hints
+        from letter_registry.structured_analysis import ContextAnalysisResult, StructuredDocumentContext
+
+        class ExistingTransport(FakeTransport):
+            def select(self, table, *, filters=None, columns="*"):
+                if table == "letters":
+                    return [{
+                        "title": "Old title", "authority": "Old authority",
+                        "category": "Old category", "subcategory": None,
+                        "summary": "Old summary", "reference_number": "OLD-REF",
+                        "issue_date": "2025-06-02", "action_required": None,
+                    }]
+                if table == "letter_processing":
+                    return [{
+                        "structured_context": {"confidence": 1.0, "summary_hi": "पुराना सारांश"},
+                        "context_version": "supabase-gemini:gemini-3.5-flash-lite:document-v3",
+                        "reviewed_at": None,
+                    }]
+                return []
+
+        transport = ExistingTransport()
+        repository = SupabaseLetterRepository(transport)
+        result = ContextAnalysisResult(
+            context=StructuredDocumentContext(
+                title="New source-grounded title", authority="New authority",
+                category="New category", summary="New source-grounded summary",
+                reference_number="NEW-REF", issue_date="2026-08-18",
+                summary_hi="नया सारांश", confidence=0.95,
+            ),
+            hints=detect_context_hints("synthetic source text"),
+            version="gemini:gemini-3.5-flash-lite:context-v3",
+        )
+        captured = {}
+        with patch(
+            "letter_registry.supabase_repository.build_supabase_context_processing_patch",
+            side_effect=lambda record, *, owner_id, result: (captured.__setitem__("result", result) or {}),
+        ), patch(
+            "letter_registry.supabase_repository.build_supabase_letter_context_patch",
+            return_value={"id": LETTER_ID, "owner_id": OWNER_ID},
+        ):
+            repository.save_context_result(record(), owner_id=OWNER_ID, result=result)
+
+        saved = captured["result"].context
+        self.assertEqual(saved.title, "New source-grounded title")
+        self.assertEqual(saved.reference_number, "NEW-REF")
+        self.assertEqual(saved.issue_date, "2026-08-18")
+
+    def test_same_version_direct_gemini_refresh_replaces_stale_unreviewed_metadata(self) -> None:
+        from unittest.mock import patch
+        from letter_registry.context_hints import detect_context_hints
+        from letter_registry.structured_analysis import ContextAnalysisResult, StructuredDocumentContext
+
+        class ExistingDirectTransport(FakeTransport):
+            def select(self, table, *, filters=None, columns="*"):
+                if table == "letters":
+                    return [{
+                        "title": "Stale AI title", "authority": "Stale authority",
+                        "category": "Stale category", "subcategory": None,
+                        "summary": "Stale summary", "reference_number": "STALE-REF",
+                        "issue_date": "2025-06-02", "action_required": None,
+                    }]
+                if table == "letter_processing":
+                    return [{
+                        "structured_context": {"confidence": 1.0},
+                        "context_version": "gemini:gemini-3.5-flash-lite:context-v3",
+                        "reviewed_at": None,
+                    }]
+                return []
+
+        transport = ExistingDirectTransport()
+        repository = SupabaseLetterRepository(transport)
+        result = ContextAnalysisResult(
+            context=StructuredDocumentContext(
+                title="Corrected source title", authority="Corrected authority",
+                category="Corrected category", summary="Corrected source summary",
+                reference_number="CORRECT-REF", issue_date="2026-08-18", confidence=0.98,
+            ),
+            hints=detect_context_hints("synthetic source text"),
+            version="gemini:gemini-3.5-flash-lite:context-v3",
+        )
+        captured = {}
+        with patch(
+            "letter_registry.supabase_repository.build_supabase_context_processing_patch",
+            side_effect=lambda record, *, owner_id, result: (captured.__setitem__("result", result) or {}),
+        ), patch(
+            "letter_registry.supabase_repository.build_supabase_letter_context_patch",
+            return_value={"id": LETTER_ID, "owner_id": OWNER_ID},
+        ):
+            repository.save_context_result(record(), owner_id=OWNER_ID, result=result)
+
+        saved = captured["result"].context
+        self.assertEqual(saved.title, "Corrected source title")
+        self.assertEqual(saved.reference_number, "CORRECT-REF")
+        self.assertEqual(saved.issue_date, "2026-08-18")
+
+    def test_human_reviewed_metadata_is_preserved_across_provider_migration(self) -> None:
+        from unittest.mock import patch
+        from letter_registry.context_hints import detect_context_hints
+        from letter_registry.structured_analysis import ContextAnalysisResult, StructuredDocumentContext
+
+        class ReviewedTransport(FakeTransport):
+            def select(self, table, *, filters=None, columns="*"):
+                if table == "letters":
+                    return [{
+                        "title": "Reviewed title", "authority": "Reviewed authority",
+                        "category": "Reviewed category", "subcategory": None,
+                        "summary": "Reviewed summary", "reference_number": "REVIEWED-REF",
+                        "issue_date": "2025-06-02", "action_required": None,
+                    }]
+                if table == "letter_processing":
+                    return [{
+                        "structured_context": {"confidence": 0.8, "summary_hi": "समीक्षित सारांश"},
+                        "context_version": "supabase-gemini:gemini-3.5-flash-lite:document-v3",
+                        "reviewed_at": "2026-10-15T12:00:00Z",
+                    }]
+                return []
+
+        transport = ReviewedTransport()
+        repository = SupabaseLetterRepository(transport)
+        result = ContextAnalysisResult(
+            context=StructuredDocumentContext(
+                title="Unreviewed new title", authority="New authority",
+                category="New category", summary="New summary",
+                reference_number="NEW-REF", issue_date="2026-08-18",
+                summary_hi="नया सारांश", confidence=0.98,
+            ),
+            hints=detect_context_hints("synthetic source text"),
+            version="gemini:gemini-3.5-flash-lite:context-v3",
+        )
+        captured = {}
+        with patch(
+            "letter_registry.supabase_repository.build_supabase_context_processing_patch",
+            side_effect=lambda record, *, owner_id, result: (captured.__setitem__("result", result) or {}),
+        ), patch(
+            "letter_registry.supabase_repository.build_supabase_letter_context_patch",
+            return_value={"id": LETTER_ID, "owner_id": OWNER_ID},
+        ):
+            repository.save_context_result(record(), owner_id=OWNER_ID, result=result)
+
+        saved = captured["result"].context
+        self.assertEqual(saved.title, "Reviewed title")
+        self.assertEqual(saved.reference_number, "REVIEWED-REF")
+        self.assertEqual(saved.issue_date, "2025-06-02")
+
     def test_adapter_contains_no_runtime_credentials(self) -> None:
         transport = FakeTransport()
         repository = SupabaseLetterRepository(transport)

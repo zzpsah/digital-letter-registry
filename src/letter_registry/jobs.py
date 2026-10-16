@@ -117,9 +117,24 @@ class SupabaseProcessingQueue:
         if not reason.strip():
             raise ValueError("processing job reason is required")
 
+        # The production table requires archive_id and its INSERT RLS policy
+        # checks membership against that exact archive. Never infer it from the
+        # worker/requesting owner; resolve it from the target letter instead.
+        letter_rows = self.transport.select(
+            "letters",
+            filters={"id": letter_id},
+            columns="archive_id",
+        )
+        archive_id = str(letter_rows[0].get("archive_id") or "") if letter_rows else ""
+        if not archive_id:
+            raise RuntimeError(
+                "cannot enqueue processing: target letter is not visible or has no archive_id"
+            )
+
         row = self.transport.insert(
             "processing_jobs",
             {
+                "archive_id": archive_id,
                 "owner_id": owner_id,
                 "letter_id": letter_id,
                 "reason": reason,

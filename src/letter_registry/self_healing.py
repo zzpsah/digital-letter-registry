@@ -7,7 +7,7 @@ import hashlib
 from .jobs import ProcessingQueue
 
 
-QUALITY_VERSION = "document-quality-v2"
+QUALITY_VERSION = "document-quality-v3"
 
 
 def provider_tier(version: str) -> int:

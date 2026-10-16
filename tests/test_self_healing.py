@@ -60,6 +60,7 @@ class SelfHealingTests(unittest.TestCase):
         result = SelfHealingReprocessor(transport, queue).scan(
             target_context_version="supabase-gemini:gemini-3.6-flash:document-v1",
             target_dictionary_version="gov-education-hi-en-auto-v2",
+            target_quality_version="document-quality-v2",
             now=datetime(2026, 10, 5, tzinfo=timezone.utc),
         )
         self.assertEqual(result.enqueued, 1)
@@ -72,6 +73,7 @@ class SelfHealingTests(unittest.TestCase):
         result = SelfHealingReprocessor(transport, queue).scan(
             target_context_version=target,
             target_dictionary_version="gov-education-hi-en-auto-v2",
+            target_quality_version="document-quality-v2",
         )
         self.assertEqual(result.enqueued, 0)
         self.assertEqual(result.skipped_same_target, 1)

@@ -49,7 +49,22 @@ class DocumentQualityAssessmentTests(unittest.TestCase):
         self.assertTrue(result.needs_reprocessing)
         self.assertIn("low_context_confidence", result.flags)
         self.assertIn("no_clean_document_text", result.flags)
-        self.assertEqual(result.version, "document-quality-v2")
+        self.assertEqual(result.version, "document-quality-v3")
+
+    def test_source_conflict_summary_always_requires_human_review(self):
+        result = assess_document_quality(
+            extracted_text=("विषय बकाया की स्वीकृति है लेकिन मुख्य पाठ अवकाश आवेदन की प्रक्रिया बताता है। " * 12),
+            context_confidence=0.98,
+            title="Source conflict: arrears subject vs leave body",
+            authority="Education Department",
+            category="teacher service",
+            reference_number="11/2024",
+            issue_date="2026-08-18",
+            clean_document_text="विषय और मुख्य पाठ में अलग-अलग निर्देश हैं।",
+            summary="Source conflict: the subject refers to arrears approval, but the body describes online leave approval.",
+        )
+        self.assertIn("source_content_conflict", result.flags)
+        self.assertTrue(result.needs_reprocessing)
 
     def test_missing_reference_date_alone_does_not_force_failure(self):
         result = assess_document_quality(
