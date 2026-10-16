@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 8b1339e74a1bd740111f656ae90c2e2b8b52788c
-- Last commit: fix: refresh document cards after reprocessing
+- HEAD: 6dd72dfa959067ef25517eda15c50e23ab78e2f0
+- Last commit: fix: flag subject and body conflicts during processing
 - Last commit date: 2026-10-16
 - Last commit author: development-os[bot]
 

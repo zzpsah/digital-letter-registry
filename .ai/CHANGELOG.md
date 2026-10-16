@@ -1,3 +1,22 @@
+## 2026-10-16 — fix: flag subject and body conflicts during processing
+- Commit: 6dd72dfa959067ef25517eda15c50e23ab78e2f0
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/gemini_provider.py`
+- `src/letter_registry/jobs.py`
+- `src/letter_registry/processing_pipeline.py`
+- `src/letter_registry/quality_assessment.py`
+- `src/letter_registry/self_healing.py`
+- `src/letter_registry/subject_body_consistency.py`
+- `src/letter_registry/supabase_repository.py`
+- `tests/test_jobs.py`
+- `tests/test_processing_pipeline.py`
+- `tests/test_quality_assessment.py`
+- `tests/test_self_healing.py`
+- `tests/test_subject_body_consistency.py`
+- `tests/test_supabase_repository.py`
+
 ## 2026-10-16 — fix: refresh document cards after reprocessing
 - Commit: 8b1339e74a1bd740111f656ae90c2e2b8b52788c
 - Author: development-os[bot]
