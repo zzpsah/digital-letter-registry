@@ -16,9 +16,9 @@ Last reconciled: 2026-10-16.
 - Queue integrity is clean and no active jobs remain.
 - Direct Gemini synthetic text/file analysis passed. One real source-conflict result remains low-confidence and flagged for human review; do not treat processing completion as semantic acceptance.
 
-## Immediate next steps
-1. Review the exact DLR working-tree diff and commit/push only reviewed implementation changes.
-2. Deploy the committed `main` revision through the guarded Ansible path and repeat production smoke checks.
-3. Preserve the four historical failed jobs; review any individual retry rather than bulk reprocessing.
+## Next steps
+1. Keep the source-conflict record and second reprocessing candidate in human-review state; do not bulk-reprocess.
+2. Review historical failed jobs individually if recovery is needed; do not bulk-retry real letters.
+3. Reconcile live Oracle schema/migration drift before any future DLR schema migration.
 4. Keep hosted Supabase marked as a DR candidate until sync, freshness, restore, failover and failback are tested.
-5. Use PostgreSQL Services' project-onboarding runbook for future projects. Generic provisioning and multi-project backup automation are not implemented yet; do not create production project databases until those gates are covered.
+5. Generic project provisioning and registry-driven local/off-site backup wrappers are now implemented and tested against a disposable database; the registry contains only `dlr_primary`. Use PostgreSQL Services `docs/PROJECT-ONBOARDING.md` for the next approved project. n8n orchestration remains the next phase, not part of this release.

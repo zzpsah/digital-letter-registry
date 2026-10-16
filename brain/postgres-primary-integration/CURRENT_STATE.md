@@ -12,7 +12,7 @@ Observed on Oracle VPS, 2026-10-16.
 ## Recovery and operations
 - A fresh encrypted local backup and a fresh encrypted private Google Drive backup were created through the Ansible backup path.
 - Both local and off-site snapshots restored into disposable databases; each reported 19 public tables and 28 public functions. The temporary restore databases were removed. Off-site hash verification and decryption passed.
-- Ansible syntax check and read-only validation playbook passed (13 tasks successful, no changes, no failures). No deployment or service restart was performed during validation.
+- Pre-deploy Ansible syntax and read-only validation passed. The subsequent guarded application deployment and post-deploy health/smoke checks are recorded under Release and repository state below.
 - Both daily backup timers are active. Latest disk check: 91% used, approximately 9.3 GiB free; recheck capacity before adding workload or retaining more backups.
 - Hosted Supabase is not a verified replica. No continuous replication or automatic failover/failback is claimed.
 
@@ -36,4 +36,5 @@ Observed on Oracle VPS, 2026-10-16.
 - Keep the conflict-marked low-confidence record and the other reprocessing candidate in human-review state; do not treat `completed` as semantic acceptance.
 - Reconcile the live Oracle schema against migration/bootstrap history before any schema migration. Do not blindly replay the DLR migration directory.
 - Hosted Supabase remains a DR candidate, not a replica. One-way synchronization, freshness/lag alerts, RPO/RTO, and tested failover/failback remain future work.
+- Generic project provisioning and registry-driven local/off-site backups are implemented and tested against a disposable project database; the approved registry remains DLR-only. An actual second project still requires its own manifest, secrets, migrations/RLS and both restore checks.
 - Google OAuth/magic-link delivery and embeddings are not certified by these checks.

@@ -23,6 +23,6 @@
 
 ## Longer-term database/DR work
 - [ ] Reconcile live Oracle schema, migration lineage, bootstrap compatibility SQL, and grants/RLS before the next schema change.
-- [ ] Implement a generic, least-privilege project database provisioning procedure and extend scheduled local/off-site backups to all approved project databases.
+- [x] Implement generic least-privilege project database provisioning and registry-driven scheduled local/off-site backups; test against a disposable database and restore both backup types. Test database/roles were removed and registry returned to DLR-only.
 - [ ] Implement one-way Oracle-to-Supabase recovery synchronization, freshness alerts, measured RPO/RTO, and manual failover/failback drills.
-- [ ] Design the n8n workflow only after the database onboarding procedure is repeatable, auditable, and tested.
+- [ ] Design the n8n workflow after an actual second project has an approved manifest/registry entry, project-specific Bitwarden secrets, reviewed migrations/RLS, and passing local/off-site restore checks.
