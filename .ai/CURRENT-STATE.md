@@ -110,3 +110,12 @@ Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-
 - Change: fix: bound source subject extraction to its line
 - Date: 2026-10-16
 - Durable context synchronization: completed
+
+
+## Source-subject boundary fix — 2026-10-16
+
+- Source change `1470fe17683dfc1b571e5cf526f376d907a9a4ad` is pushed to canonical `main`. Subject extraction and conflict detection no longer use multiline matching; missing transition headings fail closed rather than swallowing body text.
+- Focused subject/body tests: 4/4. Full DLR regression suite: 385/385. Existing non-failing `ResourceWarning` and Starlette/httpx deprecation notices remain.
+- Live authenticated read-only checks: search/detail/original all returned HTTP 200, detail omitted private storage references, and unauthenticated search returned HTTP 401. Authenticated synthetic archive/restore and important-mark/clear mutations persisted and the temporary row was deleted.
+- Oracle API, local GoTrue, n8n health, DLR job bridge, and public Vercel health/app routes returned HTTP 200. Live archive snapshot after cleanup: 67 letters, 67 processing rows, 99 jobs (98 completed, 1 retired, 0 pending/running/failed), and 71 WhatsApp provenance rows.
+- The guarded Ansible deployment follows after the documentation commit; hosted Supabase remains an unverified DR target and is not promoted or synchronized.

@@ -112,3 +112,11 @@
 - Live queue snapshot: 103 jobs (99 completed, 4 failed, 0 active); no missing/mismatched archive IDs, orphan jobs or duplicate letter/reason jobs.
 - One worker timer invocation overlapped the API restart and failed once with connection refused; the next scheduled run returned idle and the timer remained active.
 - One low-confidence source-conflict record and a second reprocessing candidate remain flagged for human review. Hosted Supabase remains an unverified DR candidate, not a replica.
+
+
+## 2026-10-16 — Bound source subject extraction
+
+- Commit `1470fe17683dfc1b571e5cf526f376d907a9a4ad` removes multiline regex matching from source-subject extraction and conflict detection. When the subject is not followed by a recognized transition heading, the parser declines to guess instead of consuming body text.
+- Added a regression case for a subject followed by ordinary body lines before the formal salutation. Focused tests passed 4/4; the full DLR suite passed 385/385.
+- Live authenticated read-only smoke checks passed for search, detail, and original streaming; unauthenticated search returned HTTP 401. A temporary synthetic Oracle row passed authenticated archive/restore and important-mark/clear mutations, then was deleted and verified absent. No real letter was changed.
+- The guarded Ansible deployment and post-deploy checks are the next release gate for this source commit.

@@ -1,6 +1,6 @@
 # Project Brain — Current State
 
-Last reconciled: 2026-10-10
+Last reconciled: 2026-10-16
 Canonical repository: `zzpsah/digital-letter-registry`
 GitHub and Oracle were reconciled on 2026-10-06. Always verify the current HEAD from Git/`.ai/STATE-INDEX.md` before acting; do not hard-code a semantic handoff to one commit hash.
 
@@ -221,3 +221,8 @@ One low-confidence source-conflict result (0.45) and a second record remain flag
 Reviewed implementation commit `aa2c54d` is deployed on Oracle as revision `b16c899`; DLR main is synchronized and clean. The guarded Ansible deployment and post-deploy API/Auth/REST, authenticated search/detail/original, unauthenticated rejection, queue-integrity and synthetic Gemini checks passed. One worker timer run failed transiently during API restart with connection refused; the next scheduled run returned idle and the timer remains active. Preserve the unrelated untracked OSINT migration in PostgreSQL Services.
 
 Read `brain/postgres-primary-integration/` and PostgreSQL Services `docs/DLR-POSTGRES-INTEGRATION-STATUS-2026-10-16.md` before database or worker changes.
+
+
+## Source-subject boundary fix — 2026-10-16
+
+Canonical source commit: `1470fe17683dfc1b571e5cf526f376d907a9a4ad`. Subject extraction/conflict detection are now single-line bounded and fail closed when no recognized transition heading follows. The added regression test and full suite passed (4/4 focused; 385/385 total). Live authenticated search/detail/original and temporary synthetic archive/restore + important-mark/clear checks passed; the synthetic row was removed. Current Oracle snapshot: 67 letters, 67 processing rows, 99 jobs (98 completed, 1 retired, no active or failed jobs). The older 103-job/four-failure snapshot is historical; this check did not reconstruct or retry any old job. Hosted Supabase remains a DR candidate, not a verified replica.

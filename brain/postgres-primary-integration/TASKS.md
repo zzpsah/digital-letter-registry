@@ -5,6 +5,7 @@
 - [x] Resolve the two self-healing test failures by making test quality-version expectations explicit.
 - [x] Add a guard so low-confidence direct-Gemini output does not overwrite stronger unreviewed metadata unless it explicitly flags a source conflict; add regression tests for both paths.
 - [x] Add subject/body conflict detection and human-review regression coverage.
+- [x] Bound subject extraction to one line and fail closed without a recognized transition heading; focused 4/4 and full 385/385 tests passed.
 - [x] Run the full DLR suite: 377 passed, 0 failures; Python compile and whitespace checks passed.
 - [x] Verify direct Gemini text and synthetic-file analysis using the configured model.
 - [x] Run authenticated login, search, detail and original-file smoke checks; verify private storage references stay out of detail JSON and unauthenticated access is rejected.

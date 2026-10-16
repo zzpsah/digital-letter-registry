@@ -5,7 +5,7 @@ Observed on Oracle VPS, 2026-10-16.
 ## Database plane
 - PostgreSQL 16 + pgvector runs in Docker container `dlr-postgres`; database `dlr_primary`; listener is loopback-only at `127.0.0.1:5432`.
 - Live catalog: 19 public base tables, 28 public functions, 18 public tables with RLS enabled; 53 public RLS policies.
-- Data snapshot: 68 letters, 68 `letter_processing` rows, 103 processing jobs (99 completed, 4 failed, 0 active). These are point-in-time counts.
+- Earlier data snapshot: 68 letters, 68 `letter_processing` rows, 103 processing jobs (99 completed, 4 failed, 0 active). A fresh authenticated API read on 2026-10-16 now reports 67 letters, 67 `letter_processing` rows, and 99 jobs (98 completed, 1 retired, 0 pending/processing/running, 0 failed). This check did not reconstruct or retry historical jobs; inspect audit history before explaining the count/status difference.
 - Integrity checks passed: no job missing `archive_id`, no orphan job, no job/letter archive mismatch, and no duplicate `(letter_id, reason)` job pairs.
 - Local GoTrue and PostgREST are behind the FastAPI compatibility bridge. PostgreSQL port 5432 remains private.
 
@@ -25,16 +25,23 @@ Observed on Oracle VPS, 2026-10-16.
 - Embeddings remain disabled; no vector backfill was started.
 
 ## Release and repository state
-- Reviewed code and regression changes are committed/pushed; implementation commit `aa2c54d` is included in deployed Oracle revision `b16c899` (the latter is an automated project-context sync commit). DLR `main` matches `origin/main` and the working tree is clean.
+- Previous release baseline: implementation commit `aa2c54d` is included in deployed Oracle revision `b16c899` (automated project-context sync commit). The newer subject-boundary guard is pushed as `1470fe1`; its guarded Ansible deployment is pending at the pre-deploy checkpoint below.
 - Guarded Ansible deployment completed successfully: 17 tasks OK, 2 changes, 0 failures; the full regression suite passed before API restart. Post-deploy API/Auth/REST health checks returned HTTP 200.
 - A worker timer run overlapped the API restart and failed once with connection refused; the next scheduled run returned `status=idle`, and the worker timer remains active. No job was active during this transient.
 - PostgreSQL Services has a separate, unrelated untracked migration `20261014163501_restore_osint_rpc_access.sql`; preserve it.
-- Four historical jobs remain failed: two classified as prior RLS/archive-scope failures and two as network/timeout failures. The live queue now has 103 jobs (99 completed, 4 failed, 0 active). There are no active jobs. Do not bulk-retry them; review any real-document retry separately.
+- At the earlier queue snapshot, four jobs were failed (two prior RLS/archive-scope and two network/timeout). The latest authenticated API read reports 99 jobs (98 completed, 1 retired, 0 pending/processing/running, 0 failed). The difference was not reconstructed; do not recreate or retry jobs from memory or backups.
 
 ## Remaining release/DR gates
-- Review the exact DLR diff, run the full suite again, commit/push reviewed changes, deploy from canonical `main`, and repeat production smoke checks.
+- At this pre-deploy checkpoint, the subject-boundary change is committed/pushed and the full suite has passed 385/385; run the guarded Ansible deployment and repeat post-deploy smoke checks.
 - Keep the conflict-marked low-confidence record and the other reprocessing candidate in human-review state; do not treat `completed` as semantic acceptance.
 - Reconcile the live Oracle schema against migration/bootstrap history before any schema migration. Do not blindly replay the DLR migration directory.
 - Hosted Supabase remains a DR candidate, not a replica. One-way synchronization, freshness/lag alerts, RPO/RTO, and tested failover/failback remain future work.
 - Generic project provisioning and registry-driven local/off-site backups are implemented and tested against a disposable project database; the approved registry remains DLR-only. An actual second project still requires its own manifest, secrets, migrations/RLS and both restore checks.
 - Google OAuth/magic-link delivery and embeddings are not certified by these checks.
+
+
+## Phase 6 acceptance update — 2026-10-16
+- Source-subject parsing fix `1470fe17683dfc1b571e5cf526f376d907a9a4ad` is pushed to DLR `main`; focused tests 4/4 and full suite 385/385 passed.
+- Live authenticated search/detail/original checks passed; detail omitted private storage references; unauthenticated search returned HTTP 401. Authenticated archive/restore and important-mark/clear passed against one temporary synthetic row, which was removed.
+- Current authenticated queue snapshot: 99 jobs (98 completed, 1 retired, 0 pending/processing/running, 0 failed); no active jobs. The previous 103-job/four-failure snapshot remains historical and was not reconstructed or retried.
+- Guarded Ansible deployment, pre-deploy backup run, and post-deploy checks are the final release gate. Hosted Supabase DR remains blocked by schema/data drift; no sync or promotion is permitted.
