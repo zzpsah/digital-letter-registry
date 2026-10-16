@@ -45,7 +45,7 @@ The original PDF/image is authoritative and immutable as the logical source. OCR
 - Authorization: archive membership with admin/editor/viewer roles plus RLS/API checks.
 - Private runtime/worker: Oracle VPS.
 - Private original storage: explicitly authorized Google Drive archive.
-- Structured archive/search metadata: Supabase.
+- Structured archive/search metadata for the migrated workload: Oracle PostgreSQL `dlr_primary` through the local Supabase-compatible API bridge; hosted Supabase is not a verified replica.
 - OCR: native PDF text first, then Hindi/English OCR fallback.
 - Private Drive credentials, runtime secrets, private identifiers, and real documents must never be committed to public Git.
 - GitHub is the durable source repository; Oracle is the live private runtime.
@@ -206,3 +206,16 @@ Use [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLO
 - The primary local archive has 68 letter records: 67 not trashed, 1 already in Trash. All 68 Drive object references returned metadata successfully; a read-only Drive original download succeeded. No files were deleted, restored, or re-uploaded during diagnosis.
 - Search's `403 Forbidden` was caused by missing authenticated `SELECT` grants on `public.authorities` and `public.authority_aliases`, which the search RPC joins. Both grants are now applied in the live database and persisted in migration `supabase/migrations/20261015181000_grant_archive_authority_read.sql`; RLS policies remain enabled.
 - Frontend Home list was hardened to reset stale pagination on login/empty pages and show explicit errors instead of silently returning on failed list requests. Service worker cache version bumped to v3. Focused web-shell tests: 24 passed. Awaiting live user confirmation after refresh.
+
+
+## PostgreSQL primary integration checkpoint — 2026-10-16
+
+Canonical database operations now live in `zzpsah/postgresql-services/projects/official-letter-intelligence/database-operations/`; the former standalone database repository was consolidated/deleted. Oracle PostgreSQL 16 + pgvector `dlr_primary` is the primary for the migrated workload. Local GoTrue/PostgREST remain behind the FastAPI compatibility bridge and the app keeps Supabase-compatible Auth/REST/RPC contracts. PostgreSQL itself remains loopback-only.
+
+Live catalog check: 19 public base tables, 28 public functions, 18 RLS-enabled tables. Observed counts: 68 letters, 68 processing rows, 102 jobs; 4 failed, 0 active. Both daily encrypted backup timers reported active. Independent encrypted local/off-site backups and disposable restore tests were previously verified. Hosted Supabase is not a verified replica; one-way replication and failover/failback remain pending.
+
+Direct Gemini now works in synthetic text and original-file checks. The worker wrapper injects the Bitwarden-held key without printing it; the Supabase Gemini gateway remains quota-blocked. One controlled real reprocess reached complete/100%, but the resulting context confidence was 0.45 and `needs_reprocessing=true`. This is not a semantic acceptance pass. Embeddings remain disabled and the embedding version is unprocessed.
+
+The processing-job insert initially failed RLS because it omitted the target letter's `archive_id`. The current DLR working tree now looks up the letter's archive_id before inserting and fails closed if the letter is not visible. Focused queue/Gemini tests passed 7/7; full suite ran 374 tests and failed 2 self-healing tests after the uncommitted `QUALITY_VERSION=document-quality-v3` change. Do not deploy until these are resolved.
+
+Dependency runbook: `brain/postgres-primary-integration/`; database-side shared status: PostgreSQL Services `projects/official-letter-intelligence/database-operations/docs/DLR-POSTGRES-INTEGRATION-STATUS-2026-10-16.md`. The DLR worktree has other uncommitted application/test changes and must be reviewed file-by-file. Preserve them and unrelated database-repo untracked migration files.

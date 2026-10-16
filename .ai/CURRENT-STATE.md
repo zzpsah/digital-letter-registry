@@ -1,6 +1,6 @@
 # Current State
 
-Last reconciled: 2026-10-10
+Last reconciled: 2026-10-16
 Canonical repository: `zzpsah/digital-letter-registry`
 
 ## Repository/runtime evidence
@@ -110,3 +110,12 @@ Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-
 - Change: fix Gemini structured output API schema
 - Date: 2026-10-16
 - Durable context synchronization: completed
+
+
+## PostgreSQL primary and Gemini checkpoint — 2026-10-16
+
+Oracle PostgreSQL 16 + pgvector database `dlr_primary` is the primary for the migrated DLR workload. Local GoTrue and PostgREST are behind the FastAPI compatibility bridge; the application retains Supabase-compatible Auth/REST/RPC contracts. Live catalog: 19 public tables, 28 public functions, 18 RLS-enabled tables. Live snapshot: 68 letters, 102 processing jobs, 4 failed, 0 active. Both daily backup timers reported active; hosted Supabase is not a verified replica.
+
+Direct Gemini synthetic text and file calls passed. One real reprocess completed, but confidence remained 0.45 and `needs_reprocessing=true`; embeddings remain disabled. Processing-job enqueue omitted required `archive_id`, causing RLS 403/42501. DLR working tree now resolves the archive from the target letter; focused queue/Gemini tests passed 7/7. Full suite ran 374 tests with two self-healing failures after the working-tree quality-version change. Do not deploy until these are resolved.
+
+Read `brain/postgres-primary-integration/` and the PostgreSQL Services status record before database or worker changes. Preserve all unrelated dirty/untracked files.

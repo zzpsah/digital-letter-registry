@@ -78,6 +78,8 @@ The main interface is one search box plus optional filters such as date/year, au
 
 The initial DLR baseline passed end-to-end verification with disposable synthetic data, including password-first multi-user auth, role-aware RLS, private Drive storage, OCR/context processing, search, original streaming, and the dedicated Oracle worker. A real short-lived Supabase bearer session passed insert/read + RLS-denial verification. This was a historical baseline checkpoint, not a statement that the current archive is empty: a controlled approved WhatsApp real-document pilot now runs on the private Oracle side. Public Vercel intake remains without private Drive upload credentials; historical bulk import/migration remains gated by explicit approval.
 
+Database migration and worker dependency handoff: `brain/postgres-primary-integration/`; canonical database operations are in the private `zzpsah/postgresql-services` repository.
+
 See:
 - `PRD.md`
 - `docs/PROJECT-HANDOFF.md`
@@ -104,7 +106,7 @@ See:
 
 ## Authentication scope
 
-DLR uses Supabase Auth for identity and archive membership for authorization.
+DLR uses the Supabase-compatible Auth API for identity and archive membership for authorization. For the migrated production workload, local GoTrue runs on Oracle behind the compatibility bridge; hosted Supabase is not the current primary database/auth data plane.
 
 - **Primary login:** email + password.
 - **Account creation:** self-service email/password registration creates a disabled viewer membership.
@@ -217,12 +219,12 @@ Optional future enhancements include Google Sign-In, Gemini semantic enrichment,
 
 ## Controlled real-letter pilot
 
-The private Oracle runtime began as a bounded manual pilot and now has active WhatsApp real-document intake for the dedicated official-letter group. The public Vercel deployment remains synthetic-only for intake and does not hold private Drive upload credentials. Real originals stay in the private Google Drive archive and private Supabase metadata/processing layer. Duplicate content is guarded before storage, and destructive archive decisions require an explicit WhatsApp choice. Bulk historical import and automated delete remain outside the normal live intake path.
+The private Oracle runtime began as a bounded manual pilot and now has active WhatsApp real-document intake for the dedicated official-letter group. The public Vercel deployment remains without private Drive upload credentials. Real originals stay in the private Google Drive archive; metadata and processing state for the migrated workload live in Oracle PostgreSQL `dlr_primary` through the Supabase-compatible API bridge. Duplicate content is guarded before storage, and destructive archive decisions require an explicit WhatsApp choice. Bulk historical import and automated delete remain outside the normal live intake path.
 
 
 ## WhatsApp intake
 
-The private Oracle runtime can ingest official PDF/JPG/JPEG/PNG attachments from a dedicated WhatsApp archive group through the existing Hermes session. The connector is group-allowlisted, stages media into a protected local queue, preserves WhatsApp message provenance for deduplication, and processes it through the same immutable Drive + Supabase + worker pipeline as manual intake. Exact content duplicates do not create a second Drive/archive row: the existing title/reference/date/Drive target is reported and a WhatsApp poll offers Overwrite, Cancel, or Supersede. No archive mutation occurs before a choice. Cancel is a true no-op; Overwrite replaces the existing Drive object's bytes in place and links the new provenance; Supersede is only valid for a genuinely revised/different document, not a byte-identical file. The poll decision is bound to the originating chat/requester. The initial WhatsApp rollout is separately capped at 20 documents. Runtime group/member identifiers and credentials are never stored in this public repository.
+The private Oracle runtime can ingest official PDF/JPG/JPEG/PNG attachments from a dedicated WhatsApp archive group through the existing Hermes session. The connector is group-allowlisted, stages media into a protected local queue, preserves WhatsApp message provenance for deduplication, and processes it through the same immutable Drive + Oracle PostgreSQL (via the Supabase-compatible API) + worker pipeline as manual intake. Exact content duplicates do not create a second Drive/archive row: the existing title/reference/date/Drive target is reported and a WhatsApp poll offers Overwrite, Cancel, or Supersede. No archive mutation occurs before a choice. Cancel is a true no-op; Overwrite replaces the existing Drive object's bytes in place and links the new provenance; Supersede is only valid for a genuinely revised/different document, not a byte-identical file. The poll decision is bound to the originating chat/requester. The initial WhatsApp rollout is separately capped at 20 documents. Runtime group/member identifiers and credentials are never stored in this public repository.
 
 ## Current UI/Admin state — 2026-10-05
 
@@ -260,7 +262,7 @@ WhatsApp uses English section headings with Hindi document intelligence beneath 
 
 eLetters defaults to **Latest first** using the archive upload timestamp. Search users can also sort by Important first, Issue date, Title A–Z, or Relevance.
 
-Editors/Admins can mark a document as **Important** and attach an optional archive note. Important cards are yellow-highlighted with a `★ Important` badge. The mark and note are stored in Supabase so they survive refresh/relogin and are shared across authorized portal users. Viewers can see the highlight/note but cannot modify it.
+Editors/Admins can mark a document as **Important** and attach an optional archive note. Important cards are yellow-highlighted with a `★ Important` badge. The mark and note are stored in the primary archive database so they survive refresh/relogin and are shared across authorized portal users. Viewers can see the highlight/note but cannot modify it.
 
 
 ## UI/behavior governance baseline
@@ -292,4 +294,4 @@ Acceptance criterion: requested functionality works, existing behavior remains i
 
 Database-service operations are documented separately from this application's source and product development in the private [PostgreSQL Services repository](https://github.com/zzpsah/postgresql-services), under `projects/official-letter-intelligence/`. That project folder is limited to DLR/eLetters database schema, migrations, compatibility, backup/restore, integration, and cutover. Host/OS operations remain in the private [Oracle VPS repository](https://github.com/zzpsah/oracle-server).
 
-The current PostgreSQL work is staging only. No production DLR records have been imported and the application has not been cut over from Supabase Auth/REST/RPC. PostgreSQL alone is not a drop-in replacement for those Supabase APIs. This link is a documentation pointer, not a claim of production migration.
+The database cutover is now complete for the migrated DLR workload: Oracle PostgreSQL `dlr_primary` is primary behind local GoTrue/PostgREST and the FastAPI Supabase-compatible bridge; Vercel production/preview point to that bridge. PostgreSQL itself remains loopback-only. Hosted Supabase is a recovery/replication candidate, not a verified replica. See `brain/postgres-primary-integration/` in this repository and the cross-repository status record in the private [PostgreSQL Services repository](https://github.com/zzpsah/postgresql-services/tree/main/projects/official-letter-intelligence/database-operations/docs). Application readiness is not yet fully green: the 2026-10-16 full suite had two self-healing failures and one controlled real reprocess remained low-confidence.

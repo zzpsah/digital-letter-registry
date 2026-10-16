@@ -37,3 +37,15 @@
 - [ ] Real Drive rename.
 - [ ] Live messaging/email connector activation.
 - [ ] Production deployment.
+
+
+## PostgreSQL primary / worker integration — 2026-10-16
+- [x] Record live PostgreSQL catalog, job and letter counts; verify both backup timers active.
+- [x] Document cross-repository ownership and dependency order.
+- [x] Fix queue enqueue contract in the working tree to resolve the target letter archive_id before inserting.
+- [x] Pass focused queue/Gemini tests (7/7).
+- [ ] Resolve 2 full-suite failures in self-healing tests after quality version changed to document-quality-v3.
+- [ ] Review and selectively commit DLR working-tree changes; preserve unrelated changes.
+- [ ] Verify low-confidence real reprocess outcome and search/original/notification side effects without exposing source content.
+- [ ] Complete authenticated RLS/job lifecycle checks, Ansible validation, and production smoke tests.
+- [ ] Implement and test one-way DR sync, freshness/lag alerts, RPO/RTO and manual failover/failback.

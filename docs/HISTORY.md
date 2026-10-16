@@ -92,3 +92,14 @@
 - Hardened the Home list against stale persisted pagination and silent fetch/JSON failures. Login now starts Home at page zero, invalid stale pages reset directly to page zero, and list failures display an actionable status rather than leaving an empty-looking panel.
 - Bumped the service-worker cache version so the updated shell registration is picked up. Existing UI layout and styling were preserved.
 - Verified the focused web-shell suite (24 tests). Production browser-level confirmation after deployment remains pending a user refresh/session check.
+
+## 2026-10-16 — PostgreSQL primary integration and Gemini worker checkpoint
+
+- Documented cross-repository ownership and dependency gates in `brain/postgres-primary-integration/` and the PostgreSQL Services database operations folder.
+- Live Oracle PostgreSQL catalog check: 19 public tables, 28 public functions, 18 RLS-enabled tables. At the check, there were 68 letters, 68 letter_processing rows, 102 processing jobs, 4 failed jobs and no active jobs. Counts are operational snapshots.
+- Both encrypted local/off-site backup timers reported active; previously verified disposable restore evidence remains documented in PostgreSQL Services.
+- Direct Gemini structured output works in synthetic text and original-file tests. Supabase Gemini gateway remains quota-blocked; embeddings remain disabled.
+- A controlled real reprocess completed at 100%, but output confidence was 0.45 and `needs_reprocessing=true`; this is not a semantic-quality pass.
+- Diagnosed processing-job insert RLS failure: the job payload omitted target `archive_id`. DLR working tree now resolves the archive from the target letter and fails closed if unavailable; focused queue/Gemini tests passed 7/7.
+- Full DLR suite ran 374 tests and had 2 self-healing failures after an uncommitted `document-quality-v3` version change. No production release is claimed; review/fix is required.
+- No bulk reprocessing, embeddings backfill, RLS relaxation, or replication activation was performed.

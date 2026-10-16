@@ -123,3 +123,8 @@ After a meaningful behavior change:
 - put chronological milestone detail in `docs/HISTORY.md` or `.ai/CHANGELOG.md`, not in the current-state header.
 
 Do not append stale checkpoints above newer truth. Current files must remain concise and present-tense.
+
+
+## PostgreSQL primary / Gemini handoff — 2026-10-16
+
+Read `brain/postgres-primary-integration/HANDOFF.md` and the cross-repository status record in PostgreSQL Services before further DB/worker changes. Oracle PostgreSQL is the primary for the migrated workload; hosted Supabase is not a verified replica. Direct Gemini synthetic calls pass, but the one controlled real reprocess is low-confidence (0.45, `needs_reprocessing=true`). Embeddings stay disabled. The queue archive_id fix is in an uncommitted working tree. Full tests have two self-healing failures; resolve those and review the dirty tree before any deploy. Do not bulk reprocess.

@@ -19,3 +19,11 @@ The 2026-10-02 RLS verification used simulated database request JWT claims. It d
 ## Data status
 
 One synthetic RLS verification row remains in the archive database because the connected destructive cleanup action was blocked. No real archive-letter record was created.
+
+
+## 2026-10-16 PostgreSQL/Gemini checkpoint
+
+- Focused `tests.test_jobs` + `tests.test_gemini_provider`: 7 passed after queue enqueue began resolving the target letter's `archive_id`.
+- Full suite: 374 tests, 2 failures in `test_self_healing.py`; see `brain/postgres-primary-integration/TESTS.md`.
+- A controlled real reprocess completed, but its output remained confidence 0.45 with `needs_reprocessing=true`; do not treat completion as semantic correctness.
+- Local PostgreSQL catalog: 19 public tables, 28 public functions, 18 RLS-enabled tables. Backup timers active at check time.
