@@ -1,3 +1,11 @@
+## 2026-10-16 — docs: clarify release follow-ups and database onboarding
+- Commit: 441004b7d418dd14504272ac7cc6fba6ec4e82c8
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `brain/postgres-primary-integration/HANDOFF.md`
+- `brain/postgres-primary-integration/TASKS.md`
+
 ## 2026-10-16 — docs: align DLR handoff with verified database onboarding
 - Commit: 32424796428550cb894f2930ac720515e14b6d42
 - Author: development-os[bot]
