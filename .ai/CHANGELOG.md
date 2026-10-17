@@ -1,3 +1,22 @@
+## 2026-10-17 — Merge remote-tracking branch 'origin/main'
+- Commit: 1360e828d467ca058546d3580d8e30ad1555a8ae
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `README.md`
+- `TASKS.md`
+- `brain/whatsapp-dlr-intake/ARCHITECTURE.md`
+- `brain/whatsapp-dlr-intake/CURRENT_STATE.md`
+- `brain/whatsapp-dlr-intake/DECISIONS.md`
+- `brain/whatsapp-dlr-intake/HANDOFF.md`
+- `brain/whatsapp-dlr-intake/SECURITY.md`
+- `brain/whatsapp-dlr-intake/TASKS.md`
+- `brain/whatsapp-dlr-intake/TESTS.md`
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`
+- `docs/TECHNICAL-FLOWCHART.html`
+- `scripts/ingest_whatsapp_attachment.py`
+- `tests/test_whatsapp_intake_limits.py`
+
 ## 2026-10-17 — docs: record initial CS teacher letter backfill
 - Commit: b061738f771a33a0f8f00b073c9016bbc88715f8
 - Author: development-os[bot]
