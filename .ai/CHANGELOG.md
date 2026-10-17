@@ -1,3 +1,18 @@
+## 2026-10-17 — merge: sync latest project context
+- Commit: becfc4a35dd7d7d11040bf7237f5148eaadac4c2
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `TASKS.md`
+- `brain/large-document-search/CURRENT_STATE.md`
+- `brain/large-document-search/HANDOFF.md`
+- `brain/large-document-search/TASKS.md`
+- `brain/large-document-search/TESTS.md`
+- `brain/whatsapp-dlr-intake/CURRENT_STATE.md`
+- `brain/whatsapp-dlr-intake/HANDOFF.md`
+- `brain/whatsapp-dlr-intake/TASKS.md`
+- `brain/whatsapp-dlr-intake/TESTS.md`
+
 ## 2026-10-17 — Merge remote-tracking branch 'origin/main'
 - Commit: 032683132d89ecd5d5eccf5973dced273e13e567
 - Author: development-os[bot]
