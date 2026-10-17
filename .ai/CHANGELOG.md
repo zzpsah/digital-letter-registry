@@ -1,3 +1,10 @@
+## 2026-10-17 — docs: record initial CS teacher letter backfill
+- Commit: b061738f771a33a0f8f00b073c9016bbc88715f8
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `docs/COMPUTER-SCIENCE-TEACHER-IMPORTANCE.md`
+
 ## 2026-10-17 — fix: require strong context for CS teacher relevance
 - Commit: 3bb0cefba504c207ce28538ba38432b4edefc878
 - Author: development-os[bot]
