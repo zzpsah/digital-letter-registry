@@ -6,7 +6,7 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 1360e828d467ca058546d3580d8e30ad1555a8ae
+- HEAD: 032683132d89ecd5d5eccf5973dced273e13e567
 - Last commit: Merge remote-tracking branch 'origin/main'
 - Last commit date: 2026-10-17
 - Last commit author: development-os[bot]
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
