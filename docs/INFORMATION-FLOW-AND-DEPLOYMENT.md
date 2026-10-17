@@ -28,10 +28,13 @@ flowchart TB
   MODEL --> WORKER
   WA[Approved WhatsApp archive group] --> HERMES[Existing Hermes WhatsApp bridge / allowlisted intake hook]
   HERMES --> STAGE[Protected local staging queue]
-  STAGE --> INTAKE[DLR intake consumer / worker]
+  STAGE --> WATCH[systemd path watcher + durable event dispatcher]
+  WATCH --> N8N[Authenticated n8n event pipeline]
+  N8N --> INTAKE[Bitwarden-aware DLR intake consumer]
   INTAKE --> DRIVE
   INTAKE --> REST
-  WORKER[DLR processing worker + queue timer] <--> REST
+  N8N --> WORKER[One-job DLR worker + postprocess / index refresh]
+  WORKER <--> REST
   WORKER -->|Fetch immutable original| DRIVE
   WORKER --> EXTRACT[Native PDF text; Hindi/English OCR fallback]
   EXTRACT -->|Source evidence| MODEL
@@ -49,7 +52,7 @@ flowchart TB
 2. Local GoTrue establishes user identity through the Supabase-compatible Auth API. Active archive membership and PostgreSQL Row Level Security (RLS), together with API checks, control archive permissions. Authentication alone does not grant archive access.
 3. Original bytes live in the configured private Google Drive archive. Oracle PostgreSQL `dlr_primary` stores structured letter records, source/provenance records, processing state/jobs, authorization, and searchable derived metadata for the migrated workload.
 4. Oracle handles private file operations and background processing that are not carried by the public Vercel deployment.
-5. Approved WhatsApp intake enters through the existing Hermes session and a narrowly allowlisted connector. It stages supported media locally before the DLR intake path stores the original and creates provenance/processing records.
+5. Approved WhatsApp intake enters through the existing Hermes session and a narrowly allowlisted connector. It stages supported media locally; a systemd path watcher dispatches a durable event to the authenticated n8n pipeline, which runs intake → one-job worker → postprocess/delivery → Gmail outbox → index refresh. The dispatcher verifies the per-message staged `done/` or `failed/` outcome instead of treating n8n HTTP success alone as proof of ingestion. The live WhatsApp cap is bounded at 150 source messages and 100 MiB per attachment; normal web upload remains capped at 20 MiB.
 6. Processing prefers native PDF text and falls back to Hindi/English OCR. Source-subject extraction is bounded to a single line: when a recognized transition heading does not follow, it fails closed instead of absorbing later body text into the subject. Subject/body conflicts still lower confidence and require human review. The Oracle worker now prefers direct Google Gemini when the Bitwarden-managed `DLR_GEMINI_API_KEY` is injected. On 2026-10-16, both a live synthetic text request and a live synthetic original-file request succeeded using `gemini-3.5-flash-lite`; one controlled real archive reprocess reached `complete/100%` and changed context version to `gemini:gemini-3.5-flash-lite:context-v3`. However, confidence remained 0.45 and `needs_reprocessing=true`, so semantic correctness is not verified. The legacy Supabase **gemini-ai-gateway** returned HTTP 402 `exceed_egress_quota` and is not the active primary route.
 7. Processing-job creation must read the target letter's `archive_id` and include it in the insert. The local-primary `processing_jobs` table requires this field and RLS checks active archive membership against it; omitting it caused HTTP 403/42501 and blocked manual reprocessing. The queue now resolves the archive from the visible target letter before inserting.
 8. The worker writes processing/search metadata and downstream delivery state back through the local Supabase-compatible Data API to Oracle PostgreSQL. Gmail and WhatsApp are delivery channels, not the archive's system of record. Embeddings remain opt-in and were not enabled during Gemini recovery.
@@ -112,7 +115,7 @@ These DLR-related user-systemd unit filenames were found on the Oracle server. *
 
 Related Hermes services also exist on this host. They are shared infrastructure and must not be modified as part of DLR work without checking their dependencies and ownership.
 
-The WhatsApp connector architecture documents a one-minute consumer for the protected staging queue and a separate guarded pilot cap. The live connector must remain group-allowlisted and preserve provenance/deduplication. Do not broaden intake or bulk-import historical documents as part of this inventory task.
+The live connector is event-driven: `dlr-whatsapp-event-dispatch.path` watches the protected staging directory; the legacy one-minute business timers remain inactive. The connector must remain group-allowlisted and preserve provenance/deduplication. Permanent failures are quarantined with explicit reasons and must not be reported as successful intake. The WhatsApp-only upload cap is configurable up to 100 MiB; ordinary web uploads retain the 20 MiB default.
 
 ## 5. External services and trust boundaries
 

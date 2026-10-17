@@ -4,7 +4,7 @@
 - [x] Inspect live Hermes inbound/media hook contract.
 - [x] Implement private connector bridge without credentials in Git.
 - [x] Add configurable source-group allow rule.
-- [x] Add connector-specific real-intake guard/cap (20 documents).
+- [x] Add connector-specific real-intake guard/cap (bounded runtime cap; currently 150, hard maximum 500).
 - [x] Add message-id dedup/provenance verification.
 - [x] Synthetic live verification through existing WhatsApp runtime.
 - [x] Enable real group intake after synthetic verification passed.
@@ -15,3 +15,8 @@
 
 - [x] Fresh bridge-originated synthetic PDF E2E: WhatsApp send → stage → intake → worker → search → original stream → cleanup.
 - [ ] Observe first genuine member-posted document after final verification.
+
+- [x] Add configurable WhatsApp-only size limit bounded to 100 MiB without changing normal web uploads.
+- [x] Verify staged message outcome before the event dispatcher marks it completed; retain failed receipts separately.
+- [ ] Reprocess 18 quarantined staged attachments and verify every resulting processing job reaches completed or a clearly reported review/failure state.
+- [ ] User must resend any attachments rejected before staging from an unapproved WhatsApp sender/chat via the configured approved group or explicitly authorize that sender after identity verification.

@@ -304,3 +304,8 @@ The database cutover is now complete for the migrated DLR workload: Oracle Postg
 ## Computer Science Teacher — automatic Important rule
 
 When document processing saves source-grounded context, clear Computer Science teacher/service references are automatically marked Important and receive an evidence-based `[Auto-CS relevance]` comment. Human-written notes are preserved; generic computer equipment mentions are not enough. Historical letters are not bulk-updated by deployment; use a read-only preview before any backfill. See [the rule and matching policy](docs/COMPUTER-SCIENCE-TEACHER-IMPORTANCE.md).
+
+
+## WhatsApp intake reliability
+
+Approved attachments arrive through the existing Hermes session and a protected local staging queue. A systemd path watcher dispatches each event to the authenticated n8n pipeline; the dispatcher verifies the per-message intake result before recording success. WhatsApp intake has a bounded cumulative cap (currently 150 source messages) and a separate configurable size cap (currently 100 MiB; hard maximum 100 MiB); normal web upload remains at 20 MiB. Rejected senders are not auto-authorized. See `brain/whatsapp-dlr-intake/` and `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`.

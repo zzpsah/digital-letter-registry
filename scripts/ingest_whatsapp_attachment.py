@@ -44,6 +44,18 @@ def _limit() -> int:
     return value
 
 
+def _max_upload_bytes() -> int:
+    """Bound WhatsApp-only uploads without changing the normal web upload limit."""
+    raw = os.environ.get("DLR_WHATSAPP_MAX_UPLOAD_BYTES", str(20 * 1024 * 1024)).strip()
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise RuntimeError("DLR_WHATSAPP_MAX_UPLOAD_BYTES must be an integer byte count") from exc
+    if value < 1 or value > 100 * 1024 * 1024:
+        raise RuntimeError("DLR_WHATSAPP_MAX_UPLOAD_BYTES must be between 1 byte and 100 MiB")
+    return value
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", required=True)
@@ -114,7 +126,7 @@ def main() -> int:
             ),
             repository=letter_repo,
             queue=SupabaseProcessingQueue(transport),
-            policy=IntakePolicy(synthetic_only=False),
+            policy=IntakePolicy(synthetic_only=False, max_bytes=_max_upload_bytes()),
         ),
         provenance=source_repo,
     )

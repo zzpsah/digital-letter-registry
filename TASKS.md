@@ -420,3 +420,12 @@ No baseline DLR work is blocked by these items.
 - `dlr-gmail-outbox.timer` is active; service result is success; queued outbox count is zero after verification.
 - Failed send attempts are returned to retryable state instead of remaining stuck in `sending`.
 - Synthetic email test package was cleaned after verification.
+
+
+## WhatsApp intake reliability recovery (2026-10-18)
+
+- [x] Add bounded configurable WhatsApp-only attachment size limit without broadening web uploads.
+- [x] Raise the bounded WhatsApp source cap from 100 to 150 for the user-authorized recovery.
+- [x] Make the event dispatcher verify the real staged intake outcome before marking an event completed.
+- [ ] Requeue and process previously quarantined attachments; verify source rows and worker statuses.
+- [ ] Confirm the latest user-sent attachments arrive via the approved WhatsApp group; do not bypass sender authorization.

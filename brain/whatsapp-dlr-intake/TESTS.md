@@ -63,3 +63,11 @@ Passed 2026-10-03: public official CBSE PDF sent into the bound group, ingested 
 - A transient Bitwarden lookup failure was observed on the first consumer attempt; the private Oracle consumer was hardened with bounded retry/backoff for that exact transient condition.
 - After retry hardening, the consumer service reports success and both connector and worker timers are active.
 - The test archive copy and all derived DB/provenance/job rows were cleaned after verification. Real archive letters were untouched.
+
+
+## 2026-10-18 intake recovery hardening
+
+- [x] WhatsApp-only file-size configuration defaults to 20 MiB and accepts a bounded value up to 100 MiB.
+- [x] Invalid or greater-than-100-MiB configuration is rejected.
+- [x] Event dispatcher unit tests cover real staged completion, quarantined failure, pending retry, dry-run, and failed-receipt deduplication.
+- [ ] Live retry of quarantined real documents and worker completion remains in progress; do not mark as complete until local PostgreSQL records confirm it.
