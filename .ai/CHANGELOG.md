@@ -1,3 +1,12 @@
+## 2026-10-17 — fix: require strong context for CS teacher relevance
+- Commit: 3bb0cefba504c207ce28538ba38432b4edefc878
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `docs/COMPUTER-SCIENCE-TEACHER-IMPORTANCE.md`
+- `src/letter_registry/teacher_relevance.py`
+- `tests/test_teacher_relevance.py`
+
 ## 2026-10-17 — feat: auto-highlight Computer Science teacher letters
 - Commit: 1d94ac2948ef2162c6702f70fddab6a951f6dc4a
 - Author: development-os[bot]

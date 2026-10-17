@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 1d94ac2948ef2162c6702f70fddab6a951f6dc4a
-- Last commit: feat: auto-highlight Computer Science teacher letters
+- HEAD: 3bb0cefba504c207ce28538ba38432b4edefc878
+- Last commit: fix: require strong context for CS teacher relevance
 - Last commit date: 2026-10-17
 - Last commit author: development-os[bot]
 
