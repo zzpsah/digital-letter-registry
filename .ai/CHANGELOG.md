@@ -1,4 +1,22 @@
 ## 2026-10-17 — Merge remote-tracking branch 'origin/main'
+- Commit: 032683132d89ecd5d5eccf5973dced273e13e567
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `TASKS.md`
+- `brain/large-document-search/ARCHITECTURE.md`
+- `brain/large-document-search/CURRENT_STATE.md`
+- `brain/large-document-search/DECISIONS.md`
+- `brain/large-document-search/HANDOFF.md`
+- `brain/large-document-search/PROJECT.md`
+- `brain/large-document-search/SECURITY.md`
+- `brain/large-document-search/TASKS.md`
+- `brain/large-document-search/TESTS.md`
+- `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`
+- `supabase/migrations/20261018193000_bound_fts_text_size.sql`
+- `tests/test_large_extracted_text_migration.py`
+
+## 2026-10-17 — Merge remote-tracking branch 'origin/main'
 - Commit: 1360e828d467ca058546d3580d8e30ad1555a8ae
 - Author: development-os[bot]
 - Classification: routine
