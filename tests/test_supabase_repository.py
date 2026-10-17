@@ -126,6 +126,58 @@ class SupabaseRepositoryTests(unittest.TestCase):
         self.assertEqual(transport.calls[1][1], "letters")
         self.assertIn(LETTER_ID, transport.calls[1][3])
 
+    def test_context_save_auto_marks_cs_teacher_letter_and_preserves_manual_comment(self) -> None:
+        from letter_registry.context_hints import detect_context_hints
+        from letter_registry.structured_analysis import ContextAnalysisResult, StructuredDocumentContext
+
+        class RelevantTransport(FakeTransport):
+            def select(self, table, *, filters=None, columns="*"):
+                if table == "letters":
+                    return [{
+                        "title": "Computer Science Teacher Seniority Clarification",
+                        "authority": "Education Department", "category": "teacher service",
+                        "subcategory": None, "summary": "Clarifies seniority for Computer Science teachers.",
+                        "reference_number": "CS-1", "issue_date": "2026-10-01",
+                        "action_required": "Review the applicable seniority order.",
+                        "is_important": False, "user_comment": "Please review this order.",
+                        "important_at": None,
+                    }]
+                if table == "letter_processing":
+                    return [{
+                        "structured_context": {}, "context_version": "fake-v1",
+                        "reviewed_at": None,
+                        "extracted_text": "Clarification on seniority for Computer Science Teachers.",
+                    }]
+                return []
+
+        transport = RelevantTransport()
+        repository = SupabaseLetterRepository(transport)
+        result = ContextAnalysisResult(
+            context=StructuredDocumentContext(
+                title="Computer Science Teacher Seniority Clarification",
+                authority="Education Department", category="teacher service",
+                summary="Clarifies seniority for Computer Science teachers.",
+                action_required="Review the applicable seniority order.",
+                confidence=0.95,
+            ),
+            hints=detect_context_hints("Computer Science Teachers seniority"),
+            version="fake-v1",
+        )
+        repository.save_context_result(record(), owner_id=OWNER_ID, result=result)
+
+        letter_updates = [
+            call[2]
+            for call in transport.calls
+            if call[0] == "update" and call[1] == "letters"
+        ]
+        self.assertEqual(len(letter_updates), 1)
+        updated = letter_updates[0]
+        self.assertTrue(updated["is_important"])
+        self.assertIn("Please review this order.", updated["user_comment"])
+        self.assertIn("[Auto-CS relevance]", updated["user_comment"])
+        self.assertIn("Computer Science", updated["user_comment"])
+        self.assertTrue(updated["important_at"])
+
     def test_direct_gemini_migration_replaces_unreviewed_gateway_metadata(self) -> None:
         from unittest.mock import patch
         from letter_registry.context_hints import detect_context_hints

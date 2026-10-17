@@ -299,3 +299,8 @@ The database cutover is now complete for the migrated DLR workload: Oracle Postg
 ## Documentation
 
 - [Document quality review queue](docs/QUALITY-REVIEW.md)
+
+
+## Computer Science Teacher — automatic Important rule
+
+When document processing saves source-grounded context, clear Computer Science teacher/service references are automatically marked Important and receive an evidence-based `[Auto-CS relevance]` comment. Human-written notes are preserved; generic computer equipment mentions are not enough. Historical letters are not bulk-updated by deployment; use a read-only preview before any backfill. See [the rule and matching policy](docs/COMPUTER-SCIENCE-TEACHER-IMPORTANCE.md).

@@ -13,6 +13,10 @@ from .extraction import ExtractionResult
 from .structured_analysis import ContextAnalysisResult
 from .models import DocumentRecord
 from .rename_execution import StoredRenameIdentity
+from .teacher_relevance import (
+    classify_computer_science_teacher_letter,
+    merge_auto_comment,
+)
 from .persistence import (
     build_supabase_letter_row,
     build_supabase_processing_row,
@@ -172,7 +176,7 @@ class SupabaseLetterRepository:
                 filters={"id": record.record_id},
                 columns=(
                     "title,authority,category,subcategory,summary,reference_number,"
-                    "issue_date,action_required"
+                    "issue_date,action_required,is_important,user_comment,important_at"
                 ),
             )
             if callable(select_existing)
@@ -182,7 +186,7 @@ class SupabaseLetterRepository:
             select_existing(
                 "letter_processing",
                 filters={"letter_id": record.record_id},
-                columns="structured_context,context_version,reviewed_at",
+                columns="structured_context,context_version,reviewed_at,extracted_text",
             )
             if callable(select_existing)
             else []
@@ -303,6 +307,29 @@ class SupabaseLetterRepository:
             owner_id=owner_id,
             result=result,
         )
+
+        # Apply the CS-teacher rule at the point where source-grounded context
+        # is saved. Do not touch existing records that do not match the rule.
+        # A prior manual note is preserved; only this rule's own note is replaced
+        # on reprocessing, avoiding duplicate comments.
+        current_letter = existing_rows[0] if existing_rows else {}
+        extracted_text = str(previous_processing.get("extracted_text") or "")
+        result_context = getattr(result, "context", None)
+        relevance = classify_computer_science_teacher_letter(
+            extracted_text=extracted_text,
+            title=getattr(result_context, "title", None),
+            summary=getattr(result_context, "summary", None),
+            action_required=getattr(result_context, "action_required", None),
+            category=getattr(result_context, "category", None),
+        )
+        if relevance.is_relevant and relevance.comment:
+            letter_row["is_important"] = True
+            if not current_letter.get("important_at"):
+                from datetime import datetime, timezone
+                letter_row["important_at"] = datetime.now(timezone.utc).isoformat()
+            letter_row["user_comment"] = merge_auto_comment(
+                current_letter.get("user_comment"), relevance.comment
+            )
 
         self.transport.upsert(
             "letter_processing",
