@@ -1,3 +1,15 @@
+## 2026-10-17 — feat: auto-highlight Computer Science teacher letters
+- Commit: 1d94ac2948ef2162c6702f70fddab6a951f6dc4a
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `docs/COMPUTER-SCIENCE-TEACHER-IMPORTANCE.md`
+- `src/letter_registry/supabase_repository.py`
+- `src/letter_registry/teacher_relevance.py`
+- `tests/test_supabase_repository.py`
+- `tests/test_teacher_relevance.py`
+
 ## 2026-10-16 — docs: record phase six production deployment
 - Commit: 6c62ae38195a0a3e10ea2379cb6bacaf2201a49f
 - Author: development-os[bot]

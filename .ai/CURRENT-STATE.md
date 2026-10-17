@@ -106,16 +106,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md). The audit confirmed the Vercel routes, Oracle DLR API listener on loopback port 8877, Tailscale/Funnel mappings and key data boundaries. Funnel ports 10000, 10001 and 8443 were publicly exposed at audit time; port 10001 maps to the DLR API and must be treated as public despite its proxy role. Some other upstream listener purposes remain unconfirmed. The Oracle checkout was clean but behind GitHub main at audit time. At that historical audit checkpoint, the documentation update had not yet been deployed and no service/configuration change had been performed. The later 2026-10-16 release checkpoint supersedes that state.
 
 ## Last automated change
-- Commit: 1470fe17683dfc1b571e5cf526f376d907a9a4ad
-- Change: fix: bound source subject extraction to its line
-- Date: 2026-10-16
+- Commit: 1d94ac2948ef2162c6702f70fddab6a951f6dc4a
+- Change: feat: auto-highlight Computer Science teacher letters
+- Date: 2026-10-17
 - Durable context synchronization: completed
-
-
-## Source-subject boundary fix — 2026-10-16
-
-- Source change `1470fe17683dfc1b571e5cf526f376d907a9a4ad` is pushed to canonical `main`. Subject extraction and conflict detection no longer use multiline matching; missing transition headings fail closed rather than swallowing body text.
-- Focused subject/body tests: 4/4. Full DLR regression suite: 385/385. Existing non-failing `ResourceWarning` and Starlette/httpx deprecation notices remain.
-- Live authenticated read-only checks: search/detail/original all returned HTTP 200, detail omitted private storage references, and unauthenticated search returned HTTP 401. Authenticated synthetic archive/restore and important-mark/clear mutations persisted and the temporary row was deleted.
-- Oracle API, local GoTrue, n8n health, DLR job bridge, and public Vercel health/app routes returned HTTP 200. Live archive snapshot after cleanup: 67 letters, 67 processing rows, 99 jobs (98 completed, 1 retired, 0 pending/running/failed), and 71 WhatsApp provenance rows.
-- Guarded Ansible deployment completed on 2026-10-16 from canonical `main`; fresh encrypted local/off-site backups succeeded, the playbook reported 19 OK / 4 changed / 0 failed, and the 385-test suite passed before API restart. Post-deploy authenticated search/detail/original and all health routes passed; one immediate health retry after restart succeeded. Hosted Supabase remains an unverified DR target and was not promoted or synchronized.
