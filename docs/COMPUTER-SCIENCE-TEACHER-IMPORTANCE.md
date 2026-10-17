@@ -19,7 +19,7 @@ The document-processing repository now applies a deterministic relevance check w
 
 ## Scope and historical records
 
-The rule runs when a document is processed or reprocessed. It does not scan or bulk-update old archive rows merely by being deployed. Historical backfill must first run in read-only preview, review the matched candidates/evidence, and only then apply a separately approved update. The existing UI is unchanged.
+The rule runs when a document is processed or reprocessed. It does not scan or bulk-update old archive rows merely by being deployed. Historical backfill must first run in read-only preview, review the matched candidates/evidence, and only then apply a separately approved update. Initial live preview on 2026-10-18 scanned 96 non-trashed letters; three clear matches were marked Important and received comments. The unrelated sports-event circular was excluded by the context guard. The existing UI is unchanged.
 
 ## Validation
 
