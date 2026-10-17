@@ -20,4 +20,4 @@ EDU- Letters (existing Hermes WhatsApp session)
   -> dedicated DLR processing worker
 ```
 
-Manual web-pilot limits and WhatsApp connector limits are separate. The connector has a guarded cumulative real-intake cap configured at runtime (currently 150, hard maximum 500). WhatsApp attachment size has a separate runtime limit (currently 100 MiB, hard maximum 100 MiB); the normal web upload limit remains 20 MiB. The event dispatcher verifies the per-message staged outcome before recording a successful event receipt.
+Manual web-pilot limits and WhatsApp connector limits are separate. The connector has a guarded cumulative real-intake cap configured at runtime (currently 100,000, hard maximum 1,000,000). WhatsApp attachment size has a separate runtime limit (currently 2 GiB, maximum 2 GiB); the normal web upload limit remains 20 MiB. The event dispatcher verifies the per-message staged outcome before recording a successful event receipt.

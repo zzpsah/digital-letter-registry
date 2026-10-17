@@ -343,7 +343,7 @@ No baseline DLR work is blocked by these items.
 - [x] Stage only PDF/JPG/JPEG/PNG attachments; suppress normal Hermes replies in the archive group.
 - [x] Add protected local queue + one-minute systemd consumer.
 - [x] Use Bitwarden-backed DLR worker identity for connector intake.
-- [x] Add connector-specific cap of 20 real WhatsApp documents without changing the manual web pilot cap.
+- [x] Add connector-specific cumulative cap for the real WhatsApp intake, independent of the manual web pilot cap.
 - [x] Preserve WhatsApp message-id/source provenance and retry idempotency.
 - [x] Complete synthetic queue→DLR→provenance verification and cleanup.
 - [x] Full DLR suite passes 280/280.

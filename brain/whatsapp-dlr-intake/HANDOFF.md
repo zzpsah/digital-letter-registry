@@ -9,6 +9,6 @@ Connector is now live. The exact group identifier, member identifiers and creden
 ## 2026-10-18 operational recovery
 
 - Production is local Oracle PostgreSQL via the local Supabase-compatible API; hosted Supabase is not the live processing primary.
-- Intake count cap was reached at 100. Recovery cap set to 150 and WhatsApp-only size cap to 100 MiB.
+- Intake count cap was reached at 100. Recovery cap set to 100,000 and WhatsApp-only size cap to 2 GiB.
 - A sender rejected by Hermes at 19:51 UTC was not staged; do not infer that message attachments were archived. Ask the owner to resend via the configured approved group or verify/authorize the sender explicitly.
 - Retry the existing quarantined attachments only after preserving the failed receipts and verifying deduplication. Verify letter source rows and job status after worker runs.

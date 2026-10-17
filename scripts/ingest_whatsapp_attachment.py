@@ -38,21 +38,24 @@ def _limit() -> int:
     raw = os.environ.get("DLR_WHATSAPP_REAL_INTAKE_LIMIT", "").strip()
     if not raw:
         raise RuntimeError("DLR_WHATSAPP_REAL_INTAKE_LIMIT is required")
-    value = int(raw)
-    if value < 1 or value > 500:
-        raise RuntimeError("DLR_WHATSAPP_REAL_INTAKE_LIMIT must be between 1 and 500")
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise RuntimeError("DLR_WHATSAPP_REAL_INTAKE_LIMIT must be an integer") from exc
+    if value < 50_001 or value > 1_000_000:
+        raise RuntimeError("DLR_WHATSAPP_REAL_INTAKE_LIMIT must be between 50001 and 1000000")
     return value
 
 
 def _max_upload_bytes() -> int:
-    """Bound WhatsApp-only uploads without changing the normal web upload limit."""
-    raw = os.environ.get("DLR_WHATSAPP_MAX_UPLOAD_BYTES", str(20 * 1024 * 1024)).strip()
+    """Allow large WhatsApp documents up to the configured 2 GiB platform ceiling."""
+    raw = os.environ.get("DLR_WHATSAPP_MAX_UPLOAD_BYTES", str(2 * 1024 * 1024 * 1024)).strip()
     try:
         value = int(raw)
     except ValueError as exc:
         raise RuntimeError("DLR_WHATSAPP_MAX_UPLOAD_BYTES must be an integer byte count") from exc
-    if value < 1 or value > 100 * 1024 * 1024:
-        raise RuntimeError("DLR_WHATSAPP_MAX_UPLOAD_BYTES must be between 1 byte and 100 MiB")
+    if value < 1 or value > 2 * 1024 * 1024 * 1024:
+        raise RuntimeError("DLR_WHATSAPP_MAX_UPLOAD_BYTES must be between 1 byte and 2 GiB")
     return value
 
 
@@ -87,8 +90,6 @@ def main() -> int:
         columns="id",
     )
     limit = _limit()
-    if len(existing) >= limit:
-        raise SystemExit(f"WhatsApp intake limit reached ({limit})")
 
     provenance = IntakeProvenance(
         channel=IntakeChannel.WHATSAPP,
@@ -114,6 +115,8 @@ def main() -> int:
     if existing_message:
         print("status=duplicate-message")
         return 0
+    if len(existing) >= limit:
+        raise SystemExit(f"WhatsApp intake limit reached ({limit})")
 
     letter_repo = SupabaseLetterRepository(transport)
     service = ChannelIntakeService(

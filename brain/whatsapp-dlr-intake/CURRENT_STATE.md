@@ -33,7 +33,12 @@ Next observation: first genuine PDF/JPG/PNG posted by another member in `EDU- Le
 ## 2026-10-18 recovery findings
 
 - Oracle local PostgreSQL primary had 100 WhatsApp provenance records and the configured real-intake cap was also 100; this caused later attachments to be quarantined with `WhatsApp intake limit reached (100)`.
-- Several staged PDFs exceeded the prior WhatsApp-specific 20 MiB intake size default. The WhatsApp-only cap is now configurable and bounded at 100 MiB; normal web/API upload policy remains unchanged.
+- Several staged PDFs exceeded the prior WhatsApp-specific 20 MiB intake size default. The WhatsApp-only cap is now configured to 2 GiB per file (the connector maximum); normal web/API upload policy remains unchanged.
 - The event dispatcher now checks the per-message `done/` or `failed/` staging outcome after n8n returns. A quarantined item is recorded under `event-dispatch/failed/`, not falsely reported as completed.
 - The current live direct WhatsApp message from an unapproved sender was rejected by Hermes before staging. Do not weaken the allowlist; the sender must use the configured approved group or be verified and explicitly authorized by the owner.
 - Recovery target is the existing 18 staged failures. No attachment is deleted; retries use the original message ID and duplicate checks.
+
+
+## Limit rationale correction
+
+The earlier small caps were inherited pilot guardrails, not a product requirement or an approved long-term operating limit. The source docs documented a 20-document connector pilot; the live runtime had later reached a 100-record cap, but no source-of-truth decision explaining that increase was found. Do not treat either value as the intended archive scale. The production setting is now 100,000 source messages (configurable up to 1,000,000) and up to 2 GiB per WhatsApp attachment. The independent normal web upload policy was not changed.

@@ -114,7 +114,7 @@ Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-
 
 ## WhatsApp intake recovery — 2026-10-18
 
-- Local Oracle PostgreSQL remains the live primary. A hard WhatsApp provenance count of 100 had been reached, causing later attachments to be quarantined. Runtime count cap is now 150.
-- WhatsApp-specific upload size is now configurable and set to 100 MiB, bounded at 100 MiB; standard web upload remains at 20 MiB.
+- Local Oracle PostgreSQL remains the live primary. A hard WhatsApp provenance count of 100 had been reached, causing later attachments to be quarantined. Runtime count cap is now 100,000 (hard maximum 1,000,000).
+- WhatsApp-specific upload size is now configurable and set to 2 GiB, maximum 2 GiB; standard web upload remains at 20 MiB.
 - Event dispatcher source now verifies that each staged message is in intake `done/` before writing an event completion receipt. Quarantined files are represented under `event-dispatch/failed/`; they are not counted as completed.
 - Eighteen previously staged attachments were found in `failed/`; recovery and processing verification is in progress. A recent direct WhatsApp sender was rejected by Hermes authorization before staging and must use the approved group or be explicitly authorized after verification.
