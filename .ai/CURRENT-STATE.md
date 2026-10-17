@@ -118,3 +118,11 @@ Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-
 - WhatsApp-specific upload size is now configurable and set to 2 GiB, maximum 2 GiB; standard web upload remains at 20 MiB.
 - Event dispatcher source now verifies that each staged message is in intake `done/` before writing an event completion receipt. Quarantined files are represented under `event-dispatch/failed/`; they are not counted as completed.
 - Eighteen previously staged attachments were found in `failed/`; recovery and processing verification is in progress. A recent direct WhatsApp sender was rejected by Hermes authorization before staging and must use the approved group or be explicitly authorized after verification.
+
+
+## Large OCR / full-text indexing — 2026-10-18
+
+- A recovered PDF produced ~1.44 MB of OCR text; the unbounded GIN tsvector index rejected the write at PostgreSQL's ~1 MiB per-tsvector limit.
+- Added and applied migration `20261018193000_bound_fts_text_size.sql` to Oracle `dlr_primary`: the full `letter_processing.extracted_text` is unchanged, while the GIN index and active `search_letter_cards_v7` haystack use a 50,000-character window.
+- A fresh encrypted local backup was created and archive-verified; a disposable restore verified 19 public tables / 28 functions. A separate disposable migration test updated a 2,000,010-byte extracted-text value and successfully searched it.
+- One job failed on the old tsvector limit and was reset to pending after the migration. Seven WhatsApp-created processing jobs remain pending at last check; live retry/processing verification is in progress.

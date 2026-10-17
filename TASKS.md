@@ -429,3 +429,11 @@ No baseline DLR work is blocked by these items.
 - [x] Make the event dispatcher verify the real staged intake outcome before marking an event completed.
 - [ ] Requeue and process previously quarantined attachments; verify source rows and worker statuses.
 - [ ] Confirm the latest user-sent attachments arrive via the approved WhatsApp group; do not bypass sender authorization.
+
+
+## Large OCR text / FTS guard (2026-10-18)
+
+- [x] Bound the extracted-text GIN index and active search RPC without truncating the stored full extraction.
+- [x] Apply migration to Oracle `dlr_primary` after a fresh verified backup and disposable restore/test.
+- [x] Reset the job rejected by the former 1 MiB tsvector limit to pending after the migration; retry is running.
+- [ ] Verify all remaining WhatsApp recovery jobs complete or reach a clear, actionable failure state.
