@@ -28,15 +28,24 @@ _SUBJECT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("Computer subject", re.compile(r"\bcomputer\s+(?:subject|teacher|education)\b", re.I)),
 )
 
+_TEACHER_CONTEXT_PATTERNS: tuple[re.Pattern[str], ...] = (
+    re.compile(r"\b(?:teacher|teachers|teaching|school\s+teacher|subject\s+teacher)\b", re.I),
+    re.compile(r"शिक्षक|शिक्षिका|अध्यापक|अध्यापिका"),
+)
+
 _TEACHER_SERVICE_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
-    ("teacher/service context", re.compile(
-        r"\b(?:teacher|teachers|teaching|appointment|recruitment|seniority|service|"
+    # Require a substantive service/duty action. A role mentioned only in a
+    # recipient list, signature, or unrelated event circular is not enough.
+    ("teacher/service action", re.compile(
+        r"\b(?:appointment|recruitment|seniority|service\s+rules?|service\s+conditions?|"
         r"pay\s*scale|salary|transfer|posting|promotion|qualification|eligibility|"
-        r"training|b\.ed\.?|tre[- ]?\d|vacancy|cadre|subject\s+teacher)\b", re.I
+        r"training|b\.ed\.?|tre[- ]?\d|vacancy|cadre|merit\s+list|exam\s+result|"
+        r"nodal|assigned|designated|responsibilit(?:y|ies)|subject\s+teacher)\b", re.I
     )),
-    ("शिक्षक/सेवा संदर्भ", re.compile(
-        r"शिक्षक|शिक्षिका|नियुक्ति|बहाली|वरीयता|सेवा\s*शर्त|वेतन|स्थानांतरण|"
-        r"पदस्थापन|प्रोन्नति|योग्यता|प्रशिक्षण|प्रशिक्षित|अप्रशिक्षित|विषय\s*शिक्षक"
+    ("शिक्षक/सेवा कार्रवाई", re.compile(
+        r"नियुक्ति|बहाली|वरीयता|सेवा\s*नियम|सेवा\s*शर्त|वेतन|मानदेय|स्थानांतरण|"
+        r"पदस्थापन|प्रोन्नति|योग्यता|पात्रता|प्रशिक्षण|प्रशिक्षित|अप्रशिक्षित|संवर्ग|"
+        r"मेधा\s*सूची|परीक्षा\s*परिणाम|नोडल|नामित|सौंपा\s*गया|जिम्मेदारी"
     )),
 )
 
@@ -63,6 +72,27 @@ def classify_computer_science_teacher_letter(
     if not source.strip():
         return TeacherRelevance(False)
 
+    primary = "\n".join(str(value or "") for value in (title, summary, action_required))
+    direct_primary = tuple(
+        label for label, pattern in _DIRECT_PATTERNS if pattern.search(primary)
+    )
+    subject_primary = tuple(
+        label for label, pattern in _SUBJECT_PATTERNS if pattern.search(primary)
+    )
+    service_primary = tuple(
+        label for label, pattern in _TEACHER_SERVICE_PATTERNS if pattern.search(primary)
+    )
+    teacher_primary = any(pattern.search(primary) for pattern in _TEACHER_CONTEXT_PATTERNS)
+
+    # Explicit unrelated event topics should not become Important just because
+    # a computer teacher is mentioned incidentally in the body/committee list.
+    unrelated_event = re.compile(
+        r"\b(?:sports?|athletics|games?|competition|expenditure|players?)\b|"
+        r"खेल|प्रतियोगिता|खिलाड़ी|व्यय|खेलकूद", re.I
+    )
+    if unrelated_event.search(primary) and not (direct_primary or subject_primary):
+        return TeacherRelevance(False)
+
     direct_evidence = tuple(
         label for label, pattern in _DIRECT_PATTERNS if pattern.search(source)
     )
@@ -73,9 +103,23 @@ def classify_computer_science_teacher_letter(
         label for label, pattern in _TEACHER_SERVICE_PATTERNS if pattern.search(source)
     )
 
-    # An explicit Computer Science/computer-teacher role is enough. A generic
-    # mention of computers is not; subject mentions need teacher/service context.
-    relevant = bool(direct_evidence or (subject_evidence and service_evidence))
+    # Metadata can establish relevance directly. In OCR/body text, require the
+    # subject/role and a substantive service or assignment action in the same
+    # sentence, preventing incidental committee/signature mentions from firing.
+    metadata_match = bool(direct_primary or (subject_primary and teacher_primary and service_primary))
+    source_match = False
+    if not metadata_match:
+        for sentence in re.split(r"[\n\r।.!?;]+", extracted_text or ""):
+            if not sentence.strip():
+                continue
+            has_direct_role = any(pattern.search(sentence) for _, pattern in _DIRECT_PATTERNS)
+            has_subject = any(pattern.search(sentence) for _, pattern in _SUBJECT_PATTERNS)
+            has_teacher = any(pattern.search(sentence) for pattern in _TEACHER_CONTEXT_PATTERNS)
+            has_action = any(pattern.search(sentence) for _, pattern in _TEACHER_SERVICE_PATTERNS)
+            if has_action and (has_direct_role or (has_subject and has_teacher)):
+                source_match = True
+                break
+    relevant = metadata_match or source_match
     if not relevant:
         return TeacherRelevance(False)
 

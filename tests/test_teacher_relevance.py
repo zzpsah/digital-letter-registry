@@ -29,6 +29,29 @@ class ComputerScienceTeacherRelevanceTests(unittest.TestCase):
         )
         self.assertTrue(result.is_relevant)
 
+    def test_incidental_computer_teacher_mention_in_unrelated_circular_does_not_match(self):
+        result = classify_computer_science_teacher_letter(
+            title="Sports competition and expenditure guidelines",
+            summary="Instructions for organising the annual sports competition.",
+            extracted_text="कंप्यूटर शिक्षक को कार्यक्रम में उपस्थित रहने हेतु कहा गया है। खेल प्रतियोगिता के व्यय का विवरण दें।",
+        )
+        self.assertFalse(result.is_relevant)
+
+    def test_sports_circular_is_not_marked_for_incidental_teacher_mention(self):
+        result = classify_computer_science_teacher_letter(
+            title="मशाल-2024 खेल प्रतियोगिता के आयोजन एवं व्यय संबंधी दिशा-निर्देश",
+            summary="Guidelines for sports competition, player training and expenditure.",
+            action_required="Ensure timely organisation of sports events and expenditure reporting.",
+            extracted_text="कंप्यूटर शिक्षक का नाम विद्यालय समिति की सूची में है।",
+        )
+        self.assertFalse(result.is_relevant)
+
+    def test_computer_teacher_assignment_as_nodal_officer_matches(self):
+        result = classify_computer_science_teacher_letter(
+            extracted_text="कंप्यूटर विज्ञान शिक्षक को APAAR ID निर्माण के लिए नोडल अधिकारी नामित किया जाता है।"
+        )
+        self.assertTrue(result.is_relevant)
+
     def test_generic_computer_mention_does_not_match(self):
         result = classify_computer_science_teacher_letter(
             extracted_text="All schools must repair computer equipment in the ICT lab."

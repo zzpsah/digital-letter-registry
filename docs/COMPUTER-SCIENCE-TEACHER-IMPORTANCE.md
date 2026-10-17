@@ -5,7 +5,8 @@ The document-processing repository now applies a deterministic relevance check w
 ## Matching policy
 
 - Direct references to Computer Science teachers, computer teachers, and common Hindi spelling variants are eligible.
-- A subject-only mention (Computer Science / कंप्यूटर विज्ञान) is eligible only when the same document also contains teacher/service context such as appointment, recruitment, seniority, pay, transfer, qualification, eligibility, or training.
+- A subject-only mention (Computer Science / कंप्यूटर विज्ञान) is eligible only when the document also contains teacher/service context such as appointment, recruitment, seniority, pay, transfer, qualification, eligibility, or training. Body-only matches require the role/subject and action to occur together in a sentence.
+- Incidental mentions in clearly unrelated event/expenditure circulars (for example, a sports event) do not qualify unless the document metadata itself identifies Computer Science teachers as the subject.
 - A generic computer/ICT equipment mention or a general teacher letter without Computer Science evidence is not enough.
 
 ## Action on a match
