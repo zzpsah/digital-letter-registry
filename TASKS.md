@@ -436,4 +436,4 @@ No baseline DLR work is blocked by these items.
 - [x] Bound the extracted-text GIN index and active search RPC without truncating the stored full extraction.
 - [x] Apply migration to Oracle `dlr_primary` after a fresh verified backup and disposable restore/test.
 - [x] Reset the job rejected by the former 1 MiB tsvector limit to pending after the migration; retry is running.
-- [ ] Verify all remaining WhatsApp recovery jobs complete or reach a clear, actionable failure state.
+- [x] Verify all 12 WhatsApp recovery processing jobs completed; separate Gmail downstream degradation is documented.

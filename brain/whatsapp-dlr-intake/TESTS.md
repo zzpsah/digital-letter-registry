@@ -70,7 +70,7 @@ Passed 2026-10-03: public official CBSE PDF sent into the bound group, ingested 
 - [x] WhatsApp-only file-size configuration defaults to 20 MiB and accepts the configured maximum of 2 GiB.
 - [x] Invalid or greater-than-100-MiB configuration is rejected.
 - [x] Event dispatcher unit tests cover real staged completion, quarantined failure, pending retry, dry-run, and failed-receipt deduplication.
-- [ ] Live retry of quarantined real documents and worker completion remains in progress; do not mark as complete until local PostgreSQL records confirm it.
+- [x] Live retry of 18 quarantined staged attachments: 17 source records added, one duplicate detected, all 12 created processing jobs completed.
 
 - [x] Count cap accepts 100,000 and rejects only below 50,001 or above the configured hard maximum.
 - [x] WhatsApp attachment limit accepts 2 GiB and rejects larger configuration.

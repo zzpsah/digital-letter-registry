@@ -18,5 +18,5 @@
 
 - [x] Add configurable WhatsApp-only size limit up to 2 GiB without changing normal web uploads.
 - [x] Verify staged message outcome before the event dispatcher marks it completed; retain failed receipts separately.
-- [ ] Reprocess 18 quarantined staged attachments and verify every resulting processing job reaches completed or a clearly reported review/failure state.
+- [x] Reprocess 18 quarantined staged attachments; all 12 created processing jobs reached completed, with one message deduplicated.
 - [ ] User must resend any attachments rejected before staging from an unapproved WhatsApp sender/chat via the configured approved group or explicitly authorize that sender after identity verification.

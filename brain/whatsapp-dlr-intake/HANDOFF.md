@@ -11,4 +11,4 @@ Connector is now live. The exact group identifier, member identifiers and creden
 - Production is local Oracle PostgreSQL via the local Supabase-compatible API; hosted Supabase is not the live processing primary.
 - Intake count cap was reached at 100. Recovery cap set to 100,000 and WhatsApp-only size cap to 2 GiB.
 - A sender rejected by Hermes at 19:51 UTC was not staged; do not infer that message attachments were archived. Ask the owner to resend via the configured approved group or verify/authorize the sender explicitly.
-- Retry the existing quarantined attachments only after preserving the failed receipts and verifying deduplication. Verify letter source rows and job status after worker runs.
+- Recovery completed: all 18 quarantined staged attachments were retried; 17 source records were recorded, one duplicate was detected, and all 12 created processing jobs completed. Two event receipts still show downstream Gmail outbox degradation. One separate direct message was rejected before staging and must be resent via the approved group or explicitly authorized after sender verification.

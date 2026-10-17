@@ -42,3 +42,12 @@ Next observation: first genuine PDF/JPG/PNG posted by another member in `EDU- Le
 ## Limit rationale correction
 
 The earlier small caps were inherited pilot guardrails, not a product requirement or an approved long-term operating limit. The source docs documented a 20-document connector pilot; the live runtime had later reached a 100-record cap, but no source-of-truth decision explaining that increase was found. Do not treat either value as the intended archive scale. The production setting is now 100,000 source messages (configurable up to 1,000,000) and up to 2 GiB per WhatsApp attachment. The independent normal web upload policy was not changed.
+
+
+## Recovery verification — 2026-10-18
+
+- All 18 previously quarantined staged attachments have been drained from `failed/` into the normal `done/` intake outcome; no attachment bytes were deleted. One message was deduplicated, and 17 WhatsApp source records were recorded.
+- The 12 processing jobs created by the recovered batch are now completed. Local Oracle `processing_jobs` status counts at verification: 144 completed, 1 retired, 0 pending, 0 processing, 0 failed.
+- A 4.39 MB extracted-text row was stored successfully after the bounded tsvector migration; active `search_letter_cards_v7` returned results without a tsvector-size error.
+- Two event receipts are `ingested_downstream_degraded` because the Gmail outbox runner returned a failure. Intake/worker processing is complete; Gmail delivery is a separate unresolved issue.
+- A recent direct WhatsApp message from an unapproved sender was rejected before staging. Those bytes are not among the 18 recovered attachments. Resend via the configured approved archive group or explicitly verify/authorize that sender; the allowlist was not bypassed.
