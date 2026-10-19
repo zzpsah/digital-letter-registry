@@ -106,23 +106,7 @@ Read `AGENTS.md`, `RULES.md`, `.ai/STATE-INDEX.md`, this file, `brain/CURRENT_ST
 Canonical technical diagram and verified site/port inventory: [docs/INFORMATION-FLOW-AND-DEPLOYMENT.md](../docs/INFORMATION-FLOW-AND-DEPLOYMENT.md). The audit confirmed the Vercel routes, Oracle DLR API listener on loopback port 8877, Tailscale/Funnel mappings and key data boundaries. Funnel ports 10000, 10001 and 8443 were publicly exposed at audit time; port 10001 maps to the DLR API and must be treated as public despite its proxy role. Some other upstream listener purposes remain unconfirmed. The Oracle checkout was clean but behind GitHub main at audit time. At that historical audit checkpoint, the documentation update had not yet been deployed and no service/configuration change had been performed. The later 2026-10-16 release checkpoint supersedes that state.
 
 ## Last automated change
-- Commit: 032683132d89ecd5d5eccf5973dced273e13e567
-- Change: Merge remote-tracking branch 'origin/main'
-- Date: 2026-10-17
+- Commit: a2102351b0b610b6fa1370622461a9da3c36aa5b
+- Change: Enforce consistent letter trash state
+- Date: 2026-10-19
 - Durable context synchronization: completed
-
-
-## WhatsApp intake recovery — 2026-10-18
-
-- Local Oracle PostgreSQL remains the live primary. A hard WhatsApp provenance count of 100 had been reached, causing later attachments to be quarantined. Runtime count cap is now 100,000 (hard maximum 1,000,000).
-- WhatsApp-specific upload size is now configurable and set to 2 GiB, maximum 2 GiB; standard web upload remains at 20 MiB.
-- Event dispatcher source now verifies that each staged message is in intake `done/` before writing an event completion receipt. Quarantined files are represented under `event-dispatch/failed/`; they are not counted as completed.
-- Eighteen previously staged attachments were found in `failed/`; recovery and processing verification is in progress. A recent direct WhatsApp sender was rejected by Hermes authorization before staging and must use the approved group or be explicitly authorized after verification.
-
-
-## Large OCR / full-text indexing — 2026-10-18
-
-- A recovered PDF produced ~1.44 MB of OCR text; the unbounded GIN tsvector index rejected the write at PostgreSQL's ~1 MiB per-tsvector limit.
-- Added and applied migration `20261018193000_bound_fts_text_size.sql` to Oracle `dlr_primary`: the full `letter_processing.extracted_text` is unchanged, while the GIN index and active `search_letter_cards_v7` haystack use a 50,000-character window.
-- A fresh encrypted local backup was created and archive-verified; a disposable restore verified 19 public tables / 28 functions. A separate disposable migration test updated a 2,000,010-byte extracted-text value and successfully searched it.
-- One job failed on the old tsvector limit and was reset to pending after the migration. All 12 WhatsApp recovery processing jobs are now completed; the local queue has zero pending, processing, or failed jobs. Two event receipts remain degraded at Gmail outbox only.

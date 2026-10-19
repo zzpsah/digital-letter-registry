@@ -1,3 +1,11 @@
+## 2026-10-19 — Enforce consistent letter trash state
+- Commit: a2102351b0b610b6fa1370622461a9da3c36aa5b
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `supabase/migrations/20261019100000_enforce_letter_trash_consistency.sql`
+- `tests/test_letter_trash_consistency_migration.py`
+
 ## 2026-10-17 — merge: sync latest project context
 - Commit: becfc4a35dd7d7d11040bf7237f5148eaadac4c2
 - Author: development-os[bot]
