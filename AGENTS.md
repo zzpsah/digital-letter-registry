@@ -15,3 +15,7 @@ Before any UI, navigation, auth UX, search UX, language, recipient, delete/resto
 ## Remote access / Desktop Commander
 
 For authorized Oracle VPS access, read [`docs/REMOTE-ACCESS.md`](docs/REMOTE-ACCESS.md). A new AI chat must use Desktop Commander `list_devices`, select the online `oracle-server`, ping it, and only then operate on the live server. Do not confuse GitHub access with VPS/runtime access.
+
+## Cross-project AI handoff
+
+For tasks spanning repositories, consult the [Oracle VPS cross-project map](https://github.com/zzpsah/oracle-server/blob/main/docs/CROSS-PROJECT-MAP.md) to identify the owning project and dependencies. This does not override this repository’s instructions. Check git status first, preserve unrelated changes, and verify live state when relevant.

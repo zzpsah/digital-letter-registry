@@ -309,3 +309,7 @@ When document processing saves source-grounded context, clear Computer Science t
 ## WhatsApp intake reliability
 
 Approved attachments arrive through the existing Hermes session and a protected local staging queue. A systemd path watcher dispatches each event to the authenticated n8n pipeline; the dispatcher verifies the per-message intake result before recording success. WhatsApp intake has a bounded cumulative cap (currently 100,000 source messages) and a separate configurable size cap (currently 2 GiB; maximum 2 GiB); normal web upload remains at 20 MiB. Rejected senders are not auto-authorized. See `brain/whatsapp-dlr-intake/` and `docs/INFORMATION-FLOW-AND-DEPLOYMENT.md`.
+
+## Cross-project AI handoff
+
+For cross-repository ownership, shared infrastructure dependencies, and safe AI handoff rules, start with the [Oracle VPS cross-project map](https://github.com/zzpsah/oracle-server/blob/main/docs/CROSS-PROJECT-MAP.md). Then follow this repository’s own AGENTS.md, architecture, current-state, security, and test documentation. The map is navigation guidance, not a substitute for verifying live state.
