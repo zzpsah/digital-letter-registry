@@ -1,3 +1,11 @@
+## 2026-10-22 — docs: link cross-project AI handoff map
+- Commit: 170b8ca4f15ddacec6aa79f373134197f51c8b8f
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `AGENTS.md`
+- `README.md`
+
 ## 2026-10-19 — Enforce consistent letter trash state
 - Commit: a2102351b0b610b6fa1370622461a9da3c36aa5b
 - Author: development-os[bot]
