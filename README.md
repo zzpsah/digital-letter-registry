@@ -313,3 +313,7 @@ Approved attachments arrive through the existing Hermes session and a protected 
 ## Cross-project AI handoff
 
 For cross-repository ownership, shared infrastructure dependencies, and safe AI handoff rules, start with the [Oracle VPS cross-project map](https://github.com/zzpsah/oracle-server/blob/main/docs/CROSS-PROJECT-MAP.md). Then follow this repository’s own AGENTS.md, architecture, current-state, security, and test documentation. The map is navigation guidance, not a substitute for verifying live state.
+
+## VidyaDesk aggregate integration
+
+A fixed-scope read-only endpoint is implemented at GET /api/v1/integrations/vidyadesk/summary. It returns only the count and latest-upload timestamp for public, non-archived letters in the explicitly configured UMV Tetahali archive. It requires a dedicated machine bearer token and a separate Supabase viewer identity with archive membership; it does not use the service-role key or expose letter-level data. It remains disabled until the service identity, archive-name check, server-side secrets and network path are approved. See docs/VIDYADESK-AGGREGATE-INTEGRATION.md.

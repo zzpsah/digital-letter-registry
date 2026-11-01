@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import hmac
 import json
 import os
 import re
@@ -16,7 +17,7 @@ from urllib.parse import quote, urlsplit
 from uuid import UUID, uuid4
 
 from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile, status
-from fastapi.responses import FileResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
@@ -46,6 +47,7 @@ from .supabase_runtime import (
     SupabasePostgrestTransport,
     SupabaseRuntimeError,
 )
+from .vidyadesk_summary import build_summary as build_vidyadesk_summary
 from .versions import current_processing_versions
 from .version_registry import ProcessingTargetVersions, SupabaseProcessingVersionRegistry
 
@@ -1391,6 +1393,88 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     @app.get("/api/v1/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get("/api/v1/integrations/vidyadesk/summary")
+    def vidyadesk_summary(request: Request) -> Response:
+        """Server-to-server public-letter aggregate; never uses service-role access."""
+        if request.query_params:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="scope_override_not_allowed",
+            )
+        expected_token = os.environ.get("DLR_VIDYADESK_READ_TOKEN", "").strip()
+        school_key = os.environ.get("DLR_VIDYADESK_SCHOOL_KEY", "").strip()
+        expected_archive_name = os.environ.get("DLR_VIDYADESK_ARCHIVE_NAME", "").strip()
+        service_email = os.environ.get("DLR_VIDYADESK_SERVICE_EMAIL", "").strip()
+        service_password = os.environ.get("DLR_VIDYADESK_SERVICE_PASSWORD", "")
+        if not all((expected_token, school_key, expected_archive_name, service_email, service_password)):
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="integration_not_configured",
+            )
+        supplied = request.headers.get("authorization", "")
+        bearer = supplied[7:].strip() if supplied.startswith("Bearer ") else ""
+        if not bearer or not hmac.compare_digest(bearer, expected_token):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="authentication_required",
+            )
+        if school_key != "umv-tetahali":
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="integration_scope_not_verified",
+            )
+        try:
+            session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
+                email=service_email,
+                password=service_password,
+            )
+            membership = _archive_membership(
+                session.access_token,
+                roles={ArchiveRole.VIEWER},
+            )
+            archive_id = _archive_id()
+            archive_rows = _raw_transport(session.access_token).select(
+                "archives",
+                filters={"id": archive_id},
+                columns="id,name,status",
+            )
+            if (
+                not archive_rows
+                or str(archive_rows[0].get("status") or "") != "active"
+                or str(archive_rows[0].get("name") or "").strip().casefold()
+                != expected_archive_name.casefold()
+                or membership.archive_id != archive_id
+            ):
+                raise ValueError("configured archive identity is not verified")
+            aggregate_rows = _raw_transport(session.access_token).rpc(
+                "vidyadesk_public_archive_summary",
+                {"target_archive_id": archive_id},
+            )
+            if not isinstance(aggregate_rows, list) or len(aggregate_rows) != 1:
+                raise ValueError("aggregate RPC returned an unexpected shape")
+            aggregate = aggregate_rows[0]
+            payload = build_vidyadesk_summary(
+                public_document_count=aggregate.get("public_document_count", -1),
+                latest_public_document_at=aggregate.get("latest_public_document_at"),
+                archive_name=str(archive_rows[0].get("name") or ""),
+                expected_archive_name=expected_archive_name,
+                school_key=school_key,
+            )
+        except HTTPException:
+            raise
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="provider_unavailable",
+            ) from exc
+        return JSONResponse(
+            content=payload,
+            headers={
+                "Cache-Control": "no-store",
+                "X-Content-Type-Options": "nosniff",
+            },
+        )
 
     @app.get(
         "/api/v1/auth/providers",

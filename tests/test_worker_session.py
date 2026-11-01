@@ -2,6 +2,7 @@
 
 import json
 import os
+from pathlib import Path
 import tempfile
 import time
 import unittest
@@ -12,6 +13,7 @@ from letter_registry.worker_session import (
     DEFAULT_EXPIRY_MARGIN_SECONDS,
     WorkerSession,
     WorkerSessionError,
+    _state_paths,
     load_worker_session,
     session_status,
 )
@@ -228,6 +230,11 @@ class ConcurrentRefreshTests(unittest.TestCase):
         self.addCleanup(self._tmp.cleanup)
         self.state = os.path.join(self._tmp.name, "worker-session.json")
         self.lock = os.path.join(self._tmp.name, "worker-session.lock")
+
+    def test_explicit_state_path_uses_adjacent_lock_file(self) -> None:
+        state, lock = _state_paths(self.state)
+        self.assertEqual(state, Path(self.state))
+        self.assertEqual(lock, Path(self.state).with_name("worker-session.lock"))
 
     def test_parallel_loads_produce_one_grant(self) -> None:
         import threading
