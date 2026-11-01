@@ -76,7 +76,11 @@ class WorkerSession:
 def _state_paths(state_path: str | None) -> tuple[Path, Path]:
     local_primary = os.environ.get("DLR_LOCAL_SUPABASE_PROXY_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
     if state_path:
+        # Explicit state paths are used by tests and isolated callers. Keep the
+        # lock beside that state file instead of falling back to the production
+        # user's global lock path (which may not exist or be writable).
         path = Path(state_path)
+        return path, path.with_name("worker-session.lock")
     elif local_primary:
         # Keep local-primary tokens/refresh tokens separate from the hosted
         # Supabase cache so a later failback cannot mix JWT issuers/secrets.
