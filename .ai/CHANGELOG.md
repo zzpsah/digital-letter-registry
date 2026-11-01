@@ -1,3 +1,17 @@
+## 2026-11-01 — Add viewer-scoped VidyaDesk letter archive summary
+- Commit: 27baefeb32919876616c8f6948c63bf9b16f2b0b
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `README.md`
+- `docs/VIDYADESK-AGGREGATE-INTEGRATION.md`
+- `src/letter_registry/api.py`
+- `src/letter_registry/vidyadesk_summary.py`
+- `src/letter_registry/worker_session.py`
+- `supabase/migrations/20261101080000_add_vidyadesk_public_summary_rpc.sql`
+- `tests/test_vidyadesk_summary.py`
+- `tests/test_worker_session.py`
+
 ## 2026-10-22 — docs: link cross-project AI handoff map
 - Commit: 170b8ca4f15ddacec6aa79f373134197f51c8b8f
 - Author: development-os[bot]
