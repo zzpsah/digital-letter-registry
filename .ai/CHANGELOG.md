@@ -1,3 +1,12 @@
+## 2026-11-04 — Expand quality review queue to all unresolved document flags
+- Commit: 580ef67676710d8bbf33b55c0a862cb32c4039ab
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `scripts/audit_document_pipeline.py`
+- `src/letter_registry/api.py`
+- `tests/test_quality_review_queue.py`
+
 ## 2026-11-04 — Automatically recover stale DLR worker jobs
 - Commit: 3f2bb21a5c6dbfda8bf02cae8c5e7bd7a63e1db0
 - Author: development-os[bot]

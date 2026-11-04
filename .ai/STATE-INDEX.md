@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 3f2bb21a5c6dbfda8bf02cae8c5e7bd7a63e1db0
-- Last commit: Automatically recover stale DLR worker jobs
+- HEAD: 580ef67676710d8bbf33b55c0a862cb32c4039ab
+- Last commit: Expand quality review queue to all unresolved document flags
 - Last commit date: 2026-11-04
 - Last commit author: development-os[bot]
 
