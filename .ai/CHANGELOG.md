@@ -1,3 +1,12 @@
+## 2026-11-04 — Version DLR worker systemd deployment units
+- Commit: 8bcef05b9a1f88ad8a3348e82641f4cb8a7f2b89
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `deploy/systemd/dlr-worker.service`
+- `deploy/systemd/dlr-worker.timer`
+- `docs/WORKER-OPERATIONS.md`
+
 ## 2026-11-04 — Refresh DLR archive quality audit snapshot
 - Commit: afabb7df73e64829246bad2432157f02e0d7f244
 - Author: development-os[bot]
