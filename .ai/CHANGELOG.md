@@ -1,3 +1,14 @@
+## 2026-11-04 — Stream archived originals to improve document loading
+- Commit: e863f08321277e8974faf6092d4e675d5b949c26
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `src/letter_registry/google_drive_reader.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_api.py`
+- `tests/test_google_drive_reader.py`
+
 ## 2026-11-04 — Bound TLS attempts across Funnel IPv4 edges
 - Commit: 4597f9ce9c1dba84ee1c70d22037b02949f7f362
 - Author: development-os[bot]
