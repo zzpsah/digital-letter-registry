@@ -2,7 +2,7 @@
 
 Read-only production snapshot. Regenerate with `scripts/audit_document_pipeline.py`; this repository intentionally stores aggregate counts, not private archive filenames or document contents.
 
-## Inventory at 18:03 UTC
+## Inventory at 18:15 UTC
 
 | Measure | Count |
 |---|---:|
@@ -11,9 +11,9 @@ Read-only production snapshot. Regenerate with `scripts/audit_document_pipeline.
 | Missing processing rows | 0 |
 | Source/provenance rows | 142 |
 | Processing jobs | 185 |
-| Completed jobs | 179 |
+| Completed jobs | 180 |
 | Failed jobs | 3 |
-| Pending jobs | 2 |
+| Pending jobs | 0 |
 | Processing jobs | 1 |
 | Stale processing jobs (45m+) | 0 |
 | Documents requiring human review | 23 |
@@ -22,7 +22,7 @@ Read-only production snapshot. Regenerate with `scripts/audit_document_pipeline.
 
 | Method | Documents |
 |---|---:|
-| OCRmyPDF/Tesseract PDF Hindi+English | 58 |
+| OCRmyPDF/Tesseract PDF Hindi+English | 59 |
 | Tesseract image Hindi+English | 48 |
 | Native PDF text | 30 |
 | pdftotext layout | 1 |
@@ -49,16 +49,16 @@ Partial/unset are review targets; they do not by themselves prove an original fi
 | Missing core metadata | 8 |
 | No clean document text | 8 |
 
-The 24 review-queue count is the union of unresolved quality flags, not the sum of the flag counts. Some flags overlap. Missing reference/date can be legitimate for forms and manuals; inspect the source before accepting or correcting it.
+The 23 review-queue count is the union of unresolved quality flags, not the sum of the flag counts. Some flags overlap. Missing reference/date can be legitimate for forms and manuals; inspect the source before accepting or correcting it.
 
 ## Failed jobs requiring action
 
 1. One legacy image record failed with `unsupported storage provider: local`. Resolve its original-file storage reference before retrying; this is a storage compatibility issue, not OCR.
-2. One 2025-26 UDISE guidance PDF failed with `OCRmyPDF timed out` under the former timeout. Retry it after the 40-minute OCR timeout and worker session-refresh fix are confirmed.
+2. The 2025-26 UDISE guidance PDF had two failed attempts under the former timeout/bridge stop. A new retry is currently processing with the 2,400-second OCR timeout and 2,700-second systemd/bridge ceiling.
 
 ## Current reprocessing
 
-The 51-page Hindi Master Circular (`01.pdf`) was manually requeued after its previous run timed out at 15 minutes and failure reporting failed with an expired JWT. At this snapshot its new OCR run is active (page raster/OCR has advanced through page 17); the UDISE retry and a newly ingested scan are queued behind it. The earlier UDISE retry was deliberately stopped when we found the n8n bridge still had a 15-minute timeout; that attempt is retained as a failed job for audit, and a fresh retry is queued under the corrected 45-minute bridge timeout. The original file is preserved; its metadata has been corrected from the original first page, but the full OCR transcript remains unverified until the new run completes.
+The 51-page Hindi Master Circular (`01.pdf`) has completed OCR. Its transcript contains 111,817 characters, including 76,964 Devanagari characters. The original remains unchanged. The record is held for human review because OCR completion does not verify the AI interpretation; the issue/effective dates and procedural claims still require source-page confirmation. The newly ingested scan completed in the same recovery session. The UDISE guidance PDF is now the sole processing job, running through OCR under the extended timeout.
 
 ## Review workflow
 
@@ -69,5 +69,7 @@ The Admin → Operations → Quality review API now includes documents with unre
 
 - Master Circular OCR: completed; all 51 pages represented; 76,964 Devanagari characters detected.
 - Master Circular delivery: held for human review; OCR output is present, but AI-derived effective date and summary details are not yet verified page by page.
-- Current queue: two pending jobs (UDISE retry and new scanned PDF); no stale processing jobs.
-- Full DLR test run: 433 tests executed; 431 passed and two existing web-shell assertions failed (`test_dashboard_recovers_stale_pagination_and_surfaces_load_errors`, `test_streamed_original_response_is_opened_from_blob`). The OCR, worker recovery, auth refresh, and quality-review tests passed in that run. These two web-shell failures remain to be reconciled before declaring the full suite green.
+- Current queue at 18:15 UTC: zero pending jobs and one processing job (the UDISE OCR retry); no stale processing jobs.
+- The one-minute legacy timer had been disabled during the event-driven migration. The WhatsApp webhook chain invoked the worker only for WhatsApp events, leaving manually queued reprocess and ordinary upload jobs without a wake-up trigger. The fallback timer is now enabled with `OnUnitInactiveSec=1min`, so it runs one minute after each worker exit. It does not poll WhatsApp intake. The webhook and fallback share the same flock-protected worker wrapper.
+- Full DLR test run: **433 tests passed**. The two stale web-shell assertions were corrected to test the current original-document streaming endpoint and current session refresh flow.
+- n8n Operations test run: **66 tests passed** after updating the bridge timeout assertion to 2,700 seconds.

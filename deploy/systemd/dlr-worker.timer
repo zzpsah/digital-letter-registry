@@ -1,10 +1,12 @@
-# FALLBACK ONLY: keep disabled while n8n workflow 4WR0M1gnKeTxYxyL is active.
+# Queue recovery consumer for jobs not dispatched by the WhatsApp event path.
+# The WhatsApp event path may invoke the same worker immediately; shared flock
+# guarantees that only one OCR worker runs at a time.
 [Unit]
-Description=Run Digital Letter Registry worker periodically
+Description=Run Digital Letter Registry queue worker after boot and after each completed job
 
 [Timer]
 OnBootSec=2min
-OnUnitActiveSec=1min
+OnUnitInactiveSec=1min
 AccuracySec=10s
 Persistent=true
 Unit=dlr-worker.service

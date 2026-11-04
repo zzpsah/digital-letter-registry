@@ -6,8 +6,8 @@
 - `letters` is the searchable current document projection; `letter_processing` stores current extraction/context; `letter_sources` records intake and delivery state; `processing_jobs` is the durable queue.
 - The local compatibility API at `127.0.0.1:8877` routes `/auth/v1` to GoTrue (`127.0.0.1:9999`) and `/rest/v1` to PostgREST (`127.0.0.1:3001`).
 - The worker uses a dedicated GoTrue identity, a rotating refresh-token cache under `/home/prashant/.config/dlr/local-platform/worker-session.json`, and a lock beside that file. Never copy tokens into logs, reports, or Git.
-- `dlr-worker.timer` invokes `dlr-worker.service` approximately once a minute. The service is `Type=oneshot` and claims one job. `inactive (dead)` after an idle/completed run is expected.
-- OCR is serial on this VPS. A long document occupies the one-shot worker and delays later queue items; the timer does not launch a competing worker while the service is active.
+- `dlr-worker.timer` is enabled as a queue-recovery consumer. It invokes `dlr-worker.service` two minutes after boot and one minute after each worker service run exits (`OnUnitInactiveSec=1min`). The service is `Type=oneshot` and claims one job. `inactive (dead)` after an idle/completed run is expected.
+- OCR is serial on this VPS. A long document occupies the one-shot worker and delays later queue items. The WhatsApp webhook path invokes the worker immediately after intake; the systemd timer is the fallback wake-up for manual reprocess, web uploads, and recovery jobs not dispatched by that webhook. Both use the same non-blocking `flock` wrapper, so an overlapping invocation exits `already_running` instead of starting a competing OCR process.
 - PDFs first use native text only when it passes readability checks. Otherwise OCRmyPDF/Tesseract uses `hin+eng`. OCR/context output is derived data; the Drive original is authoritative.
 - Email/WhatsApp delivery is downstream and must be blocked for low OCR readability, `needs_reprocessing`, or context confidence below 0.60 unless a human review explicitly accepts the result.
 
@@ -53,12 +53,12 @@ The script does not reprocess, approve, delete, resend, or change any document. 
 
 ## Versioned systemd units
 
-The deployed unit definitions are versioned in `deploy/systemd/`; the shared-lock launcher is versioned in `deploy/bin/dlr-worker-run-with-bitwarden`. Keep the VPS copies synchronized with these files. After changing them, run `systemctl --user daemon-reload`; verify the timer remains disabled while n8n is the primary scheduler and the service has a 45-minute start ceiling.
+The deployed unit definitions are versioned in `deploy/systemd/`; the shared-lock launcher is versioned in `deploy/bin/dlr-worker-run-with-bitwarden`. Keep the VPS copies synchronized with these files. After changing them, run `systemctl --user daemon-reload`; verify the timer is enabled as the fallback queue consumer and the service has a 45-minute start ceiling.
 
 ## Operational commands
 
 ```bash
-systemctl --user is-enabled dlr-worker.timer  # expected: disabled
+systemctl --user is-enabled dlr-worker.timer  # expected: enabled
 systemctl --user status dlr-worker.service --no-pager
 systemctl --user status dlr-n8n-job-bridge.service --no-pager
 journalctl --user -u dlr-worker.service --since '24 hours ago' --no-pager
@@ -69,6 +69,11 @@ Never interpret `dlr-worker.service: inactive (dead)` alone as an outage. Confir
 
 ## Incident recorded 2026-11-04
 
-A 51-page Hindi PDF had a corrupt legacy-font native text layer. The native extraction check accepted Latin-looking gibberish; low-confidence AI metadata was delivered. During manual reprocessing, OCRmyPDF hit the 900-second timeout. The worker then attempted to mark the job failed, but the worker's access JWT had expired; the `fail_processing_job` request returned HTTP 401 (`JWT expired`). The job remained `processing`, and the one-shot worker occupied the timer until OCR exited.
+A 51-page Hindi PDF had a corrupt legacy-font native text layer. The native extraction check accepted Latin-looking gibberish; low-confidence AI metadata was delivered. During manual reprocessing, OCRmyPDF hit the 900-second timeout. The worker then attempted to mark the job failed, but the worker's access JWT had expired; the `fail_processing_job` request returned HTTP 401 (`JWT expired`). The job remained `processing`. Separately, the later event-driven scheduler migration disabled the systemd worker timer. Manual reprocess jobs and web-upload jobs did not emit the WhatsApp event webhook, so they could remain pending indefinitely even though the WhatsApp event path itself was healthy.
 
 Corrective code now detects this legacy-font pattern, re-extracts unusable text on manual reprocess, refreshes the worker session before every database request, raises the OCR timeout to 2,400 seconds, updates the job heartbeat, and catches failure-report errors. The worker-level stale-job recovery is active in the deployed code. The SQL migration adds an atomic database-side guard and should also be applied to the local PostgreSQL primary.
+
+
+### Queue wake-up correction — 2026-11-04
+
+The worker timer is restored as a fallback queue consumer using `OnUnitInactiveSec=1min`, not a one-minute competing schedule. This means the next one-job claim occurs one minute after the prior oneshot worker exits. WhatsApp documents still use the immediate event-driven chain; manual reprocess, ordinary uploads and recovery jobs are picked up by the fallback. The shared wrapper lock is the concurrency invariant. This timer does not run WhatsApp intake, postprocess delivery, Gmail outbox or index refresh.
