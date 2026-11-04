@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import http.client
 import socket
+import time
 from urllib import parse, request
 
 
@@ -17,11 +18,18 @@ class _IPv4HTTPSConnection(http.client.HTTPSConnection):
     """
 
     def connect(self) -> None:
+        started = time.monotonic()
+        print(f"[dlr-net] dns-start host={self.host} port={self.port}", flush=True)
         addresses = socket.getaddrinfo(
             self.host,
             self.port,
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
+        )
+        print(
+            f"[dlr-net] dns-done host={self.host} addresses={len(addresses)} "
+            f"elapsed={time.monotonic() - started:.3f}s",
+            flush=True,
         )
         last_error: OSError | None = None
         for family, socktype, proto, _canonname, sockaddr in addresses:
@@ -30,18 +38,32 @@ class _IPv4HTTPSConnection(http.client.HTTPSConnection):
                 sock.settimeout(self.timeout)
                 if self.source_address:
                     sock.bind(self.source_address)
+                connect_started = time.monotonic()
+                print(f"[dlr-net] connect-start host={self.host} ip={sockaddr[0]}", flush=True)
                 sock.connect(sockaddr)
+                print(
+                    f"[dlr-net] connect-done host={self.host} ip={sockaddr[0]} "
+                    f"elapsed={time.monotonic() - connect_started:.3f}s",
+                    flush=True,
+                )
                 if self._tunnel_host:
                     self.sock = sock
                     self._tunnel()
                     sock = self.sock
                 server_hostname = self._tunnel_host or self.host
+                tls_started = time.monotonic()
                 self.sock = self._context.wrap_socket(
                     sock,
                     server_hostname=server_hostname,
                 )
+                print(
+                    f"[dlr-net] tls-done host={self.host} "
+                    f"elapsed={time.monotonic() - tls_started:.3f}s",
+                    flush=True,
+                )
                 return
             except OSError as exc:
+                print(f"[dlr-net] connect-error host={self.host} error={type(exc).__name__}:{exc}", flush=True)
                 last_error = exc
                 sock.close()
         if last_error is not None:
@@ -62,6 +84,27 @@ def open_url(req: request.Request, *, timeout: float = 12) -> object:
     """Open a URL, using IPv4-only DNS for Tailscale Funnel HTTPS hosts."""
     hostname = parse.urlsplit(req.full_url).hostname or ""
     if req.full_url.startswith("https://") and hostname.endswith(".ts.net"):
+        started = time.monotonic()
+        parsed = parse.urlsplit(req.full_url)
+        print(
+            f"[dlr-net] request-start method={req.get_method()} "
+            f"host={hostname} path={parsed.path} timeout={timeout}",
+            flush=True,
+        )
         opener = request.build_opener(_IPv4HTTPSHandler())
-        return opener.open(req, timeout=timeout)
+        try:
+            response = opener.open(req, timeout=timeout)
+            print(
+                f"[dlr-net] response-start host={hostname} "
+                f"status={response.status} elapsed={time.monotonic() - started:.3f}s",
+                flush=True,
+            )
+            return response
+        except Exception as exc:
+            print(
+                f"[dlr-net] request-error host={hostname} "
+                f"error={type(exc).__name__}:{exc} elapsed={time.monotonic() - started:.3f}s",
+                flush=True,
+            )
+            raise
     return request.urlopen(req, timeout=timeout)
