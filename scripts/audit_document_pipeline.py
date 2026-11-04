@@ -70,7 +70,7 @@ def build_report(db: ArchiveScopedSupabaseTransport) -> dict[str, object]:
         except (TypeError, ValueError):
             low_confidence = True
         hard_review = bool(context.get("needs_reprocessing")) or low_confidence or bool(
-            {"low_ocr_readability", "low_context_confidence", "no_clean_document_text", "missing_core_metadata"}.intersection(flags)
+            {"low_ocr_readability", "low_context_confidence", "no_clean_document_text", "missing_core_metadata", "missing_reference_and_date", "source_content_conflict", "missing_or_invalid_context_confidence"}.intersection(flags)
         )
         if hard_review and not proc.get("reviewed_at"):
             needs_review.append({

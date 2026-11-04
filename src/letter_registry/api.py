@@ -1376,6 +1376,28 @@ def _runtime_dependencies() -> ApiDependencies:
     return ApiDependencies()
 
 
+_QUALITY_REVIEW_FLAGS = frozenset({
+    "source_content_conflict",
+    "missing_reference_and_date",
+    "no_clean_document_text",
+    "low_confidence",
+    "low_context_confidence",
+    "missing_core_metadata",
+    "low_ocr_readability",
+    "missing_or_invalid_context_confidence",
+})
+
+
+def _quality_review_required(context: dict[str, object]) -> bool:
+    raw_flags = context.get("quality_flags")
+    flags = {str(flag) for flag in raw_flags if isinstance(flag, str)} if isinstance(raw_flags, list) else set()
+    raw_needs_reprocessing = context.get("needs_reprocessing")
+    needs_reprocessing = raw_needs_reprocessing is True or str(
+        raw_needs_reprocessing or ""
+    ).strip().casefold() in {"true", "1", "yes"}
+    return needs_reprocessing or bool(flags.intersection(_QUALITY_REVIEW_FLAGS))
+
+
 def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     deps = dependencies if dependencies is not None else _runtime_dependencies()
     app = FastAPI(
@@ -2898,15 +2920,17 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             "missing_reference_and_date": "The reference number and issue date are missing or uncertain.",
             "no_clean_document_text": "Text extraction was not reliable enough.",
             "low_confidence": "The extracted metadata has low confidence.",
+            "low_context_confidence": "The document interpretation needs verification.",
+            "missing_core_metadata": "The issuer, title or category needs verification.",
+            "low_ocr_readability": "OCR readability is below the safe threshold.",
+            "missing_or_invalid_context_confidence": "No reliable confidence score was available.",
         }
         items: list[dict[str, object]] = []
         for row in processing_rows:
             context = row.get("structured_context")
             if not isinstance(context, dict):
                 continue
-            needs_review = context.get("needs_reprocessing") is True or str(
-                context.get("needs_reprocessing") or ""
-            ).strip().casefold() in {"true", "1", "yes"}
+            needs_review = _quality_review_required(context)
             if not needs_review or row.get("reviewed_at"):
                 continue
             letter_id = str(row.get("letter_id") or "").strip()
@@ -2993,9 +3017,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Document has already been reviewed",
             )
-        needs_review = context.get("needs_reprocessing") is True or str(
-            context.get("needs_reprocessing") or ""
-        ).strip().casefold() in {"true", "1", "yes"}
+        needs_review = _quality_review_required(context)
         if not needs_review:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,

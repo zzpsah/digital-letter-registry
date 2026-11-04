@@ -15,6 +15,7 @@ ADMIN_ID = "11111111-1111-4111-8111-111111111111"
 FLAGGED_ID = "22222222-2222-4222-8222-222222222222"
 REVIEWED_ID = "33333333-3333-4333-8333-333333333333"
 NORMAL_ID = "44444444-4444-4444-8444-444444444444"
+ADVISORY_ID = "55555555-5555-4555-8555-555555555555"
 ARCHIVE_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
 
 
@@ -48,6 +49,12 @@ class FakeReviewDatabase:
                 "reviewed_at": None,
                 "updated_at": "2026-10-14T10:00:00Z",
             },
+            {
+                "letter_id": ADVISORY_ID,
+                "structured_context": {"needs_reprocessing": False, "quality_flags": ["no_clean_document_text"]},
+                "reviewed_at": None,
+                "updated_at": "2026-10-13T10:00:00Z",
+            },
         ]
         self.letters = {
             FLAGGED_ID: {
@@ -65,6 +72,7 @@ class FakeReviewDatabase:
             },
             REVIEWED_ID: {"id": REVIEWED_ID, "title": "Already reviewed", "is_trashed": False},
             NORMAL_ID: {"id": NORMAL_ID, "title": "Normal record", "is_trashed": False},
+            ADVISORY_ID: {"id": ADVISORY_ID, "title": "OCR quality flagged", "original_filename": "scan.pdf", "is_trashed": False},
         }
         self.updates: list[tuple[str, dict[str, object], dict[str, str]]] = []
 
@@ -124,8 +132,8 @@ class QualityReviewQueueTests(unittest.TestCase):
         response = self.client.get("/api/v1/admin/review-queue", headers=self.headers)
         self.assertEqual(response.status_code, 200)
         body = response.json()
-        self.assertEqual(body["count"], 1)
-        item = body["items"][0]
+        self.assertEqual(body["count"], 2)
+        item = next(row for row in body["items"] if row["letter_id"] == FLAGGED_ID)
         self.assertEqual(item["letter_id"], FLAGGED_ID)
         self.assertEqual(item["title"], "Synthetic review document")
         self.assertIn("The document heading and body may refer to different topics.", item["review_reasons"])
@@ -149,6 +157,17 @@ class QualityReviewQueueTests(unittest.TestCase):
         self.audit_mock.assert_called_once()
         self.assertEqual(self.audit_mock.call_args.kwargs["action"], "document_quality_review_accepted")
         self.assertEqual(self.audit_mock.call_args.kwargs["target_id"], FLAGGED_ID)
+
+    def test_queue_includes_ocr_flags_even_when_needs_reprocessing_is_false(self) -> None:
+        response = self.client.get("/api/v1/admin/review-queue", headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        item = next(row for row in response.json()["items"] if row["letter_id"] == ADVISORY_ID)
+        self.assertIn("Text extraction was not reliable enough.", item["review_reasons"])
+        accepted = self.client.post(
+            f"/api/v1/admin/review-queue/{ADVISORY_ID}/accept",
+            headers=self.headers,
+        )
+        self.assertEqual(accepted.status_code, 200, accepted.text)
 
     def test_accept_rejects_records_not_flagged_for_review(self) -> None:
         response = self.client.post(
