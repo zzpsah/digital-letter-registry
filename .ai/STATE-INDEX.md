@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 580ef67676710d8bbf33b55c0a862cb32c4039ab
-- Last commit: Expand quality review queue to all unresolved document flags
+- HEAD: afabb7df73e64829246bad2432157f02e0d7f244
+- Last commit: Refresh DLR archive quality audit snapshot
 - Last commit date: 2026-11-04
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
