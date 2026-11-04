@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: e863f08321277e8974faf6092d4e675d5b949c26
-- Last commit: Stream archived originals to improve document loading
+- HEAD: da7ca32f76c24562de20aed4a4419375f6932f55
+- Last commit: Require OCR quality review before document delivery
 - Last commit date: 2026-11-04
 - Last commit author: development-os[bot]
 

@@ -1,3 +1,11 @@
+## 2026-11-04 — Require OCR quality review before document delivery
+- Commit: da7ca32f76c24562de20aed4a4419375f6932f55
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/quality_assessment.py`
+- `tests/test_quality_assessment.py`
+
 ## 2026-11-04 — Stream archived originals to improve document loading
 - Commit: e863f08321277e8974faf6092d4e675d5b949c26
 - Author: development-os[bot]
