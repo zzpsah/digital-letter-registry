@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: fc578a40a3f929923145c4add294262feb5de617
-- Last commit: Fix IPv4 connectivity to Tailscale Supabase endpoint
+- HEAD: 9b8b590e61a70fed0787662312d08e62dcf13de8
+- Last commit: Add outbound Supabase connection diagnostics
 - Last commit date: 2026-11-04
 - Last commit author: development-os[bot]
 
