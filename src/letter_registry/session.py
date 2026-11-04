@@ -9,6 +9,8 @@ from typing import Callable
 from urllib import error, request
 from uuid import UUID
 
+from .http_client import open_url
+
 
 class SupabaseSessionError(RuntimeError):
     pass
@@ -19,7 +21,7 @@ HttpExecutor = Callable[[request.Request], tuple[int, str]]
 
 def _default_http_executor(req: request.Request) -> tuple[int, str]:
     try:
-        with request.urlopen(req, timeout=30) as response:  # noqa: S310
+        with open_url(req, timeout=12) as response:  # noqa: S310
             return response.status, response.read().decode("utf-8")
     except error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
