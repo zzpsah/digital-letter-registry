@@ -1,3 +1,19 @@
+## 2026-11-04 — Harden DLR worker sessions and document pipeline recovery
+- Commit: f10a0bc4862e4009672c473bf201ce1e45d7c08a
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `docs/QUALITY-AUDIT-2026-11-04.md`
+- `docs/WORKER-OPERATIONS.md`
+- `scripts/audit_document_pipeline.py`
+- `src/letter_registry/extraction_backends.py`
+- `src/letter_registry/supabase_runtime.py`
+- `src/letter_registry/worker.py`
+- `tests/test_extraction_backends.py`
+- `tests/test_supabase_runtime.py`
+- `tests/test_worker.py`
+
 ## 2026-11-04 — Re-extract corrupt legacy-font text on manual reprocess
 - Commit: d687506efe1a0d20fd038958a12fd5f1859d4462
 - Author: development-os[bot]
