@@ -1309,6 +1309,37 @@ class ApiTests(unittest.TestCase):
         self.assertNotIn("private-object-reference", str(response.headers))
         self.assertNotIn(b"private-object-reference", response.content)
 
+    def test_original_endpoint_uses_streaming_storage_when_available(self):
+        from io import BytesIO
+        from letter_registry.original_access import SupabaseOriginalAccessService
+
+        class Database:
+            def select(self, table, *, filters=None, columns="*"):
+                return [{
+                    "original_filename": "large-sample.pdf",
+                    "storage_provider": "gdrive",
+                    "storage_object_id": "private-stream-reference",
+                }]
+
+        class Storage:
+            def open_stream(self, *, provider, object_reference, filename):
+                self.assertions = (provider, object_reference, filename)
+                return BytesIO(b"%PDF-streamed-content"), "application/pdf"
+
+        storage = Storage()
+        app = create_app(ApiDependencies(original_access=SupabaseOriginalAccessService(storage)))
+        client = TestClient(app)
+        with patch("letter_registry.api._transport", return_value=Database()):
+            response = client.get(
+                "/api/v1/letters/22222222-2222-4222-8222-222222222222/original",
+                headers={"Authorization": "Bearer synthetic-user-token"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"%PDF-streamed-content")
+        self.assertEqual(response.headers["content-type"], "application/pdf")
+        self.assertEqual(storage.assertions, ("gdrive", "private-stream-reference", "large-sample.pdf"))
+
     def test_original_endpoint_handles_devanagari_filename(self):
         """A Hindi filename must not break the header (latin-1 only) -> no 500."""
         from letter_registry.original_access import OriginalFile, SupabaseOriginalAccessService

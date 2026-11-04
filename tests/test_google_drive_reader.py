@@ -29,6 +29,28 @@ class GoogleDrivePrivateTransportTests(unittest.TestCase):
         self.assertIn("/drive/v3/files/synthetic-object-id?", seen["url"])
         self.assertEqual(seen["authorization"], "Bearer synthetic-token")
 
+    def test_open_stream_returns_live_response_without_buffering(self):
+        from io import BytesIO
+        from unittest.mock import patch
+
+        class FakeResponse(BytesIO):
+            status = 200
+            headers = {"Content-Type": "application/pdf; charset=binary"}
+
+        response = FakeResponse(b"%PDF-stream")
+        transport = GoogleDrivePrivateTransport(access_token="synthetic-token")
+        with patch("letter_registry.google_drive_reader.request.urlopen", return_value=response) as opener:
+            upstream, content_type = transport.open_stream(
+                provider="gdrive",
+                object_reference="synthetic-object-id",
+                filename="letter.pdf",
+            )
+
+        self.assertIs(upstream, response)
+        self.assertEqual(content_type, "application/pdf")
+        self.assertEqual(upstream.read(), b"%PDF-stream")
+        self.assertIn("Bearer synthetic-token", opener.call_args.args[0].headers["Authorization"])
+
     def test_object_reference_rejects_path_like_input(self):
         transport = GoogleDrivePrivateTransport(
             access_token="synthetic-token",

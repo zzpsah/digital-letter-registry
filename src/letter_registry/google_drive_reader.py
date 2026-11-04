@@ -143,3 +143,42 @@ class GoogleDrivePrivateTransport:
             content_type=content_type,
             content=content,
         )
+
+    def open_stream(
+        self,
+        *,
+        provider: str,
+        object_reference: str,
+        filename: str,
+    ) -> tuple[object, str]:
+        """Open a private Drive response without buffering the entire file."""
+        if provider != "gdrive":
+            raise ValueError(f"unsupported storage provider: {provider}")
+        object_id = object_reference.strip()
+        if not object_id or "/" in object_id or "\\" in object_id:
+            raise ValueError("invalid Google Drive object reference")
+        encoded_id = parse.quote(object_id, safe="")
+        url = (
+            "https://www.googleapis.com/drive/v3/files/"
+            f"{encoded_id}?alt=media&supportsAllDrives=true"
+        )
+        req = request.Request(
+            url, headers={"Authorization": f"Bearer {self._token()}"}, method="GET"
+        )
+        try:
+            upstream = request.urlopen(req, timeout=60)  # noqa: S310
+        except error.HTTPError as exc:
+            raise GoogleDriveReadError(
+                f"Google Drive request failed with HTTP {exc.code}"
+            ) from exc
+        except error.URLError as exc:
+            raise GoogleDriveReadError(
+                f"Google Drive request failed: {exc.reason}"
+            ) from exc
+        guessed_type, _ = mimetypes.guess_type(filename)
+        content_type = (
+            (upstream.headers.get("Content-Type") or "").split(";", 1)[0].strip()
+            or guessed_type
+            or "application/octet-stream"
+        )
+        return upstream, content_type

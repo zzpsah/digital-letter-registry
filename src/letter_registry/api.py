@@ -17,7 +17,7 @@ from urllib.parse import quote, urlsplit
 from uuid import UUID, uuid4
 
 from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile, status
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
@@ -1285,6 +1285,19 @@ def _letter_storage_row(
             detail="Letter not found",
         )
     return rows[0]
+
+
+def _stream_upstream(upstream: object):
+    try:
+        while True:
+            chunk = upstream.read(1024 * 1024)
+            if not chunk:
+                break
+            yield chunk
+    finally:
+        close = getattr(upstream, "close", None)
+        if callable(close):
+            close()
 
 
 def _drive_public_url(
@@ -4447,20 +4460,36 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_307_TEMPORARY_REDIRECT,
             )
 
-        original = deps.original_access.fetch(
-            record_id=record_id,
-            database=_transport(access_token),
-        )
-        if original is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Letter not found",
+        database = _transport(access_token)
+        storage = deps.original_access.storage
+        if callable(getattr(storage, "open_stream", None)):
+            rows = database.select(
+                "letters", filters={"id": record_id},
+                columns="original_filename,storage_provider,storage_object_id",
+            )
+            if not rows:
+                raise HTTPException(status_code=404, detail="Letter not found")
+            row = rows[0]
+            filename = str(row["original_filename"])
+            upstream, content_type = storage.open_stream(
+                provider=str(row["storage_provider"]),
+                object_reference=str(row["storage_object_id"]),
+                filename=filename,
+            )
+            return StreamingResponse(
+                _stream_upstream(upstream), media_type=content_type,
+                headers={
+                    "Content-Disposition": _content_disposition("inline", filename.replace('"', "")),
+                    "Cache-Control": "private, no-store",
+                },
             )
 
+        original = deps.original_access.fetch(record_id=record_id, database=database)
+        if original is None:
+            raise HTTPException(status_code=404, detail="Letter not found")
         safe_name = original.filename.replace('"', "")
         return Response(
-            content=original.content,
-            media_type=original.content_type,
+            content=original.content, media_type=original.content_type,
             headers={
                 "Content-Disposition": _content_disposition("inline", safe_name),
                 "Cache-Control": "private, no-store",
@@ -4484,19 +4513,36 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 status_code=status.HTTP_307_TEMPORARY_REDIRECT,
             )
 
-        original = deps.original_access.fetch(
-            record_id=record_id,
-            database=_transport(access_token),
-        )
-        if original is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Letter not found",
+        database = _transport(access_token)
+        storage = deps.original_access.storage
+        if callable(getattr(storage, "open_stream", None)):
+            rows = database.select(
+                "letters", filters={"id": record_id},
+                columns="original_filename,storage_provider,storage_object_id",
             )
+            if not rows:
+                raise HTTPException(status_code=404, detail="Letter not found")
+            row = rows[0]
+            filename = str(row["original_filename"])
+            upstream, content_type = storage.open_stream(
+                provider=str(row["storage_provider"]),
+                object_reference=str(row["storage_object_id"]),
+                filename=filename,
+            )
+            return StreamingResponse(
+                _stream_upstream(upstream), media_type=content_type,
+                headers={
+                    "Content-Disposition": _content_disposition("attachment", filename.replace('"', "")),
+                    "Cache-Control": "private, no-store",
+                },
+            )
+
+        original = deps.original_access.fetch(record_id=record_id, database=database)
+        if original is None:
+            raise HTTPException(status_code=404, detail="Letter not found")
         safe_name = original.filename.replace('"', "")
         return Response(
-            content=original.content,
-            media_type=original.content_type,
+            content=original.content, media_type=original.content_type,
             headers={
                 "Content-Disposition": _content_disposition("attachment", safe_name),
                 "Cache-Control": "private, no-store",
