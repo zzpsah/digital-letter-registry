@@ -2,7 +2,7 @@
 
 Read-only production snapshot. Regenerate with `scripts/audit_document_pipeline.py`; this repository intentionally stores aggregate counts, not private archive filenames or document contents.
 
-## Inventory at 17:24 UTC
+## Inventory at 17:28 UTC
 
 | Measure | Count |
 |---|---:|
@@ -14,7 +14,7 @@ Read-only production snapshot. Regenerate with `scripts/audit_document_pipeline.
 | Completed jobs | 178 |
 | Failed jobs | 2 |
 | Pending jobs | 1 |
-| Processing jobs | 0 |
+| Processing jobs | 1 |
 | Stale processing jobs (45m+) | 0 |
 | Documents requiring human review | 24 |
 
@@ -58,7 +58,7 @@ The 24 review-queue count is the union of unresolved quality flags, not the sum 
 
 ## Current reprocessing
 
-The 51-page Hindi Master Circular (`01.pdf`) was manually requeued after its previous run timed out at 15 minutes and failure reporting failed with an expired JWT. At this snapshot it is pending and will be claimed by the next worker tick. The original file is preserved; its metadata has been corrected from the original first page, but the full OCR transcript remains unverified until the new run completes.
+The 51-page Hindi Master Circular (`01.pdf`) was manually requeued after its previous run timed out at 15 minutes and failure reporting failed with an expired JWT. At this snapshot its new OCR run is active (page raster/OCR has advanced through the early pages); the UDISE retry is queued behind it. The original file is preserved; its metadata has been corrected from the original first page, but the full OCR transcript remains unverified until the new run completes.
 
 ## Review workflow
 
