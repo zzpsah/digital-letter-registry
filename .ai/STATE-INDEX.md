@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 7f13e91a6c6771b9076d155b11e9928198d830de
-- Last commit: Add durable WhatsApp recovery batch receipts
+- HEAD: ce61f6eaa7a47b2552c11e9888336cff38ff2e41
+- Last commit: Improve sign-in feedback and error handling
 - Last commit date: 2026-11-04
 - Last commit author: development-os[bot]
 

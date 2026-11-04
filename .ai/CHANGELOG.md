@@ -1,3 +1,10 @@
+## 2026-11-04 — Improve sign-in feedback and error handling
+- Commit: ce61f6eaa7a47b2552c11e9888336cff38ff2e41
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/web/index.html`
+
 ## 2026-11-04 — Add durable WhatsApp recovery batch receipts
 - Commit: 7f13e91a6c6771b9076d155b11e9928198d830de
 - Author: development-os[bot]
