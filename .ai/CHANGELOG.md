@@ -1,3 +1,13 @@
+## 2026-11-04 — Re-extract corrupt legacy-font text on manual reprocess
+- Commit: d687506efe1a0d20fd038958a12fd5f1859d4462
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/quality_assessment.py`
+- `src/letter_registry/worker.py`
+- `tests/test_quality_assessment.py`
+- `tests/test_worker.py`
+
 ## 2026-11-04 — Detect broken legacy Hindi PDF text layers
 - Commit: 3aa67289fd7169a772d54b8928ac73578661dfbd
 - Author: development-os[bot]

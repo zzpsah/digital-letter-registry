@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 3aa67289fd7169a772d54b8928ac73578661dfbd
-- Last commit: Detect broken legacy Hindi PDF text layers
+- HEAD: d687506efe1a0d20fd038958a12fd5f1859d4462
+- Last commit: Re-extract corrupt legacy-font text on manual reprocess
 - Last commit date: 2026-11-04
 - Last commit author: development-os[bot]
 
