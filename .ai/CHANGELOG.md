@@ -1,3 +1,15 @@
+## 2026-11-04 — Automatically recover stale DLR worker jobs
+- Commit: 3f2bb21a5c6dbfda8bf02cae8c5e7bd7a63e1db0
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `database/migrations/20261104190000_recover_stale_processing_jobs.sql`
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `docs/WORKER-OPERATIONS.md`
+- `scripts/run_worker_once.py`
+- `src/letter_registry/jobs.py`
+- `tests/test_jobs.py`
+
 ## 2026-11-04 — Harden DLR worker sessions and document pipeline recovery
 - Commit: f10a0bc4862e4009672c473bf201ce1e45d7c08a
 - Author: development-os[bot]
