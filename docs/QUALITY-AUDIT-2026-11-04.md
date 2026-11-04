@@ -2,18 +2,18 @@
 
 Read-only production snapshot. Regenerate with `scripts/audit_document_pipeline.py`; this repository intentionally stores aggregate counts, not private archive filenames or document contents.
 
-## Inventory at 17:28 UTC
+## Inventory at 17:36 UTC
 
 | Measure | Count |
 |---|---:|
-| Documents | 137 |
-| Processing rows | 137 |
+| Documents | 138 |
+| Processing rows | 138 |
 | Missing processing rows | 0 |
-| Source/provenance rows | 141 |
-| Processing jobs | 182 |
+| Source/provenance rows | 142 |
+| Processing jobs | 185 |
 | Completed jobs | 178 |
-| Failed jobs | 2 |
-| Pending jobs | 1 |
+| Failed jobs | 3 |
+| Pending jobs | 2 |
 | Processing jobs | 1 |
 | Stale processing jobs (45m+) | 0 |
 | Documents requiring human review | 24 |
@@ -58,7 +58,7 @@ The 24 review-queue count is the union of unresolved quality flags, not the sum 
 
 ## Current reprocessing
 
-The 51-page Hindi Master Circular (`01.pdf`) was manually requeued after its previous run timed out at 15 minutes and failure reporting failed with an expired JWT. At this snapshot its new OCR run is active (page raster/OCR has advanced through the early pages); the UDISE retry is queued behind it. The original file is preserved; its metadata has been corrected from the original first page, but the full OCR transcript remains unverified until the new run completes.
+The 51-page Hindi Master Circular (`01.pdf`) was manually requeued after its previous run timed out at 15 minutes and failure reporting failed with an expired JWT. At this snapshot its new OCR run is active (page raster/OCR has advanced through page 17); the UDISE retry and a newly ingested scan are queued behind it. The earlier UDISE retry was deliberately stopped when we found the n8n bridge still had a 15-minute timeout; that attempt is retained as a failed job for audit, and a fresh retry is queued under the corrected 45-minute bridge timeout. The original file is preserved; its metadata has been corrected from the original first page, but the full OCR transcript remains unverified until the new run completes.
 
 ## Review workflow
 
