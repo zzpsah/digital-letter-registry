@@ -7,6 +7,9 @@ deployment is intentionally out of scope until explicitly approved.
 from __future__ import annotations
 
 import os
+from pathlib import Path
+
+from letter_registry.recovery_notifications import reconcile_recovery_notifications
 
 from letter_registry.extraction import VersionedTextExtractor
 from letter_registry.autonomous_learning import AutonomousCorrectionMemory
@@ -112,6 +115,16 @@ def main() -> int:
     )
 
     result = worker.run_once()
+    # Recovery receipts are reconciled on every tick, including idle ticks.
+    # A failed WhatsApp send remains unmarked and is retried next minute.
+    try:
+        reconcile_recovery_notifications(
+            transport,
+            state_dir=Path("/home/prashant/.hermes/state/dlr-worker-notifications"),
+            source_loader=SupabaseSourceLoader(transport),
+        )
+    except Exception as exc:
+        print(f"recovery_notification_check_failed={str(exc)[:240]}")
     print(f"status={result.status}")
     if result.job_id:
         print(f"job_id={result.job_id}")
