@@ -1,3 +1,10 @@
+## 2026-11-04 — Bound TLS attempts across Funnel IPv4 edges
+- Commit: 4597f9ce9c1dba84ee1c70d22037b02949f7f362
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/http_client.py`
+
 ## 2026-11-04 — Add outbound Supabase connection diagnostics
 - Commit: 9b8b590e61a70fed0787662312d08e62dcf13de8
 - Author: development-os[bot]
