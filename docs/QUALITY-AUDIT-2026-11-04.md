@@ -2,7 +2,7 @@
 
 Read-only production snapshot. Regenerate with `scripts/audit_document_pipeline.py`; this repository intentionally stores aggregate counts, not private archive filenames or document contents.
 
-## Inventory at 17:36 UTC
+## Inventory at 18:03 UTC
 
 | Measure | Count |
 |---|---:|
@@ -11,20 +11,20 @@ Read-only production snapshot. Regenerate with `scripts/audit_document_pipeline.
 | Missing processing rows | 0 |
 | Source/provenance rows | 142 |
 | Processing jobs | 185 |
-| Completed jobs | 178 |
+| Completed jobs | 179 |
 | Failed jobs | 3 |
 | Pending jobs | 2 |
 | Processing jobs | 1 |
 | Stale processing jobs (45m+) | 0 |
-| Documents requiring human review | 24 |
+| Documents requiring human review | 23 |
 
 ## OCR method inventory
 
 | Method | Documents |
 |---|---:|
-| OCRmyPDF/Tesseract PDF Hindi+English | 57 |
+| OCRmyPDF/Tesseract PDF Hindi+English | 58 |
 | Tesseract image Hindi+English | 48 |
-| Native PDF text | 31 |
+| Native PDF text | 30 |
 | pdftotext layout | 1 |
 | Unprocessed | 1 |
 
@@ -34,9 +34,9 @@ Read-only production snapshot. Regenerate with `scripts/audit_document_pipeline.
 |---|---:|
 | Complete | 117 |
 | Partial | 8 |
-| Needs review | 10 |
-| Processing | 1 |
-| Unset | 5 |
+| Needs review | 11 |
+| Processing | 0 |
+| Unset | 6 |
 
 Partial/unset are review targets; they do not by themselves prove an original file is missing.
 
@@ -45,9 +45,9 @@ Partial/unset are review targets; they do not by themselves prove an original fi
 | Flag | Documents |
 |---|---:|
 | Missing reference number and issue date | 14 |
-| Low context confidence | 12 |
-| Missing core metadata | 9 |
-| No clean document text | 9 |
+| Low context confidence | 11 |
+| Missing core metadata | 8 |
+| No clean document text | 8 |
 
 The 24 review-queue count is the union of unresolved quality flags, not the sum of the flag counts. Some flags overlap. Missing reference/date can be legitimate for forms and manuals; inspect the source before accepting or correcting it.
 
@@ -63,3 +63,11 @@ The 51-page Hindi Master Circular (`01.pdf`) was manually requeued after its pre
 ## Review workflow
 
 The Admin → Operations → Quality review API now includes documents with unresolved OCR, confidence, missing-core-metadata, missing-reference/date and source-conflict flags even when `needs_reprocessing` was not set. The administrator must inspect the original before accepting a record. Reprocess extraction failures; do not invent dates, memo numbers or amounts.
+
+
+## Latest verification
+
+- Master Circular OCR: completed; all 51 pages represented; 76,964 Devanagari characters detected.
+- Master Circular delivery: held for human review; OCR output is present, but AI-derived effective date and summary details are not yet verified page by page.
+- Current queue: two pending jobs (UDISE retry and new scanned PDF); no stale processing jobs.
+- Full DLR test run: 433 tests executed; 431 passed and two existing web-shell assertions failed (`test_dashboard_recovers_stale_pagination_and_surfaces_load_errors`, `test_streamed_original_response_is_opened_from_blob`). The OCR, worker recovery, auth refresh, and quality-review tests passed in that run. These two web-shell failures remain to be reconciled before declaring the full suite green.
