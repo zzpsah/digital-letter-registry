@@ -225,6 +225,31 @@ class WorkerTests(unittest.TestCase):
             "extends",
         )
 
+    def test_failure_report_database_error_does_not_escape_worker(self):
+        class FailingQueue(FakeQueue):
+            def fail(self, job, *, error_message):
+                raise RuntimeError("JWT expired")
+
+        queue = FailingQueue(ProcessingJob(
+            job_id=JOB_ID,
+            letter_id=LETTER_ID,
+            owner_id=OWNER_ID,
+            created_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
+        ))
+        worker = DocumentProcessingWorker(
+            queue=queue,
+            source_loader=FakeSourceLoader(None),
+            database=FakeDatabase(),
+            original_access=FakeOriginalAccess(),
+            repository=FakeRepository(),
+            extractor=VersionedTextExtractor(FakePdfBackend()),
+            context_provider=FakeContextProvider(),
+            embeddings=None,
+        )
+        result = worker.run_once()
+        self.assertEqual(result.status, "failure_report_pending")
+        self.assertIn("JWT expired", result.error)
+
     def test_missing_source_marks_job_failed(self):
         queue = FakeQueue(job())
         worker = DocumentProcessingWorker(

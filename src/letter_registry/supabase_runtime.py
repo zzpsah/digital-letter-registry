@@ -43,6 +43,7 @@ class SupabasePostgrestTransport:
     publishable_key: str
     access_token: str
     http_executor: HttpExecutor = _default_http_executor
+    access_token_provider: Callable[[], str] | None = None
 
     @classmethod
     def from_worker_environment(cls) -> "SupabasePostgrestTransport":
@@ -80,12 +81,23 @@ class SupabasePostgrestTransport:
             email=worker_email,
             password=worker_password,
         )
+
+        def current_worker_token() -> str:
+            # A single OCR/AI job can outlive the JWT issued at worker startup.
+            # Re-read/refresh the rotating session before every DB request so
+            # completion and failure reporting never depend on that old token.
+            return load_worker_session(
+                email=worker_email,
+                password=worker_password,
+            ).access_token
+
         return cls(
             base_url=os.environ.get("SUPABASE_URL", "").strip(),
             publishable_key=os.environ.get(
                 "SUPABASE_PUBLISHABLE_KEY", ""
             ).strip(),
             access_token=session.access_token,
+            access_token_provider=current_worker_token,
         )
 
     @classmethod
@@ -117,6 +129,12 @@ class SupabasePostgrestTransport:
         prefer: str | None = None,
     ) -> object:
         url = f"{self.base_url.rstrip('/')}/rest/v1/{path.lstrip('/')}"
+        if self.access_token_provider is not None:
+            refreshed_token = self.access_token_provider()
+            if not refreshed_token:
+                raise SupabaseRuntimeError("worker session refresh returned an empty access token")
+            self.access_token = refreshed_token
+
         headers = {
             "apikey": self.publishable_key,
             "Authorization": f"Bearer {self.access_token}",

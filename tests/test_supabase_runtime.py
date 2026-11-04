@@ -142,6 +142,31 @@ class SupabaseRuntimeTransportTests(unittest.TestCase):
         self.assertEqual(seen["apikey"], "synthetic-publishable-key")
         self.assertIn("resolution=ignore-duplicates", seen["prefer"])
 
+    def test_transport_refreshes_worker_token_before_each_request(self) -> None:
+        seen = []
+        tokens = iter(["fresh-token-one", "fresh-token-two"])
+
+        def executor(req):
+            seen.append(req.headers["Authorization"])
+            return 200, "[]"
+
+        transport = SupabasePostgrestTransport(
+            base_url="http://127.0.0.1:8877",
+            publishable_key="synthetic-key",
+            access_token="expired-at-start",
+            http_executor=executor,
+            access_token_provider=lambda: next(tokens),
+        )
+
+        transport.select("letters", columns="id")
+        transport.select("letters", columns="id")
+
+        self.assertEqual(
+            seen,
+            ["Bearer fresh-token-one", "Bearer fresh-token-two"],
+        )
+        self.assertEqual(transport.access_token, "fresh-token-two")
+
     def test_upsert_uses_merge_duplicate_resolution(self) -> None:
         seen = {}
 

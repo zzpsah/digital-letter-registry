@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Protocol
@@ -98,7 +99,12 @@ class DocumentProcessingWorker:
         try:
             self.database.update(
                 "processing_jobs",
-                {"progress_stage": stage, "progress_percent": percent, "progress_detail": detail},
+                {
+                    "progress_stage": stage,
+                    "progress_percent": percent,
+                    "progress_detail": detail,
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                },
                 filters={"id": job.job_id},
             )
         except Exception:
@@ -292,7 +298,19 @@ class DocumentProcessingWorker:
             )
         except Exception as exc:
             message = str(exc)[:2000] or exc.__class__.__name__
-            self.queue.fail(job, error_message=message)
+            try:
+                self.queue.fail(job, error_message=message)
+            except Exception as report_exc:
+                # Never hide the original processing failure. The durable stale
+                # lease recovery in claim_processing_job() will recover this
+                # row if the database/auth path is unavailable at failure time.
+                report_message = str(report_exc)[:500] or report_exc.__class__.__name__
+                return WorkerRunResult(
+                    status="failure_report_pending",
+                    job_id=job.job_id,
+                    letter_id=job.letter_id,
+                    error=f"{message}; failure report unavailable: {report_message}",
+                )
             return WorkerRunResult(
                 status="failed",
                 job_id=job.job_id,

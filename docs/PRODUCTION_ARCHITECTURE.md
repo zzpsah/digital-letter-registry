@@ -204,7 +204,53 @@ Reasons may include:
 
 A run must never destroy prior run outputs.
 
-## 6. Provider architecture
+## 6. Production worker topology (Oracle VPS)
+
+The current production path is intentionally simple and serial to protect the small Oracle VPS from OCR memory/CPU spikes:
+
+```text
+WhatsApp / email / manual upload
+        |
+        v
+DLR intake + immutable original in private Google Drive
+        |
+        v
+Local PostgreSQL (letters, letter_sources, letter_processing, processing_jobs)
+        |
+        v
+PostgREST (127.0.0.1:3001) via local compatibility proxy (127.0.0.1:8877)
+        |
+        v
+GoTrue worker identity + rotating refresh-token session
+        |
+        v
+systemd user timer: dlr-worker.timer (about once per minute)
+        |
+        v
+dlr-worker.service (Type=oneshot; one job per invocation)
+        |
+        +--> native PDF text extraction (only when usable)
+        +--> OCRmyPDF + Tesseract hin+eng when needed
+        +--> Gemini/context provider + deterministic fallback
+        +--> searchable text, metadata, relationships and optional embeddings
+        |
+        v
+Quality gate -> email/WhatsApp outbox delivery
+```
+
+Important runtime facts:
+- `processing_jobs` is the durable queue; `pending` jobs are claimed atomically with `FOR UPDATE SKIP LOCKED`.
+- The worker is a one-shot service, not a permanently running daemon. `inactive (dead)` after `status=idle` or `status=completed` is expected. The timer, not the service process, is the persistent component.
+- Only one job runs at a time. A long OCR job occupies the service and delays all later jobs; it does not imply that the timer was disabled. Do not add parallel OCR workers without measuring VPS CPU/RAM and queue pressure.
+- Worker auth uses the dedicated non-human GoTrue account and a file-backed, lock-protected rotating refresh-token session. Refresh the session before every PostgREST request because a job may outlive the access token loaded at process start. Never log token contents.
+- Every progress-stage update refreshes `processing_jobs.updated_at`. A job with no heartbeat for 45 minutes is eligible for recovery; the SQL claim function requeues stale jobs below three attempts and marks exhausted jobs failed for administrator review.
+- OCRmyPDF hard timeout is configurable via `DLR_OCR_TIMEOUT_SECONDS`; production default is 2,400 seconds (40 minutes). The systemd service start timeout must exceed it (45 minutes) so the worker can record completion/failure.
+- A failure to report a failure must not crash the worker's error handler. It returns `failure_report_pending`; the stale-lease recovery path is the durable fallback.
+- Delivery is fail-closed: low OCR readability, `needs_reprocessing`, or confidence below 0.60 requires review; successful execution alone is not approval to send.
+
+Operational commands and the current queue/review inventory are maintained in [WORKER-OPERATIONS.md](WORKER-OPERATIONS.md).
+
+## 7. Provider architecture
 
 ### Primary document understanding
 Supabase `gemini-ai-gateway` is the current primary Gemini path.
@@ -224,7 +270,7 @@ Local Hermes/Ollama may be used for optional enrichment or offline experiments, 
 
 Provider selection is runtime configuration, never embedded into document identity.
 
-## 7. PDF/image understanding policy
+## 8. PDF/image understanding policy
 
 For scanned government documents:
 
@@ -238,7 +284,7 @@ For scanned government documents:
 6. Human-readable summary is generated from document understanding, not by simply truncating raw OCR.
 7. Full OCR remains stored and searchable even when imperfect.
 
-## 8. Email contract
+## 9. Email contract
 
 Email is an archival human-readable delivery.
 
@@ -262,7 +308,7 @@ Body order:
 Hindi is preferred for Hindi official documents.
 The full OCR may be imperfect; it must not be presented as the human-readable summary.
 
-## 9. WhatsApp contract
+## 10. WhatsApp contract
 
 WhatsApp is a compact search/retrieval receipt.
 
@@ -276,7 +322,7 @@ Include:
 
 Do not paste the full OCR into WhatsApp.
 
-## 10. Metadata taxonomy
+## 11. Metadata taxonomy
 
 Free-text categories are not sufficient long-term.
 
@@ -315,7 +361,7 @@ Important identifiers should use dedicated fields rather than only hashtags:
 - scheme/system identifier
 - deadline/action state
 
-## 11. Duplicate and version policy
+## 12. Duplicate and version policy
 
 ### Exact duplicate
 Same SHA-256:
@@ -334,7 +380,7 @@ Different hash but strong metadata similarity:
 New bytes = new document ID.
 Link with `supersedes` or `corrects`.
 
-## 12. Auditability
+## 13. Auditability
 
 Long-lived systems need an append-only audit trail for significant actions:
 - intake accepted/rejected
@@ -349,7 +395,7 @@ Long-lived systems need an append-only audit trail for significant actions:
 
 Audit events must not contain secrets.
 
-## 13. Retention and deletion
+## 14. Retention and deletion
 
 Default:
 - originals retained indefinitely
@@ -360,7 +406,7 @@ Default:
 
 Deletion must be explicit, auditable, and separate from ordinary reprocessing.
 
-## 14. Backup and recovery
+## 15. Backup and recovery
 
 Minimum long-term recovery requirement:
 - original documents exist in durable private storage
@@ -371,7 +417,7 @@ Minimum long-term recovery requirement:
 
 Oracle VPS must never be the sole durable copy.
 
-## 15. Schema evolution strategy
+## 16. Schema evolution strategy
 
 No destructive redesign in one migration.
 
@@ -391,7 +437,7 @@ Phase 4 — switch reads
 
 Phase 5 — retire compatibility fields only after verified migration
 
-## 16. Required future tables
+## 17. Required future tables
 
 Recommended additive tables:
 - document_files or immutable_file_metadata extension
@@ -405,7 +451,7 @@ Recommended additive tables:
 
 These should be owner/archive scoped, indexed, RLS protected, and created by migrations.
 
-## 17. Operational SLOs
+## 18. Operational SLOs
 
 Targets, not guarantees:
 - intake acknowledgement should not depend on AI completion
@@ -415,7 +461,7 @@ Targets, not guarantees:
 - a failed delivery can be retried without reprocessing the document
 - an AI/model upgrade can reprocess historical documents without changing original identity
 
-## 18. Definition of production-grade
+## 19. Definition of production-grade
 
 A feature is production-grade only when:
 - its data ownership and lifecycle are defined

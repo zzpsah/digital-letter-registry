@@ -77,7 +77,7 @@ class OcrmypdfTesseractBackend:
     # discarded as "OCRmyPDF timed out" despite producing usable text. The
     # ceiling is configurable so it can be tuned without a code change.
     timeout_seconds: int = field(
-        default_factory=lambda: _resolve_timeout("DLR_OCR_TIMEOUT_SECONDS", 900)
+        default_factory=lambda: _resolve_timeout("DLR_OCR_TIMEOUT_SECONDS", 2400)
     )
 
     def extract_text(self, path: Path, *, languages: tuple[str, ...]) -> str:

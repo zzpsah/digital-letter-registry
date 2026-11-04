@@ -125,10 +125,10 @@ class OcrmypdfBackendTests(unittest.TestCase):
         import os
         from unittest.mock import patch
 
-        # Default must clear the measured 328s for a 43-page Hindi scan.
+        # Forty minutes covers large Hindi scans while the systemd unit has a 45-minute ceiling.
         with patch.dict(os.environ, {}, clear=False):
             os.environ.pop("DLR_OCR_TIMEOUT_SECONDS", None)
-            self.assertGreaterEqual(OcrmypdfTesseractBackend().timeout_seconds, 600)
+            self.assertEqual(OcrmypdfTesseractBackend().timeout_seconds, 2400)
 
         with patch.dict(os.environ, {"DLR_OCR_TIMEOUT_SECONDS": "1200"}, clear=False):
             self.assertEqual(OcrmypdfTesseractBackend().timeout_seconds, 1200)
