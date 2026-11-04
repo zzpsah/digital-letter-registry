@@ -1,3 +1,12 @@
+## 2026-11-04 — Add durable WhatsApp recovery batch receipts
+- Commit: 7f13e91a6c6771b9076d155b11e9928198d830de
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `scripts/run_worker_once.py`
+- `src/letter_registry/recovery_notifications.py`
+- `tests/test_recovery_notifications.py`
+
 ## 2026-11-01 — Add viewer-scoped VidyaDesk letter archive summary
 - Commit: 27baefeb32919876616c8f6948c63bf9b16f2b0b
 - Author: PRASHANT KUMAR SAH
