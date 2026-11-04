@@ -1,3 +1,11 @@
+## 2026-11-04 — Version shared-lock DLR worker launcher
+- Commit: e0586fa866aab588d4ffde1aac06980c2616e522
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `deploy/bin/dlr-worker-run-with-bitwarden`
+- `docs/WORKER-OPERATIONS.md`
+
 ## 2026-11-04 — Document n8n primary worker scheduler and shared lock
 - Commit: a05805684e78ab841680dd94f6bb9dedec98280b
 - Author: development-os[bot]
