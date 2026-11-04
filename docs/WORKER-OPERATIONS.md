@@ -51,6 +51,10 @@ The script does not reprocess, approve, delete, resend, or change any document. 
 5. Failed jobs require diagnosis before retry. A failed job caused by missing storage support is not an OCR problem.
 6. Check pending/processing jobs separately from the quality-review queue. A document can have completed processing and still need review, or have no failed job while remaining stuck in `processing`.
 
+## Versioned systemd units
+
+The deployed unit definitions are versioned in `deploy/systemd/`. Keep the VPS copies in `/home/prashant/.config/systemd/user/` synchronized with these files. After changing them, run `systemctl --user daemon-reload`; verify the timer is active and the service has a 45-minute start ceiling.
+
 ## Operational commands
 
 ```bash
