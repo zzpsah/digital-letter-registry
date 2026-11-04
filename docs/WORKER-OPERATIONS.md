@@ -53,7 +53,7 @@ The script does not reprocess, approve, delete, resend, or change any document. 
 
 ## Versioned systemd units
 
-The deployed unit definitions are versioned in `deploy/systemd/`. Keep the VPS copies in `/home/prashant/.config/systemd/user/` synchronized with these files. After changing them, run `systemctl --user daemon-reload`; verify the timer remains disabled while n8n is the primary scheduler and the service has a 45-minute start ceiling.
+The deployed unit definitions are versioned in `deploy/systemd/`; the shared-lock launcher is versioned in `deploy/bin/dlr-worker-run-with-bitwarden`. Keep the VPS copies synchronized with these files. After changing them, run `systemctl --user daemon-reload`; verify the timer remains disabled while n8n is the primary scheduler and the service has a 45-minute start ceiling.
 
 ## Operational commands
 

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT="/home/prashant/projects/digital-letter-registry"
+SCOPED_RUNNER="/home/prashant/.local/bin/secret-run-scoped"
+
+cd "$PROJECT"
+
+# A single cross-launcher lock coordinates systemd and the n8n job bridge.
+# Both launch paths call this wrapper, so long OCR jobs cannot overlap.
+LOCK_DIR="/home/prashant/.hermes/state/dlr-worker"
+LOCK_FILE="$LOCK_DIR/worker.lock"
+install -d -m 700 "$LOCK_DIR"
+umask 077
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+  echo "status=already_running"
+  exit 75
+fi
+
+if [[ ! -r .env ]]; then
+  echo "DLR runtime config is unavailable" >&2
+  exit 1
+fi
+if [[ ! -x "$SCOPED_RUNNER" ]]; then
+  echo "Scoped Bitwarden runner is unavailable" >&2
+  exit 1
+fi
+
+set -a
+. ./.env
+set +a
+
+unset SUPABASE_ACCESS_TOKEN
+unset SUPABASE_WORKER_EMAIL
+unset SUPABASE_WORKER_PASSWORD
+unset GOOGLE_OAUTH_CREDENTIALS_FILE
+unset GOOGLE_DRIVE_ACCESS_TOKEN
+unset GOOGLE_OAUTH_CLIENT_ID
+unset GOOGLE_OAUTH_CLIENT_SECRET
+unset GOOGLE_DRIVE_REFRESH_TOKEN
+
+# Prefer service-account auth when the protected runtime key has been provisioned.
+SERVICE_ACCOUNT_FILE="/home/prashant/.config/dlr/google-service-account.json"
+if [[ -f "$SERVICE_ACCOUNT_FILE" ]]; then
+  export GOOGLE_SERVICE_ACCOUNT_FILE="$SERVICE_ACCOUNT_FILE"
+fi
+
+if [[ -n "${GOOGLE_SERVICE_ACCOUNT_FILE:-}" ]]; then
+  exec "$SCOPED_RUNNER" \
+    SUPABASE_WORKER_EMAIL=DLR_SUPABASE_WORKER_EMAIL \
+    SUPABASE_WORKER_PASSWORD=DLR_SUPABASE_WORKER_PASSWORD \
+    ?GEMINI_API_KEY=DLR_GEMINI_API_KEY \
+    -- "$PROJECT/.venv/bin/python" "$PROJECT/scripts/run_worker_once.py"
+fi
+exec "$SCOPED_RUNNER" \
+  SUPABASE_WORKER_EMAIL=DLR_SUPABASE_WORKER_EMAIL \
+  SUPABASE_WORKER_PASSWORD=DLR_SUPABASE_WORKER_PASSWORD \
+  GOOGLE_OAUTH_CLIENT_ID=DLR_GOOGLE_OAUTH_CLIENT_ID \
+  GOOGLE_OAUTH_CLIENT_SECRET=DLR_GOOGLE_OAUTH_CLIENT_SECRET \
+  GOOGLE_DRIVE_REFRESH_TOKEN=DLR_GOOGLE_DRIVE_REFRESH_TOKEN \
+  ?GEMINI_API_KEY=DLR_GEMINI_API_KEY \
+  -- "$PROJECT/.venv/bin/python" "$PROJECT/scripts/run_worker_once.py"
