@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: ce61f6eaa7a47b2552c11e9888336cff38ff2e41
-- Last commit: Improve sign-in feedback and error handling
+- HEAD: fc578a40a3f929923145c4add294262feb5de617
+- Last commit: Fix IPv4 connectivity to Tailscale Supabase endpoint
 - Last commit date: 2026-11-04
 - Last commit author: development-os[bot]
 

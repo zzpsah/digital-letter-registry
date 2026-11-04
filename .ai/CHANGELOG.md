@@ -1,3 +1,13 @@
+## 2026-11-04 — Fix IPv4 connectivity to Tailscale Supabase endpoint
+- Commit: fc578a40a3f929923145c4add294262feb5de617
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/auth.py`
+- `src/letter_registry/http_client.py`
+- `src/letter_registry/session.py`
+- `src/letter_registry/supabase_runtime.py`
+
 ## 2026-11-04 — Improve sign-in feedback and error handling
 - Commit: ce61f6eaa7a47b2552c11e9888336cff38ff2e41
 - Author: development-os[bot]
