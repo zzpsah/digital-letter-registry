@@ -210,9 +210,11 @@ class WebShellTests(unittest.TestCase):
         self.assertNotIn('id="registerMagicLink"', self.html)
         self.assertNotIn('data-send-invite-email=', self.html)
 
-    def test_streamed_original_response_is_opened_from_blob(self) -> None:
-        self.assertIn("const blob=await res.blob()", self.html)
-        self.assertIn("URL.createObjectURL(blob)", self.html)
+    def test_original_document_opens_through_streamed_server_endpoint(self) -> None:
+        self.assertIn('function openOriginal(id){const url="/api/v1/letters/"+encodeURIComponent(id)+"/original"', self.html)
+        self.assertIn('opened.location.replace(url)', self.html)
+        self.assertIn('location.href=url', self.html)
+        self.assertIn('location.href="/api/v1/letters/"+encodeURIComponent(b.dataset.download)+"/download"', self.html)
 
     def test_sign_out_uses_server_cookie_clear_endpoint(self) -> None:
         self.assertIn(
@@ -234,7 +236,8 @@ class WebShellTests(unittest.TestCase):
         self.assertIn('homePage=0;localStorage.setItem("elettersHomePage","0");return loadDashboard(0)', self.html)
         self.assertIn('Could not load documents. Check your connection and tap Refresh to try again.', self.html)
         self.assertIn('The document list response was invalid. Tap Refresh to try again.', self.html)
-        self.assertIn('homePage=0;localStorage.setItem("elettersHomePage","0");$("passwordLoginStatus").textContent="Signed in. Loading your documents…"', self.html)
+        self.assertIn('async function refreshSessionUi(){', self.html)
+        self.assertIn('await Promise.all([loadDashboard(),refreshAuthorityOptions()])', self.html)
 
 if __name__ == "__main__":
     unittest.main()
