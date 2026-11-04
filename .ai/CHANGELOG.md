@@ -1,3 +1,12 @@
+## 2026-11-04 — Document queue recovery timer and archive audit
+- Commit: 7f6a6a96a48b37d74a746fee5174fc0a443a3523
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `deploy/systemd/dlr-worker.timer`
+- `docs/QUALITY-AUDIT-2026-11-04.md`
+- `docs/WORKER-OPERATIONS.md`
+
 ## 2026-11-04 — Align web shell tests and audit queue recovery
 - Commit: bc2c9e32c4a2ef2589555fd89325c55672864664
 - Author: development-os[bot]
