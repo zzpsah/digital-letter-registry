@@ -32,10 +32,14 @@ class _IPv4HTTPSConnection(http.client.HTTPSConnection):
             flush=True,
         )
         last_error: OSError | None = None
+        # A Funnel edge address can accept TCP but stall during TLS from
+        # Vercel. Bound each address attempt so the next A record is tried
+        # quickly instead of consuming the whole serverless request budget.
+        per_address_timeout = min(float(self.timeout or 12), 4.0)
         for family, socktype, proto, _canonname, sockaddr in addresses:
             sock = socket.socket(family, socktype, proto)
             try:
-                sock.settimeout(self.timeout)
+                sock.settimeout(per_address_timeout)
                 if self.source_address:
                     sock.bind(self.source_address)
                 connect_started = time.monotonic()
