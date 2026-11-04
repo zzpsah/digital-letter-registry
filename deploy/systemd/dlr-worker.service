@@ -9,6 +9,7 @@ ExecStart=/home/prashant/.local/bin/dlr-worker-run-with-bitwarden
 WorkingDirectory=/home/prashant/projects/digital-letter-registry
 NoNewPrivileges=true
 PrivateTmp=true
+SuccessExitStatus=75
 # OCRmyPDF is capped at 40 minutes; leave five minutes for queue finalization.
 TimeoutStartSec=2700
 TimeoutStopSec=30

@@ -224,10 +224,13 @@ PostgREST (127.0.0.1:3001) via local compatibility proxy (127.0.0.1:8877)
 GoTrue worker identity + rotating refresh-token session
         |
         v
-systemd user timer: dlr-worker.timer (about once per minute)
+n8n scheduled worker workflow (every minute)
         |
         v
-dlr-worker.service (Type=oneshot; one job per invocation)
+private allowlisted bridge (:9141) -> worker wrapper
+        |
+        v
+shared flock lock -> run_worker_once.py (one job per invocation)
         |
         +--> native PDF text extraction (only when usable)
         +--> OCRmyPDF + Tesseract hin+eng when needed

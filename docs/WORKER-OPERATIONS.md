@@ -53,18 +53,19 @@ The script does not reprocess, approve, delete, resend, or change any document. 
 
 ## Versioned systemd units
 
-The deployed unit definitions are versioned in `deploy/systemd/`. Keep the VPS copies in `/home/prashant/.config/systemd/user/` synchronized with these files. After changing them, run `systemctl --user daemon-reload`; verify the timer is active and the service has a 45-minute start ceiling.
+The deployed unit definitions are versioned in `deploy/systemd/`. Keep the VPS copies in `/home/prashant/.config/systemd/user/` synchronized with these files. After changing them, run `systemctl --user daemon-reload`; verify the timer remains disabled while n8n is the primary scheduler and the service has a 45-minute start ceiling.
 
 ## Operational commands
 
 ```bash
-systemctl --user status dlr-worker.timer dlr-worker.service --no-pager
-systemctl --user list-timers --all --no-pager | grep dlr-worker
+systemctl --user is-enabled dlr-worker.timer  # expected: disabled
+systemctl --user status dlr-worker.service --no-pager
+systemctl --user status dlr-n8n-job-bridge.service --no-pager
 journalctl --user -u dlr-worker.service --since '24 hours ago' --no-pager
 ps -eo pid,etime,%cpu,%mem,args | grep -E '[o]crmypdf|[t]esseract'
 ```
 
-Never interpret `dlr-worker.service: inactive (dead)` alone as an outage. Confirm the timer is active, inspect its next/last trigger, inspect the queue, and check whether a long OCR invocation is currently occupying the service.
+Never interpret `dlr-worker.service: inactive (dead)` alone as an outage. Confirm the n8n worker workflow and private bridge are active, inspect the queue, and check whether a long OCR invocation is currently occupying the service. The systemd timer is expected to be disabled.
 
 ## Incident recorded 2026-11-04
 

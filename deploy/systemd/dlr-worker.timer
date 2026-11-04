@@ -1,3 +1,4 @@
+# FALLBACK ONLY: keep disabled while n8n workflow 4WR0M1gnKeTxYxyL is active.
 [Unit]
 Description=Run Digital Letter Registry worker periodically
 
