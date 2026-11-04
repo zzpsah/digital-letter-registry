@@ -7,7 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Protocol
 
-from .extraction import ExtractionResult, VersionedTextExtractor
+from .extraction import ExtractionResult, VersionedTextExtractor, is_usable_native_text
 from .jobs import ProcessingJob
 from .models import DocumentRecord
 from .original_access import SupabaseOriginalAccessService
@@ -159,7 +159,7 @@ class DocumentProcessingWorker:
                     if processing_rows:
                         existing_text = str(processing_rows[0].get("extracted_text") or "").strip()
                         existing_version = str(processing_rows[0].get("ocr_version") or "").strip()
-                        if existing_text:
+                        if existing_text and is_usable_native_text(existing_text):
                             extraction_override = ExtractionResult(
                                 text=existing_text,
                                 method="reused_existing_extraction",

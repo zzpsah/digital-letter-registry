@@ -304,7 +304,7 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(queue.completed, [JOB_ID])
         self.assertEqual(queue.failed, [])
 
-    def test_manual_reprocess_reuses_existing_extracted_text(self):
+    def test_manual_reprocess_reuses_existing_usable_extracted_text(self):
         class ReuseDatabase:
             def select(self, table, *, filters=None, columns="*"):
                 if table == "letter_processing":
@@ -348,6 +348,55 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(queue.completed, [JOB_ID])
         self.assertIsNone(repository.extraction)
         self.assertIsNotNone(repository.context)
+
+    def test_manual_reprocess_reextracts_unusable_legacy_font_text(self):
+        class LegacyTextDatabase:
+            def select(self, table, *, filters=None, columns="*"):
+                if table == "letter_processing":
+                    return [{
+                        "extracted_text": (
+                            "nso T{16-3 vrc 4o 2o2sfiros fuen srort rff ftqFr "
+                            "do fio trd rqw gcq sfuq dr fi erw rcq sfuq qtrn "
+                            "qfuqZrgfosZFlrqllaa qfus rfrtcr qtfr qqu sdrq "
+                            "oTr ff fr sfus rcrfrfier sfufl sc EEffHoqft fuf "
+                        ) * 30,
+                        "ocr_version": "native-pdf-v1",
+                    }]
+                return []
+
+        class FreshOcrBackend:
+            def extract_text(self, path, *, languages):
+                self.languages = languages
+                return "बिहार सरकार सामान्य प्रशासन विभाग का स्पष्ट OCR पाठ। " * 12
+
+        retry_job = ProcessingJob(
+            job_id=JOB_ID,
+            letter_id=LETTER_ID,
+            owner_id=OWNER_ID,
+            created_at=datetime(2026, 10, 2, tzinfo=timezone.utc),
+            reason="manual_reprocess:legacy-font-recovery",
+        )
+        queue = FakeQueue(retry_job)
+        repository = FakeRepository()
+        ocr = FreshOcrBackend()
+        worker = DocumentProcessingWorker(
+            queue=queue,
+            source_loader=FakeSourceLoader(record()),
+            database=LegacyTextDatabase(),
+            original_access=FakeOriginalAccess(),
+            repository=repository,
+            extractor=VersionedTextExtractor(FakePdfBackend(), ocr_backend=ocr),
+            context_provider=FakeContextProvider(),
+            embeddings=None,
+        )
+
+        result = worker.run_once()
+
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(ocr.languages, ("hin", "eng"))
+        self.assertIsNotNone(repository.extraction)
+        self.assertEqual(repository.extraction.method, "ocr_pdf")
+        self.assertIn("बिहार सरकार", repository.extraction.text)
 
     def test_worker_completes_without_embeddings(self):
         queue = FakeQueue(job())

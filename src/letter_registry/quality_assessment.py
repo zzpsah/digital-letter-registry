@@ -4,6 +4,8 @@ from dataclasses import dataclass
 import re
 import unicodedata
 
+from .extraction import is_usable_native_text
+
 
 @dataclass(frozen=True, slots=True)
 class DocumentQualityAssessment:
@@ -85,7 +87,14 @@ def assess_document_quality(
 ) -> DocumentQualityAssessment:
     flags: list[str] = []
     readability = _readability_score(extracted_text)
-    if readability < 0.55:
+    extracted_value = str(extracted_text or "")
+    has_devanagari = any("\u0900" <= char <= "\u097f" for char in extracted_value)
+    legacy_font_suspected = (
+        len(extracted_value) >= 500
+        and not has_devanagari
+        and not is_usable_native_text(extracted_value, minimum_characters=500)
+    )
+    if readability < 0.55 or legacy_font_suspected:
         flags.append("low_ocr_readability")
 
     normalized_confidence = normalize_confidence(context_confidence)

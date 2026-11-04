@@ -48,6 +48,26 @@ class DocumentQualityAssessmentTests(unittest.TestCase):
         self.assertIn("low_ocr_readability", result.flags)
         self.assertTrue(result.needs_reprocessing)
 
+    def test_legacy_hindi_font_gibberish_is_flagged_even_when_alphanumeric_ratio_is_high(self):
+        garbled = (
+            "nso T{16-3 vrc 4o 2o2sfiros fuen srort rff ftqFr "
+            "do fio trd rqw gcq sfuq dr fi erw rcq sfuq qtrn "
+            "qfuqZrgfosZFlrqllaa qfus rfrtcr qtfr qqu sdrq "
+            "oTr ff fr sfus rcrfrfier sfufl sc EEffHoqft fuf "
+        ) * 30
+        result = assess_document_quality(
+            extracted_text=garbled,
+            context_confidence=0.97,
+            title="Examination Instructions",
+            authority="Education Department",
+            category="fee",
+            reference_number="13/2012",
+            issue_date="2012-12-13",
+            clean_document_text=None,
+        )
+        self.assertIn("low_ocr_readability", result.flags)
+        self.assertTrue(result.needs_reprocessing)
+
     def test_low_confidence_without_clean_text_requires_reprocessing_even_if_score_is_above_threshold(self):
         result = assess_document_quality(
             extracted_text=("पंजीयन संबंधी स्पष्ट पाठ और कुछ सामान्य निर्देश " * 20),
