@@ -1,13 +1,15 @@
 import unittest
+from datetime import datetime, timedelta, timezone
 
 from letter_registry.jobs import SupabaseProcessingQueue
 
 
 class FakeTransport:
-    def __init__(self, *, duplicate=False, missing_letter=False):
+    def __init__(self, *, duplicate=False, missing_letter=False, jobs=None):
         self.calls = []
         self.duplicate = duplicate
         self.missing_letter = missing_letter
+        self.jobs = list(jobs or [])
 
     def insert(self, table, row, *, on_conflict=None):
         self.calls.append(("insert", table, row, on_conflict))
@@ -24,10 +26,20 @@ class FakeTransport:
             if self.missing_letter:
                 return []
             return [{"archive_id": "44444444-4444-4444-8444-444444444444"}]
+        if table == "processing_jobs" and self.jobs:
+            return list(self.jobs)
         return [{
             "id": "33333333-3333-4333-8333-333333333333",
             "created_at": "2026-10-02T08:00:00+00:00",
         }]
+
+    def update(self, table, row, *, filters):
+        self.calls.append(("update", table, row, filters))
+        for job in self.jobs:
+            if job.get("id") == filters.get("id") and job.get("status") == filters.get("status"):
+                job.update(row)
+                return dict(job)
+        return {}
 
 
 class SupabaseProcessingQueueTests(unittest.TestCase):
@@ -59,6 +71,43 @@ class SupabaseProcessingQueueTests(unittest.TestCase):
         self.assertEqual(job.job_id, "33333333-3333-4333-8333-333333333333")
         self.assertEqual(transport.calls[2][0], "select")
         self.assertEqual(transport.calls[2][1], "processing_jobs")
+
+    def test_recover_stale_processing_job_requeues_under_attempt_limit(self):
+        now = datetime(2026, 11, 4, 17, 0, tzinfo=timezone.utc)
+        transport = FakeTransport(jobs=[{
+            "id": "55555555-5555-4555-8555-555555555555",
+            "status": "processing",
+            "attempts": 1,
+            "updated_at": (now - timedelta(minutes=60)).isoformat(),
+        }])
+        result = SupabaseProcessingQueue(transport).recover_stale_jobs(now=now)
+        self.assertEqual(result, {"requeued": 1, "failed": 0})
+        self.assertEqual(transport.jobs[0]["status"], "pending")
+        self.assertIsNone(transport.jobs[0]["claimed_by"])
+
+    def test_recover_stale_job_marks_failed_after_attempt_limit(self):
+        now = datetime(2026, 11, 4, 17, 0, tzinfo=timezone.utc)
+        transport = FakeTransport(jobs=[{
+            "id": "55555555-5555-4555-8555-555555555555",
+            "status": "processing",
+            "attempts": 3,
+            "updated_at": (now - timedelta(minutes=60)).isoformat(),
+        }])
+        result = SupabaseProcessingQueue(transport).recover_stale_jobs(now=now)
+        self.assertEqual(result, {"requeued": 0, "failed": 1})
+        self.assertEqual(transport.jobs[0]["status"], "failed")
+
+    def test_recover_does_not_touch_recent_processing_job(self):
+        now = datetime(2026, 11, 4, 17, 0, tzinfo=timezone.utc)
+        transport = FakeTransport(jobs=[{
+            "id": "55555555-5555-4555-8555-555555555555",
+            "status": "processing",
+            "attempts": 1,
+            "updated_at": (now - timedelta(minutes=10)).isoformat(),
+        }])
+        result = SupabaseProcessingQueue(transport).recover_stale_jobs(now=now)
+        self.assertEqual(result, {"requeued": 0, "failed": 0})
+        self.assertEqual(transport.jobs[0]["status"], "processing")
 
     def test_enqueue_rejects_invisible_letter_without_insert(self):
         transport = FakeTransport(missing_letter=True)

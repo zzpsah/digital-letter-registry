@@ -16,7 +16,7 @@
 1. Refresh the worker's GoTrue session before every PostgREST request. A job can outlive the access token loaded when the worker starts.
 2. OCR hard timeout defaults to 2,400 seconds. Set `TimeoutStartSec=2700` on the systemd oneshot unit so systemd does not kill the worker before OCR's own timeout and error handling complete.
 3. Each progress-stage update must refresh `processing_jobs.updated_at` (the worker lease heartbeat).
-4. The database migration `20261104190000_recover_stale_processing_jobs.sql` reclaims `processing` jobs whose heartbeat is older than 45 minutes. It retries only while `attempts < 3`; exhausted jobs become `failed` and require review.
+4. The worker runs a conditional stale-job recovery before claiming work: processing rows with a heartbeat older than 45 minutes are requeued while attempts are below three; exhausted jobs become failed and require review. The database migration 20261104190000_recover_stale_processing_jobs.sql adds the atomic claim-side equivalent and should be applied to the local PostgreSQL primary.
 5. If the worker cannot write its failure status because the database/auth service is unavailable, it returns `failure_report_pending`; the stale-lease migration is the durable recovery path.
 6. Do not add parallel OCR workers without a measured CPU/RAM/load test. Do not auto-send low-confidence results.
 
@@ -40,7 +40,7 @@ For machine-readable output, append `--format json`. The report is read-only and
 - failed, pending, processing and stale jobs;
 - email/WhatsApp delivery-state counts.
 
-The script does not reprocess, approve, delete, resend, or change any document.
+The script does not reprocess, approve, delete, resend, or change any document. The worker invokes the same stale-job recovery automatically before claiming a job; the audit reports current stale jobs without modifying them.
 
 ## Review documents in the UI
 
@@ -66,4 +66,4 @@ Never interpret `dlr-worker.service: inactive (dead)` alone as an outage. Confir
 
 A 51-page Hindi PDF had a corrupt legacy-font native text layer. The native extraction check accepted Latin-looking gibberish; low-confidence AI metadata was delivered. During manual reprocessing, OCRmyPDF hit the 900-second timeout. The worker then attempted to mark the job failed, but the worker's access JWT had expired; the `fail_processing_job` request returned HTTP 401 (`JWT expired`). The job remained `processing`, and the one-shot worker occupied the timer until OCR exited.
 
-Corrective code now detects this legacy-font pattern, re-extracts unusable text on manual reprocess, refreshes the worker session before every database request, raises the OCR timeout to 2,400 seconds, updates the job heartbeat, and catches failure-report errors. The stale-job SQL migration must also be applied to the local PostgreSQL primary before automatic stale-job recovery is active.
+Corrective code now detects this legacy-font pattern, re-extracts unusable text on manual reprocess, refreshes the worker session before every database request, raises the OCR timeout to 2,400 seconds, updates the job heartbeat, and catches failure-report errors. The worker-level stale-job recovery is active in the deployed code. The SQL migration adds an atomic database-side guard and should also be applied to the local PostgreSQL primary.

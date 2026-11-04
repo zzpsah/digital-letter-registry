@@ -7,7 +7,7 @@ OCR/AI/embedding work belongs to a worker.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Protocol
 from uuid import UUID, uuid4
 
@@ -98,6 +98,15 @@ class JobTransport(Protocol):
     ) -> dict[str, object]:
         ...
 
+    def update(
+        self,
+        table: str,
+        row: dict[str, object],
+        *,
+        filters: dict[str, str],
+    ) -> dict[str, object]:
+        ...
+
 
 @dataclass(slots=True)
 class SupabaseProcessingQueue:
@@ -175,6 +184,65 @@ class SupabaseProcessingQueue:
             created_at=created_at,
             reason=str(row.get("reason") or reason),
         )
+
+    def recover_stale_jobs(
+        self,
+        *,
+        stale_after: timedelta = timedelta(minutes=45),
+        max_attempts: int = 3,
+        now: datetime | None = None,
+    ) -> dict[str, int]:
+        """Recover jobs stranded in processing after worker death or lost auth."""
+        current = now or datetime.now(timezone.utc)
+        rows = self.transport.select(
+            "processing_jobs",
+            columns="id,status,attempts,updated_at",
+        )
+        counts = {"requeued": 0, "failed": 0}
+        for row in rows:
+            if str(row.get("status") or "") != "processing":
+                continue
+            try:
+                updated = datetime.fromisoformat(
+                    str(row.get("updated_at") or "").replace("Z", "+00:00")
+                )
+                if updated.tzinfo is None:
+                    updated = updated.replace(tzinfo=timezone.utc)
+                attempts = int(row.get("attempts") or 0)
+            except (TypeError, ValueError):
+                continue
+            if current - updated < stale_after:
+                continue
+            job_id = str(row.get("id") or "")
+            if not job_id:
+                continue
+            filters = {"id": job_id, "status": "processing"}
+            common = {"claimed_by": None, "updated_at": current.isoformat()}
+            if attempts < max_attempts:
+                patch = {
+                    **common,
+                    "status": "pending",
+                    "available_at": current.isoformat(),
+                    "progress_stage": "queued",
+                    "progress_percent": 0,
+                    "progress_detail": "Recovered stale worker lease; retry queued",
+                    "last_error": "Recovered stale processing lease after worker timeout/crash",
+                }
+                result = self.transport.update("processing_jobs", patch, filters=filters)
+                if result:
+                    counts["requeued"] += 1
+            else:
+                patch = {
+                    **common,
+                    "status": "failed",
+                    "progress_stage": "failed",
+                    "progress_detail": "Automatic retries exhausted; administrator review required",
+                    "last_error": "Worker lease expired three times; administrator review required",
+                }
+                result = self.transport.update("processing_jobs", patch, filters=filters)
+                if result:
+                    counts["failed"] += 1
+        return counts
 
     def claim_next(self) -> ProcessingJob | None:
         rows = self.transport.rpc("claim_processing_job", {})

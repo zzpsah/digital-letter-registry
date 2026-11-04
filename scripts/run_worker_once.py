@@ -114,6 +114,13 @@ def main() -> int:
         allow_real_documents=_truthy("ENABLE_REAL_INTAKE"),
     )
 
+    recovered = queue.recover_stale_jobs()
+    if recovered["requeued"] or recovered["failed"]:
+        print(
+            "stale_jobs_recovered="
+            f"requeued:{recovered['requeued']},failed:{recovered['failed']}"
+        )
+
     result = worker.run_once()
     # Recovery receipts are reconciled on every tick, including idle ticks.
     # A failed WhatsApp send remains unmarked and is retried next minute.
