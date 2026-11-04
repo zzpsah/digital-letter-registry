@@ -1,3 +1,13 @@
+## 2026-11-04 — Document n8n primary worker scheduler and shared lock
+- Commit: a05805684e78ab841680dd94f6bb9dedec98280b
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `deploy/systemd/dlr-worker.service`
+- `deploy/systemd/dlr-worker.timer`
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `docs/WORKER-OPERATIONS.md`
+
 ## 2026-11-04 — Update live DLR reprocessing status in audit
 - Commit: b6bd4c4999839b4e96e1f5e1d2cb38a62e1ad5ee
 - Author: development-os[bot]

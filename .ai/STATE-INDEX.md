@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: b6bd4c4999839b4e96e1f5e1d2cb38a62e1ad5ee
-- Last commit: Update live DLR reprocessing status in audit
+- HEAD: a05805684e78ab841680dd94f6bb9dedec98280b
+- Last commit: Document n8n primary worker scheduler and shared lock
 - Last commit date: 2026-11-04
 - Last commit author: development-os[bot]
 
