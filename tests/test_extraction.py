@@ -112,6 +112,25 @@ class ExtractionTests(unittest.TestCase):
         ) * 20
         self.assertFalse(is_usable_native_text(garbled))
 
+    def test_usability_rejects_long_latin_gibberish_from_hindi_legacy_font_pdf(self) -> None:
+        garbled = (
+            "nso T{16-3 vrc 4o 2o2sfiros fuen srort rff ftqFr "
+            "do fio trd rqw gcq sfuq dr fi erw rcq sfuq qtrn "
+            "qfuqZrgfosZFlrqllaa qfus rfrtcr qtfr qqu sdrq "
+            "oTr ff fr sfus rcrfrfier sfufl sc EEffHoqft fuf "
+            "qflffi rc ft ors enq orgt ErEd sfi Tftq sks "
+        ) * 30
+        self.assertFalse(is_usable_native_text(garbled))
+
+    def test_usability_keeps_long_english_native_text(self) -> None:
+        english = (
+            "The department has issued this circular to all offices and authorities. "
+            "The rules apply to each government servant and shall be followed by the "
+            "concerned departments. This document explains the process and the "
+            "responsibilities of each authority. "
+        ) * 30
+        self.assertTrue(is_usable_native_text(english))
+
     def test_usability_rejects_private_use_glyph_noise(self) -> None:
         garbled = (
             "काया\ue7e2लय िजला िश\ue88aा पदािधकारी SIWAN "

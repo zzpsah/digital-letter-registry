@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
+import re
 import unicodedata
 
 
@@ -83,6 +84,33 @@ def is_usable_native_text(
     )
     if punctuation / length > maximum_punctuation_ratio:
         return False
+
+    # Some Hindi PDFs embed a broken legacy font map. pdftotext then returns
+    # long, alphanumeric Latin-looking strings (so the punctuation heuristic
+    # above passes) even though the page itself is Devanagari. Detect this
+    # only for long Latin-only documents and require a plausible English
+    # function-word rate before trusting the native text layer.
+    devanagari = sum(1 for char in normalized if "\u0900" <= char <= "\u097f")
+    latin_words = re.findall(r"[A-Za-z]{2,}", normalized)
+    if devanagari == 0 and len(latin_words) >= 200:
+        common_english = {
+            "a", "about", "above", "after", "all", "also", "an", "and", "any",
+            "are", "as", "at", "be", "been", "before", "between", "both",
+            "but", "by", "can", "could", "did", "do", "does", "each", "for",
+            "from", "had", "has", "have", "he", "her", "here", "him", "his",
+            "how", "if", "in", "into", "is", "it", "its", "may", "more",
+            "most", "no", "not", "of", "on", "one", "or", "other", "our",
+            "out", "over", "shall", "she", "should", "so", "some", "such",
+            "than", "that", "the", "their", "them", "then", "there", "these",
+            "they", "this", "those", "through", "to", "under", "up", "was",
+            "we", "were", "what", "when", "where", "which", "who", "will",
+            "with", "would", "you", "your",
+        }
+        common_ratio = sum(
+            1 for word in latin_words if word.casefold() in common_english
+        ) / len(latin_words)
+        if common_ratio < 0.08:
+            return False
 
     return True
 
