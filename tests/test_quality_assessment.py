@@ -34,6 +34,20 @@ class DocumentQualityAssessmentTests(unittest.TestCase):
         self.assertTrue(result.needs_reprocessing)
         self.assertIn("low_ocr_readability", result.flags)
 
+    def test_low_ocr_readability_always_requires_reprocessing_even_with_high_ai_confidence(self):
+        result = assess_document_quality(
+            extracted_text="||| � x _",
+            context_confidence=0.97,
+            title="Examination Instructions",
+            authority="Education Department",
+            category="fee",
+            reference_number="13/2012",
+            issue_date="2012-12-13",
+            clean_document_text=None,
+        )
+        self.assertIn("low_ocr_readability", result.flags)
+        self.assertTrue(result.needs_reprocessing)
+
     def test_low_confidence_without_clean_text_requires_reprocessing_even_if_score_is_above_threshold(self):
         result = assess_document_quality(
             extracted_text=("पंजीयन संबंधी स्पष्ट पाठ और कुछ सामान्य निर्देश " * 20),
@@ -49,7 +63,7 @@ class DocumentQualityAssessmentTests(unittest.TestCase):
         self.assertTrue(result.needs_reprocessing)
         self.assertIn("low_context_confidence", result.flags)
         self.assertIn("no_clean_document_text", result.flags)
-        self.assertEqual(result.version, "document-quality-v3")
+        self.assertEqual(result.version, "document-quality-v4")
 
     def test_source_conflict_summary_always_requires_human_review(self):
         result = assess_document_quality(
