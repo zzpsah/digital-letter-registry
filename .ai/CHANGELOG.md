@@ -1,3 +1,11 @@
+## 2026-11-04 — Detect broken legacy Hindi PDF text layers
+- Commit: 3aa67289fd7169a772d54b8928ac73578661dfbd
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/extraction.py`
+- `tests/test_extraction.py`
+
 ## 2026-11-04 — Require OCR quality review before document delivery
 - Commit: da7ca32f76c24562de20aed4a4419375f6932f55
 - Author: development-os[bot]

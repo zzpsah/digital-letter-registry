@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: da7ca32f76c24562de20aed4a4419375f6932f55
-- Last commit: Require OCR quality review before document delivery
+- HEAD: 3aa67289fd7169a772d54b8928ac73578661dfbd
+- Last commit: Detect broken legacy Hindi PDF text layers
 - Last commit date: 2026-11-04
 - Last commit author: development-os[bot]
 
