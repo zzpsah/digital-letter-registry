@@ -1,3 +1,11 @@
+## 2026-11-05 — Distinguish auth network outages from invalid credentials
+- Commit: 8510b2d4c0b768555dec22bfe85cfa3d9caf1b03
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/api.py`
+- `src/letter_registry/auth.py`
+
 ## 2026-11-05 — Record UDISE OCR timeout and extended retry ceiling
 - Commit: 60c02ff34dc32ca813170f6125b7384ac756078f
 - Author: development-os[bot]

@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 60c02ff34dc32ca813170f6125b7384ac756078f
-- Last commit: Record UDISE OCR timeout and extended retry ceiling
+- HEAD: 8510b2d4c0b768555dec22bfe85cfa3d9caf1b03
+- Last commit: Distinguish auth network outages from invalid credentials
 - Last commit date: 2026-11-05
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.
