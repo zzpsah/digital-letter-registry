@@ -247,7 +247,7 @@ Important runtime facts:
 - Only one job runs at a time. A long OCR job occupies the service and delays all later jobs; it does not imply that the timer was disabled. Do not add parallel OCR workers without measuring VPS CPU/RAM and queue pressure.
 - Worker auth uses the dedicated non-human GoTrue account and a file-backed, lock-protected rotating refresh-token session. Refresh the session before every PostgREST request because a job may outlive the access token loaded at process start. Never log token contents.
 - Every progress-stage update refreshes `processing_jobs.updated_at`. Before each claim, the worker conditionally requeues jobs with no heartbeat for 45 minutes while attempts are below three; exhausted jobs become failed for administrator review. The SQL claim function migration provides the atomic database-side equivalent.
-- OCRmyPDF hard timeout is configurable via `DLR_OCR_TIMEOUT_SECONDS`; production default is 2,400 seconds (40 minutes). The systemd service start timeout must exceed it (45 minutes) so the worker can record completion/failure.
+- OCRmyPDF hard timeout is configurable via `DLR_OCR_TIMEOUT_SECONDS`; production default is 3,600 seconds (60 minutes). The systemd service start timeout must exceed it (45 minutes) so the worker can record completion/failure.
 - A failure to report a failure must not crash the worker's error handler. It returns `failure_report_pending`; the stale-lease recovery path is the durable fallback.
 - Delivery is fail-closed: low OCR readability, `needs_reprocessing`, or confidence below 0.60 requires review; successful execution alone is not approval to send.
 
