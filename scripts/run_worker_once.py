@@ -36,6 +36,7 @@ from letter_registry.supabase_runtime import (
     ArchiveScopedSupabaseTransport,
     SupabasePostgrestTransport,
 )
+from letter_registry.postgres_runtime import ArchiveScopedPostgresTransport, PostgresTransport
 from letter_registry.worker import DocumentProcessingWorker
 
 
@@ -49,14 +50,24 @@ def _truthy(name: str) -> bool:
 
 
 def main() -> int:
-    transport = ArchiveScopedSupabaseTransport(
-        transport=SupabasePostgrestTransport.from_worker_environment(),
-        archive_id=os.environ["DLR_ARCHIVE_ID"],
-    )
+    native_postgres = _truthy("DLR_NATIVE_WORKER_ENABLED")
+    if native_postgres:
+        worker_user_id = os.environ.get("DLR_WORKER_USER_ID", "").strip()
+        if not worker_user_id:
+            raise RuntimeError("DLR_WORKER_USER_ID is required for the native PostgreSQL worker")
+        transport = ArchiveScopedPostgresTransport(
+            transport=PostgresTransport(user_id=worker_user_id),
+            archive_id=os.environ["DLR_ARCHIVE_ID"],
+        )
+    else:
+        transport = ArchiveScopedSupabaseTransport(
+            transport=SupabasePostgrestTransport.from_worker_environment(),
+            archive_id=os.environ["DLR_ARCHIVE_ID"],
+        )
     repository = SupabaseLetterRepository(transport)
     queue = SupabaseProcessingQueue(transport)
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    gateway_configured = bool(
+    gateway_configured = (not native_postgres) and bool(
         os.environ.get("SUPABASE_GEMINI_GATEWAY_URL", "").strip()
         or os.environ.get("SUPABASE_GEMINI_PROJECT_URL", "").strip()
     )

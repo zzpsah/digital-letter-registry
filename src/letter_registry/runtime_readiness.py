@@ -115,21 +115,34 @@ def check_runtime_readiness() -> RuntimeReadiness:
     tesseract_ready = tesseract is not None
     ocrmypdf_ready = ocrmypdf is not None
 
-    checks = (
-        ReadinessCheck(
+    native_mode = (
+        os.environ.get("DLR_NATIVE_POSTGRES_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
+        and os.environ.get("DLR_NATIVE_AUTH_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
+    )
+    if native_mode:
+        database_password_file = os.environ.get("DLR_DATABASE_PASSWORD_FILE", "").strip()
+        database_ready = _present("DLR_DATABASE_URL") or bool(database_password_file and os.path.isfile(database_password_file))
+        auth_secret = os.environ.get("DLR_AUTH_JWT_SECRET_FILE", "/home/prashant/.config/dlr/native-runtime/jwt-secret").strip()
+        database_check = ReadinessCheck("database_runtime", database_ready,
+            "native PostgreSQL configured" if database_ready else "native PostgreSQL credentials are missing")
+        auth_check = ReadinessCheck("native_auth", os.path.isfile(auth_secret),
+            "native authentication configured" if os.path.isfile(auth_secret) else "native JWT signing secret is missing")
+    else:
+        database_check = ReadinessCheck(
             "supabase_runtime",
             _present("SUPABASE_URL") and _present("SUPABASE_PUBLISHABLE_KEY"),
-            "configured" if (
-                _present("SUPABASE_URL")
-                and _present("SUPABASE_PUBLISHABLE_KEY")
-            ) else "missing required Supabase runtime values",
-        ),
-        ReadinessCheck(
-            "auth_callback",
-            _auth_redirect_ready(),
+            "configured" if (_present("SUPABASE_URL") and _present("SUPABASE_PUBLISHABLE_KEY"))
+            else "missing required Supabase runtime values",
+        )
+        auth_check = ReadinessCheck(
+            "auth_callback", _auth_redirect_ready(),
             "configured" if _auth_redirect_ready()
             else "AUTH_REDIRECT_URL must end in /auth/confirm on HTTPS or localhost",
-        ),
+        )
+
+    checks = (
+        database_check,
+        auth_check,
         ReadinessCheck(
             "drive_credentials",
             _drive_credentials_ready(),

@@ -12,6 +12,10 @@ dependencies = [
   "fastapi[standard-no-fastapi-cloud-cli]>=0.142.2,<0.143.0",
   "python-multipart>=0.0.20,<0.1",
   "google-auth[requests]>=2.38,<3",
+  "psycopg[binary]>=3.2,<4",
+  "PyJWT[crypto]>=2.10,<3",
+  "argon2-cffi>=23.1,<26",
+  "bcrypt>=4.2,<6",
 ]
 
 [tool.fastapi]
