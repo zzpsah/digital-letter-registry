@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 247a330acd198371f27f7e93fbfe6409eea6602e
-- Last commit: Pin Funnel auth transport to TLS 1.2
+- HEAD: 2fa78db11646925642dbf0bd26e2afad1d1709fc
+- Last commit: Run auth gateway in alternate Vercel region
 - Last commit date: 2026-11-05
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: true
+- Meaningful change detected: false
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

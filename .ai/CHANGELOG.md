@@ -1,3 +1,10 @@
+## 2026-11-05 — Run auth gateway in alternate Vercel region
+- Commit: 2fa78db11646925642dbf0bd26e2afad1d1709fc
+- Author: development-os[bot]
+- Classification: routine
+- Changed files:
+- `vercel.json`
+
 ## 2026-11-05 — Pin Funnel auth transport to TLS 1.2
 - Commit: 247a330acd198371f27f7e93fbfe6409eea6602e
 - Author: development-os[bot]
