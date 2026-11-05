@@ -15,6 +15,10 @@ class SupabaseAuthError(RuntimeError):
     pass
 
 
+class SupabaseAuthUnavailable(SupabaseAuthError):
+    """Authentication service could not be reached; credentials are unverified."""
+
+
 HttpExecutor = Callable[[request.Request], tuple[int, str]]
 
 
@@ -28,8 +32,8 @@ def _default_http_executor(req: request.Request) -> tuple[int, str]:
             f"Supabase Auth failed with HTTP {exc.code}: {body}"
         ) from exc
     except error.URLError as exc:
-        raise SupabaseAuthError(
-            f"Supabase Auth failed: {exc.reason}"
+        raise SupabaseAuthUnavailable(
+            f"Supabase Auth is temporarily unreachable: {exc.reason}"
         ) from exc
 
 

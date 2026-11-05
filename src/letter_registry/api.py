@@ -23,7 +23,12 @@ from pydantic import BaseModel, Field
 
 from .access import ArchiveMembership, ArchiveRole, SupabaseArchiveAccess
 from .account_admin import SupabaseArchiveAccountAdmin
-from .auth import SupabaseAuthError, SupabaseAuthSession, SupabasePasswordlessAuth
+from .auth import (
+    SupabaseAuthError,
+    SupabaseAuthSession,
+    SupabaseAuthUnavailable,
+    SupabasePasswordlessAuth,
+)
 from .channel_intake import ChannelIntakeService, IntakeChannel, IntakeProvenance, SupabaseProvenanceRepository
 from .detail import SupabaseLetterDetailRepository
 from .gemini_embeddings import GeminiEmbeddingProvider
@@ -1770,6 +1775,12 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 email=payload.email,
                 password=payload.password,
             )
+        except SupabaseAuthUnavailable as exc:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Sign-in service is temporarily unreachable. Please retry; your credentials were not verified.",
+                headers={"Retry-After": "15"},
+            ) from exc
         except (SupabaseAuthError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
