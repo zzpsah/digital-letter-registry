@@ -10,6 +10,7 @@ from urllib.parse import urljoin
 
 import httpx
 from fastapi import FastAPI, Request
+from fastapi.responses import Response
 from fastapi.responses import StreamingResponse
 from starlette.background import BackgroundTask
 
@@ -23,6 +24,12 @@ _HOP_BY_HOP = {
     b"te", b"trailer", b"transfer-encoding", b"upgrade", b"host",
 }
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
+@app.middleware("http")
+async def hide_legacy_auth_and_rest_routes(request: Request, call_next):
+    if request.url.path.startswith(("/rest/v1", "/auth/v1", "/functions/v1")):
+        return Response(status_code=404)
+    return await call_next(request)
 
 
 async def _close_upstream(upstream: httpx.Response, client: httpx.AsyncClient) -> None:

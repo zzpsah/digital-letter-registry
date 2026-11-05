@@ -655,6 +655,9 @@ def _native_auth_enabled() -> bool:
 def _native_postgres_enabled() -> bool:
     return os.environ.get("DLR_NATIVE_POSTGRES_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
 
+def _native_worker_enabled() -> bool:
+    return os.environ.get("DLR_NATIVE_WORKER_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
+
 
 def _raw_transport(access_token: str):
     if _native_postgres_enabled():
@@ -1505,8 +1508,16 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         docs_url="/api/docs",
         redoc_url=None,
     )
-    if not (_native_auth_enabled() and _native_postgres_enabled()):
+    if not (_native_auth_enabled() and _native_postgres_enabled() and _native_worker_enabled()):
         register_local_supabase_routes(app)
+
+    @app.middleware("http")
+    async def restrict_legacy_compatibility_routes(request: Request, call_next):
+        if request.url.path.startswith(("/rest/v1", "/auth/v1", "/functions/v1")):
+            client_host = request.client.host if request.client else ""
+            if client_host not in {"127.0.0.1", "::1"}:
+                return Response(status_code=status.HTTP_404_NOT_FOUND)
+        return await call_next(request)
 
     @app.get("/", include_in_schema=False)
     def home() -> FileResponse:
