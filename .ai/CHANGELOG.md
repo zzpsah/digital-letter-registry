@@ -1,3 +1,11 @@
+## 2026-11-05 — Merge remote-tracking branch 'origin/main'
+- Commit: f2b022392ac224719223d0b8a2550d8b38a7431b
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `app.py`
+- `src/letter_registry/api.py`
+
 ## 2026-11-05 — merge: native PostgreSQL cutover foundation
 - Commit: 2bd806afa3b2d9d1dc0780ac77255a739824d3f0
 - Author: development-os[bot]
