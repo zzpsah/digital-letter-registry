@@ -6,9 +6,9 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 7f6a6a96a48b37d74a746fee5174fc0a443a3523
-- Last commit: Document queue recovery timer and archive audit
-- Last commit date: 2026-11-04
+- HEAD: 804d5a37138147c8464857a2377ddab2f56c5c62
+- Last commit: Allow long Hindi OCR jobs up to one hour
+- Last commit date: 2026-11-05
 - Last commit author: development-os[bot]
 
 ## Context health
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

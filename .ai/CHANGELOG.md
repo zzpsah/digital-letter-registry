@@ -1,3 +1,15 @@
+## 2026-11-05 — Allow long Hindi OCR jobs up to one hour
+- Commit: 804d5a37138147c8464857a2377ddab2f56c5c62
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `deploy/systemd/dlr-worker.service`
+- `docs/PRODUCTION_ARCHITECTURE.md`
+- `docs/QUALITY-AUDIT-2026-11-04.md`
+- `docs/WORKER-OPERATIONS.md`
+- `src/letter_registry/extraction_backends.py`
+- `tests/test_extraction_backends.py`
+
 ## 2026-11-04 — Document queue recovery timer and archive audit
 - Commit: 7f6a6a96a48b37d74a746fee5174fc0a443a3523
 - Author: development-os[bot]
