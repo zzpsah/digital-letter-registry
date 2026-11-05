@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import http.client
 import socket
+import ssl
 import time
 from urllib import parse, request
 
@@ -95,7 +96,13 @@ def open_url(req: request.Request, *, timeout: float = 12) -> object:
             f"host={hostname} path={parsed.path} timeout={timeout}",
             flush=True,
         )
-        opener = request.build_opener(_IPv4HTTPSHandler())
+        # Tailscale Funnel's public edge intermittently stalls while negotiating
+        # TLS 1.3 from Vercel's serverless runtime. Pin this origin to TLS 1.2;
+        # certificate verification and hostname/SNI checks remain enabled.
+        context = ssl.create_default_context()
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        context.maximum_version = ssl.TLSVersion.TLSv1_2
+        opener = request.build_opener(_IPv4HTTPSHandler(context=context))
         try:
             response = opener.open(req, timeout=timeout)
             print(
