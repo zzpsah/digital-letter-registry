@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 2fa78db11646925642dbf0bd26e2afad1d1709fc
-- Last commit: Run auth gateway in alternate Vercel region
+- HEAD: 2bd806afa3b2d9d1dc0780ac77255a739824d3f0
+- Last commit: merge: native PostgreSQL cutover foundation
 - Last commit date: 2026-11-05
 - Last commit author: development-os[bot]
 
@@ -23,7 +23,7 @@ Generated automatically by Development OS.
 
 ## Recent activity
 - Latest session: session-template.md
-- Meaningful change detected: false
+- Meaningful change detected: true
 
 ## Recovery
 1. Read `AGENTS.md` and `.ai/manifest.yaml`.

@@ -1,3 +1,26 @@
+## 2026-11-05 — merge: native PostgreSQL cutover foundation
+- Commit: 2bd806afa3b2d9d1dc0780ac77255a739824d3f0
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `.env.example`
+- `app.py`
+- `database/migrations/20261105190000_native_auth_foundation.sql`
+- `docs-native-postgres-cutover.md`
+- `pyproject.toml`
+- `scripts/run_worker_once.py`
+- `src/letter_registry/api.py`
+- `src/letter_registry/google_oauth.py`
+- `src/letter_registry/native_auth.py`
+- `src/letter_registry/postgres_runtime.py`
+- `src/letter_registry/runtime_readiness.py`
+- `src/letter_registry/web/index.html`
+- `tests/test_google_oauth.py`
+- `tests/test_native_api_mode.py`
+- `tests/test_native_auth.py`
+- `tests/test_postgres_runtime.py`
+- `tests/test_runtime_readiness.py`
+
 ## 2026-11-05 — Run auth gateway in alternate Vercel region
 - Commit: 2fa78db11646925642dbf0bd26e2afad1d1709fc
 - Author: development-os[bot]
