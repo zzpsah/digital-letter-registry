@@ -211,3 +211,25 @@ class RuntimeReadinessTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_native_runtime_readiness_does_not_require_supabase_settings(self):
+        with tempfile.TemporaryDirectory() as td:
+            database_password = Path(td) / "db-password"
+            jwt_secret = Path(td) / "jwt-secret"
+            database_password.write_text("not-a-real-password", encoding="utf-8")
+            jwt_secret.write_text("not-a-real-secret", encoding="utf-8")
+            env = {
+                "DLR_NATIVE_POSTGRES_ENABLED": "true",
+                "DLR_NATIVE_AUTH_ENABLED": "true",
+                "DLR_DATABASE_PASSWORD_FILE": str(database_password),
+                "DLR_AUTH_JWT_SECRET_FILE": str(jwt_secret),
+                "GOOGLE_DRIVE_ACCESS_TOKEN": "token",
+                "DRIVE_ORIGINALS_FOLDER_REFERENCE": "folder",
+            }
+            with patch.dict(os.environ, env, clear=True):
+                with patch("letter_registry.runtime_readiness.shutil.which", return_value=None):
+                    readiness = check_runtime_readiness()
+            checks = {item.name: item for item in readiness.checks}
+            self.assertTrue(checks["database_runtime"].ready)
+            self.assertTrue(checks["native_auth"].ready)
+            self.assertNotIn("supabase_runtime", checks)

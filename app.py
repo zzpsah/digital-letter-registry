@@ -1,33 +1,67 @@
-"""Vercel entrypoint for the DLR control plane.
+"""Vercel edge-facing reverse proxy for the Oracle-hosted DLR application.
 
-Vercel system environment variables determine the public origin dynamically.
-Project-specific Supabase/archive settings remain runtime environment variables
-and are never committed here.
+Oracle FastAPI is the sole owner of PostgreSQL connections. Vercel forwards
+HTTP traffic to Oracle and never opens a database connection from a serverless runtime.
 """
 from __future__ import annotations
 
 import os
-import sys
-from pathlib import Path
+from urllib.parse import urljoin
 
-ROOT = Path(__file__).resolve().parent
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
+import httpx
+from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse
+from starlette.background import BackgroundTask
 
-vercel_host = (
-    os.environ.get("VERCEL_PROJECT_PRODUCTION_URL", "").strip()
-    or os.environ.get("VERCEL_URL", "").strip()
-)
-if vercel_host:
-    origin = vercel_host if vercel_host.startswith("http") else f"https://{vercel_host}"
-    os.environ.setdefault("AUTH_APP_ORIGIN", origin)
-    os.environ.setdefault("AUTH_REDIRECT_URL", f"{origin.rstrip('/')}/auth/confirm")
-    os.environ.setdefault("AUTH_COOKIE_SECURE", "true")
-    os.environ.setdefault(
-        "DLR_FILE_OPS_PROXY_ORIGIN",
-        "https://oracle-server.tail2b7fe2.ts.net:10001",
+UPSTREAM_ORIGIN = os.environ.get(
+    "DLR_NATIVE_API_ORIGIN",
+    "https://oracle-server.tail2b7fe2.ts.net/dlr",
+).strip().rstrip("/")
+PROXY_TOKEN = os.environ.get("DLR_VERCEL_PROXY_TOKEN", "").strip()
+_HOP_BY_HOP = {
+    b"connection", b"keep-alive", b"proxy-authenticate", b"proxy-authorization",
+    b"te", b"trailer", b"transfer-encoding", b"upgrade", b"host",
+}
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
+
+async def _close_upstream(upstream: httpx.Response, client: httpx.AsyncClient) -> None:
+    await upstream.aclose()
+    await client.aclose()
+
+
+async def _forward(request: Request, path: str) -> StreamingResponse:
+    if not UPSTREAM_ORIGIN.startswith("https://"):
+        raise RuntimeError("DLR_NATIVE_API_ORIGIN must use HTTPS")
+    target = urljoin(UPSTREAM_ORIGIN + "/", path)
+    if request.url.query:
+        target += "?" + request.url.query
+    headers = [(key, value) for key, value in request.headers.raw if key.lower() not in _HOP_BY_HOP]
+    if PROXY_TOKEN:
+        headers.append((b"x-dlr-vercel-proxy-token", PROXY_TOKEN.encode("utf-8")))
+    client = httpx.AsyncClient(timeout=httpx.Timeout(90.0, connect=15.0), follow_redirects=False)
+    try:
+        outgoing = client.build_request(request.method, target, headers=headers, content=request.stream())
+        upstream = await client.send(outgoing, stream=True)
+    except httpx.RequestError as exc:
+        await client.aclose()
+        raise RuntimeError("Oracle DLR API is temporarily unavailable") from exc
+    response = StreamingResponse(
+        upstream.aiter_raw(), status_code=upstream.status_code,
+        background=BackgroundTask(_close_upstream, upstream, client),
     )
-    os.environ.setdefault("DLR_PUBLIC_DRIVE_REDIRECT", "true")
+    response.raw_headers = [
+        (key.lower(), value) for key, value in upstream.headers.raw
+        if key.lower() not in _HOP_BY_HOP
+    ]
+    return response
 
-from letter_registry.api import app  # noqa: E402
+
+@app.api_route("/", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"])
+async def proxy_root(request: Request) -> StreamingResponse:
+    return await _forward(request, "")
+
+
+@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"])
+async def proxy_path(request: Request, path: str) -> StreamingResponse:
+    return await _forward(request, path)

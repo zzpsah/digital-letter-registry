@@ -39,6 +39,9 @@ from .intake import DuplicateSourceError, IntakePolicy, IntakeService
 from .local_supabase import register_local_supabase_routes
 from .jobs import SupabaseProcessingQueue
 from .original_access import SupabaseOriginalAccessService
+from .native_auth import NativeAuthError, NativeAuthService
+from .google_oauth import GoogleOAuthError, complete_google_oauth, start_google_oauth
+from .postgres_runtime import ArchiveScopedPostgresTransport, PostgresRuntimeError, PostgresTransport
 from .relationships import RelationshipReviewStatus, SupabaseRelationshipRepository
 from .runtime_readiness import check_runtime_readiness
 from .reprocessing import ReprocessingTargets, SupabaseReprocessingPlanner
@@ -306,9 +309,8 @@ class AuthProvidersResponse(BaseModel):
 
 
 class FragmentSessionRequest(BaseModel):
-    # Token format/length is owned by Supabase and may change. Keep request
-    # validation permissive here; the access token is validated against
-    # Supabase immediately before any DLR session cookie is issued.
+    # Keep bearer token validation permissive at the request boundary; the
+    # selected native or legacy auth provider validates it before issuing cookies.
     access_token: str = Field(min_length=1, max_length=16384)
     refresh_token: str = Field(min_length=1, max_length=8192)
     expires_in: int = Field(default=3600, ge=1, le=604800)
@@ -487,7 +489,7 @@ def _refresh_cookie_max_age() -> int:
 
 def _set_session_cookies(
     response: Response,
-    session: SupabaseAuthSession,
+    session,
     *,
     remember_me: bool = True,
 ) -> None:
@@ -535,6 +537,37 @@ def _access_token(
     response: Response,
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
 ) -> str:
+    if _native_auth_enabled() and _native_postgres_enabled():
+        service = NativeAuthService.from_environment()
+        if credentials is not None and credentials.scheme.lower() == "bearer":
+            try:
+                service.verify_access_token(credentials.credentials)
+                return credentials.credentials
+            except NativeAuthError as exc:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                    detail="Invalid or expired native session") from exc
+        native_access = request.cookies.get(_ACCESS_COOKIE, "").strip()
+        if native_access:
+            try:
+                service.verify_access_token(native_access)
+                return native_access
+            except NativeAuthError:
+                pass
+        native_refresh = request.cookies.get(_REFRESH_COOKIE, "").strip()
+        if native_refresh:
+            try:
+                session = service.refresh(native_refresh)
+            except NativeAuthError as exc:
+                _clear_session_cookies(response)
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                    detail="Native session expired") from exc
+            remember = request.cookies.get(_REMEMBER_COOKIE, "1").strip() != "0"
+            _set_session_cookies(response, session, remember_me=remember)
+            return session.access_token
+        _clear_session_cookies(response)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Authenticated native DLR session required")
+
     if credentials is not None and credentials.scheme.lower() == "bearer":
         return credentials.credentials
 
@@ -615,7 +648,18 @@ def _archive_id() -> str:
         raise RuntimeError("DLR_ARCHIVE_ID must be a valid UUID") from exc
 
 
-def _raw_transport(access_token: str) -> SupabasePostgrestTransport:
+def _native_auth_enabled() -> bool:
+    return os.environ.get("DLR_NATIVE_AUTH_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _native_postgres_enabled() -> bool:
+    return os.environ.get("DLR_NATIVE_POSTGRES_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _raw_transport(access_token: str):
+    if _native_postgres_enabled():
+        user = NativeAuthService.from_environment().verify_access_token(access_token)
+        return PostgresTransport(user_id=str(user["id"]))
     return SupabasePostgrestTransport(
         base_url=_required_env("SUPABASE_URL"),
         publishable_key=_required_env("SUPABASE_PUBLISHABLE_KEY"),
@@ -623,7 +667,9 @@ def _raw_transport(access_token: str) -> SupabasePostgrestTransport:
     )
 
 
-def _anon_transport() -> SupabasePostgrestTransport:
+def _anon_transport():
+    if _native_postgres_enabled():
+        return PostgresTransport()
     key = _required_env("SUPABASE_PUBLISHABLE_KEY")
     return SupabasePostgrestTransport(
         base_url=_required_env("SUPABASE_URL"),
@@ -639,6 +685,20 @@ def _admin_user_account_action(
     action: str,
     password: str | None = None,
 ) -> dict[str, object]:
+    if _native_auth_enabled() and _native_postgres_enabled():
+        try:
+            NativeAuthService.from_environment().admin_user_account_action(
+                access_token, _archive_id(), user_id, action, password,
+            )
+        except PermissionError as exc:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required") from exc
+        except LookupError as exc:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+        except (NativeAuthError, PostgresRuntimeError) as exc:
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Native account service unavailable") from exc
+        return {"success": True, "action": action}
     endpoint = (
         _required_env("SUPABASE_URL").rstrip("/")
         + "/functions/v1/dlr-admin-user-account"
@@ -685,6 +745,18 @@ def _complete_approved_account(
     password: str,
     approval_token: str,
 ) -> None:
+    if _native_auth_enabled() and _native_postgres_enabled():
+        try:
+            NativeAuthService.from_environment().complete_approved_account(
+                email, password, approval_token,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="Invalid or expired approval") from exc
+        except (NativeAuthError, PostgresRuntimeError) as exc:
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                                detail="Native account activation service unavailable") from exc
+        return
     endpoint = (
         _required_env("SUPABASE_URL").rstrip("/")
         + "/functions/v1/dlr-complete-approved-account"
@@ -740,6 +812,19 @@ def _archive_membership(
     *,
     roles: set[ArchiveRole] | None = None,
 ) -> ArchiveMembership:
+    if _native_auth_enabled() and _native_postgres_enabled():
+        try:
+            user = NativeAuthService.from_environment().verify_access_token(access_token)
+            return SupabaseArchiveAccess(
+                transport=PostgresTransport(user_id=str(user["id"])),
+                archive_id=_archive_id(),
+            ).require(str(user["id"]), roles=roles)
+        except PermissionError as exc:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="This account is not authorized for the archive") from exc
+        except (NativeAuthError, PostgresRuntimeError, ValueError) as exc:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Invalid or expired archive session") from exc
     try:
         user_id = SupabaseUserSession.from_environment(
             access_token=access_token,
@@ -766,6 +851,12 @@ def _transport(
     roles: set[ArchiveRole] | None = None,
 ) -> ArchiveScopedSupabaseTransport:
     _archive_membership(access_token, roles=roles)
+    if _native_postgres_enabled():
+        user = NativeAuthService.from_environment().verify_access_token(access_token)
+        return ArchiveScopedPostgresTransport(
+            transport=PostgresTransport(user_id=str(user["id"])),
+            archive_id=_archive_id(),
+        )
     return ArchiveScopedSupabaseTransport(
         transport=_raw_transport(access_token),
         archive_id=_archive_id(),
@@ -1141,7 +1232,10 @@ def _audit_admin_action(
     detail: dict[str, object] | None = None,
 ) -> None:
     try:
-        actor = SupabaseUserSession.from_environment(access_token=access_token).user_id()
+        if _native_auth_enabled() and _native_postgres_enabled():
+            actor = str(NativeAuthService.from_environment().verify_access_token(access_token)["id"])
+        else:
+            actor = SupabaseUserSession.from_environment(access_token=access_token).user_id()
         _transport(access_token, roles={ArchiveRole.ADMIN}).insert(
             "admin_audit_log",
             {
@@ -1411,7 +1505,8 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         docs_url="/api/docs",
         redoc_url=None,
     )
-    register_local_supabase_routes(app)
+    if not (_native_auth_enabled() and _native_postgres_enabled()):
+        register_local_supabase_routes(app)
 
     @app.get("/", include_in_schema=False)
     def home() -> FileResponse:
@@ -1465,10 +1560,16 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                 detail="integration_scope_not_verified",
             )
         try:
-            session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
-                email=service_email,
-                password=service_password,
-            )
+            if _native_auth_enabled() and _native_postgres_enabled():
+                session = NativeAuthService.from_environment().sign_in(
+                    email=service_email, password=service_password,
+                    user_agent="VidyaDesk service integration",
+                )
+            else:
+                session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
+                    email=service_email,
+                    password=service_password,
+                )
             membership = _archive_membership(
                 session.access_token,
                 roles={ArchiveRole.VIEWER},
@@ -1521,6 +1622,14 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         response_model=AuthProvidersResponse,
     )
     def auth_providers() -> AuthProvidersResponse:
+        if _native_auth_enabled() and _native_postgres_enabled():
+            configured = all(os.environ.get(key, "").strip() for key in (
+                "DLR_GOOGLE_WEB_CLIENT_ID", "DLR_GOOGLE_WEB_CLIENT_SECRET", "DLR_GOOGLE_WEB_REDIRECT_URI"
+            ))
+            return AuthProvidersResponse(
+                google=configured, password=True, magic_link=False,
+                registration_mode="invite_only",
+            )
         try:
             google = SupabasePasswordlessAuth.from_environment().provider_enabled(
                 "google"
@@ -1531,6 +1640,24 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
 
     @app.get("/auth/google", include_in_schema=False)
     def google_sign_in() -> Response:
+        if _native_auth_enabled() and _native_postgres_enabled():
+            client_id = os.environ.get("DLR_GOOGLE_WEB_CLIENT_ID", "").strip()
+            client_secret = os.environ.get("DLR_GOOGLE_WEB_CLIENT_SECRET", "").strip()
+            redirect_uri = os.environ.get("DLR_GOOGLE_WEB_REDIRECT_URI", "").strip()
+            if not all((client_id, client_secret, redirect_uri)):
+                raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                                    detail="Google OAuth is not configured for the native application")
+            service = NativeAuthService.from_environment()
+            authorize_url, signed_state, verifier = start_google_oauth(
+                client_id=client_id, redirect_uri=redirect_uri, jwt_secret=service.jwt_secret,
+            )
+            response = RedirectResponse(authorize_url, status_code=status.HTTP_302_FOUND)
+            secure_cookie = _truthy_env("AUTH_COOKIE_SECURE")
+            response.set_cookie("dlr_google_state", signed_state, max_age=600, httponly=True,
+                                secure=secure_cookie, samesite="lax", path="/auth/google/callback")
+            response.set_cookie("dlr_google_verifier", verifier, max_age=600, httponly=True,
+                                secure=secure_cookie, samesite="lax", path="/auth/google/callback")
+            return response
         redirect_to = _required_env("AUTH_REDIRECT_URL")
         auth = SupabasePasswordlessAuth.from_environment()
         try:
@@ -1557,6 +1684,42 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             },
         )
 
+    @app.get("/auth/google/callback", include_in_schema=False)
+    def google_callback(request: Request, code: str | None = None,
+                        state: str | None = None, error: str | None = None) -> Response:
+        if not (_native_auth_enabled() and _native_postgres_enabled()):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+        if error:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Google sign-in was cancelled")
+        client_id = os.environ.get("DLR_GOOGLE_WEB_CLIENT_ID", "").strip()
+        client_secret = os.environ.get("DLR_GOOGLE_WEB_CLIENT_SECRET", "").strip()
+        redirect_uri = os.environ.get("DLR_GOOGLE_WEB_REDIRECT_URI", "").strip()
+        signed_state = request.cookies.get("dlr_google_state", "")
+        verifier = request.cookies.get("dlr_google_verifier", "")
+        if not all((code, state, signed_state, verifier, client_id, client_secret, redirect_uri)):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Google sign-in state is missing")
+        service = NativeAuthService.from_environment()
+        try:
+            claims = complete_google_oauth(
+                code=code, returned_state=state, signed_state=signed_state,
+                code_verifier=verifier, client_id=client_id,
+                client_secret=client_secret, redirect_uri=redirect_uri,
+                jwt_secret=service.jwt_secret,
+            )
+            session = service.sign_in_google(
+                str(claims["email"]), str(claims["sub"]),
+                user_agent=request.headers.get("user-agent"),
+                ip_address=request.client.host if request.client else None,
+            )
+        except (GoogleOAuthError, NativeAuthError, ValueError) as exc:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Google identity could not be linked to an active archive account") from exc
+        response = RedirectResponse(_configured_app_origin() + "/", status_code=status.HTTP_303_SEE_OTHER)
+        _set_session_cookies(response, session)
+        response.delete_cookie("dlr_google_state", path="/auth/google/callback")
+        response.delete_cookie("dlr_google_verifier", path="/auth/google/callback")
+        return response
+
     @app.post(
         "/api/v1/auth/password/change",
         response_model=MessageResponse,
@@ -1568,11 +1731,15 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     ) -> MessageResponse:
         _archive_membership(access_token)
         try:
-            SupabasePasswordlessAuth.from_environment().update_password(
-                access_token=access_token,
-                password=payload.password,
-            )
-        except (SupabaseAuthError, ValueError) as exc:
+            if _native_auth_enabled() and _native_postgres_enabled():
+                user = NativeAuthService.from_environment().verify_access_token(access_token)
+                NativeAuthService.from_environment().change_password(str(user["id"]), payload.password)
+            else:
+                SupabasePasswordlessAuth.from_environment().update_password(
+                    access_token=access_token,
+                    password=payload.password,
+                )
+        except (NativeAuthError, SupabaseAuthError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Password could not be updated",
@@ -1597,7 +1764,7 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
                     "target_email": payload.email.strip().lower(),
                 },
             )
-        except (SupabaseRuntimeError, ValueError) as exc:
+        except (PostgresRuntimeError, SupabaseRuntimeError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Account access request could not be submitted",
@@ -1629,12 +1796,18 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
             approval_token=payload.approval_token,
         )
         try:
-            session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
-                email=payload.email,
-                password=payload.password,
-            )
+            if _native_auth_enabled() and _native_postgres_enabled():
+                session = NativeAuthService.from_environment().sign_in(
+                    email=payload.email, password=payload.password,
+                    user_agent="DLR account activation",
+                )
+            else:
+                session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
+                    email=payload.email,
+                    password=payload.password,
+                )
             membership = _archive_membership(session.access_token)
-        except (SupabaseAuthError, SupabaseSessionError, ValueError) as exc:
+        except (NativeAuthError, PostgresRuntimeError, SupabaseAuthError, SupabaseSessionError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail="Account activated but sign-in could not be completed",
@@ -1661,6 +1834,23 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         payload: RegistrationRequest,
         _: None = Depends(_require_same_origin),
     ) -> Response:
+        if _native_auth_enabled() and _native_postgres_enabled():
+            try:
+                session = NativeAuthService.from_environment().register_with_invite(
+                    payload.email, payload.password, payload.invite_code,
+                )
+                membership = _archive_membership(session.access_token)
+            except ValueError as exc:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                    detail="Registration invitation is invalid or already used") from exc
+            except (NativeAuthError, PostgresRuntimeError) as exc:
+                raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                                    detail="Native registration service is unavailable") from exc
+            body = RegistrationResponse(authenticated=True, confirmation_required=False,
+                                        role=membership.role.value, message="DLR account created and signed in.")
+            response = Response(content=body.model_dump_json(), media_type="application/json")
+            _set_session_cookies(response, session)
+            return response
         auth = SupabasePasswordlessAuth.from_environment()
         try:
             valid = auth.validate_archive_invite(
@@ -1724,6 +1914,9 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         payload: RegistrationMagicLinkRequest,
         _: None = Depends(_require_same_origin),
     ) -> MessageResponse:
+        if _native_auth_enabled() and _native_postgres_enabled():
+            raise HTTPException(status_code=status.HTTP_410_GONE,
+                                detail="Email-link registration is not enabled in native mode")
         auth = SupabasePasswordlessAuth.from_environment()
         try:
             valid = auth.validate_archive_invite(
@@ -1768,13 +1961,28 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
     )
     def password_sign_in(
         payload: PasswordLoginRequest,
+        request: Request,
         _: None = Depends(_require_same_origin),
     ) -> Response:
         try:
-            session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
-                email=payload.email,
-                password=payload.password,
-            )
+            if _native_auth_enabled() and _native_postgres_enabled():
+                session = NativeAuthService.from_environment().sign_in(
+                    email=payload.email,
+                    password=payload.password,
+                    user_agent=request.headers.get("user-agent"),
+                    ip_address=request.client.host if request.client else None,
+                )
+            else:
+                session = SupabasePasswordlessAuth.from_environment().sign_in_with_password(
+                    email=payload.email,
+                    password=payload.password,
+                )
+        except NativeAuthError as exc:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Email or password is invalid") from exc
+        except PostgresRuntimeError as exc:
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                                detail="Native sign-in service is temporarily unavailable") from exc
         except SupabaseAuthUnavailable as exc:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -1817,6 +2025,9 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         payload: MagicLinkRequest,
         _: None = Depends(_require_same_origin),
     ) -> MessageResponse:
+        if _native_auth_enabled() and _native_postgres_enabled():
+            raise HTTPException(status_code=status.HTTP_410_GONE,
+                                detail="Email-link sign-in is not enabled in native mode")
         redirect_to = _required_env("AUTH_REDIRECT_URL")
         auth = SupabasePasswordlessAuth.from_environment()
         try:
@@ -1840,6 +2051,9 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         token_hash: str | None = None,
         type: str = "email",
     ) -> Response:
+        if _native_auth_enabled() and _native_postgres_enabled():
+            raise HTTPException(status_code=status.HTTP_410_GONE,
+                                detail="Hosted email-link authentication is disabled")
         if not token_hash:
             return FileResponse(
                 Path(__file__).with_name("web") / "auth-confirm.html",
@@ -1880,6 +2094,9 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         payload: FragmentSessionRequest,
         _: None = Depends(_require_same_origin),
     ) -> Response:
+        if _native_auth_enabled() and _native_postgres_enabled():
+            raise HTTPException(status_code=status.HTTP_410_GONE,
+                                detail="Hosted identity callbacks are disabled")
         try:
             user_id = SupabaseUserSession.from_environment(
                 access_token=payload.access_token,
@@ -2012,10 +2229,13 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
         try:
             role = ArchiveRole(payload.role)
             if payload.status == "active":
-                SupabasePasswordlessAuth.from_environment().confirm_account_as_admin(
-                    access_token=access_token,
-                    target_user_id=user_id,
-                )
+                if _native_auth_enabled() and _native_postgres_enabled():
+                    NativeAuthService.from_environment().confirm_user(user_id)
+                else:
+                    SupabasePasswordlessAuth.from_environment().confirm_account_as_admin(
+                        access_token=access_token,
+                        target_user_id=user_id,
+                    )
             result = SupabaseArchiveAccountAdmin(
                 transport=_raw_transport(access_token),
                 archive_id=_archive_id(),
@@ -3908,8 +4128,21 @@ def create_app(dependencies: ApiDependencies | None = None) -> FastAPI:
 
     @app.post("/api/v1/auth/logout", response_model=MessageResponse)
     def logout(
+        request: Request,
         _: None = Depends(_require_same_origin),
     ) -> Response:
+        if _native_auth_enabled() and _native_postgres_enabled():
+            service = NativeAuthService.from_environment()
+            access = request.cookies.get(_ACCESS_COOKIE, "").strip()
+            refresh = request.cookies.get(_REFRESH_COOKIE, "").strip()
+            if access:
+                try:
+                    service.sign_out(access)
+                except NativeAuthError:
+                    if refresh:
+                        service.sign_out_refresh(refresh)
+            elif refresh:
+                service.sign_out_refresh(refresh)
         response = Response(
             content='{"message":"Signed out"}',
             media_type="application/json",
