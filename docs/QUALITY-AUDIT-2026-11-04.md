@@ -54,7 +54,7 @@ The 23 review-queue count is the union of unresolved quality flags, not the sum 
 ## Failed jobs requiring action
 
 1. One legacy image record failed with `unsupported storage provider: local`. Resolve its original-file storage reference before retrying; this is a storage compatibility issue, not OCR.
-2. The 2025-26 UDISE guidance PDF had two failed attempts under the former timeout/bridge stop. A new retry is currently processing with the 3,600-second OCR timeout and 3,900-second systemd/bridge ceiling.
+2. The 2025-26 UDISE guidance PDF has three failed OCR attempts. The latest 40-minute run reached the OCR hard timeout. The OCR, systemd and bridge ceilings have now been raised to 3,600/3,900 seconds respectively. A fresh retry has not yet been queued after this change; do not treat the document as processed.
 
 ## Current reprocessing
 
@@ -69,7 +69,8 @@ The Admin → Operations → Quality review API now includes documents with unre
 
 - Master Circular OCR: completed; all 51 pages represented; 76,964 Devanagari characters detected.
 - Master Circular delivery: held for human review; OCR output is present, but AI-derived effective date and summary details are not yet verified page by page.
-- Current queue at 18:15 UTC: zero pending jobs and one processing job (the UDISE OCR retry); no stale processing jobs.
+- Latest queue audit (2026-11-05 02:34 UTC): zero pending/processing jobs and zero stale processing jobs. The UDISE guidance document's latest retry is failed with `OCRmyPDF timed out`; it needs one new retry under the updated 60-minute OCR ceiling.
 - The one-minute legacy timer had been disabled during the event-driven migration. The WhatsApp webhook chain invoked the worker only for WhatsApp events, leaving manually queued reprocess and ordinary upload jobs without a wake-up trigger. The fallback timer is now enabled with `OnUnitInactiveSec=1min`, so it runs one minute after each worker exit. It does not poll WhatsApp intake. The webhook and fallback share the same flock-protected worker wrapper.
+- The UDISE guidance retry exceeded the previous 2,400-second OCR limit. The OCR default is now 3,600 seconds; the systemd and private bridge limits are 3,900 seconds. The 433 DLR tests and 66 n8n operations tests pass with these limits. A fresh UDISE retry is still required.
 - Full DLR test run: **433 tests passed**. The two stale web-shell assertions were corrected to test the current original-document streaming endpoint and current session refresh flow.
 - n8n Operations test run: **66 tests passed** after updating the bridge timeout assertion to 3,900 seconds.
