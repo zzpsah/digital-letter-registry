@@ -6,8 +6,8 @@ Generated automatically by Development OS.
 
 ## Repository
 - Branch: main
-- HEAD: 8510b2d4c0b768555dec22bfe85cfa3d9caf1b03
-- Last commit: Distinguish auth network outages from invalid credentials
+- HEAD: 247a330acd198371f27f7e93fbfe6409eea6602e
+- Last commit: Pin Funnel auth transport to TLS 1.2
 - Last commit date: 2026-11-05
 - Last commit author: development-os[bot]
 

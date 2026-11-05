@@ -1,3 +1,10 @@
+## 2026-11-05 — Pin Funnel auth transport to TLS 1.2
+- Commit: 247a330acd198371f27f7e93fbfe6409eea6602e
+- Author: development-os[bot]
+- Classification: meaningful
+- Changed files:
+- `src/letter_registry/http_client.py`
+
 ## 2026-11-05 — Distinguish auth network outages from invalid credentials
 - Commit: 8510b2d4c0b768555dec22bfe85cfa3d9caf1b03
 - Author: development-os[bot]
