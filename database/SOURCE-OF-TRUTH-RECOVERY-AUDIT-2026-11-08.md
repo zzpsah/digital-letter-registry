@@ -81,3 +81,18 @@ A complete read-only integrity pass downloaded all 144 original files referenced
 ## Regression suite checkpoint — 2026-11-08
 
 After the recovery/source-of-truth changes, the full DLR test suite was rerun on the Oracle working tree with the repository root on `PYTHONPATH`: **453 passed, 9 subtests passed, one Starlette/httpx deprecation warning**, in 44.61 seconds. No test failures. The deprecation warning is non-blocking and should be addressed in a separate dependency-maintenance change.
+
+
+## Authentication and backup-scheduler checkpoint — 2026-11-08
+
+The running API was checked read-only after the regression run:
+
+- `GET /api/v1/health`: HTTP 200, `{"status":"ok"}`.
+- `GET /app`: HTTP 200; the served application contains the password sign-in form and archive search UI.
+- `GET /api/v1/auth/providers`: password sign-in enabled, Google sign-in disabled, magic link disabled, registration is invite-only.
+- Without an authenticated session, `GET /api/v1/auth/session`, `GET /api/v1/readiness`, and `GET /api/v1/search` correctly return HTTP 401. This is expected access control, not proof of a successful user login.
+- Authenticated browser sign-in, search, original view and download remain unverified. The connected browser context was unavailable for this run, and no credentials or synthetic session were used. A real authorized user session is still required to complete this gate.
+
+The user-level systemd timers `dlr-postgres-backup.timer` and `dlr-postgres-offsite-backup.timer` are both enabled and active (waiting). Their next scheduled runs were reported for 2026-11-08 02:31:54 UTC and 03:02:40 UTC respectively. The prior local and off-site snapshots have already passed disposable restore verification. Timer activation confirms scheduling only; the next backup execution and its resulting artifact still need post-run verification.
+
+The full test suite was rerun on 2026-11-08: **453 passed, 9 subtests passed, one non-blocking Starlette/httpx deprecation warning, 47.48 seconds**. No production migration, database mutation, restore, deployment or secret access was performed during this checkpoint.
