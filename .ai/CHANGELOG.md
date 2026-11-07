@@ -1,3 +1,10 @@
+## 2026-11-08 — docs: pin verified DLR source-of-truth in project handoff
+- Commit: d99b6ce82d4dcc853d51f1a22d927ce150bce247
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `docs/PROJECT-HANDOFF.md`
+
 ## 2026-11-08 — docs: verify post-snapshot DLR originals and metadata
 - Commit: 5060b1a43a350355fcb44d30486ee6ca74eb91c9
 - Author: PRASHANT KUMAR SAH
