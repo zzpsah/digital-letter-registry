@@ -63,3 +63,11 @@ An initial row-level query omitted the configured archive-member identity in its
 ## Verification boundary
 
 This audit records read-only production inspection and disposable backup-restore rehearsals. It does not claim authenticated browser login, document-view/download E2E, full original-byte checksum validation, migration application or Supabase retirement. No production data was changed during these checks.
+
+## Post-snapshot delta reconciliation — 2026-11-08
+
+The three letters created after the 2026-11-07 off-site snapshot were inspected read-only. All three have the expected archive ID and owner ID, use Google Drive storage, have a non-empty object reference and stored original SHA-256. Their three source records and three completed processing jobs reference the corresponding letter IDs. Four post-snapshot jobs were identified in total; one is a completed job for an older letter. Two post-snapshot relationships also reference existing archive letters. No orphan relationship/source/job was observed in this focused linkage check.
+
+Most importantly, the original bytes for all three post-snapshot letters were downloaded read-only from private Drive and SHA-256 compared against each database `original_sha256`. **All three matched.** The exact document content, names and Drive object IDs are intentionally excluded from Git.
+
+This validates the post-snapshot originals and their stored hashes; it does not yet certify every older original byte-for-byte or complete authenticated browser/API view/download flows.
