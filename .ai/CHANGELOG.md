@@ -1,3 +1,10 @@
+## 2026-11-08 — docs: add DLR source-of-truth and recovery audit
+- Commit: 0867fd8760244428e41bd4e65461176bbc658aab
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `database/SOURCE-OF-TRUTH-RECOVERY-AUDIT-2026-11-08.md`
+
 ## 2026-11-08 — docs: record verified DLR source of truth and recovery state
 - Commit: a7bd0e6cf682cf1dae7e2db07a6914ab56641f46
 - Author: PRASHANT KUMAR SAH
