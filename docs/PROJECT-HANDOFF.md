@@ -469,3 +469,12 @@ The current DLR source-of-truth decision and recovery evidence are recorded in [
 Full original-byte integrity was subsequently verified: all 144 Drive files were downloaded read-only and their SHA-256 hashes matched the live database (359,781,661 bytes total).
 
 Public Git documentation intentionally excludes document text, personal identifiers, exact Drive object IDs, credentials and private session/group details. Re-check the linked audit before future recovery or migration work; do not repeat discovery from scratch.
+
+
+### 2026-11-08 follow-up checkpoint
+
+- Latest full test run: 453 passed, 9 subtests passed, one non-blocking Starlette/httpx deprecation warning.
+- Runtime health and app shell return HTTP 200. Password login is enabled; Google and magic-link sign-in are disabled; registration remains invite-only.
+- Unauthenticated session, readiness and search endpoints return HTTP 401 as expected. Real authenticated login + search + original view/download E2E is still a release gate; no synthetic session or credentials were used.
+- Both daily user-level backup timers are enabled and active: local PostgreSQL backup and encrypted off-site backup. Next scheduled runs are 2026-11-08 02:31:54 UTC and 03:02:40 UTC. Verify resulting artifacts after those runs.
+- Detailed evidence is in [the recovery audit](../database/SOURCE-OF-TRUTH-RECOVERY-AUDIT-2026-11-08.md). No migration, production DB mutation, restore or deployment was performed.
