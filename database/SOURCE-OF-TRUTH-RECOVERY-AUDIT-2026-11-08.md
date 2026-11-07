@@ -71,3 +71,9 @@ The three letters created after the 2026-11-07 off-site snapshot were inspected 
 Most importantly, the original bytes for all three post-snapshot letters were downloaded read-only from private Drive and SHA-256 compared against each database `original_sha256`. **All three matched.** The exact document content, names and Drive object IDs are intentionally excluded from Git.
 
 This validates the post-snapshot originals and their stored hashes; it does not yet certify every older original byte-for-byte or complete authenticated browser/API view/download flows.
+
+## Full original-byte integrity verification — 2026-11-08
+
+A complete read-only integrity pass downloaded all 144 original files referenced by the live database (approximately 359,781,661 bytes total) from the configured private Drive archive and computed SHA-256 for each file. Each digest was compared with its corresponding `letters.original_sha256` value.
+
+**Result: 144/144 SHA-256 matches; zero download errors; zero mismatches.** This confirms the original-file bytes currently in Drive match the hashes recorded in the live PostgreSQL catalogue. No originals were modified, renamed or deleted.
