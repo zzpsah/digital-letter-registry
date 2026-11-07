@@ -328,4 +328,6 @@ A fixed-scope read-only endpoint is implemented at GET /api/v1/integrations/vidy
 - Local and private off-site 2026-11-07 encrypted backups both passed SHA-256/decryption and disposable PostgreSQL restore checks. Each contains 141 letters, 145 sources and 187 jobs. The live database is newer by 3 letters, 3 sources, 4 jobs and 2 relationships; never restore those snapshots over production without reconciling that delta.
 - Use the database-specific off-site pointer and canonical registry-driven restore script. The legacy global `LATEST.txt` pointer may refer to another project.
 
+Full original-byte integrity was subsequently verified: all 144 Drive files were downloaded read-only and their SHA-256 hashes matched the live database (359,781,661 bytes total).
+
 Detailed evidence and recovery procedure: [2026-11-08 source-of-truth and recovery audit](database/SOURCE-OF-TRUTH-RECOVERY-AUDIT-2026-11-08.md).
