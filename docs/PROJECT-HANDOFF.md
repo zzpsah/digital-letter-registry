@@ -466,4 +466,6 @@ The current DLR source-of-truth decision and recovery evidence are recorded in [
 - All 144 Drive object references were accessible and not trashed in metadata checks. The three post-snapshot original files were downloaded and SHA-256 matched against their database hashes.
 - Do not apply the prepared auth-detachment migration or declare Supabase retirement complete until authenticated login, search, original view/download and remaining dependency checks pass.
 
+Full original-byte integrity was subsequently verified: all 144 Drive files were downloaded read-only and their SHA-256 hashes matched the live database (359,781,661 bytes total).
+
 Public Git documentation intentionally excludes document text, personal identifiers, exact Drive object IDs, credentials and private session/group details. Re-check the linked audit before future recovery or migration work; do not repeat discovery from scratch.
