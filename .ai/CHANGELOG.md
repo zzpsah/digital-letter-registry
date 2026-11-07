@@ -1,3 +1,10 @@
+## 2026-11-08 — docs: verify post-snapshot DLR originals and metadata
+- Commit: 5060b1a43a350355fcb44d30486ee6ca74eb91c9
+- Author: PRASHANT KUMAR SAH
+- Classification: meaningful
+- Changed files:
+- `database/SOURCE-OF-TRUTH-RECOVERY-AUDIT-2026-11-08.md`
+
 ## 2026-11-08 — docs: add DLR source-of-truth and recovery audit
 - Commit: 0867fd8760244428e41bd4e65461176bbc658aab
 - Author: PRASHANT KUMAR SAH
