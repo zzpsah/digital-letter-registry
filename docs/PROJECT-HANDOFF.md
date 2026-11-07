@@ -452,3 +452,18 @@ The incident record is [GOOGLE_DRIVE_OAUTH_INCIDENT_2026-10-10.md](GOOGLE_DRIVE_
 ## Verified information-flow and deployment inventory — 2026-10-10
 
 Before planning infrastructure migration, replication or backups, consult [INFORMATION-FLOW-AND-DEPLOYMENT.md](INFORMATION-FLOW-AND-DEPLOYMENT.md). It records the source-grounded Mermaid data-flow diagram, Vercel routes, observed Oracle port mappings and exposure classes, service boundaries, known current-search limitations, and unresolved listener ownerships. It is an inventory only; no migration, backup or production change was made. Keep the public Vercel control plane, private Drive OAuth, Supabase authorization and Oracle worker as separate trust boundaries.
+
+
+## 2026-11-08 authoritative source-of-truth and recovery checkpoint
+
+The current DLR source-of-truth decision and recovery evidence are recorded in [SOURCE-OF-TRUTH-RECOVERY-AUDIT-2026-11-08.md](../database/SOURCE-OF-TRUTH-RECOVERY-AUDIT-2026-11-08.md). This checkpoint supersedes older architecture notes that describe hosted Supabase as the active archive database:
+
+- Oracle PostgreSQL `dlr_primary` is authoritative for structured letters, archive membership, provenance, processing/jobs, relationships and search metadata.
+- The configured private Google Drive archive is authoritative for immutable original PDF/image bytes.
+- Hosted Supabase is historical/divergent, not a verified current replica and must not be promoted over Oracle.
+- Live verified counts: 144 letters, 148 source rows, 144 processing rows, 191 jobs, 41 relationships, one archive, four memberships and four native users. Public index count is 136.
+- Local and database-specific off-site encrypted backups from 2026-11-07 both passed disposable restore tests (141 letters each). The live primary is newer by three letters, three sources, four jobs and two relationships; never restore the older snapshot over production without delta reconciliation.
+- All 144 Drive object references were accessible and not trashed in metadata checks. The three post-snapshot original files were downloaded and SHA-256 matched against their database hashes.
+- Do not apply the prepared auth-detachment migration or declare Supabase retirement complete until authenticated login, search, original view/download and remaining dependency checks pass.
+
+Public Git documentation intentionally excludes document text, personal identifiers, exact Drive object IDs, credentials and private session/group details. Re-check the linked audit before future recovery or migration work; do not repeat discovery from scratch.
