@@ -317,3 +317,15 @@ For cross-repository ownership, shared infrastructure dependencies, and safe AI 
 ## VidyaDesk aggregate integration
 
 A fixed-scope read-only endpoint is implemented at GET /api/v1/integrations/vidyadesk/summary. It returns only the count and latest-upload timestamp for public, non-archived letters in the explicitly configured UMV Tetahali archive. It requires a dedicated machine bearer token and a separate Supabase viewer identity with archive membership; it does not use the service-role key or expose letter-level data. It remains disabled until the service identity, archive-name check, server-side secrets and network path are approved. See docs/VIDYADESK-AGGREGATE-INTEGRATION.md.
+
+
+## Current production source of truth (verified 2026-11-08)
+
+- Oracle PostgreSQL `dlr_primary` is authoritative for structured letter records, archive membership, processing state, provenance and search metadata.
+- The configured private Google Drive archive stores the original PDF/image bytes. The database contains 144 Drive object references; all 144 were confirmed accessible and not trashed through read-only Drive metadata checks.
+- Hosted Supabase is a historical divergent copy, not the current authoritative DLR database or a verified replica. Do not promote it or use it to overwrite Oracle.
+- Current live aggregates: 144 letters, 148 source records, 144 processing rows, 191 jobs, 41 relationships, one archive, four memberships and four native users. The public index contains 136 eligible cards (public, not trashed/archived).
+- Local and private off-site 2026-11-07 encrypted backups both passed SHA-256/decryption and disposable PostgreSQL restore checks. Each contains 141 letters, 145 sources and 187 jobs. The live database is newer by 3 letters, 3 sources, 4 jobs and 2 relationships; never restore those snapshots over production without reconciling that delta.
+- Use the database-specific off-site pointer and canonical registry-driven restore script. The legacy global `LATEST.txt` pointer may refer to another project.
+
+Detailed evidence and recovery procedure: [2026-11-08 source-of-truth and recovery audit](database/SOURCE-OF-TRUTH-RECOVERY-AUDIT-2026-11-08.md).
