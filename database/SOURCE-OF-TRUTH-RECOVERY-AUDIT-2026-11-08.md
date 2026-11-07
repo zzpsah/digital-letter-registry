@@ -77,3 +77,7 @@ This validates the post-snapshot originals and their stored hashes; it does not 
 A complete read-only integrity pass downloaded all 144 original files referenced by the live database (approximately 359,781,661 bytes total) from the configured private Drive archive and computed SHA-256 for each file. Each digest was compared with its corresponding `letters.original_sha256` value.
 
 **Result: 144/144 SHA-256 matches; zero download errors; zero mismatches.** This confirms the original-file bytes currently in Drive match the hashes recorded in the live PostgreSQL catalogue. No originals were modified, renamed or deleted.
+
+## Regression suite checkpoint — 2026-11-08
+
+After the recovery/source-of-truth changes, the full DLR test suite was rerun on the Oracle working tree with the repository root on `PYTHONPATH`: **453 passed, 9 subtests passed, one Starlette/httpx deprecation warning**, in 44.61 seconds. No test failures. The deprecation warning is non-blocking and should be addressed in a separate dependency-maintenance change.
