@@ -1,3 +1,10 @@
+## 2026-11-08 — docs: record verified DLR source of truth and recovery state
+- Commit: a7bd0e6cf682cf1dae7e2db07a6914ab56641f46
+- Author: PRASHANT KUMAR SAH
+- Classification: routine
+- Changed files:
+- `README.md`
+
 ## 2026-11-05 — Merge remote-tracking branch 'origin/main'
 - Commit: f2b022392ac224719223d0b8a2550d8b38a7431b
 - Author: development-os[bot]
